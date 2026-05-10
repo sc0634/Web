@@ -80,10 +80,13 @@
             
             <div class="field"><label>Ödeme Sıklığı :</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda Bir</option><option value="2">6 Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="12">Ayda Bir</option></select></div>
             <div class="field"><label>Ödeme Planı :</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksitli</option><option value="esit_anapara">Anapara Eşit Taksitli</option></select></div>
+            
             <div class="field"><label>Aylık Faiz (%) :</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga(); resetButtons();"></div>
             <div class="field"><label>Yıllık Faiz (%) :</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga(); resetButtons();"></div>
+            
             <div class="field"><label>KKDF (%) :</label><input type="number" id="kkdfOran" value="0" readonly></div>
             <div class="field"><label>BSMV (%) :</label><input type="number" id="bsmvOran" value="5" readonly></div>
+            
             <div class="field" id="subContainer"><label>Sübvansiyon (%) :</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
 
@@ -149,13 +152,13 @@
         const label = document.getElementById('vadeLabel');
         select.innerHTML = '';
         if (currentType === 'ticari' || currentType === 'zirai') {
-            label.innerText = "Vade (Ay) :";
+            label.innerText = "Vade :";
             for (let i = 1; i <= 60; i++) {
                 let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Ay";
                 if (i === 60) opt.selected = true; select.appendChild(opt);
             }
         } else {
-            label.innerText = "Vade (Yıl) :";
+            label.innerText = "Vade :";
             for (let i = 1; i <= 5; i++) {
                 let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Yıl";
                 if (i === 5) opt.selected = true; select.appendChild(opt);
@@ -194,7 +197,8 @@
     }
 
     function hesapla() {
-        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const tutarStr = document.getElementById('tutar').value.replace(/\./g, "");
+        const tutar = parseFloat(tutarStr);
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeSecim').value);
