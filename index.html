@@ -20,20 +20,22 @@
         .tab-link span { font-size: 14px; margin-bottom: 3px; }
         .tab-link.active { background: var(--secondary); color: #fff; box-shadow: inset 0 -3px 0 #fff; }
 
-        /* --- Form Girişleri --- */
+        /* --- Form Girişleri (Yan Yana Sabitlendi) --- */
         .input-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; 
-            background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); /* Mobilde de 2 sütun kalması için sabitlendi */
+            gap: 10px; 
+            background: #f9f9f9; padding: 15px; border-radius: 0 0 8px 8px; 
             margin-bottom: 20px; border: 1px solid #ddd;
         }
         .field { display: flex; align-items: center; }
-        .field label { flex: 0 0 110px; font-size: 11.5px; font-weight: 600; color: #34495e; }
-        input, select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; outline: none; }
+        .field label { flex: 0 0 75px; font-size: 10px; font-weight: 600; color: #34495e; margin-right: 5px; } /* Label daraltıldı */
+        input, select { flex: 1; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; outline: none; min-width: 0; }
         input[readonly] { background-color: #f0f0f0; cursor: not-allowed; color: #7f8c8d; font-weight: bold; }
 
         /* --- Butonlar --- */
-        .btn-group { display: flex; gap: 10px; margin: 20px 0; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: #fff; transition: 0.2s; }
+        .btn-group { display: flex; gap: 8px; margin: 15px 0; }
+        button { flex: 1; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: #fff; transition: 0.2s; font-size: 12px; }
         .btn-calc { background: var(--success); }
         .btn-clear { background: var(--danger); }
         #btnPdf { background: var(--secondary); }
@@ -56,7 +58,6 @@
 
         @media print { .no-print { display: none !important; } .container { width: 100%; max-width: 100%; margin: 0; border: none; } }
         .pdf-printing .no-print { display: none !important; }
-        @media (max-width: 768px) { .input-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body onload="vadeYukle(); yilliktanAyliga();">
@@ -72,28 +73,28 @@
 
 <div class="container" id="pdf-area">
     <div id="calc-container" class="tab-content active">
-        <h1 id="baslikText" style="text-align:center; font-size: 18px; color: var(--primary); margin-bottom: 20px;">Zirai Traktör Kredisi Hesaplama</h1>
+        <h1 id="baslikText" style="text-align:center; font-size: 16px; color: var(--primary); margin-bottom: 15px;">Zirai Traktör Kredisi Hesaplama</h1>
         
         <div class="input-grid no-print">
-            <div class="field"><label>Tutar (₺) :</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
-            <div class="field"><label id="vadeLabel">Vade :</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
+            <div class="field"><label>Tutar (₺):</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
+            <div class="field"><label id="vadeLabel">Vade:</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
             
-            <div class="field"><label>Ödeme Sıklığı :</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda Bir</option><option value="2">6 Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="12">Ayda Bir</option></select></div>
-            <div class="field"><label>Ödeme Planı :</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksitli</option><option value="esit_anapara">Anapara Eşit Taksitli</option></select></div>
+            <div class="field"><label>Sıklık:</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option></select></div>
+            <div class="field"><label>Plan:</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksit</option><option value="esit_anapara">Eşit Anapara</option></select></div>
             
-            <div class="field"><label>Aylık Faiz (%) :</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga(); resetButtons();"></div>
-            <div class="field"><label>Yıllık Faiz (%) :</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga(); resetButtons();"></div>
+            <div class="field"><label>Aylık %:</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga(); resetButtons();"></div>
+            <div class="field"><label>Yıllık %:</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga(); resetButtons();"></div>
             
-            <div class="field"><label>KKDF (%) :</label><input type="number" id="kkdfOran" value="0" readonly></div>
-            <div class="field"><label>BSMV (%) :</label><input type="number" id="bsmvOran" value="5" readonly></div>
+            <div class="field"><label>KKDF %:</label><input type="number" id="kkdfOran" value="0" readonly></div>
+            <div class="field"><label>BSMV %:</label><input type="number" id="bsmvOran" value="5" readonly></div>
             
-            <div class="field" id="subContainer"><label>Sübvansiyon (%) :</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
+            <div class="field" id="subContainer"><label>Süb. %:</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
 
         <div class="btn-group no-print">
             <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
             <button class="btn-clear" onclick="location.reload()">SIFIRLA</button>
-            <button id="btnPdf" onclick="indirPDF()" disabled>PDF KAYDET</button>
+            <button id="btnPdf" onclick="indirPDF()" disabled>PDF</button>
             <button id="btnYazdir" onclick="window.print()" disabled>YAZDIR</button>
         </div>
 
@@ -108,7 +109,7 @@
                             <th>Faiz Tutarı</th>
                             <th>BSMV</th>
                             <th>KKDF</th>
-                            <th id="thSub">Sübvansiyonlu Taksit</th>
+                            <th id="thSub">Sübvansiyonlu</th>
                             <th>Kalan Anapara</th>
                         </tr>
                     </thead>
@@ -152,13 +153,13 @@
         const label = document.getElementById('vadeLabel');
         select.innerHTML = '';
         if (currentType === 'ticari' || currentType === 'zirai') {
-            label.innerText = "Vade :";
+            label.innerText = "Vade:";
             for (let i = 1; i <= 60; i++) {
                 let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Ay";
                 if (i === 60) opt.selected = true; select.appendChild(opt);
             }
         } else {
-            label.innerText = "Vade :";
+            label.innerText = "Vade:";
             for (let i = 1; i <= 5; i++) {
                 let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Yıl";
                 if (i === 5) opt.selected = true; select.appendChild(opt);
