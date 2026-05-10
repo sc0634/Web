@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kredi Hesaplama - Traktör Özel</title>
+    <title>Kredi Hesaplama - Masraflar Dahil</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @page { size: A4 landscape; margin: 10mm; }
@@ -23,14 +23,17 @@
         button:hover { background: #000; color: #fff; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
-        th { background: #eee; color: #000; padding: 8px; border: 1px solid #000; text-align: center; }
+        th { background: #eee; color: #000; padding: 8px; border: 1px solid #000; text-align: center; font-size: 10px; }
         td { border: 1px solid #000; padding: 8px; text-align: center; background: #fff; }
-        tfoot td { font-weight: bold; background: #eee !important; border: 2px solid #000; }
-        .sub-highlight { font-weight: bold; background: #f9f9f9 !important; border: 1px solid #000; }
         
-        .detaylar-section { margin-top: 25px; padding: 15px; border-top: 2px solid #000; }
-        .detaylar-baslik { font-size: 16px; font-weight: bold; text-decoration: underline; margin-bottom: 8px; }
-        .detay-satir { font-size: 14px; margin-bottom: 4px; }
+        .taksit-font { font-size: 10px; }
+        tfoot td { font-weight: bold; background: #eee !important; border: 2px solid #000; }
+        .sub-highlight { font-weight: bold; background: #f0f0f0 !important; border: 1px solid #000; font-size: 10px; }
+        
+        /* Masraflar Bölümü */
+        .masraflar-section { margin-top: 25px; padding: 15px; border-top: 2px solid #000; }
+        .masraflar-baslik { font-size: 16px; font-weight: bold; text-decoration: underline; margin-bottom: 8px; text-transform: uppercase; }
+        .masraf-satir { font-size: 14px; margin-bottom: 4px; font-weight: 500; }
         
         @media print {
             .no-print { display: none !important; }
@@ -106,7 +109,7 @@
                     <th>Faiz</th>
                     <th>BSMV</th>
                     <th>KKDF</th>
-                    <th style="background: #ddd;">Sübv. Ödeme</th>
+                    <th style="background: #ddd;">Sübvansiyon Sonrası Taksit Tutarı</th>
                     <th>Kalan Anapara</th>
                 </tr>
             </thead>
@@ -114,11 +117,12 @@
             <tfoot id="planFoot"></tfoot>
         </table>
 
-        <div class="detaylar-section">
-            <div class="detaylar-baslik">Önemli Detaylar</div>
-            <div id="detay-kasko" class="detay-satir"></div>
-            <div id="detay-sigorta" class="detay-satir"></div>
-            <div id="detay-tesis" class="detay-satir"></div>
+        <div class="masraflar-section">
+            <div class="masraflar-baslik">MASRAFLAR</div>
+            <div id="masraf-tahsis" class="masraf-satir"></div>
+            <div id="masraf-kasko" class="masraf-satir"></div>
+            <div id="masraf-sigorta" class="masraf-satir"></div>
+            <div id="masraf-diger" class="masraf-satir"></div>
         </div>
     </div>
 </div>
@@ -133,8 +137,6 @@
         const tur = document.getElementById('krediTuru').value;
         const kkdfLabel = document.getElementById('kkdfGosterge');
         const bsmvLabel = document.getElementById('bsmvGosterge');
-        
-        // Traktör ve Ticari kredi için KKDF 0, BSMV 5 olarak ayarlandı
         if (tur === 'traktor' || tur === 'ticari') {
             kkdfLabel.innerText = "%0";
             bsmvLabel.innerText = "%5";
@@ -159,7 +161,6 @@
 
     function hesapla() {
         const tur = document.getElementById('krediTuru').value;
-        // Her iki türde de oranlar artık aynı
         let kkdf = 0;
         let bsmv = 0.05;
 
@@ -197,30 +198,32 @@
 
             tbody.innerHTML += `<tr>
                 <td>${j}</td>
-                <td>${taksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-                <td>${a.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-                <td>${f.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-                <td>${b.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-                <td>${k.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+                <td class="taksit-font">${taksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+                <td class="taksit-font">${a.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+                <td class="taksit-font">${f.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+                <td class="taksit-font">${b.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+                <td class="taksit-font">${k.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
                 <td class="sub-highlight">${subTaksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-                <td>${Math.abs(kalan).toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+                <td class="taksit-font">${Math.abs(kalan).toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
             </tr>`;
         }
 
         tfoot.innerHTML = `<tr>
             <td>TOPLAM</td>
-            <td>${tTaksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td>${tAnapara.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td>${tFaiz.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td>${tBsmv.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td>${tKkdf.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td style="background: #ddd;">${tSub.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td class="taksit-font">${tTaksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td class="taksit-font">${tAnapara.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td class="taksit-font">${tFaiz.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td class="taksit-font">${tBsmv.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td class="taksit-font">${tKkdf.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td style="background: #ddd;" class="taksit-font">${tSub.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
             <td>-</td>
         </tr>`;
 
-        document.getElementById('detay-kasko').innerText = "Kasko: ~ " + (P * 0.03).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
-        document.getElementById('detay-sigorta').innerText = "Hayat Sigortası: ~ " + (P * 0.02).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
-        document.getElementById('detay-tesis').innerText = "Tesis Masrafı: ~ " + (P * 0.04).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        // Masraflar Hesaplama (Tahmini Değerler)
+        document.getElementById('masraf-tahsis').innerText = "Limit Tahsis Ücreti: ~ " + (P * 0.005).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        document.getElementById('masraf-kasko').innerText = "Kasko: ~ " + (P * 0.03).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        document.getElementById('masraf-sigorta').innerText = "Hayat Sigortası: ~ " + (P * 0.02).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        document.getElementById('masraf-diger').innerText = "Diğer Masraflar: ~ " + (P * 0.01).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
     }
 
     function indirPDF() {
