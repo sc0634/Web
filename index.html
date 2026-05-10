@@ -27,7 +27,7 @@
             margin-bottom: 20px; border: 1px solid #ddd;
         }
         .field { display: flex; align-items: center; }
-        .field label { flex: 0 0 140px; font-size: 11.5px; font-weight: 600; color: #34495e; }
+        .field label { flex: 0 0 110px; font-size: 11.5px; font-weight: 600; color: #34495e; }
         input, select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; outline: none; }
         input[readonly] { background-color: #f0f0f0; cursor: not-allowed; color: #7f8c8d; font-weight: bold; }
 
@@ -75,8 +75,9 @@
         <h1 id="baslikText" style="text-align:center; font-size: 18px; color: var(--primary); margin-bottom: 20px;">Zirai Traktör Kredisi Hesaplama</h1>
         
         <div class="input-grid no-print">
-            <div class="field"><label>Kredi Tutarı (₺) :</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
-            <div class="field"><label id="vadeLabel">Vade (Yıl) :</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
+            <div class="field"><label>Tutar (₺) :</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
+            <div class="field"><label id="vadeLabel">Vade :</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
+            
             <div class="field"><label>Ödeme Sıklığı :</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda Bir</option><option value="2">6 Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="12">Ayda Bir</option></select></div>
             <div class="field"><label>Ödeme Planı :</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksitli</option><option value="esit_anapara">Anapara Eşit Taksitli</option></select></div>
             <div class="field"><label>Aylık Faiz (%) :</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga(); resetButtons();"></div>
@@ -118,10 +119,7 @@
 
     <div id="empty-container" class="tab-content">
         <h1 id="emptyBaslik" style="text-align:center; font-size: 18px; color: var(--primary); margin-bottom: 20px;">İçerik</h1>
-        <div class="info-card">
-            <div class="info-header" id="emptyHeader">BİLGİ</div>
-            <div class="info-content" id="emptyContent"></div>
-        </div>
+        <div class="info-card"><div class="info-header" id="emptyHeader">BİLGİ</div><div class="info-content" id="emptyContent"></div></div>
     </div>
 </div>
 
@@ -174,8 +172,7 @@
         if(tabName === 'hakkimda' || tabName === 'zirai_isletme') {
             document.getElementById('empty-container').classList.add('active');
             document.getElementById('emptyBaslik').innerText = (tabName === 'hakkimda') ? "Süleyman Coşkun" : "Zirai/İşletme Kredisi";
-            document.getElementById('emptyHeader').innerText = "BİLGİ";
-            document.getElementById('emptyContent').innerHTML = ""; // İçerik boş
+            document.getElementById('emptyContent').innerHTML = "";
         } else {
             document.getElementById('calc-container').classList.add('active');
             const titles = {'traktor':'Zirai Traktör Kredisi','ticari':'Ticari Kredi','zirai':'Çiftçi Tüketici Kredisi','tuketici':'Tüketici Kredisi'};
