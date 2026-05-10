@@ -15,13 +15,13 @@
         .tab-link { flex: 1; padding: 12px 5px; color: #ecf0f1; border: none; background: none; font-weight: bold; font-size: 11px; cursor: pointer; text-align: center; }
         .tab-link.active { background: var(--secondary); color: #fff; }
 
-        /* --- Form Yapısı --- */
+        /* --- Form Yapısı (Mobil Yan Yana) --- */
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #2c3e50; }
         input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; outline: none; }
         
-        /* Okunabilir (Readonly) Alanlar */
+        /* Readonly Alanlar */
         input[readonly] { background-color: #eeeeee; color: #7f8c8d; cursor: not-allowed; border: 1px dashed #bbb; }
 
         /* --- Butonlar --- */
@@ -34,13 +34,13 @@
 
         /* --- Tablo --- */
         .table-responsive { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 500px; }
+        table { width: 100%; border-collapse: collapse; font-size: 10px; min-width: 700px; }
         th { background: var(--primary); color: #fff; padding: 10px 5px; }
         td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; }
 
-        /* --- Yazdırma ve PDF Gizleme Kuralı --- */
+        /* --- Gizleme Kuralları --- */
         @media print {
-            .no-print, .tabs, .btn-group, .input-grid { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
+            .no-print, .tabs, .btn-group, .input-grid { display: none !important; }
             .container { border: none; padding: 0; }
         }
         .force-hide { display: none !important; }
@@ -51,6 +51,7 @@
             .field label { flex: 0 0 100px; margin-bottom: 0; }
             .btn-group { grid-template-columns: repeat(4, 1fr); }
             .btn-calc, #btnYazdir { grid-column: auto; }
+            table { font-size: 11px; }
         }
     </style>
 </head>
@@ -99,7 +100,8 @@
                             <th>Taksit Tutarı</th>
                             <th>Anapara</th>
                             <th>Faiz</th>
-                            <th>Vergi (B+K)</th>
+                            <th>BSMV</th>
+                            <th>KKDF</th>
                             <th id="thSub">Sübvansiyonlu</th>
                             <th>Kalan Anapara</th>
                         </tr>
@@ -178,7 +180,8 @@
     }
 
     function hesapla() {
-        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const tutarStr = document.getElementById('tutar').value.replace(/\./g, "");
+        const tutar = parseFloat(tutarStr);
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeSecim').value);
@@ -201,7 +204,7 @@
             t = a + f + b + k;
             let subT = t - ((f+b+k)*sub);
             kalan -= a;
-            body += `<tr><td>${j}</td><td>${Math.round(t).toLocaleString('tr-TR')}₺</td><td>${Math.round(a).toLocaleString('tr-TR')}₺</td><td>${Math.round(f).toLocaleString('tr-TR')}₺</td><td>${Math.round(b+k).toLocaleString('tr-TR')}₺</td><td style="${currentType === 'traktor' ? '' : 'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}₺</td></tr>`;
+            body += `<tr><td>${j}</td><td>${Math.round(t).toLocaleString('tr-TR')}₺</td><td>${Math.round(a).toLocaleString('tr-TR')}₺</td><td>${Math.round(f).toLocaleString('tr-TR')}₺</td><td>${Math.round(b).toLocaleString('tr-TR')}₺</td><td>${Math.round(k).toLocaleString('tr-TR')}₺</td><td style="${currentType === 'traktor' ? '' : 'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}₺</td></tr>`;
         }
         document.getElementById('planBody').innerHTML = body;
         document.getElementById('sonucAlani').style.display = 'block';
@@ -214,7 +217,6 @@
         const inputSec = document.getElementById('inputSection');
         const tabs = document.querySelector('.tabs');
         
-        // PDF oluşturulurken her şeyi zorla gizle
         btnGroup.classList.add('force-hide');
         inputSec.classList.add('force-hide');
         tabs.classList.add('force-hide');
@@ -222,7 +224,7 @@
         const opt = { 
             margin: 10, 
             filename: 'kredi_plani.pdf', 
-            html2canvas: { scale: 2, useCORS: true }, 
+            html2canvas: { scale: 2 }, 
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
         };
         
