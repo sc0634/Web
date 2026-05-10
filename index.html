@@ -40,8 +40,6 @@
         .masraf-toplam { margin-top: 8px; padding-top: 5px; border-top: 1px dashed #000; font-weight: bold; font-size: 13px; }
 
         .disclaimer { margin-top: 15px; font-size: 11px; color: #555; font-style: italic; border-left: 3px solid #000; padding-left: 10px; }
-        
-        /* İmza Bölümü: İngilizce ve %50 Küçük (6px) */
         .signature { display: none; text-align: right; font-size: 6px; font-style: italic; font-weight: bold; margin-top: 10px; color: #333; }
         
         @media print {
@@ -72,7 +70,7 @@
             </div>
             <div class="field">
                 <label>Kredi Tutarı (₺)</label>
-                <input type="number" id="tutar" value="2000000">
+                <input type="text" id="tutar" value="2.000.000" oninput="formatTutar(this)">
             </div>
             <div class="field">
                 <label>Vade (Yıl)</label>
@@ -158,6 +156,17 @@
         document.getElementById('tarihGosterge').innerText = "Tarih: " + new Date().toLocaleDateString('tr-TR');
     };
 
+    function formatTutar(input) {
+        let value = input.value.replace(/\D/g, "");
+        if (value === "") { input.value = ""; return; }
+        input.value = new Intl.NumberFormat('tr-TR').format(value);
+    }
+
+    function getCleanValue(id) {
+        let val = document.getElementById(id).value;
+        return parseFloat(val.replace(/\./g, "").replace(",", "."));
+    }
+
     function yilliktanAyliga() {
         const yillik = parseFloat(document.getElementById('faizYillik').value);
         if (!isNaN(yillik)) document.getElementById('faizAylik').value = (yillik / 12).toFixed(3);
@@ -175,7 +184,9 @@
     }
 
     function hesapla() {
-        const P = parseFloat(document.getElementById('tutar').value);
+        const P = getCleanValue('tutar');
+        if (isNaN(P)) { alert("Lütfen geçerli bir kredi tutarı giriniz."); return; }
+
         const aylikFaiz = parseFloat(document.getElementById('faizAylik').value) / 100;
         const toplamVade = parseInt(document.getElementById('vadeYil').value);
         const periyot = parseInt(document.getElementById('periyot').value);
@@ -231,7 +242,8 @@
         const mKasko = P * 0.03, mSigorta = P * 0.02, mTarsim = P * 0.05, mDiger = P * 0.01;
         const mToplam = mTahsis + mKasko + mSigorta + mTarsim + mDiger;
 
-        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti (Binde 0,40): " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        // Oran ibaresi kaldırıldı
+        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti: " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-kasko').innerText = "• Kasko: " + mKasko.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-sigorta').innerText = "• Hayat Sigortası: " + mSigorta.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-tarsim').innerText = "• Tarsim (%5): " + mTarsim.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
