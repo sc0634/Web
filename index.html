@@ -20,7 +20,7 @@
             html, body { width: 297mm; background: #fff !important; color: #000 !important; }
             .no-print, .tabs, .btn-group, .input-grid, h1 { display: none !important; }
             .container { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; border: none !important; }
-            table { width: 100% !important; table-layout: fixed; font-size: 8pt !important; border-collapse: collapse !important; }
+            table { width: 100% !important; table-layout: fixed; font-size: 8.5pt !important; border-collapse: collapse !important; }
             th, td { border: 1px solid #000 !important; padding: 4px !important; }
             th { background: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
             .print-header { display: block !important; text-align: center; border-bottom: 2px solid #000; margin-bottom: 10px; }
@@ -29,18 +29,18 @@
 
         /* --- EKRAN TASARIMI --- */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; scroll-behavior: smooth; }
-        .tabs { display: flex; background: #2c3e50; position: sticky; top: 0; z-index: 1000; overflow-x: auto; }
-        .tab-link { padding: 12px 15px; color: #ecf0f1; border: none; background: none; cursor: pointer; font-weight: bold; display: flex; align-items: center; font-size: 12px; white-space: nowrap; }
+        .tabs { display: flex; background: #2c3e50; position: sticky; top: 0; z-index: 1000; }
+        .tab-link { padding: 12px 25px; color: #ecf0f1; border: none; background: none; cursor: pointer; font-weight: bold; display: flex; align-items: center; }
         .tab-link.active { background: #3498db; color: #fff; }
         
-        .container { max-width: 1300px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .container { max-width: 1200px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        h1 { color: #2c3e50; text-align: center; margin-bottom: 20px; font-size: 22px; }
-        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3498db; }
-        .field label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 13px; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 20px; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3498db; }
+        .field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
         
         .btn-group { display: flex; gap: 10px; margin-bottom: 25px; }
         button { flex: 1; padding: 14px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: #fff; }
@@ -49,8 +49,8 @@
         button:disabled { background: #ccc !important; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #34495e; color: #fff; padding: 10px; font-size: 11px; }
-        td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; font-size: 11px; }
+        th { background: #34495e; color: #fff; padding: 12px; font-size: 13px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; font-size: 13px; }
         .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
         .print-only { display: none; }
     </style>
@@ -60,7 +60,6 @@
 <div class="tabs no-print">
     <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span> Traktör</button>
     <button class="tab-link" onclick="openTab(event, 'ticari')"><span>💼</span> Ticari</button>
-    <button class="tab-link" onclick="openTab(event, 'ciftci_ihtiyac')"><span>🌾💰</span> Çiftçi İhtiyaç</button>
     <button class="tab-link" onclick="openTab(event, 'tuketici')"><span>🛒💳</span> Tüketici</button>
     <button class="tab-link" onclick="openTab(event, 'hakkimda')"><span>👤</span> Hakkımda</button>
 </div>
@@ -77,17 +76,24 @@
         <div class="no-print">
             <h1 id="baslikText">Traktör Kredisi Hesaplama</h1>
             <div class="input-grid">
-                <div class="field"><label>Kredi Tutarı (₺)</label><input type="text" id="tutar" value="100.000" oninput="formatTutar(this); resetButtons();"></div>
+                <div class="field"><label>Kredi Tutarı (₺)</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
                 <div class="field">
-                    <label>Vade (Ay/Yıl)</label>
+                    <label>Vade (Yıl)</label>
                     <select id="vadeYil" onchange="resetButtons();">
-                        <option value="1">1 Yıl (12 Ay)</option><option value="2">2 Yıl (24 Ay)</option><option value="3">3 Yıl (36 Ay)</option>
+                        <option value="1">1 Yıl</option>
+                        <option value="2">2 Yıl</option>
+                        <option value="3">3 Yıl</option>
+                        <option value="4">4 Yıl</option>
+                        <option value="5" selected>5 Yıl</option>
                     </select>
                 </div>
                 <div class="field">
                     <label>Ödeme Sıklığı</label>
                     <select id="periyot" onchange="resetButtons();">
-                        <option value="12">Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="1">Yılda Bir</option>
+                        <option value="1" selected>Yılda Bir</option>
+                        <option value="2">6 Ayda Bir</option>
+                        <option value="4">3 Ayda Bir</option>
+                        <option value="12">Ayda Bir</option>
                     </select>
                 </div>
                 <div class="field">
@@ -97,8 +103,8 @@
                         <option value="esit_anapara">Anapara Eşit Taksitli</option>
                     </select>
                 </div>
-                <div class="field"><label>Yıllık Faiz (%)</label><input type="number" id="faizYillik" value="45.00" step="0.01" oninput="resetButtons();"></div>
-                <div class="field" id="subAlan"><label>Sübvansiyon Oranı (%)</label><input type="number" id="subOran" value="0" oninput="resetButtons();"></div>
+                <div class="field"><label>Yıllık Faiz (%)</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
+                <div class="field" id="subContainer"><label>Sübvansiyon Oranı (%)</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
             </div>
 
             <div class="btn-group">
@@ -117,8 +123,7 @@
                         <th>Taksit Tutarı</th>
                         <th>Anapara</th>
                         <th>Faiz</th>
-                        <th id="thBsmv">BSMV</th>
-                        <th id="thKkdf">KKDF</th>
+                        <th>BSMV</th>
                         <th id="thSub" style="background:#2c3e50; color:#fff;">Sübvansiyonlu Taksit</th>
                         <th>Kalan Anapara</th>
                     </tr>
@@ -131,7 +136,7 @@
 
     <div id="hakkimdaAlani" class="tab-content">
         <h1>Süleyman Coşkun</h1>
-        <p style="text-align:center;">Finansal Analiz Uzmanı</p>
+        <p style="text-align:center;">Finansal Analiz & Bankacılık Çözümleri</p>
     </div>
 </div>
 
@@ -152,18 +157,18 @@
             const titles = {
                 'traktor': 'Traktör Kredisi',
                 'ticari': 'Ticari Kredi',
-                'ciftci_ihtiyac': 'Taksitli Tarım Kredisi (Çiftçi İhtiyaç)',
                 'tuketici': 'Tüketici Kredisi'
             };
-
             document.getElementById('baslikText').innerText = titles[tabName] + " Hesaplama";
             document.getElementById('printTitle').innerText = titles[tabName].toUpperCase() + " ÖDEME PLANI";
             
-            // Tüketici ve Ticari'de sübvansiyon genellikle olmaz, gizle/göster yapalım
-            document.getElementById('subAlan').style.display = (tabName === 'tuketici' || tabName === 'ticari') ? 'none' : 'block';
-            document.getElementById('subOran').value = (tabName === 'tuketici' || tabName === 'ticari') ? "0" : "50";
+            // Sübvansiyon Sadece Traktörde Görünsün
+            document.getElementById('subContainer').style.display = tabName === 'traktor' ? 'block' : 'none';
+            document.getElementById('subOran').value = tabName === 'traktor' ? "50" : "0";
             
-            document.getElementById('periyot').value = "12"; // Varsayılan aylık
+            // Varsayılan Ödeme Sıklığı: Yılda Bir
+            document.getElementById('periyot').value = "1";
+            
             resetButtons();
         }
     }
@@ -188,22 +193,14 @@
         const planTipi = document.getElementById('planTipi').value;
         const toplamTaksit = vade * per;
         
-        // Vergi Mantığı
-        let bsmvOran = 0.05, kkdfOran = 0;
-        if(currentType === 'ciftci_ihtiyac' || currentType === 'tuketici') {
-            bsmvOran = 0.15;
-            kkdfOran = 0.15;
-        }
-
-        document.getElementById('thBsmv').innerText = `BSMV (%${bsmvOran*100})`;
-        document.getElementById('thKkdf').innerText = `KKDF (%${kkdfOran*100})`;
-        document.getElementById('thKkdf').style.display = kkdfOran === 0 ? 'none' : '';
-        document.getElementById('thSub').style.display = sub === 0 ? 'none' : '';
+        const bsmvOran = currentType === 'tuketici' ? 0.15 : 0.05;
+        const kkdfOran = currentType === 'tuketici' ? 0.15 : 0;
 
         const donemFaiz = (yFaiz / per);
         const i_vergi = donemFaiz * (1 + bsmvOran + kkdfOran);
 
         let body = ''; let kalan = tutar; let sabitA = tutar / toplamTaksit;
+        document.getElementById('thSub').style.display = sub > 0 ? '' : 'none';
 
         for(let j=1; j<=toplamTaksit; j++){
             let f = kalan * donemFaiz, b = f * bsmvOran, k = f * kkdfOran, a, t;
@@ -226,14 +223,12 @@
                 <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
                 <td>${Math.round(f).toLocaleString('tr-TR')} ₺</td>
                 <td>${Math.round(b).toLocaleString('tr-TR')} ₺</td>
-                <td style="${kkdfOran===0?'display:none':''}">${Math.round(k).toLocaleString('tr-TR')} ₺</td>
-                <td class="sub-row" style="${sub===0?'display:none':''}">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
+                <td class="sub-row" style="${sub > 0 ? '' : 'display:none'}">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
                 <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
 
         document.getElementById('planBody').innerHTML = body;
         document.getElementById('sonucAlani').style.display = 'block';
-        document.getElementById('sonucAlani').scrollIntoView({ behavior: 'smooth' });
         document.getElementById('btnYazdir').disabled = false;
         document.getElementById('btnPdf').disabled = false;
         document.getElementById('pMethod').innerText = "Ödeme Tipi: " + (planTipi === 'esit_taksit' ? "Eşit Taksitli" : "Eşit Anapara Ödemeli");
@@ -244,7 +239,7 @@
         const element = document.getElementById('main-content');
         html2pdf().set({ 
             margin: 5, 
-            filename: `Kredi_Plani.pdf`, 
+            filename: `Finansal_Odeme_Plani.pdf`, 
             html2canvas: { scale: 2, ignoreElements: (el) => el.classList.contains('no-print') }, 
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
         }).from(element).save();
