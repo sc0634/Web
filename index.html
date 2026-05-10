@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kredi Hesaplama - Yazdırma Odaklı</title>
+    <title>Kredi Hesaplama - Süleyman Coşkun</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @page { size: A4 landscape; margin: 10mm; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #000; }
-        .container { max-width: 1150px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; border: 1px solid #ddd; }
+        .container { max-width: 1150px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; border: 1px solid #ddd; position: relative; }
         h1 { color: #000; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-top: 0; }
         
         .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 20px 0 10px 0; background: #fff; padding: 15px; border: 1px solid #000; border-radius: 4px; }
@@ -34,15 +34,25 @@
         .masraflar-baslik { font-size: 14px; font-weight: bold; text-decoration: underline; margin-bottom: 8px; text-transform: uppercase; }
         .masraf-satir { font-size: 12px; margin-bottom: 4px; font-weight: 500; }
         .masraf-toplam { margin-top: 8px; padding-top: 5px; border-top: 1px dashed #000; font-weight: bold; font-size: 13px; }
+
+        .signature {
+            display: none; 
+            text-align: right;
+            font-size: 12px;
+            font-style: italic;
+            font-weight: bold;
+            margin-top: 15px;
+            color: #333;
+        }
         
-        /* Yazdırma Ayarları - Kritik Bölüm */
         @media print {
-            .no-print, .btn-group, h1 { display: none !important; } /* Butonlar ve Gereksiz Başlıklar Gizlenir */
+            .no-print, .btn-group, h1, .input-grid, .vergi-bilgi-satiri { display: none !important; }
             body { padding: 0; background: #fff; margin: 0; }
             .container { border: none; width: 100%; max-width: 100%; padding: 0; margin: 0; }
+            .signature { display: block; }
             table { font-size: 9px; page-break-inside: auto; }
             tr { page-break-inside: avoid; page-break-after: auto; }
-            .masraflar-section { page-break-inside: avoid; margin-top: 10px; } /* Masrafların bölünmesini engeller */
+            .masraflar-section { page-break-inside: avoid; margin-top: 10px; }
             th, tfoot td { background: #ddd !important; -webkit-print-color-adjust: exact; }
         }
     </style>
@@ -50,8 +60,7 @@
 <body>
 
 <div class="container" id="main-content">
-    <!-- Giriş ve Buton Bölümü (Yazdırmada Gizlenir) -->
-    <div class="no-print">
+    <div id="setup-area" class="no-print">
         <h1>Kredi Hesaplama Sistemi</h1>
         <div class="input-grid">
             <div class="field">
@@ -102,7 +111,6 @@
         </div>
     </div>
 
-    <!-- Sonuç ve Yazdırılacak Bölüm -->
     <div id="sonucAlani" style="display:none;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; margin-bottom: 10px;">
             <h2 id="planBaslik" style="font-size: 16px; margin: 0; padding: 5px 0;"></h2>
@@ -135,6 +143,8 @@
             <div id="masraf-diger" class="masraf-satir"></div>
             <div id="masraf-toplam" class="masraf-toplam"></div>
         </div>
+
+        <div class="signature">Created by Süleyman Coşkun</div>
     </div>
 </div>
 
@@ -147,12 +157,8 @@
 
     function vergiGuncelle() {
         const tur = document.getElementById('krediTuru').value;
-        const kkdfLabel = document.getElementById('kkdfGosterge');
-        const bsmvLabel = document.getElementById('bsmvGosterge');
-        if (tur === 'traktor' || tur === 'ticari') {
-            kkdfLabel.innerText = "%0";
-            bsmvLabel.innerText = "%5";
-        }
+        document.getElementById('kkdfGosterge').innerText = "%0";
+        document.getElementById('bsmvGosterge').innerText = "%5";
     }
 
     function yilliktanAyliga() {
@@ -178,32 +184,27 @@
         const periyot = parseInt(document.getElementById('periyot').value);
         const sRate = parseFloat(document.getElementById('subOran').value) / 100;
 
-        const kkdf = 0;
-        const bsmv = 0.05;
-
         const taksitSayisi = toplamVade / periyot;
         const donemlikFaiz = aylikFaiz * periyot;
-        const i = donemlikFaiz * (1 + kkdf + bsmv);
+        const i = donemlikFaiz * (1 + 0.05); // BSMV dahil faiz oranı
         const taksit = (P * i * Math.pow(1 + i, taksitSayisi)) / (Math.pow(1 + i, taksitSayisi) - 1);
         
         document.getElementById('planBaslik').innerText = "KREDİ ÖDEME PLANI (" + document.getElementById('krediTuru').selectedOptions[0].text + ")";
         const tbody = document.getElementById('planBody');
-        const tfoot = document.getElementById('planFoot');
-        tbody.innerHTML = ''; tfoot.innerHTML = '';
+        tbody.innerHTML = '';
         document.getElementById('sonucAlani').style.display = 'block';
 
         let kalan = P;
-        let tTaksit = 0, tAnapara = 0, tFaiz = 0, tBsmv = 0, tKkdf = 0, tSub = 0;
+        let tTaksit = 0, tAnapara = 0, tFaiz = 0, tBsmv = 0, tSub = 0;
 
         for (let j = 1; j <= taksitSayisi; j++) {
             const f = kalan * donemlikFaiz;
-            const b = f * bsmv;
-            const k = f * kkdf;
-            let a = taksit - (f + b + k);
+            const b = f * 0.05;
+            let a = taksit - (f + b);
             if (j === taksitSayisi) a = kalan;
-            const subTaksit = taksit - ((f + b + k) * sRate);
+            const subTaksit = taksit - ((f + b) * sRate);
             
-            tTaksit += taksit; tAnapara += a; tFaiz += f; tBsmv += b; tKkdf += k; tSub += subTaksit;
+            tTaksit += taksit; tAnapara += a; tFaiz += f; tBsmv += b; tSub += subTaksit;
             kalan -= a;
 
             tbody.innerHTML += `<tr>
@@ -212,29 +213,24 @@
                 <td class="taksit-font">${a.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
                 <td class="taksit-font">${f.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
                 <td class="taksit-font">${b.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-                <td class="taksit-font">${k.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+                <td>0,00</td>
                 <td class="sub-highlight">${subTaksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
                 <td class="taksit-font">${Math.abs(kalan).toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
             </tr>`;
         }
 
-        tfoot.innerHTML = `<tr>
+        document.getElementById('planFoot').innerHTML = `<tr>
             <td>TOPLAM</td>
             <td class="taksit-font">${tTaksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
             <td class="taksit-font">${tAnapara.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
             <td class="taksit-font">${tFaiz.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
             <td class="taksit-font">${tBsmv.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td class="taksit-font">${tKkdf.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td>0,00</td>
             <td style="background: #ddd;" class="taksit-font">${tSub.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
             <td>-</td>
         </tr>`;
 
-        // Masraflar
-        const mTahsis = P * 0.005;
-        const mKasko = P * 0.03;
-        const mSigorta = P * 0.02;
-        const mTarsim = P * 0.05;
-        const mDiger = P * 0.01;
+        const mTahsis = P * 0.005, mKasko = P * 0.03, mSigorta = P * 0.02, mTarsim = P * 0.05, mDiger = P * 0.01;
         const mToplam = mTahsis + mKasko + mSigorta + mTarsim + mDiger;
 
         document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti: " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
@@ -246,8 +242,27 @@
     }
 
     function indirPDF() {
+        const setupArea = document.getElementById('setup-area');
+        const signature = document.querySelector('.signature');
         const element = document.getElementById('main-content');
-        html2pdf().set({ margin: 5, filename: 'odeme-plani.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
+
+        // PDF oluşturmadan önce butonları ve ayarları gizle, imzayı aç
+        setupArea.style.display = 'none';
+        signature.style.display = 'block';
+
+        const opt = {
+            margin: 5,
+            filename: 'kredi_odeme_plani.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            // İşlem bittikten sonra her şeyi ekranda eski haline getir
+            setupArea.style.display = 'block';
+            signature.style.display = 'none';
+        });
     }
 </script>
 </body>
