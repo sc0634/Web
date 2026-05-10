@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Süleyman Coşkun - Finansal Analiz</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -12,53 +12,61 @@
             position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid #3498db;
         }
         .tab-link { 
-            flex: 1; min-width: 100px; padding: 12px 5px; color: #ecf0f1; border: none; 
+            flex: 1; min-width: 80px; padding: 12px 2px; color: #ecf0f1; border: none; 
             background: none; cursor: pointer; font-weight: bold; display: flex; 
-            flex-direction: column; align-items: center; font-size: 12px;
+            flex-direction: column; align-items: center; font-size: 11px;
         }
         .tab-link span { display: block; font-size: 1.53em; margin-bottom: 4px; }
         .tab-link.active { background: #3498db; color: #fff; }
 
         .input-grid { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px 30px; 
-            background: #f9f9f9; padding: 20px; border-radius: 8px; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; 
+            background: #f9f9f9; padding: 15px; border-radius: 8px; 
             margin-bottom: 20px; border-left: 5px solid #3498db; 
         }
         .field { display: flex; align-items: center; }
-        .field label { flex: 0 0 140px; font-size: 13px; font-weight: 600; color: #34495e; }
-        input, select { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; outline: none; background: #fff; }
+        .field label { flex: 0 0 130px; font-size: 12px; font-weight: 600; color: #34495e; }
+        input, select { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; outline: none; background: #fff; width: 100%; }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
-        .container { max-width: 1200px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 1200px; margin: 10px auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; font-size: 22px; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 20px; font-size: 20px; }
         
-        .btn-group { display: flex; gap: 10px; margin-bottom: 25px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: #fff; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        button { flex: 1; min-width: 120px; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: #fff; font-size: 13px; }
         .btn-calc { background: #27ae60; }
         .btn-clear { background: #e74c3c; }
         #btnPdf { background: #3498db; } #btnYazdir { background: #f39c12; }
         button:disabled { background: #ccc !important; cursor: not-allowed; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #34495e; color: #fff; padding: 12px 5px; font-size: 11px; text-align: center; }
-        td { padding: 10px 5px; border-bottom: 1px solid #eee; text-align: center; font-size: 12px; color: #333; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px; }
+        th { background: #34495e; color: #fff; padding: 10px 4px; font-size: 10px; text-align: center; }
+        td { padding: 10px 4px; border-bottom: 1px solid #eee; text-align: center; font-size: 11px; color: #333; }
         .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
 
-        /* --- ÇIKTI GÜZELLEŞTİRME (PRINT & PDF) --- */
+        /* --- MOBİL VE ÇIKTI OPTİMİZASYONU --- */
         @media print {
             .tabs, .btn-group, .no-print { display: none !important; }
-            .container { box-shadow: none; margin: 0; width: 100%; max-width: none; }
-            .input-grid { background: white !important; border: 1px solid #ddd !important; grid-template-columns: 1fr 1fr 1fr; }
-            input, select { border: none !important; background: transparent !important; appearance: none; -webkit-appearance: none; font-weight: bold; }
-            h1 { border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+            .container { box-shadow: none; margin: 0; padding: 0; width: 100%; }
+            .input-grid { grid-template-columns: 1fr 1fr 1fr !important; border: 1px solid #ddd !important; background: white !important; }
+            input, select { border: none !important; font-weight: bold; background: transparent !important; }
+            th { background: #eee !important; color: #000 !important; border: 1px solid #ddd; }
+            td { border: 1px solid #ddd; }
+        }
+
+        @media (max-width: 600px) {
+            .input-grid { grid-template-columns: 1fr; }
+            .field label { flex: 0 0 110px; }
+            button { width: 100%; flex: none; }
         }
     </style>
 </head>
 <body>
 
-<div class="tabs no-print">
+<div class="tabs no-print" id="navbar">
     <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Traktör</button>
     <button class="tab-link" onclick="openTab(event, 'ticari')"><span>💼</span>Ticari</button>
     <button class="tab-link" onclick="openTab(event, 'tuketici')"><span>🛒💳</span>Tüketici</button>
@@ -70,7 +78,7 @@
         <h1 id="baslikText">Traktör Kredisi Hesaplama</h1>
         
         <div class="form-wrapper">
-            <div class="input-grid" id="kredi-bilgileri">
+            <div class="input-grid">
                 <div class="field"><label>Kredi Tutarı (₺) :</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
                 <div class="field"><label>Vade (Yıl) :</label><select id="vadeYil" onchange="resetButtons();"><option value="1">1 Yıl</option><option value="2">2 Yıl</option><option value="3">3 Yıl</option><option value="4">4 Yıl</option><option value="5" selected>5 Yıl</option></select></div>
                 <div class="field"><label>Ödeme Sıklığı :</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda Bir</option><option value="2">6 Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="12">Ayda Bir</option></select></div>
@@ -79,7 +87,7 @@
                 <div class="field" id="subContainer"><label>Sübvansiyon (%) :</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
             </div>
             
-            <div class="btn-group" id="islem-butonlari">
+            <div class="btn-group no-print" id="action-buttons">
                 <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
                 <button class="btn-clear" onclick="location.reload()">SIFIRLA</button>
                 <button id="btnPdf" onclick="indirPDF()" disabled>PDF KAYDET</button>
@@ -88,21 +96,23 @@
         </div>
 
         <div id="sonucAlani" style="display:none;">
-            <table id="planTable">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Taksit Tutarı</th>
-                        <th>Anapara</th>
-                        <th>Net Faiz</th>
-                        <th>BSMV</th>
-                        <th>KKDF</th>
-                        <th id="thSub" style="background:#2c3e50; color:#fff;">Sübvansiyonlu Taksit</th>
-                        <th>Kalan Anapara</th>
-                    </tr>
-                </thead>
-                <tbody id="planBody"></tbody>
-            </table>
+            <div class="table-responsive">
+                <table id="planTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Taksit Tutarı</th>
+                            <th>Anapara</th>
+                            <th>Net Faiz</th>
+                            <th>BSMV</th>
+                            <th>KKDF</th>
+                            <th id="thSub" style="background:#2c3e50; color:#fff;">Sübvansiyonlu Taksit</th>
+                            <th>Kalan Anapara</th>
+                        </tr>
+                    </thead>
+                    <tbody id="planBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div id="hakkimdaAlani" class="tab-content">
@@ -172,25 +182,29 @@
     
     function indirPDF() {
         const element = document.getElementById('main-content');
-        const buttons = document.getElementById('islem-butonlari');
-        const tabs = document.querySelector('.tabs');
+        const buttons = document.getElementById('action-buttons');
+        const nav = document.getElementById('navbar');
 
-        // PDF oluşturulurken gizle
-        buttons.style.display = 'none';
-        tabs.style.display = 'none';
+        // Mobil uyumlu gizleme
+        buttons.style.visibility = 'hidden';
+        nav.style.display = 'none';
 
         const opt = {
-            margin: 10,
-            filename: 'Kredi_Odeme_Plani.pdf',
+            margin: [10, 5, 10, 5],
+            filename: 'Kredi_Plani.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true, 
+                letterRendering: true,
+                scrollY: 0
+            },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
-            // İşlem bitince geri getir
-            buttons.style.display = 'flex';
-            tabs.style.display = 'flex';
+            buttons.style.visibility = 'visible';
+            nav.style.display = 'flex';
         });
     }
 </script>
