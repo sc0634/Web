@@ -64,7 +64,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="vadeYukle()">
 
 <div class="tabs no-print" id="navbar">
     <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Traktör</button>
@@ -80,10 +80,10 @@
         <div class="form-wrapper">
             <div class="input-grid">
                 <div class="field"><label>Kredi Tutarı (₺) :</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
-                <div class="field"><label>Vade (Yıl) :</label><select id="vadeYil" onchange="resetButtons();"><option value="1">1 Yıl</option><option value="2">2 Yıl</option><option value="3">3 Yıl</option><option value="4">4 Yıl</option><option value="5" selected>5 Yıl</option></select></div>
+                <div class="field"><label id="vadeLabel">Vade (Yıl) :</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
                 <div class="field"><label>Ödeme Sıklığı :</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda Bir</option><option value="2">6 Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="12">Ayda Bir</option></select></div>
                 <div class="field"><label>Ödeme Planı :</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksitli</option><option value="esit_anapara">Anapara Eşit Taksitli</option></select></div>
-                <div class="field"><label>Yıllık Faiz (%) :</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
+                <div class="field"><label>Yıllık Faiz (%) :</label><input type="number" id="faizYillik" value="49.00" step="0.01" oninput="resetButtons();"></div>
                 <div class="field" id="subContainer"><label>Sübvansiyon (%) :</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
             </div>
             
@@ -123,6 +123,33 @@
 
 <script>
     let currentType = 'traktor';
+
+    function vadeYukle() {
+        const select = document.getElementById('vadeSecim');
+        const label = document.getElementById('vadeLabel');
+        select.innerHTML = '';
+        
+        if (currentType === 'ticari') {
+            label.innerText = "Vade (Ay) :";
+            for (let i = 1; i <= 60; i++) {
+                let opt = document.createElement('option');
+                opt.value = i;
+                opt.innerHTML = i + " Ay";
+                if (i === 60) opt.selected = true;
+                select.appendChild(opt);
+            }
+        } else {
+            label.innerText = "Vade (Yıl) :";
+            for (let i = 1; i <= 5; i++) {
+                let opt = document.createElement('option');
+                opt.value = i;
+                opt.innerHTML = i + " Yıl";
+                if (i === 5) opt.selected = true;
+                select.appendChild(opt);
+            }
+        }
+    }
+
     function openTab(evt, tabName) {
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -136,9 +163,11 @@
             document.getElementById('subContainer').style.visibility = tabName === 'traktor' ? 'visible' : 'hidden';
             document.getElementById('subOran').value = tabName === 'traktor' ? "50" : "0";
             document.getElementById('periyot').value = "1";
+            vadeYukle();
             resetButtons();
         }
     }
+
     function resetButtons() { document.getElementById('btnYazdir').disabled = true; document.getElementById('btnPdf').disabled = true; document.getElementById('sonucAlani').style.display = 'none'; }
     function formatTutar(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); }
     
@@ -147,10 +176,17 @@
         const tutar = parseFloat(tutarStr);
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
-        const vade = parseInt(document.getElementById('vadeYil').value);
+        const vadeDeger = parseInt(document.getElementById('vadeSecim').value);
         const per = parseInt(document.getElementById('periyot').value);
         const planTipi = document.getElementById('planTipi').value;
-        const toplamTaksit = vade * per;
+        
+        let toplamTaksit;
+        if (currentType === 'ticari') {
+            toplamTaksit = Math.ceil(vadeDeger / (12 / per));
+        } else {
+            toplamTaksit = vadeDeger * per;
+        }
+
         const bsmvOran = currentType === 'tuketici' ? 0.15 : 0.05;
         const kkdfOran = currentType === 'tuketici' ? 0.15 : 0;
         const donemFaiz = yFaiz / per;
