@@ -3,249 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Süleyman Coşkun - Finansal Portfolyo</title>
+    <title>Süleyman Coşkun - Kredi Portalı</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @page { size: A4 landscape; margin: 10mm; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #000; display: flex; flex-direction: column; min-height: 100vh; }
-        .tabs { display: flex; background: #2c3e50; padding: 0 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 1000; }
-        .tab-link { padding: 12px 25px; color: #fff; border: none; background: none; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 14px; }
-        .tab-link:hover { background: #34495e; }
-        .tab-link.active { background: #fff; color: #2c3e50; border-radius: 4px 4px 0 0; margin-top: 5px; }
-        .tab-content { display: none; padding: 20px; animation: fadeIn 0.5s; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .container { max-width: 1150px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
-        h1 { color: #000; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin: 0 0 20px 0; font-size: 22px; }
-        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 15px; padding: 15px; border: 1px solid #000; border-radius: 4px; }
-        .vergi-bilgi-satiri { display: flex; gap: 20px; background: #f9f9f9; padding: 8px 15px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 15px; font-size: 13px; font-weight: bold; }
-        .field { display: flex; flex-direction: column; }
-        label { font-weight: bold; margin-bottom: 5px; font-size: 12px; }
-        input, select { padding: 8px; border: 1px solid #000; border-radius: 4px; font-size: 13px; }
-        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        button { flex: 1; min-width: 140px; padding: 10px; border: 2px solid #000; border-radius: 4px; font-weight: bold; cursor: pointer; background: #fff; }
-        button:hover { background: #000; color: #fff; }
-        .btn-clear { border-color: #d32f2f; color: #d32f2f; }
-        .btn-clear:hover { background: #d32f2f; color: #fff; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10px; }
-        th { background: #eee; padding: 6px; border: 1px solid #000; text-align: center; }
-        td { border: 1px solid #000; padding: 6px; text-align: center; }
-        .section-box { margin-top: 15px; padding: 10px; border: 1px solid #000; border-radius: 4px; }
-        .section-title { font-size: 13px; font-weight: bold; text-decoration: underline; margin-bottom: 8px; text-transform: uppercase; }
-        .list-item { font-size: 11px; margin-bottom: 4px; }
-        .masraf-toplam { margin-top: 8px; padding-top: 5px; border-top: 1px dashed #000; font-weight: bold; font-size: 13px; }
-        .about-card { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); line-height: 1.6; }
-        .profile-header { text-align: center; margin-bottom: 20px; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .info-item { background: #f8f9fa; padding: 12px; border-radius: 5px; border-left: 4px solid #2c3e50; font-size: 14px; }
-        @media print { .tabs, .no-print, h1 { display: none !important; } .tab-content { display: block !important; padding: 0; } #hakkimda { display: none !important; } .container { border: none; box-shadow: none; } }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        
+        /* Üst Header */
+        header { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1001; }
+        
+        /* Ana Layout */
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+
+        /* Sol Dikey Menü */
+        .side-menu { width: 220px; background: #fff; border-right: 1px solid #ddd; display: flex; flex-direction: column; padding: 20px 0; }
+        .side-menu-title { padding: 0 20px 10px; font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold; }
+        .menu-btn { padding: 15px 20px; border: none; background: none; text-align: left; cursor: pointer; font-weight: 500; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .menu-btn:hover { background: #f8f9fa; color: #2c3e50; }
+        .menu-btn.active { background: #e8f0fe; color: #1a73e8; border-right: 4px solid #1a73e8; }
+
+        /* Sağ İçerik Alanı */
+        .content-area { flex: 1; padding: 25px; overflow-y: auto; }
+        .container { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 1000px; margin: 0 auto; }
+
+        /* Form Elemanları */
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 12px; font-weight: bold; color: #555; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+
+        .btn-calculate { background: #1a73e8; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-calculate:hover { background: #1557b0; }
+
+        /* Hakkımda Görünümü */
+        #hakkimda-view { display: none; text-align: center; }
+        .profile-img { width: 120px; height: 120px; border-radius: 60px; object-fit: cover; border: 3px solid #1a73e8; }
+
+        @media print { .side-menu, header, .btn-calculate { display: none !important; } .content-area { padding: 0; } }
     </style>
 </head>
 <body>
 
-<div class="tabs no-print">
-    <button class="tab-link active" onclick="openTab(event, 'krediModulu')">Kredi Hesaplama Modülü</button>
-    <button class="tab-link" onclick="openTab(event, 'hakkimda')">Hakkımda</button>
-</div>
+<header>
+    <div style="font-weight: bold; font-size: 18px;">SC Finansal Panel</div>
+    <button class="menu-btn" style="color:white; padding:5px 15px;" onclick="toggleHakkimda()">👤 Hakkımda</button>
+</header>
 
-<div id="krediModulu" class="tab-content active">
-    <div class="container" id="main-content">
-        <div id="setup-area" class="no-print">
-            <h1>Kredi Hesaplama Sistemi</h1>
-            <div class="input-grid">
-                <div class="field">
-                    <label>Kredi Türü</label>
-                    <select id="krediTuru" onchange="periyotGuncelle();">
-                        <option value="traktor" selected>Traktör Kredisi</option>
-                        <option value="ticari">Ticari Kredi</option>
-                    </select>
-                </div>
+<div class="main-wrapper">
+    <nav class="side-menu">
+        <div class="side-menu-title">Kredi Türleri</div>
+        <button class="menu-btn active" onclick="switchKredi('traktor', this)">🚜 Traktör Kredisi</button>
+        <button class="menu-btn" onclick="switchKredi('ticari', this)">💼 Ticari Kredi</button>
+        <button class="menu-btn" onclick="switchKredi('konut', this)">🏠 Konut Kredisi</button>
+        <button class="menu-btn" onclick="switchKredi('ihtiyac', this)">🛍️ İhtiyaç Kredisi</button>
+    </nav>
+
+    <main class="content-area">
+        <div id="calculator-view" class="container">
+            <h2 id="view-title" style="margin-top:0;">Traktör Kredisi Hesaplama</h2>
+            <div class="grid-inputs">
                 <div class="field">
                     <label>Kredi Tutarı (₺)</label>
-                    <input type="text" id="tutar" value="2.000.000" oninput="formatTutar(this)">
+                    <input type="text" id="tutar" value="2.000.000" oninput="formatMoney(this)">
                 </div>
                 <div class="field">
-                    <label>Vade (Yıl)</label>
-                    <select id="vadeYil">
-                        <option value="60" selected>5 Yıl (60 Ay)</option>
-                        <option value="48">4 Yıl (48 Ay)</option>
-                        <option value="36">3 Yıl (36 Ay)</option>
-                        <option value="24">2 Yıl (24 Ay)</option>
-                        <option value="12">1 Yıl (12 Ay)</option>
+                    <label>Vade (Ay)</label>
+                    <select id="vade">
+                        <option value="12">12 Ay</option>
+                        <option value="24">24 Ay</option>
+                        <option value="36">36 Ay</option>
+                        <option value="48">48 Ay</option>
+                        <option value="60" selected>60 Ay</option>
                     </select>
                 </div>
                 <div class="field">
-                    <label>Ödeme Periyodu</label>
-                    <select id="periyot"></select>
-                </div>
-                <div class="field">
-                    <label>Yıllık Faiz (%)</label>
-                    <input type="number" id="faizYillik" step="0.01" value="40.50" oninput="yilliktanAyliga()">
-                </div>
-                <div class="field">
-                    <label>Sübvansiyon (%)</label>
-                    <input type="number" id="subOran" value="50">
+                    <label>Faiz Oranı (%)</label>
+                    <input type="number" id="faiz" value="3.375" step="0.001">
                 </div>
             </div>
-            <div class="vergi-bilgi-satiri">
-                <div>KKDF: %0</div>
-                <div>BSMV: %5</div>
-                <input type="hidden" id="faizAylik" value="3.375">
-            </div>
-            <div class="btn-group">
-                <button onclick="hesapla()">HESAPLA</button>
-                <button class="btn-clear" onclick="temizle()">TEMİZLE</button>
-                <button onclick="window.print()">YAZICIDAN ÇIKART</button>
-                <button onclick="indirPDF()">PDF OLARAK KAYDET</button>
-            </div>
+            <button class="btn-calculate" onclick="alert('Hesaplama fonksiyonu tetiklendi!')">HESAPLA</button>
         </div>
-        <div id="sonucAlani" style="display:none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; margin-bottom: 10px;">
-                <h2 id="planBaslik" style="font-size: 16px; margin: 0; padding: 5px 0;"></h2>
-                <div style="font-size: 11px; font-weight: bold;" id="tarihGosterge"></div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Taksit No</th>
-                        <th>Taksit Tutarı</th>
-                        <th>Anapara</th>
-                        <th>Faiz</th>
-                        <th>BSMV</th>
-                        <th>KKDF</th>
-                        <th style="background: #ddd;">Sübvansiyonlu Taksit</th>
-                        <th>Kalan Anapara</th>
-                    </tr>
-                </thead>
-                <tbody id="planBody"></tbody>
-                <tfoot id="planFoot"></tfoot>
-            </table>
-            <div style="display: flex; gap: 20px;">
-                <div class="section-box" style="flex: 1;">
-                    <div class="section-title">MASRAFLAR</div>
-                    <div id="masraf-tahsis" class="list-item"></div>
-                    <div id="masraf-kasko" class="list-item"></div>
-                    <div id="masraf-sigorta" class="list-item"></div>
-                    <div id="masraf-tarsim" class="list-item"></div>
-                    <div id="masraf-diger" class="list-item"></div>
-                    <div id="masraf-toplam" class="masraf-toplam"></div>
-                </div>
-                <div class="section-box" style="flex: 1;">
-                    <div class="section-title">GEREKLİ BELGELER</div>
-                    <div class="list-item">• ÇKS Belgesi</div>
-                    <div class="list-item">• Noter onaylı kira sözleşmesi</div>
-                    <div class="list-item">• İşletme Tescil Belgesi</div>
-                    <div class="list-item">• Tapu ve Ruhsatlar</div>
-                    <div class="list-item">• Proforma Fatura</div>
-                    <div class="list-item">• Kredi Uygunluk Belgesi</div>
-                    <div class="list-item">• Yerli Malı Belgesi</div>
-                </div>
-            </div>
-            <div style="text-align: right; font-size: 10px; font-style: italic; margin-top: 10px;">Prepared by Süleyman Coşkun</div>
-        </div>
-    </div>
-</div>
 
-<div id="hakkimda" class="tab-content">
-    <div class="about-card">
-        <div class="profile-header">
-            <img src="IMG_0047.jpeg" alt="Süleyman Coşkun" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #2c3e50; margin-bottom: 15px;">
-            <h2 style="margin:0;">Süleyman Coşkun</h2>
-            <p style="color: #666;">Finansal Analist & Proje Geliştirici</p>
+        <div id="hakkimda-view" class="container">
+            <img src="IMG_0047.jpeg" class="profile-img" alt="Süleyman Coşkun">
+            <h2>Süleyman Coşkun</h2>
+            <p>Finansal Analist & Proje Geliştirici</p>
+            <hr>
+            <p>Diyarbakır merkezli tarımsal finansman ve kredi risk analizi uzmanı.</p>
+            <button class="btn-calculate" style="background:#666;" onclick="toggleHakkimda()">Geri Dön</button>
         </div>
-        <p>Finansal veri analizi, bankacılık muhasebesi ve tarımsal kredi süreçleri konusunda uzmanlaşmış bir profesyonelim. Diyarbakır merkezli olarak çalışmalarımı sürdürmekteyim.</p>
-        <div class="info-grid">
-            <div class="info-item"><strong>Uzmanlık:</strong> Tarımsal Finansman, Kredi Risk Analizi, Arduino.</div>
-            <div class="info-item"><strong>Projeler:</strong> Banka performans skorlama sistemleri.</div>
-            <div class="info-item"><strong>Gelişim:</strong> Finansal teknolojiler ve IoT çalışmaları.</div>
-            <div class="info-item"><strong>İlgi:</strong> Otomotiv teknolojileri ve yenilikçi araç sistemleri.</div>
-        </div>
-    </div>
+    </main>
 </div>
 
 <script>
-    function openTab(evt, tabName) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tab-content");
-        for (i = 0; i < tabcontent.length; i++) { tabcontent[i].classList.remove("active"); }
-        tablinks = document.getElementsByClassName("tab-link");
-        for (i = 0; i < tablinks.length; i++) { tablinks[i].classList.remove("active"); }
-        document.getElementById(tabName).classList.add("active");
-        evt.currentTarget.classList.add("active");
-        window.scrollTo(0,0);
+    function switchKredi(type, btn) {
+        // Aktif buton görselini güncelle
+        document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Görünümü ayarla
+        document.getElementById('calculator-view').style.display = 'block';
+        document.getElementById('hakkimda-view').style.display = 'none';
+        
+        // Başlığı güncelle
+        const titles = {
+            'traktor': '🚜 Traktör Kredisi Hesaplama',
+            'ticari': '💼 Ticari Kredi Hesaplama',
+            'konut': '🏠 Konut Kredisi Hesaplama',
+            'ihtiyac': '🛍️ İhtiyaç Kredisi Hesaplama'
+        };
+        document.getElementById('view-title').innerText = titles[type];
     }
-    window.onload = function() { 
-        periyotGuncelle(); 
-        document.getElementById('tarihGosterge').innerText = "Tarih: " + new Date().toLocaleDateString('tr-TR');
-    };
-    function temizle() { if(confirm("Tüm verileri temizlemek istediğinize emin misiniz?")) { location.reload(); } }
-    function formatTutar(input) {
+
+    function toggleHakkimda() {
+        const calc = document.getElementById('calculator-view');
+        const about = document.getElementById('hakkimda-view');
+        if (about.style.display === 'none' || about.style.display === '') {
+            about.style.display = 'block';
+            calc.style.display = 'none';
+        } else {
+            about.style.display = 'none';
+            calc.style.display = 'block';
+        }
+    }
+
+    function formatMoney(input) {
         let value = input.value.replace(/\D/g, "");
-        if (value === "") { input.value = ""; return; }
         input.value = new Intl.NumberFormat('tr-TR').format(value);
     }
-    function getCleanValue(id) {
-        let val = document.getElementById(id).value;
-        return parseFloat(val.replace(/\./g, "").replace(",", "."));
-    }
-    function yilliktanAyliga() {
-        const yillik = parseFloat(document.getElementById('faizYillik').value);
-        if (!isNaN(yillik)) document.getElementById('faizAylik').value = (yillik / 12).toFixed(3);
-    }
-    function periyotGuncelle() {
-        const tur = document.getElementById('krediTuru').value;
-        const periyotSelect = document.getElementById('periyot');
-        periyotSelect.innerHTML = '';
-        if (tur === 'traktor') {
-            periyotSelect.innerHTML = `<option value="6">6 Ayda Bir</option><option value="12" selected>Yılda Bir</option>`;
-        } else {
-            periyotSelect.innerHTML = `<option value="1">Ayda Bir</option><option value="3">3 Ayda Bir</option><option value="6">6 Ayda Bir</option><option value="12">Yılda Bir</option>`;
-        }
-    }
-    function hesapla() {
-        const P = getCleanValue('tutar');
-        if (isNaN(P)) { alert("Lütfen geçerli bir kredi tutarı giriniz."); return; }
-        const aylikFaiz = parseFloat(document.getElementById('faizAylik').value) / 100;
-        const toplamVade = parseInt(document.getElementById('vadeYil').value);
-        const periyot = parseInt(document.getElementById('periyot').value);
-        const sRate = parseFloat(document.getElementById('subOran').value) / 100;
-        const taksitSayisi = toplamVade / periyot;
-        const donemlikFaiz = aylikFaiz * periyot;
-        const i = donemlikFaiz * (1 + 0.05); 
-        const taksit = (P * i * Math.pow(1 + i, taksitSayisi)) / (Math.pow(1 + i, taksitSayisi) - 1);
-        document.getElementById('planBaslik').innerText = "KREDİ ÖDEME PLANI (" + document.getElementById('krediTuru').selectedOptions[0].text.toUpperCase() + ")";
-        const tbody = document.getElementById('planBody');
-        tbody.innerHTML = '';
-        document.getElementById('sonucAlani').style.display = 'block';
-        let kalan = P;
-        let tTaksit = 0, tAnapara = 0, tFaiz = 0, tBsmv = 0, tSub = 0;
-        for (let j = 1; j <= taksitSayisi; j++) {
-            const f = kalan * donemlikFaiz;
-            const b = f * 0.05;
-            let a = taksit - (f + b);
-            if (j === taksitSayisi) a = kalan;
-            const subTaksit = taksit - ((f + b) * sRate);
-            tTaksit += taksit; tAnapara += a; tFaiz += f; tBsmv += b; tSub += subTaksit;
-            kalan -= a;
-            tbody.innerHTML += `<tr><td>${j}</td><td>${taksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>${a.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>${f.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>${b.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>0,00</td><td style="background:#f0f0f0; font-weight:bold;">${subTaksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>${Math.abs(kalan).toLocaleString('tr-TR', {minimumFractionDigits:2})}</td></tr>`;
-        }
-        document.getElementById('planFoot').innerHTML = `<tr><td>TOPLAM</td><td>${tTaksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>${tAnapara.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>${tFaiz.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>${tBsmv.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>0,00</td><td style="background: #ddd;">${tSub.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td><td>-</td></tr>`;
-        const mTahsis = Math.round(P * 0.004);
-        const mKasko = Math.round(P * 0.03);
-        const mSigorta = Math.round(P * 0.02);
-        const mTarsim = Math.round(P * 0.04);
-        const mDiger = Math.round(P * 0.01);
-        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis: " + mTahsis.toLocaleString('tr-TR') + " ₺";
-        document.getElementById('masraf-kasko').innerText = "• Kasko: " + mKasko.toLocaleString('tr-TR') + " ₺";
-        document.getElementById('masraf-sigorta').innerText = "• Hayat Sigortası: " + mSigorta.toLocaleString('tr-TR') + " ₺";
-        document.getElementById('masraf-tarsim').innerText = "• Tarsim: " + mTarsim.toLocaleString('tr-TR') + " ₺";
-        document.getElementById('masraf-diger').innerText = "• Diğer: " + mDiger.toLocaleString('tr-TR') + " ₺";
-        document.getElementById('masraf-toplam').innerText = "TOPLAM: " + (mTahsis + mKasko + mSigorta + mTarsim + mDiger).toLocaleString('tr-TR') + " ₺";
-    }
-    function indirPDF() {
-        const element = document.getElementById('main-content');
-        html2pdf().set({ margin: 5, filename: 'kredi_plani.pdf', jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
-    }
 </script>
+
 </body>
 </html>
