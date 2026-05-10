@@ -28,14 +28,12 @@
             display: flex; 
             flex-direction: column; 
             align-items: center;
-            justify-content: center;
             font-size: 12px;
             transition: 0.3s;
-            border-right: 1px solid rgba(255,255,255,0.1);
         }
         .tab-link span {
             display: block;
-            font-size: 1.53em; /* İkonlar %53 büyük */
+            font-size: 1.53em; /* %53 Büyük İkonlar */
             margin-bottom: 4px;
         }
         .tab-link.active { background: #3498db; color: #fff; }
@@ -43,7 +41,7 @@
         /* --- YAN YANA LABEL & BOX DÜZENİ --- */
         .input-grid { 
             display: grid; 
-            grid-template-columns: 1fr 1fr; /* İki sütunlu form düzeni */
+            grid-template-columns: 1fr 1fr; 
             gap: 15px 30px; 
             background: #f9f9f9; 
             padding: 20px; 
@@ -53,14 +51,13 @@
         }
         .field { 
             display: flex; 
-            align-items: center; /* Dikeyde ortala */
+            align-items: center; 
         }
         .field label { 
-            flex: 0 0 140px; /* Label genişliği sabitlendi */
+            flex: 0 0 140px; 
             font-size: 13px; 
             font-weight: 600; 
             color: #34495e; 
-            margin-right: 10px;
         }
         input, select { 
             flex: 1; 
@@ -91,7 +88,7 @@
         .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
 
         @media (max-width: 768px) {
-            .input-grid { grid-template-columns: 1fr; } /* Mobilde tek sütun */
+            .input-grid { grid-template-columns: 1fr; }
             .field label { flex: 0 0 110px; font-size: 12px; }
         }
     </style>
@@ -197,9 +194,14 @@
             currentType = tabName;
             const titles = {'traktor': 'Traktör Kredisi', 'ticari': 'Ticari Kredi', 'tuketici': 'Tüketici Kredisi'};
             document.getElementById('baslikText').innerText = titles[tabName] + " Hesaplama";
+            
+            // Traktör harici sübvansiyon alanını gizle
             document.getElementById('subContainer').style.visibility = tabName === 'traktor' ? 'visible' : 'hidden';
             document.getElementById('subOran').value = tabName === 'traktor' ? "50" : "0";
+            
+            // Varsayılan ödeme sıklığı: Yılda Bir
             document.getElementById('periyot').value = "1";
+            
             resetButtons();
         }
     }
@@ -216,7 +218,8 @@
     }
 
     function hesapla() {
-        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const tutarStr = document.getElementById('tutar').value.replace(/\./g, "");
+        const tutar = parseFloat(tutarStr);
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeYil').value);
@@ -224,6 +227,7 @@
         const planTipi = document.getElementById('planTipi').value;
         const toplamTaksit = vade * per;
         
+        // Tüketici için %15 BSMV + %15 KKDF, Diğerleri için sadece %5 BSMV
         const bsmv = currentType === 'tuketici' ? 0.15 : 0.05;
         const kkdf = currentType === 'tuketici' ? 0.15 : 0;
         const donemFaiz = yFaiz / per;
@@ -234,6 +238,7 @@
 
         for(let j=1; j<=toplamTaksit; j++){
             let fv = kalan * donemFaiz * (1 + bsmv + kkdf), a, t;
+            
             if(planTipi === 'esit_taksit') {
                 t = (tutar * i_vergi * Math.pow(1+i_vergi, toplamTaksit)) / (Math.pow(1+i_vergi, toplamTaksit)-1);
                 a = t - fv;
@@ -241,6 +246,7 @@
                 a = sabitA;
                 t = a + fv;
             }
+            
             if(j === toplamTaksit) a = kalan;
             t = a + fv;
             let sTaksit = t - (fv * sub);
@@ -262,7 +268,8 @@
     function indirPDF() {
         const element = document.getElementById('main-content');
         html2pdf().set({ 
-            margin: 5, filename: `Odeme_Plani.pdf`, 
+            margin: 5, 
+            filename: `Finansal_Odeme_Plani.pdf`, 
             html2canvas: { scale: 2 }, 
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
         }).from(element).save();
