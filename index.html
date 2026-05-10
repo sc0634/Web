@@ -29,7 +29,7 @@
         input, select { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; outline: none; background: #fff; width: 100%; }
 
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-        .container { max-width: 1200px; margin: 10px auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .container { max-width: 1200px; margin: 10px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 20px; font-size: 20px; }
@@ -42,7 +42,7 @@
         button:disabled { background: #ccc !important; cursor: not-allowed; }
 
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 800px; }
         th { background: #34495e; color: #fff; padding: 10px 4px; font-size: 10px; text-align: center; }
         td { padding: 10px 4px; border-bottom: 1px solid #eee; text-align: center; font-size: 11px; color: #333; }
         .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
@@ -52,8 +52,8 @@
             .tabs, .btn-group, .no-print { display: none !important; }
             .container { box-shadow: none; margin: 0; padding: 0; width: 100%; }
             .input-grid { grid-template-columns: 1fr 1fr 1fr !important; border: 1px solid #ddd !important; background: white !important; }
-            input, select { border: none !important; font-weight: bold; background: transparent !important; }
-            th { background: #eee !important; color: #000 !important; border: 1px solid #ddd; }
+            input, select { border: none !important; font-weight: bold; background: transparent !important; appearance: none; }
+            th { background: #f2f2f2 !important; color: #000 !important; border: 1px solid #ddd; }
             td { border: 1px solid #ddd; }
         }
 
@@ -103,7 +103,7 @@
                             <th>No</th>
                             <th>Taksit Tutarı</th>
                             <th>Anapara</th>
-                            <th>Net Faiz</th>
+                            <th>Taksitin İçindeki Faiz Tutarı</th>
                             <th>BSMV</th>
                             <th>KKDF</th>
                             <th id="thSub" style="background:#2c3e50; color:#fff;">Sübvansiyonlu Taksit</th>
@@ -185,7 +185,6 @@
         const buttons = document.getElementById('action-buttons');
         const nav = document.getElementById('navbar');
 
-        // Mobil uyumlu gizleme
         buttons.style.visibility = 'hidden';
         nav.style.display = 'none';
 
@@ -193,12 +192,7 @@
             margin: [10, 5, 10, 5],
             filename: 'Kredi_Plani.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2, 
-                useCORS: true, 
-                letterRendering: true,
-                scrollY: 0
-            },
+            html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
         };
 
