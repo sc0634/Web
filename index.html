@@ -238,19 +238,20 @@
             <td>-</td>
         </tr>`;
 
-        const mTahsis = P * 0.004;
-        const mKasko = P * 0.03, mSigorta = P * 0.02, mDiger = P * 0.01;
-        // Tarsim oranı %4 (0.04) olarak güncellendi
-        const mTarsim = P * 0.04;
+        // Masraflarda küsuratları kaldırmak için Math.round veya .toFixed(0) kullanıldı
+        const mTahsis = Math.round(P * 0.004);
+        const mKasko = Math.round(P * 0.03);
+        const mSigorta = Math.round(P * 0.02);
+        const mTarsim = Math.round(P * 0.04);
+        const mDiger = Math.round(P * 0.01);
         const mToplam = mTahsis + mKasko + mSigorta + mTarsim + mDiger;
 
-        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti: " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
-        document.getElementById('masraf-kasko').innerText = "• Kasko: " + mKasko.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
-        document.getElementById('masraf-sigorta').innerText = "• Hayat Sigortası: " + mSigorta.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
-        // Tarsim için oran ibaresi kaldırıldı
-        document.getElementById('masraf-tarsim').innerText = "• Tarsim: " + mTarsim.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
-        document.getElementById('masraf-diger').innerText = "• Diğer Masraflar: " + mDiger.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
-        document.getElementById('masraf-toplam').innerText = "MASRAFLAR TOPLAMI: " + mToplam.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti: " + mTahsis.toLocaleString('tr-TR') + " ₺";
+        document.getElementById('masraf-kasko').innerText = "• Kasko: " + mKasko.toLocaleString('tr-TR') + " ₺";
+        document.getElementById('masraf-sigorta').innerText = "• Hayat Sigortası: " + mSigorta.toLocaleString('tr-TR') + " ₺";
+        document.getElementById('masraf-tarsim').innerText = "• Tarsim: " + mTarsim.toLocaleString('tr-TR') + " ₺";
+        document.getElementById('masraf-diger').innerText = "• Diğer Masraflar: " + mDiger.toLocaleString('tr-TR') + " ₺";
+        document.getElementById('masraf-toplam').innerText = "MASRAFLAR TOPLAMI: " + mToplam.toLocaleString('tr-TR') + " ₺";
     }
 
     function indirPDF() {
