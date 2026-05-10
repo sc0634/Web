@@ -41,7 +41,6 @@
         #btnPdf { background: #3498db; } #btnYazdir { background: #f39c12; }
         button:disabled { background: #ccc !important; cursor: not-allowed; }
 
-        /* ÖZET PANELİ */
         .summary-box { 
             background: #fdfdfd; border: 2px solid #3498db; padding: 15px; 
             border-radius: 8px; margin-bottom: 20px; display: grid; 
@@ -78,6 +77,7 @@
     <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Traktör</button>
     <button class="tab-link" onclick="openTab(event, 'ticari')"><span>💼</span>Ticari</button>
     <button class="tab-link" onclick="openTab(event, 'zirai')"><span>👨‍🌾</span>Zirai</button>
+    <button class="tab-link" onclick="openTab(event, 'zirai_isletme')"><span>🏦</span>Zirai/İşletme</button>
     <button class="tab-link" onclick="openTab(event, 'tuketici')"><span>🛒💳</span>Tüketici</button>
     <button class="tab-link" onclick="openTab(event, 'hakkimda')"><span>👤</span>Hakkımda</button>
 </div>
@@ -130,6 +130,12 @@
             </div>
         </div>
     </div>
+
+    <div id="zirai_isletmeAlani" class="tab-content">
+        <h1>Zirai/İşletme Kredisi</h1>
+        <p style="text-align:center; color: #7f8c8d;">Bu bölüm henüz yapılandırılmadı.</p>
+    </div>
+
     <div id="hakkimdaAlani" class="tab-content">
         <h1>Süleyman Coşkun</h1>
         <p style="text-align:center;">Finansal Analiz Uzmanı & Bankacılık Çözümleri</p>
@@ -166,21 +172,38 @@
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         evt.currentTarget.classList.add('active');
-        if(tabName === 'hakkimda') { document.getElementById('hakkimdaAlani').classList.add('active'); } 
-        else {
+
+        if(tabName === 'hakkimda') { 
+            document.getElementById('hakkimdaAlani').classList.add('active'); 
+        } else if (tabName === 'zirai_isletme') {
+            document.getElementById('zirai_isletmeAlani').classList.add('active');
+        } else {
             document.getElementById('krediAlani').classList.add('active');
             currentType = tabName;
-            const titles = {'traktor':'Traktör Kredisi','ticari':'Ticari Kredi','zirai':'Zirai/Çiftçi Tarım Kredisi','tuketici':'Tüketici Kredisi'};
+            const titles = {
+                'traktor':'Traktör Kredisi',
+                'ticari':'Ticari Kredi',
+                'zirai':'Zirai/Çiftçi Tarım Kredisi',
+                'tuketici':'Tüketici Kredisi'
+            };
             document.getElementById('baslikText').innerText = titles[tabName] + " Hesaplama";
             document.getElementById('subContainer').style.visibility = tabName === 'traktor' ? 'visible' : 'hidden';
             document.getElementById('subOran').value = tabName === 'traktor' ? "50" : "0";
-            document.getElementById('periyot').value = "1";
-            vadeYukle(); resetButtons();
+            vadeYukle(); 
+            resetButtons();
         }
     }
 
-    function resetButtons() { document.getElementById('btnYazdir').disabled = true; document.getElementById('btnPdf').disabled = true; document.getElementById('sonucAlani').style.display = 'none'; }
-    function formatTutar(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); }
+    function resetButtons() { 
+        document.getElementById('btnYazdir').disabled = true; 
+        document.getElementById('btnPdf').disabled = true; 
+        document.getElementById('sonucAlani').style.display = 'none'; 
+    }
+    
+    function formatTutar(i) { 
+        let v = i.value.replace(/\D/g, ""); 
+        if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); 
+    }
     
     function hesapla() {
         const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
