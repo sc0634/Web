@@ -8,86 +8,59 @@
     <style>
         @page { size: A4 landscape; margin: 10mm; }
         body { 
-            font-family: 'Courier New', Courier, monospace; /* Banka dekontu havası için monospaced font */
-            background-color: #fff; 
-            margin: 0; 
-            padding: 0; 
-            color: #000;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f0f2f5; 
+            margin: 0; padding: 0; color: #333;
+            display: flex; flex-direction: column; min-height: 100vh;
         }
         
-        /* Menü */
+        /* EKRAN TASARIMI (RENKLİ) */
         .tabs { 
-            display: flex; 
-            background: #000; 
-            padding: 0 10px; 
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            overflow-x: auto;
+            display: flex; background: #1a252f; padding: 0 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: sticky; top: 0; z-index: 1000;
         }
-        
         .tab-link { 
-            padding: 12px 20px; 
-            color: #fff; 
-            border: none; 
-            background: none; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 13px; 
+            padding: 15px 25px; color: #bdc3c7; border: none; background: none; 
+            cursor: pointer; font-weight: bold; transition: 0.3s;
         }
-        .tab-link.active { background: #fff; color: #000; }
+        .tab-link.active { color: #fff; background: #3498db; border-bottom: 3px solid #fff; }
         
-        .tab-content { display: none; padding: 15px; }
-        .tab-content.active { display: block; }
-
-        .container { max-width: 1150px; margin: 0 auto; background: #fff; padding: 25px; border: 1px solid #000; }
+        .container { max-width: 1150px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
         
-        h1 { color: #000; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 25px; font-size: 20px; text-transform: uppercase; }
-
-        .print-header { display: none; text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
 
         .input-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 20px; 
-            padding: 20px; 
-            border: 1px solid #000;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 15px; margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 5px solid #3498db;
         }
-
-        .vergi-bilgi-satiri { 
-            display: flex; gap: 20px; padding: 10px; 
-            border: 1px solid #000; margin-bottom: 20px; font-size: 12px; font-weight: bold;
-        }
-
-        .field { display: flex; flex-direction: column; }
-        label { font-weight: bold; margin-bottom: 5px; font-size: 11px; text-transform: uppercase; }
-        input, select { padding: 10px; border: 1px solid #000; font-size: 13px; background: #fff; }
+        .field label { font-weight: 600; font-size: 12px; color: #34495e; margin-bottom: 5px; display: block; }
+        input, select { padding: 12px; border: 1px solid #dcdde1; border-radius: 6px; width: 100%; box-sizing: border-box; }
         
-        .btn-group { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
-        button { flex: 1; min-width: 120px; padding: 12px; border: 1px solid #000; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; transition: 0.2s; }
-        button:hover:not(:disabled) { background: #000; color: #fff; }
-        .btn-clear { background: #fff; color: #000; }
-        button:disabled { border-color: #ccc; color: #ccc; cursor: not-allowed; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 25px; }
+        button { flex: 1; padding: 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; color: #fff; }
+        
+        .btn-calc { background: #2ecc71; } .btn-calc:hover { background: #27ae60; }
+        .btn-clear { background: #e74c3c; } .btn-clear:hover { background: #c0392b; }
+        #btnPdf { background: #3498db; } #btnPdf:hover { background: #2980b9; }
+        #btnYazdir { background: #f39c12; } #btnYazdir:hover { background: #d35400; }
+        button:disabled { background: #bdc3c7 !important; cursor: not-allowed; }
 
-        .table-responsive { width: 100%; overflow-x: auto; }
+        .table-responsive { width: 100%; overflow-x: auto; border-radius: 8px; }
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #000; color: #fff; padding: 10px 5px; font-size: 11px; border: 1px solid #000; }
-        td { border: 1px solid #000; padding: 10px 5px; text-align: center; font-size: 12px; }
-        .bold-col { font-weight: bold; }
+        th { background: #34495e; color: #fff; padding: 12px; font-size: 12px; }
+        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
+        .sub-row { background: #ebf5fb; font-weight: bold; color: #2980b9; }
 
-        @media (min-width: 768px) { h1 { font-size: 24px; } }
-
+        /* YAZDIRMA TASARIMI (SİYAH-BEYAZ) */
         @media print {
-            .tabs, .no-print, .btn-group, .input-grid, .vergi-bilgi-satiri, h1 { display: none !important; }
-            .container { border: none; padding: 0; }
-            .print-header { display: block; }
-            table { min-width: 100%; }
-            th { background: #000 !important; color: #fff !important; }
-            .table-responsive { overflow: visible; }
+            .tabs, .no-print, .btn-group, .input-grid, h1 { display: none !important; }
+            body { background: #fff; color: #000; font-family: 'Courier New', monospace; }
+            .container { box-shadow: none; border: none; width: 100%; padding: 0; }
+            .print-header { display: block !important; text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; }
+            table { border: 1px solid #000; width: 100%; }
+            th { background: #000 !important; color: #fff !important; border: 1px solid #000; }
+            td { border: 1px solid #000; color: #000 !important; background: #fff !important; }
+            .sub-row { color: #000 !important; text-decoration: underline; }
         }
     </style>
 </head>
@@ -102,14 +75,14 @@
 <div id="krediAlani" class="tab-content active">
     <div class="container" id="main-content">
         
-        <div class="print-header">
-            <h2 style="margin:0;">KREDİ ÖDEME PLANI</h2>
-            <p style="margin:5px 0;">Süleyman Coşkun | Finansal Analiz</p>
-            <p id="printDate" style="font-size:12px;"></p>
+        <div class="print-header" style="display:none;">
+            <h2 style="margin:0;">KREDİ ÖDEME PLANI RAPORU</h2>
+            <p>Süleyman Coşkun - Finansal Analiz</p>
+            <p id="pDate"></p>
         </div>
 
         <div class="no-print">
-            <h1 id="baslikText">Kredi Hesaplama Sistemi</h1>
+            <h1 id="baslikText">Traktör Kredisi Hesaplama</h1>
             <div class="input-grid">
                 <div class="field">
                     <label>Kredi Tutarı (₺)</label>
@@ -131,7 +104,7 @@
                         <option value="12">Ayda Bir</option>
                         <option value="4">3 Ayda Bir</option>
                         <option value="2">6 Ayda Bir</option>
-                        <option value="1">Yılda Bir</option>
+                        <option value="1" selected>Yılda Bir</option>
                     </select>
                 </div>
                 <div class="field">
@@ -144,14 +117,9 @@
                 </div>
             </div>
 
-            <div class="vergi-bilgi-satiri">
-                <span>BSMV: %5</span>
-                <span id="kkdfBilgi">KKDF: %0</span>
-            </div>
-
             <div class="btn-group">
-                <button onclick="hesapla()">HESAPLA</button>
-                <button class="btn-clear" onclick="temizleForm()">TEMİZLE</button>
+                <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
+                <button class="btn-clear" onclick="resetButtons()">TEMİZLE</button>
                 <button id="btnPdf" onclick="indirPDF()" disabled>PDF KAYDET</button>
                 <button id="btnYazdir" onclick="window.print()" disabled>YAZDIR</button>
             </div>
@@ -167,7 +135,7 @@
                         <th>Faiz</th>
                         <th>BSMV</th>
                         <th class="kkdf-col">KKDF</th>
-                        <th style="border: 2px solid #000;">Sübvansiyonlu Taksit</th>
+                        <th style="background:#2c3e50; color:#fff;">Sübvansiyonlu Taksit</th>
                         <th>Kalan Anapara</th>
                     </tr>
                 </thead>
@@ -177,33 +145,25 @@
     </div>
 </div>
 
-<div id="hakkimda" class="tab-content">
-    <div class="container">
-        <h2>Süleyman Coşkun</h2>
-        <p>Finansal Analiz & Bankacılık Çözümleri</p>
-    </div>
-</div>
-
 <script>
     let currentType = 'traktor';
 
     function openTab(evt, tabName) {
-        const tabcontents = document.getElementsByClassName("tab-content");
-        for (let i = 0; i < tabcontents.length; i++) tabcontents[i].classList.remove("active");
-        const tablinks = document.getElementsByClassName("tab-link");
-        for (let i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
+        const links = document.getElementsByClassName("tab-link");
+        for (let l of links) l.classList.remove("active");
         evt.currentTarget.classList.add("active");
 
-        if (tabName === 'hakkimda') {
-            document.getElementById('hakkimda').classList.add('active');
-            document.getElementById('krediAlani').classList.remove('active');
+        currentType = tabName;
+        const periyotSelect = document.getElementById('periyot');
+        
+        if (tabName === 'traktor') {
+            document.getElementById('baslikText').innerText = 'Traktör Kredisi Hesaplama';
+            periyotSelect.value = "1"; // Yılda Bir
         } else {
-            currentType = tabName;
-            document.getElementById('krediAlani').classList.add('active');
-            document.getElementById('baslikText').innerText = tabName === 'traktor' ? 'Traktör Kredisi' : 'Ticari Kredi';
-            document.getElementById('kkdfBilgi').innerText = tabName === 'traktor' ? 'KKDF: %0' : 'KKDF: %15';
-            resetButtons();
+            document.getElementById('baslikText').innerText = 'Ticari Kredi Hesaplama';
+            periyotSelect.value = "12"; // Ayda Bir
         }
+        resetButtons();
     }
 
     function resetButtons() {
@@ -212,80 +172,57 @@
         document.getElementById('sonucAlani').style.display = 'none';
     }
 
-    function temizleForm() {
-        resetButtons();
-    }
-
     function formatTutar(input) {
-        let value = input.value.replace(/\D/g, "");
-        if (value === "") return;
-        input.value = new Intl.NumberFormat('tr-TR').format(value);
+        let v = input.value.replace(/\D/g, "");
+        if (v) input.value = new Intl.NumberFormat('tr-TR').format(v);
     }
 
     function hesapla() {
-        const rawValue = document.getElementById('tutar').value.replace(/\./g, "");
-        const P = parseFloat(rawValue);
-        if (isNaN(P) || P <= 0) { alert("Lütfen tutar giriniz."); return; }
-
+        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
-        const vadeYil = parseInt(document.getElementById('vadeYil').value);
+        const vade = parseInt(document.getElementById('vadeYil').value);
         const periyot = parseInt(document.getElementById('periyot').value);
-        const toplamTaksit = vadeYil * periyot;
-        
-        const bsmv = 0.05;
-        const kkdf = currentType === 'traktor' ? 0 : 0.15;
+        const toplamTaksit = vade * periyot;
+        const bsmv = 0.05, kkdf = (currentType === 'traktor' ? 0 : 0.15);
 
-        // KKDF Sütun Kontrolü
         const kkdfCols = document.querySelectorAll('.kkdf-col');
-        kkdfCols.forEach(el => currentType === 'traktor' ? el.classList.add('hide-kkdf') : el.classList.remove('hide-kkdf'));
+        kkdfCols.forEach(el => currentType === 'traktor' ? el.style.display='none' : el.style.display='table-cell');
 
-        // Dönemsel Faiz Oranı
         const i = (yFaiz / periyot) * (1 + bsmv + kkdf);
-        const taksit = (P * i * Math.pow(1 + i, toplamTaksit)) / (Math.pow(1 + i, toplamTaksit) - 1);
+        const taksit = (tutar * i * Math.pow(1+i, toplamTaksit)) / (Math.pow(1+i, toplamTaksit)-1);
 
-        const tbody = document.getElementById('planBody');
-        tbody.innerHTML = '';
-        let kalan = P;
-
-        for (let j = 1; j <= toplamTaksit; j++) {
+        let body = ''; let kalan = tutar;
+        for(let j=1; j<=toplamTaksit; j++){
             let f = kalan * (yFaiz / periyot);
-            let b = f * bsmv;
-            let k = f * kkdf;
+            let b = f * bsmv, k = f * kkdf;
             let a = taksit - (f + b + k);
-            if (j === toplamTaksit) a = kalan;
-            let sTaksit = taksit - ((f + b + k) * sub);
+            if(j === toplamTaksit) a = kalan;
+            let sTaksit = taksit - ((f+b+k)*sub);
             kalan -= a;
-
-            tbody.innerHTML += `
-                <tr>
-                    <td>${j}</td>
-                    <td>${taksit.toLocaleString('tr-TR',{maximumFractionDigits:0})} ₺</td>
-                    <td>${a.toLocaleString('tr-TR',{maximumFractionDigits:0})} ₺</td>
-                    <td>${f.toLocaleString('tr-TR',{maximumFractionDigits:0})} ₺</td>
-                    <td>${b.toLocaleString('tr-TR',{maximumFractionDigits:0})} ₺</td>
-                    <td class="kkdf-col ${currentType === 'traktor' ? 'hide-kkdf' : ''}">${k.toLocaleString('tr-TR',{maximumFractionDigits:0})} ₺</td>
-                    <td class="bold-col">${sTaksit.toLocaleString('tr-TR',{maximumFractionDigits:0})} ₺</td>
-                    <td>${Math.abs(kalan).toLocaleString('tr-TR',{maximumFractionDigits:0})} ₺</td>
-                </tr>`;
+            body += `<tr><td>${j}</td>
+                <td>${Math.round(taksit).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(f).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(b).toLocaleString('tr-TR')} ₺</td>
+                <td class="kkdf-col" style="${currentType==='traktor'?'display:none':''}">${Math.round(k).toLocaleString('tr-TR')} ₺</td>
+                <td class="sub-row">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
-        
-        document.getElementById('printDate').innerText = "Rapor Tarihi: " + new Date().toLocaleDateString('tr-TR');
+        document.getElementById('planBody').innerHTML = body;
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('btnYazdir').disabled = false;
         document.getElementById('btnPdf').disabled = false;
+        document.getElementById('pDate').innerText = "Rapor Tarihi: " + new Date().toLocaleDateString('tr-TR');
     }
 
     function indirPDF() {
         const element = document.getElementById('main-content');
-        const opt = {
-            margin: 5,
-            filename: 'kredi_plani.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, ignoreElements: (el) => el.classList.contains('no-print') },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-        };
-        html2pdf().set(opt).from(element).save();
+        html2pdf().set({ 
+            margin: 5, filename: 'odeme_plani.pdf', 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
+        }).from(element).save();
     }
 </script>
 </body>
