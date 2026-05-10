@@ -34,12 +34,12 @@
         tfoot td { font-weight: bold; background: #eee !important; border: 2px solid #000; }
         .sub-highlight { font-weight: bold; background: #f0f0f0 !important; border: 1px solid #000; font-size: 9px; }
         
-        .masraflar-section { margin-top: 20px; padding: 10px; border: 1px solid #000; border-radius: 4px; }
-        .masraflar-baslik { font-size: 14px; font-weight: bold; text-decoration: underline; margin-bottom: 8px; text-transform: uppercase; }
-        .masraf-satir { font-size: 12px; margin-bottom: 4px; font-weight: 500; }
+        .section-box { margin-top: 15px; padding: 10px; border: 1px solid #000; border-radius: 4px; }
+        .section-title { font-size: 13px; font-weight: bold; text-decoration: underline; margin-bottom: 8px; text-transform: uppercase; }
+        .list-item { font-size: 11px; margin-bottom: 4px; font-weight: 500; }
         .masraf-toplam { margin-top: 8px; padding-top: 5px; border-top: 1px dashed #000; font-weight: bold; font-size: 13px; }
 
-        .disclaimer { margin-top: 15px; font-size: 11px; color: #555; font-style: italic; border-left: 3px solid #000; padding-left: 10px; }
+        .disclaimer { margin-top: 15px; font-size: 10px; color: #555; font-style: italic; border-left: 3px solid #000; padding-left: 10px; }
         .signature { display: none; text-align: right; font-size: 6px; font-style: italic; font-weight: bold; margin-top: 10px; color: #333; }
         
         @media print {
@@ -50,7 +50,7 @@
             .signature { display: block; }
             table { font-size: 9px; page-break-inside: auto; }
             tr { page-break-inside: avoid; page-break-after: auto; }
-            .masraflar-section { page-break-inside: avoid; margin-top: 10px; }
+            .section-box { page-break-inside: avoid; }
             th, tfoot td { background: #ddd !important; -webkit-print-color-adjust: exact; }
         }
     </style>
@@ -132,14 +132,24 @@
             <tfoot id="planFoot"></tfoot>
         </table>
 
-        <div class="masraflar-section">
-            <div class="masraflar-baslik">MASRAFLAR</div>
-            <div id="masraf-tahsis" class="masraf-satir"></div>
-            <div id="masraf-kasko" class="masraf-satir"></div>
-            <div id="masraf-sigorta" class="masraf-satir"></div>
-            <div id="masraf-tarsim" class="masraf-satir"></div>
-            <div id="masraf-diger" class="masraf-satir"></div>
-            <div id="masraf-toplam" class="masraf-toplam"></div>
+        <div style="display: flex; gap: 20px;">
+            <div class="section-box" style="flex: 1;">
+                <div class="section-title">MASRAFLAR</div>
+                <div id="masraf-tahsis" class="list-item"></div>
+                <div id="masraf-kasko" class="list-item"></div>
+                <div id="masraf-sigorta" class="list-item"></div>
+                <div id="masraf-tarsim" class="list-item"></div>
+                <div id="masraf-diger" class="list-item"></div>
+                <div id="masraf-toplam" class="masraf-toplam"></div>
+            </div>
+
+            <div class="section-box" style="flex: 1;">
+                <div class="section-title">GEREKLİ BELGELER</div>
+                <div class="list-item">• ÇKS (Çiftçi Kayıt Sistemi) Belgesi</div>
+                <div class="list-item">• Araziler kiralık ise noter onaylı kira sözleşmesi</div>
+                <div class="list-item">• İşletme Tescil Belgesi</div>
+                <div class="list-item">• Varlık belgeleri (Tapu ve Ruhsatlar)</div>
+            </div>
         </div>
 
         <div class="disclaimer">
@@ -238,7 +248,6 @@
             <td>-</td>
         </tr>`;
 
-        // Masraflarda küsuratları kaldırmak için Math.round veya .toFixed(0) kullanıldı
         const mTahsis = Math.round(P * 0.004);
         const mKasko = Math.round(P * 0.03);
         const mSigorta = Math.round(P * 0.02);
