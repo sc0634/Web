@@ -41,30 +41,23 @@
         #btnPdf { background: #3498db; } #btnYazdir { background: #f39c12; }
         button:disabled { background: #ccc !important; cursor: not-allowed; }
 
-        .summary-box { 
-            background: #fdfdfd; border: 2px solid #3498db; padding: 15px; 
-            border-radius: 8px; margin-bottom: 20px; display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
-        }
-        .summary-item { text-align: center; border-right: 1px solid #eee; }
-        .summary-item:last-child { border-right: none; }
-        .summary-item strong { display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; }
-        .summary-item span { font-size: 18px; font-weight: bold; color: #2c3e50; }
-
-        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 850px; }
         th { background: #34495e; color: #fff; padding: 12px 4px; font-size: 10px; text-align: center; }
         td { padding: 10px 4px; border-bottom: 1px solid #eee; text-align: center; font-size: 11px; color: #333; }
-        .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
+        
+        .total-row { background: #2c3e50 !important; color: #fff !important; font-weight: bold; }
+        .total-row td { color: #fff !important; border: none; font-size: 12px; }
+        
+        .expense-section { margin-top: 25px; border-top: 2px solid #3498db; padding-top: 15px; }
+        .expense-section h3 { font-size: 16px; color: #2c3e50; margin-bottom: 10px; }
+        .expense-table { min-width: 400px; width: 50%; }
+        .expense-table td { text-align: left; padding: 8px; }
+        .expense-table .price { text-align: right; font-weight: bold; }
 
         @media print {
             .tabs, .btn-group, .no-print { display: none !important; }
             .container { box-shadow: none; margin: 0; padding: 0; width: 100%; }
-        }
-
-        @media (max-width: 600px) {
-            .input-grid { grid-template-columns: 1fr; }
-            .summary-box { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -105,12 +98,6 @@
         </div>
 
         <div id="sonucAlani" style="display:none;">
-            <div class="summary-box">
-                <div class="summary-item"><strong>Kredi Tutarı</strong><span id="sumAnapara">0 ₺</span></div>
-                <div class="summary-item"><strong>Toplam Faiz + Vergi</strong><span id="sumFaiz">0 ₺</span></div>
-                <div class="summary-item" style="color: #27ae60;"><strong>Toplam Geri Ödeme</strong><span id="sumGenel">0 ₺</span></div>
-            </div>
-
             <div class="table-responsive">
                 <table id="planTable">
                     <thead>
@@ -126,20 +113,24 @@
                         </tr>
                     </thead>
                     <tbody id="planBody"></tbody>
+                    <tfoot id="planFoot"></tfoot>
+                </table>
+            </div>
+
+            <div class="expense-section">
+                <h3>MASRAFLAR</h3>
+                <table class="expense-table">
+                    <tr><td>Kredi Tahsis Ücreti (%0.5)</td><td class="price" id="expTahsis">0 ₺</td></tr>
+                    <tr><td>Ekspertiz Ücreti</td><td class="price">0 ₺ (Masrafsız)</td></tr>
+                    <tr><td>Hayat Sigortası (Tahmini)</td><td class="price" id="expSigorta">0 ₺</td></tr>
+                    <tr style="background:#eee; font-weight:bold;"><td>TOPLAM MASRAF</td><td class="price" id="expToplam">0 ₺</td></tr>
                 </table>
             </div>
         </div>
     </div>
-
-    <div id="zirai_isletmeAlani" class="tab-content">
-        <h1>Zirai/İşletme Kredisi</h1>
-        <p style="text-align:center; color: #7f8c8d;">Bu bölüm henüz yapılandırılmadı.</p>
-    </div>
-
-    <div id="hakkimdaAlani" class="tab-content">
-        <h1>Süleyman Coşkun</h1>
-        <p style="text-align:center;">Finansal Analiz Uzmanı</p>
-    </div>
+    
+    <div id="zirai_isletmeAlani" class="tab-content"><h1>Zirai/İşletme Kredisi</h1><p style="text-align:center;">Yapılandırılmadı.</p></div>
+    <div id="hakkimdaAlani" class="tab-content"><h1>Süleyman Coşkun</h1><p style="text-align:center;">Finansal Analiz Uzmanı</p></div>
 </div>
 
 <script>
@@ -183,24 +174,18 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         evt.currentTarget.classList.add('active');
 
-        if(tabName === 'hakkimda') { 
-            document.getElementById('hakkimdaAlani').classList.add('active'); 
-        } else if (tabName === 'zirai_isletme') {
-            document.getElementById('zirai_isletmeAlani').classList.add('active');
-        } else {
+        if(tabName === 'hakkimda') { document.getElementById('hakkimdaAlani').classList.add('active'); }
+        else if (tabName === 'zirai_isletme') { document.getElementById('zirai_isletmeAlani').classList.add('active'); }
+        else {
             document.getElementById('krediAlani').classList.add('active');
             currentType = tabName;
             const titles = {'traktor':'Zirai Traktör Kredisi','ticari':'Ticari Kredi','zirai':'Çiftçi Tüketici Kredisi','tuketici':'Tüketici Kredisi'};
             document.getElementById('baslikText').innerText = titles[tabName] + " Hesaplama";
             document.getElementById('subContainer').style.visibility = tabName === 'traktor' ? 'visible' : 'hidden';
             
-            if (tabName === 'traktor') {
-                document.getElementById('faizYillik').value = "40.50";
-                document.getElementById('subOran').value = "50";
-            } else {
-                document.getElementById('faizYillik').value = "49.00";
-                document.getElementById('subOran').value = "0";
-            }
+            if (tabName === 'traktor') { document.getElementById('faizYillik').value = "40.50"; document.getElementById('subOran').value = "50"; }
+            else if (tabName === 'zirai') { document.getElementById('faizYillik').value = "45.00"; document.getElementById('subOran').value = "0"; }
+            else { document.getElementById('faizYillik').value = "49.00"; document.getElementById('subOran').value = "0"; }
             yilliktanAyliga(); vadeYukle(); resetButtons();
         }
     }
@@ -231,7 +216,9 @@
         const donemFaiz = yFaiz / per;
         const i_vergi = donemFaiz * (1 + bsmvOran + kkdfOran);
         
-        let body = ''; let kalan = tutar; let toplamGeriOdeme = 0;
+        let body = ''; let kalan = tutar;
+        let sumTaksit = 0, sumAnapara = 0, sumFaiz = 0, sumBsmv = 0, sumKkdf = 0, sumSub = 0;
+        
         document.getElementById('thSub').style.display = sub > 0 ? '' : 'none';
         
         for(let j=1; j<=toplamTaksit; j++){
@@ -245,19 +232,27 @@
             } else { a = tutar / toplamTaksit; t = a + netFaiz + bsmv + kkdf; }
             if(j === toplamTaksit) a = kalan;
             t = a + netFaiz + bsmv + kkdf;
-            
             let sTaksit = t - ((netFaiz + bsmv + kkdf) * sub);
-            toplamGeriOdeme += (sub > 0 ? sTaksit : t);
+            
+            sumTaksit += t; sumAnapara += a; sumFaiz += netFaiz; sumBsmv += bsmv; sumKkdf += kkdf; sumSub += sTaksit;
             kalan -= a;
 
-            body += `<tr><td>${j}</td><td>${Math.round(t).toLocaleString('tr-TR')} ₺</td><td>${Math.round(a).toLocaleString('tr-TR')} ₺</td><td>${Math.round(netFaiz).toLocaleString('tr-TR')} ₺</td><td>${Math.round(bsmv).toLocaleString('tr-TR')} ₺</td><td>${Math.round(kkdf).toLocaleString('tr-TR')} ₺</td><td class="sub-row" style="${sub > 0 ? '' : 'display:none'}">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
+            body += `<tr><td>${j}</td><td>${Math.round(t).toLocaleString('tr-TR')} ₺</td><td>${Math.round(a).toLocaleString('tr-TR')} ₺</td><td>${Math.round(netFaiz).toLocaleString('tr-TR')} ₺</td><td>${Math.round(bsmv).toLocaleString('tr-TR')} ₺</td><td>${Math.round(kkdf).toLocaleString('tr-TR')} ₺</td><td style="${sub > 0 ? '' : 'display:none'}">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
 
-        document.getElementById('sumAnapara').innerText = Math.round(tutar).toLocaleString('tr-TR') + " ₺";
-        document.getElementById('sumFaiz').innerText = Math.round(toplamGeriOdeme - tutar).toLocaleString('tr-TR') + " ₺";
-        document.getElementById('sumGenel').innerText = Math.round(toplamGeriOdeme).toLocaleString('tr-TR') + " ₺";
+        // Toplam Satırı (Tfoot)
+        let foot = `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(sumTaksit).toLocaleString('tr-TR')} ₺</td><td>${Math.round(sumAnapara).toLocaleString('tr-TR')} ₺</td><td>${Math.round(sumFaiz).toLocaleString('tr-TR')} ₺</td><td>${Math.round(sumBsmv).toLocaleString('tr-TR')} ₺</td><td>${Math.round(sumKkdf).toLocaleString('tr-TR')} ₺</td><td style="${sub > 0 ? '' : 'display:none'}">${Math.round(sumSub).toLocaleString('tr-TR')} ₺</td><td>-</td></tr>`;
 
         document.getElementById('planBody').innerHTML = body;
+        document.getElementById('planFoot').innerHTML = foot;
+
+        // Masraf Hesaplamaları
+        const tahsis = tutar * 0.005;
+        const sigorta = tutar * 0.015; // Örnek %1.5
+        document.getElementById('expTahsis').innerText = Math.round(tahsis).toLocaleString('tr-TR') + " ₺";
+        document.getElementById('expSigorta').innerText = Math.round(sigorta).toLocaleString('tr-TR') + " ₺";
+        document.getElementById('expToplam').innerText = Math.round(tahsis + sigorta).toLocaleString('tr-TR') + " ₺";
+
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('btnYazdir').disabled = false;
         document.getElementById('btnPdf').disabled = false;
