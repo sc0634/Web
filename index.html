@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traktör ve Tarım Kredisi Hesaplama</title>
+    <title>Traktör Kredisi Hesaplama Sistemi</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @page { size: A4 landscape; margin: 10mm; }
@@ -25,6 +25,12 @@
         td { border-bottom: 1px solid #eee; padding: 10px; text-align: center; }
         tr:nth-child(even) { background: #f8f9fa; }
         .sub-highlight { color: #d35400; font-weight: bold; background: #fff5eb !important; }
+        
+        /* Önemli Detaylar Bölümü */
+        .detaylar-section { margin-top: 30px; padding: 20px; border-top: 1px solid #eee; }
+        .detaylar-baslik { font-size: 18px; font-weight: bold; text-decoration: underline; margin-bottom: 10px; color: #2c3e50; }
+        .detay-satir { font-size: 15px; margin-bottom: 5px; color: #555; }
+
         @media print { .no-print { display: none !important; } .container { box-shadow: none; border: none; width: 100%; } }
     </style>
 </head>
@@ -32,11 +38,11 @@
 
 <div class="container" id="main-content">
     <div class="no-print">
-        <h1>Traktör Kredisi Ödeme Planı</h1>
+        <h1>Traktör Kredisi Planlama</h1>
         <div class="input-grid">
             <div class="field">
                 <label>Kredi Türü</label>
-                <select id="krediTuru">
+                <select id="krediTuru" onchange="periyotGuncelle()">
                     <option value="traktor" selected>Traktör Kredisi (%15 KKDF + %15 BSMV)</option>
                     <option value="ihtiyac">İhtiyaç Kredisi (%15 KKDF + %15 BSMV)</option>
                     <option value="ticari">Ticari Kredi (%0 KKDF + %5 BSMV)</option>
@@ -52,16 +58,15 @@
             </div>
             <div class="field">
                 <label>Ödeme Periyodu</label>
-                <select id="periyot">
-                    <option value="1">Ayda Bir</option>
-                    <option value="3">3 Ayda Bir</option>
-                    <option value="6">6 Ayda Bir</option>
-                    <option value="12" selected>Yılda Bir</option>
-                </select>
+                <select id="periyot"></select>
             </div>
             <div class="field">
                 <label>Aylık Faiz Oranı (%)</label>
-                <input type="number" id="faiz" step="0.01" value="3.50">
+                <input type="number" id="faizAylik" step="0.01" value="3.50" oninput="ayliktanYilliga()">
+            </div>
+            <div class="field">
+                <label>Yıllık Faiz Oranı (%)</label>
+                <input type="number" id="faizYillik" step="0.01" value="42.00" oninput="yilliktanAyliga()">
             </div>
             <div class="field">
                 <label>Sübvansiyon (%)</label>
@@ -93,28 +98,58 @@
             </thead>
             <tbody id="planBody"></tbody>
         </table>
+
+        <!-- Yeni Önemli Detaylar Bölümü -->
+        <div class="detaylar-section">
+            <div class="detaylar-baslik">Önemli Detaylar</div>
+            <div class="detay-satir" id="detay-kasko"></div>
+            <div class="detay-satir" id="detay-sigorta"></div>
+            <div class="detay-satir" id="detay-tesis"></div>
+        </div>
     </div>
 </div>
 
 <script>
+    window.onload = function() { periyotGuncelle(); };
+
+    function ayliktanYilliga() {
+        const aylik = parseFloat(document.getElementById('faizAylik').value);
+        if (!isNaN(aylik)) document.getElementById('faizYillik').value = (aylik * 12).toFixed(2);
+    }
+
+    function yilliktanAyliga() {
+        const yillik = parseFloat(document.getElementById('faizYillik').value);
+        if (!isNaN(yillik)) document.getElementById('faizAylik').value = (yillik / 12).toFixed(2);
+    }
+
+    function periyotGuncelle() {
+        const tur = document.getElementById('krediTuru').value;
+        const periyotSelect = document.getElementById('periyot');
+        periyotSelect.innerHTML = '';
+        if (tur === 'traktor') {
+            periyotSelect.innerHTML = `<option value="6">6 Ayda Bir</option><option value="12" selected>Yılda Bir</option>`;
+        } else {
+            periyotSelect.innerHTML = `<option value="1">Ayda Bir</option><option value="3">3 Ayda Bir</option><option value="6">6 Ayda Bir</option><option value="12">Yılda Bir</option>`;
+        }
+    }
+
     function hesapla() {
         const tur = document.getElementById('krediTuru').value;
         let kkdf = 0.15, bsmv = 0.15;
         if (tur === 'ticari') { kkdf = 0; bsmv = 0.05; }
 
         const P = parseFloat(document.getElementById('tutar').value);
-        const aylikFaiz = parseFloat(document.getElementById('faiz').value) / 100;
+        const aylikFaiz = parseFloat(document.getElementById('faizAylik').value) / 100;
         const toplamVade = parseInt(document.getElementById('vade').value);
         const periyot = parseInt(document.getElementById('periyot').value);
         const sRate = parseFloat(document.getElementById('subOran').value) / 100;
 
         const taksitSayisi = toplamVade / periyot;
-        const donemlikFaiz = aylikFaiz * periyot; // Basit faiz yaklaşımı
+        const donemlikFaiz = aylikFaiz * periyot;
         const i = donemlikFaiz * (1 + kkdf + bsmv);
-        
         const taksit = (P * i * Math.pow(1 + i, taksitSayisi)) / (Math.pow(1 + i, taksitSayisi) - 1);
         
-        document.getElementById('planBaslik').innerText = "2.000.000 ₺ Traktör Kredisi - " + document.getElementById('periyot').selectedOptions[0].text + " Ödeme Planı";
+        document.getElementById('planBaslik').innerText = "Ödeme Planı (" + document.getElementById('periyot').selectedOptions[0].text + ")";
         const tbody = document.getElementById('planBody');
         tbody.innerHTML = '';
         document.getElementById('sonucAlani').style.display = 'block';
@@ -126,7 +161,6 @@
             const k = f * kkdf;
             let a = taksit - (f + b + k);
             if (j === taksitSayisi) a = kalan;
-            
             const subTaksit = taksit - ((f + b + k) * sRate);
             kalan -= a;
 
@@ -141,11 +175,16 @@
                 <td>${Math.abs(kalan).toLocaleString('tr-TR', {minimumFractionDigits:2})} ₺</td>
             </tr>`;
         }
+
+        // Önemli Detaylar Hesaplamaları
+        document.getElementById('detay-kasko').innerText = "Kasko: " + (P * 0.03).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺ (%3)";
+        document.getElementById('detay-sigorta').innerText = "Hayat Sigortası: " + (P * 0.02).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺ (%2)";
+        document.getElementById('detay-tesis').innerText = "Tesis Masrafı: " + (P * 0.04).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺ (%4)";
     }
 
     function indirPDF() {
         const element = document.getElementById('main-content');
-        html2pdf().set({ margin: 10, filename: 'traktor-kredisi.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
+        html2pdf().set({ margin: 10, filename: 'kredi-planı.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
     }
 </script>
 </body>
