@@ -6,14 +6,14 @@
     <title>Süleyman Coşkun - Finansal Analiz</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* --- YAZDIRMA AYARLARI --- */
+        /* --- YAZDIRMA AYARLARI (YATAY & TEK SAYFA) --- */
         @media print {
             @page { size: landscape; margin: 5mm; }
             html, body { width: 297mm; background: #fff !important; color: #000 !important; }
             .no-print, .tabs, .btn-group, .input-grid, h1 { display: none !important; }
             .container { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; border: none !important; }
-            table { width: 100% !important; table-layout: fixed; font-size: 8.5pt !important; border-collapse: collapse !important; }
-            th, td { border: 1px solid #000 !important; padding: 4px !important; word-wrap: break-word !important; }
+            table { width: 100% !important; table-layout: fixed; font-size: 9pt !important; border-collapse: collapse !important; }
+            th, td { border: 1px solid #000 !important; padding: 5px !important; word-wrap: break-word !important; }
             th { background: #f2f2f2 !important; color: #000 !important; -webkit-print-color-adjust: exact; }
             .print-header { display: block !important; text-align: center; border-bottom: 2px solid #000; margin-bottom: 10px; }
             .print-footer { display: block !important; text-align: right; margin-top: 15px; font-weight: bold; font-size: 11pt; }
@@ -37,7 +37,7 @@
         #btnPdf { background: #3498db; } #btnYazdir { background: #f39c12; }
         button:disabled { background: #ccc !important; }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #34495e; color: #fff; padding: 10px; font-size: 13px; }
+        th { background: #34495e; color: #fff; padding: 12px; font-size: 13px; }
         td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; font-size: 13px; }
         .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
         .print-only { display: none; }
@@ -96,7 +96,6 @@
                         <th>Anapara</th>
                         <th>Faiz</th>
                         <th>BSMV (%5)</th>
-                        <th class="kkdf-col">KKDF (%15)</th>
                         <th style="background:#2c3e50; color:#fff;">Sübvansiyonlu Taksit</th>
                         <th>Kalan Anapara</th>
                     </tr>
@@ -145,35 +144,38 @@
     }
 
     function hesapla() {
-        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const tutarStr = document.getElementById('tutar').value.replace(/\./g, "");
+        const tutar = parseFloat(tutarStr);
+        if(isNaN(tutar)) return;
+
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeYil').value);
         const per = parseInt(document.getElementById('periyot').value);
         const toplamTaksit = vade * per;
-        const bsmvOran = 0.05, kkdfOran = (currentType === 'traktor' ? 0 : 0.15);
+        
+        // Ticari kredide KKDF 0 olduğu için her iki tipte de kkdfOran 0 oldu.
+        const bsmvOran = 0.05, kkdfOran = 0; 
 
         const i = (yFaiz / per) * (1 + bsmvOran + kkdfOran);
         const taksit = (tutar * i * Math.pow(1+i, toplamTaksit)) / (Math.pow(1+i, toplamTaksit)-1);
 
         let body = ''; let kalan = tutar;
         for(let j=1; j<=toplamTaksit; j++){
-            let f = kalan * (yFaiz / per), b = f * bsmvOran, k = f * kkdfOran;
-            let a = taksit - (f + b + k);
+            let f = kalan * (yFaiz / per), b = f * bsmvOran;
+            let a = taksit - (f + b);
             if(j === toplamTaksit) a = kalan;
-            let sTaksit = taksit - ((f+b+k)*sub);
+            let sTaksit = taksit - ((f+b)*sub);
             kalan -= a;
             body += `<tr><td>${j}</td>
                 <td>${Math.round(taksit).toLocaleString('tr-TR')} ₺</td>
                 <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
                 <td>${Math.round(f).toLocaleString('tr-TR')} ₺</td>
                 <td>${Math.round(b).toLocaleString('tr-TR')} ₺</td>
-                <td class="kkdf-col" style="${currentType==='traktor'?'display:none':''}">${Math.round(k).toLocaleString('tr-TR')} ₺</td>
                 <td class="sub-row">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
                 <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
         document.getElementById('planBody').innerHTML = body;
-        document.querySelectorAll('.kkdf-col').forEach(el => el.style.display = currentType === 'traktor' ? 'none' : '');
         
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('sonucAlani').scrollIntoView({ behavior: 'smooth' });
