@@ -12,11 +12,12 @@
             position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid #3498db;
         }
         .tab-link { 
-            flex: 1; min-width: 70px; padding: 12px 2px; color: #ecf0f1; border: none; 
+            flex: 1; min-width: 80px; padding: 15px 2px; color: #ecf0f1; border: none; 
             background: none; cursor: pointer; font-weight: bold; display: flex; 
             flex-direction: column; align-items: center; font-size: 10px;
         }
-        .tab-link span { display: block; font-size: 1.5em; margin-bottom: 4px; }
+        /* İkonlar %50 büyütüldü (1.5em -> 2.25em) */
+        .tab-link span { display: block; font-size: 2.25em; margin-bottom: 6px; }
         .tab-link.active { background: #3498db; color: #fff; }
 
         .input-grid { 
@@ -74,17 +75,17 @@
 <body onload="vadeYukle()">
 
 <div class="tabs no-print" id="navbar">
-    <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Traktör</button>
+    <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Zirai Traktör</button>
     <button class="tab-link" onclick="openTab(event, 'ticari')"><span>💼</span>Ticari</button>
     <button class="tab-link" onclick="openTab(event, 'zirai')"><span>👨‍🌾</span>Çiftçi Tüketici</button>
-    <button class="tab-link" onclick="openTab(event, 'zirai_isletme')"><span>🏦</span>Zirai/İşletme</button>
+    <button class="tab-link" onclick="openTab(event, 'zirai_isletme')"><span>🏚️</span>Zirai/İşletme</button>
     <button class="tab-link" onclick="openTab(event, 'tuketici')"><span>🛒💳</span>Tüketici</button>
     <button class="tab-link" onclick="openTab(event, 'hakkimda')"><span>👤</span>Hakkımda</button>
 </div>
 
 <div class="container" id="main-content">
     <div id="krediAlani" class="tab-content active">
-        <h1 id="baslikText">Traktör Kredisi Hesaplama</h1>
+        <h1 id="baslikText">Zirai Traktör Kredisi Hesaplama</h1>
         
         <div class="form-wrapper">
             <div class="input-grid">
@@ -181,7 +182,7 @@
             document.getElementById('krediAlani').classList.add('active');
             currentType = tabName;
             const titles = {
-                'traktor':'Traktör Kredisi',
+                'traktor':'Zirai Traktör Kredisi',
                 'ticari':'Ticari Kredi',
                 'zirai':'Çiftçi Tüketici Kredisi',
                 'tuketici':'Tüketici Kredisi'
@@ -205,7 +206,8 @@
     }
     
     function hesapla() {
-        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const tutarStr = document.getElementById('tutar').value.replace(/\./g, "");
+        const tutar = parseFloat(tutarStr);
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vadeDeger = parseInt(document.getElementById('vadeSecim').value);
