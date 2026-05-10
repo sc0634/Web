@@ -8,48 +8,21 @@
     <style>
         :root { --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; --danger: #e74c3c; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
-        
         .container { width: 100%; max-width: 1100px; margin: 0 auto; background: #fff; padding: 10px; box-sizing: border-box; }
 
-        /* --- Sekme Sistemi (Mobil Optimize) --- */
+        /* --- Sekme Sistemi --- */
         .tabs { display: flex; background: var(--primary); overflow-x: auto; white-space: nowrap; }
-        .tab-link { 
-            flex: 1; padding: 10px 5px; color: #ecf0f1; border: none; background: none; 
-            font-weight: bold; font-size: 10px; cursor: pointer; text-align: center;
-        }
+        .tab-link { flex: 1; padding: 12px 5px; color: #ecf0f1; border: none; background: none; font-weight: bold; font-size: 11px; cursor: pointer; text-align: center; }
         .tab-link.active { background: var(--secondary); color: #fff; }
 
-        /* --- Input Grid (Yan Yana Sabit) --- */
-        .input-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 8px; 
-            padding: 10px; 
-            background: #f9f9f9; 
-            border: 1px solid #ddd;
-        }
-        .field { 
-            display: flex; 
-            flex-direction: column; /* Mobilde yazıyı üste alarak karmaşayı çözer */
-            justify-content: center;
-        }
-        .field label { 
-            font-size: 11px; 
-            font-weight: bold; 
-            margin-bottom: 3px; 
-            color: #2c3e50;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        input, select { 
-            width: 100%; 
-            padding: 8px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            font-size: 13px; 
-            box-sizing: border-box;
-        }
+        /* --- Form Yapısı --- */
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; }
+        .field { display: flex; flex-direction: column; }
+        .field label { font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #2c3e50; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; outline: none; }
+        
+        /* Okunabilir (Readonly) Alanlar */
+        input[readonly] { background-color: #eeeeee; color: #7f8c8d; cursor: not-allowed; border: 1px dashed #bbb; }
 
         /* --- Butonlar --- */
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 15px 0; }
@@ -61,9 +34,16 @@
 
         /* --- Tablo --- */
         .table-responsive { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 600px; }
-        th { background: var(--primary); color: #fff; padding: 8px; }
-        td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 500px; }
+        th { background: var(--primary); color: #fff; padding: 10px 5px; }
+        td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; }
+
+        /* --- Yazdırma ve PDF Gizleme Kuralı --- */
+        @media print {
+            .no-print, .tabs, .btn-group, .input-grid { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
+            .container { border: none; padding: 0; }
+        }
+        .force-hide { display: none !important; }
 
         @media (min-width: 768px) {
             .container { padding: 20px; margin-top: 10px; border-radius: 8px; }
@@ -87,21 +67,23 @@
 
 <div class="container" id="pdf-area">
     <div id="calc-container" class="tab-content active">
-        <h2 id="baslikText" style="text-align:center; font-size: 16px; margin: 10px 0;">Zirai Traktör Kredisi</h2>
+        <h2 id="baslikText" style="text-align:center; font-size: 18px; margin: 10px 0;">Zirai Traktör Kredisi</h2>
         
-        <div class="input-grid no-print">
+        <div class="input-grid no-print" id="inputSection">
             <div class="field"><label>Tutar (₺)</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
             <div class="field"><label id="vadeLabel">Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
             <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option></select></div>
             <div class="field"><label>Plan Tipi</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksit</option><option value="esit_anapara">Eşit Anapara</option></select></div>
             <div class="field"><label>Aylık Faiz %</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga(); resetButtons();"></div>
             <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga(); resetButtons();"></div>
+            
             <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" readonly></div>
             <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" readonly></div>
+            
             <div class="field" id="subContainer"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
 
-        <div class="btn-group no-print">
+        <div class="btn-group no-print" id="buttonGroup">
             <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
             <button class="btn-clear" onclick="location.reload()">SIFIRLA</button>
             <button id="btnPdf" onclick="indirPDF()" disabled>PDF KAYDET</button>
@@ -130,7 +112,7 @@
 
     <div id="empty-container" class="tab-content">
         <h2 id="emptyBaslik" style="text-align:center;"></h2>
-        <div style="padding: 20px; border: 1px dashed #ccc; text-align: center; color: #777;">Bu alan serbest kullanım için boş bırakılmıştır.</div>
+        <div style="padding: 20px; border: 1px dashed #ccc; text-align: center; color: #777;">Süleyman Coşkun - Finansal Analiz Sistemi</div>
     </div>
 </div>
 
@@ -228,8 +210,27 @@
     }
 
     function indirPDF() {
-        const opt = { margin: 5, filename: 'kredi_plani.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-        html2pdf().set(opt).from(document.getElementById('pdf-area')).save();
+        const btnGroup = document.getElementById('buttonGroup');
+        const inputSec = document.getElementById('inputSection');
+        const tabs = document.querySelector('.tabs');
+        
+        // PDF oluşturulurken her şeyi zorla gizle
+        btnGroup.classList.add('force-hide');
+        inputSec.classList.add('force-hide');
+        tabs.classList.add('force-hide');
+
+        const opt = { 
+            margin: 10, 
+            filename: 'kredi_plani.pdf', 
+            html2canvas: { scale: 2, useCORS: true }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+        };
+        
+        html2pdf().set(opt).from(document.getElementById('pdf-area')).save().then(() => {
+            btnGroup.classList.remove('force-hide');
+            inputSec.classList.remove('force-hide');
+            tabs.classList.remove('force-hide');
+        });
     }
 </script>
 </body>
