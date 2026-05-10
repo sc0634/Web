@@ -9,15 +9,41 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
         .container { max-width: 1100px; margin: 10px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
-        .tabs { display: flex; flex-wrap: wrap; background: #2c3e50; position: sticky; top: 0; z-index: 1000; }
-        .tab-link { 
-            flex: 1; min-width: 90px; padding: 10px 5px; color: #ecf0f1; border: none; 
-            background: none; cursor: pointer; font-weight: bold; display: flex; 
-            flex-direction: column; align-items: center; font-size: 10px;
+        /* --- Tek Satır Sekme Optimizasyonu --- */
+        .tabs { 
+            display: flex; 
+            flex-direction: row; /* Zorunlu yan yana */
+            background: #2c3e50; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            width: 100%;
+            overflow-x: hidden; /* Taşmayı önle */
         }
-        .tab-link span { display: block; font-size: 1.15em; margin-bottom: 4px; }
-        .tab-link.active { background: #3498db; color: #fff; }
+        .tab-link { 
+            flex: 1; /* Eşit genişlik */
+            padding: 8px 1px; 
+            color: #ecf0f1; 
+            border: none; 
+            background: none; 
+            cursor: pointer; 
+            font-weight: bold; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            font-size: 8.5px; /* Küçük ekranlar için optimize edildi */
+            white-space: nowrap; /* Yazıları alt satıra atma */
+            transition: 0.3s;
+        }
+        .tab-link span { 
+            display: block; 
+            font-size: 14px; /* İkonlar küçültüldü */
+            margin-bottom: 2px; 
+        }
+        .tab-link.active { background: #3498db; color: #fff; border-bottom: 3px solid #fff; }
+        .tab-link:hover:not(.active) { background: #34495e; }
 
+        /* --- Form Alanı --- */
         .input-grid { 
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; 
             background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;
@@ -35,6 +61,7 @@
         #btnYazdir { background: #f39c12; }
         button:disabled { background: #ccc !important; cursor: not-allowed; }
 
+        /* --- Tablo Tasarımı --- */
         .table-responsive { overflow-x: auto; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 800px; }
         th { background: #34495e; color: #fff; padding: 10px; text-align: center; }
@@ -43,29 +70,11 @@
         .total-row { background: #2c3e50 !important; color: #fff !important; font-weight: bold; }
         .total-row td { color: #fff !important; border-top: 2px solid #3498db; }
 
-        /* --- Masraflar Bölümü Optimizasyonu --- */
-        .expense-card { 
-            margin-top: 25px; 
-            background: #fff; 
-            border: 1px solid #ddd; 
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        .expense-header {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            font-weight: bold;
-            font-size: 13px;
-            color: #2c3e50;
-            border-bottom: 1px solid #ddd;
-        }
+        /* --- Masraflar --- */
+        .expense-card { margin-top: 25px; background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; }
+        .expense-header { background: #f8f9fa; padding: 10px 15px; font-weight: bold; font-size: 13px; color: #2c3e50; border-bottom: 1px solid #ddd; }
         .expense-table { width: 100%; border-collapse: collapse; }
-        .expense-table td { 
-            text-align: left; 
-            padding: 12px 15px; 
-            font-size: 12px;
-            border-bottom: 1px solid #f0f0f0;
-        }
+        .expense-table td { text-align: left; padding: 12px 15px; font-size: 12px; border-bottom: 1px solid #f0f0f0; }
         .expense-table .price { text-align: right; font-weight: bold; color: #2c3e50; }
         .expense-table .grand-total { background: #f1f8ff; font-size: 13px; color: #2980b9; }
 
@@ -75,18 +84,20 @@
         }
         @media (max-width: 600px) {
             .input-grid { grid-template-columns: 1fr; }
+            .tab-link { font-size: 7px; } /* Çok küçük ekranlar için yazı küçültme */
+            .tab-link span { font-size: 12px; }
         }
     </style>
 </head>
 <body onload="vadeYukle(); yilliktanAyliga();">
 
 <div class="tabs no-print">
-    <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Zirai Traktör</button>
+    <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Traktör</button>
     <button class="tab-link" onclick="openTab(event, 'ticari')"><span>💼</span>Ticari</button>
-    <button class="tab-link" onclick="openTab(event, 'zirai')"><span>👨‍🌾</span>Çiftçi Tüketici</button>
-    <button class="tab-link" onclick="openTab(event, 'zirai_isletme')"><span>🏚️</span>Zirai/İşletme</button>
-    <button class="tab-link" onclick="openTab(event, 'tuketici')"><span>🛒💳</span>Tüketici</button>
-    <button class="tab-link" onclick="openTab(event, 'hakkimda')"><span>👤</span>Hakkımda</button>
+    <button class="tab-link" onclick="openTab(event, 'zirai')"><span>👨‍🌾</span>Çiftçi</button>
+    <button class="tab-link" onclick="openTab(event, 'zirai_isletme')"><span>🏚️</span>İşletme</button>
+    <button class="tab-link" onclick="openTab(event, 'tuketici')"><span>🛒</span>Tüketici</button>
+    <button class="tab-link" onclick="openTab(event, 'hakkimda')"><span>👤</span>Profil</button>
 </div>
 
 <div class="container" id="main-content">
@@ -133,22 +144,9 @@
             <div class="expense-card">
                 <div class="expense-header">KREDİ MASRAFLARI VE ÖZET</div>
                 <table class="expense-table">
-                    <tr>
-                        <td>Kredi Tahsis Ücreti (%0.5)</td>
-                        <td class="price" id="expTahsis">0 ₺</td>
-                    </tr>
-                    <tr>
-                        <td>Hayat Sigortası (Tahmini %1)</td>
-                        <td class="price" id="expSigorta">0 ₺</td>
-                    </tr>
-                    <tr>
-                        <td>Ekspertiz ve Diğer Ücretler</td>
-                        <td class="price">Masrafsız</td>
-                    </tr>
-                    <tr class="grand-total">
-                        <td><strong>TOPLAM MASRAF</strong></td>
-                        <td class="price" id="expToplam">0 ₺</td>
-                    </tr>
+                    <tr><td>Kredi Tahsis Ücreti (%0.5)</td><td class="price" id="expTahsis">0 ₺</td></tr>
+                    <tr><td>Hayat Sigortası (Tahmini %1)</td><td class="price" id="expSigorta">0 ₺</td></tr>
+                    <tr class="grand-total"><td><strong>TOPLAM MASRAF</strong></td><td class="price" id="expToplam">0 ₺</td></tr>
                 </table>
             </div>
         </div>
@@ -220,8 +218,7 @@
     }
 
     function hesapla() {
-        const tutarStr = document.getElementById('tutar').value.replace(/\./g, "");
-        const tutar = parseFloat(tutarStr);
+        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeSecim').value);
@@ -241,32 +238,24 @@
         for(let j=1; j<=toplamTaksit; j++){
             let f = kalan * dFaiz;
             let b = f * bsmv, k = f * kkdf, a, t;
-            
             if(planTipi === 'esit_taksit') {
                 t = (tutar * i_vergi * Math.pow(1+i_vergi, toplamTaksit)) / (Math.pow(1+i_vergi, toplamTaksit)-1);
                 a = t - (f + b + k);
             } else { a = tutar / toplamTaksit; t = a + f + b + k; }
-            
             if(j === toplamTaksit) a = kalan;
             t = a + f + b + k;
             let subT = t - ((f+b+k)*sub);
-
             sTaksit += t; sAna += a; sFaiz += f; sBsmv += b; sKkdf += k; sSub += subT;
             kalan -= a;
-
             body += `<tr><td>${j}</td><td>${Math.round(t).toLocaleString('tr-TR')} ₺</td><td>${Math.round(a).toLocaleString('tr-TR')} ₺</td><td>${Math.round(f).toLocaleString('tr-TR')} ₺</td><td>${Math.round(b).toLocaleString('tr-TR')} ₺</td><td>${Math.round(k).toLocaleString('tr-TR')} ₺</td><td style="${sub > 0 ? '' : 'display:none'}">${Math.round(subT).toLocaleString('tr-TR')} ₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
-
         document.getElementById('planBody').innerHTML = body;
         document.getElementById('planFoot').innerHTML = `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td><td>${Math.round(sAna).toLocaleString('tr-TR')} ₺</td><td>${Math.round(sFaiz).toLocaleString('tr-TR')} ₺</td><td>${Math.round(sBsmv).toLocaleString('tr-TR')} ₺</td><td>${Math.round(sKkdf).toLocaleString('tr-TR')} ₺</td><td style="${sub > 0 ? '' : 'display:none'}">${Math.round(sSub).toLocaleString('tr-TR')} ₺</td><td>-</td></tr>`;
-
-        // Masraf Hesaplama Optimizasyonu
         const tahsis = tutar * 0.005;
         const sigorta = tutar * 0.01;
         document.getElementById('expTahsis').innerText = Math.round(tahsis).toLocaleString('tr-TR') + " ₺";
         document.getElementById('expSigorta').innerText = Math.round(sigorta).toLocaleString('tr-TR') + " ₺";
         document.getElementById('expToplam').innerText = Math.round(tahsis + sigorta).toLocaleString('tr-TR') + " ₺";
-
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('btnYazdir').disabled = false;
         document.getElementById('btnPdf').disabled = false;
@@ -274,12 +263,7 @@
 
     function indirPDF() {
         const element = document.getElementById('main-content');
-        const opt = { 
-            margin: 10, 
-            filename: 'Kredi_Plani.pdf', 
-            html2canvas: { scale: 2 }, 
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
-        };
+        const opt = { margin: 10, filename: 'Kredi_Plani.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
         html2pdf().set(opt).from(element).save();
     }
 </script>
