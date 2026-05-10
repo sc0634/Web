@@ -3,28 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kredi Hesaplama</title>
+    <title>Kredi Hesaplama - Profesyonel Plan</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        /* Genel ve Yazıcı Dostu Tasarım */
         @page { size: A4 landscape; margin: 10mm; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #000; }
         .container { max-width: 1150px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; border: 1px solid #ddd; }
         h1 { color: #000; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-top: 0; }
-        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; background: #fff; padding: 15px; border: 1px solid #000; border-radius: 4px; }
+        
+        /* Giriş Paneli */
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 20px 0 10px 0; background: #fff; padding: 15px; border: 1px solid #000; border-radius: 4px; }
+        .vergi-bilgi-satiri { display: flex; gap: 20px; background: #f9f9f9; padding: 10px 15px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 20px; font-size: 13px; font-weight: bold; }
+        
         .field { display: flex; flex-direction: column; }
         label { font-weight: bold; margin-bottom: 5px; font-size: 12px; }
         input, select { padding: 8px; border: 1px solid #000; border-radius: 4px; font-size: 13px; background: #fff; }
+        
+        /* Butonlar */
         .btn-group { display: flex; gap: 10px; margin-bottom: 25px; }
-        button { flex: 1; padding: 12px; border: 2px solid #000; border-radius: 4px; font-weight: bold; cursor: pointer; background: #fff; color: #000; }
+        button { flex: 1; padding: 12px; border: 2px solid #000; border-radius: 4px; font-weight: bold; cursor: pointer; background: #fff; color: #000; transition: 0.2s; }
         button:hover { background: #000; color: #fff; }
+        
+        /* Tablo (Yüksek Kontrast) */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
         th { background: #eee; color: #000; padding: 8px; border: 1px solid #000; text-align: center; }
         td { border: 1px solid #000; padding: 8px; text-align: center; background: #fff; }
         tfoot td { font-weight: bold; background: #eee !important; border: 2px solid #000; }
         .sub-highlight { font-weight: bold; background: #f9f9f9 !important; border: 1px solid #000; }
+        
+        /* Alt Bilgiler */
         .detaylar-section { margin-top: 25px; padding: 15px; border-top: 2px solid #000; }
         .detaylar-baslik { font-size: 16px; font-weight: bold; text-decoration: underline; margin-bottom: 8px; }
         .detay-satir { font-size: 14px; margin-bottom: 4px; }
+        
         @media print {
             .no-print { display: none !important; }
             body { padding: 0; background: #fff; }
@@ -38,13 +50,13 @@
 <div class="container" id="main-content">
     <div class="no-print">
         <h1>Kredi Hesaplama</h1>
+        
         <div class="input-grid">
             <div class="field">
                 <label>Kredi Türü</label>
-                <select id="krediTuru" onchange="periyotGuncelle()">
-                    <option value="traktor" selected>Traktör Kredisi (%15 KKDF + %15 BSMV)</option>
-                    <option value="ihtiyac">İhtiyaç Kredisi (%15 KKDF + %15 BSMV)</option>
-                    <option value="ticari">Ticari Kredi (%0 KKDF + %5 BSMV)</option>
+                <select id="krediTuru" onchange="vergiGuncelle(); periyotGuncelle();">
+                    <option value="traktor" selected>Traktör Kredisi</option>
+                    <option value="ticari">Ticari Kredi</option>
                 </select>
             </div>
             <div class="field">
@@ -70,13 +82,16 @@
                 <input type="number" id="faizYillik" step="0.01" value="40.50" oninput="yilliktanAyliga()">
             </div>
             <div class="field">
-                <label>Aylık Faiz (%)</label>
-                <input type="number" id="faizAylik" step="0.001" value="3.375" oninput="ayliktanYilliga()">
-            </div>
-            <div class="field">
                 <label>Sübvansiyon (%)</label>
                 <input type="number" id="subOran" value="50">
             </div>
+        </div>
+
+        <!-- Sabit Vergi Oranları -->
+        <div class="vergi-bilgi-satiri">
+            <div>KKDF Oranı: <span id="kkdfGosterge">%15</span></div>
+            <div>BSMV Oranı: <span id="bsmvGosterge">%15</span></div>
+            <input type="hidden" id="faizAylik" value="3.375">
         </div>
 
         <div class="btn-group">
@@ -86,6 +101,7 @@
         </div>
     </div>
 
+    <!-- Sonuçların Gösterileceği Alan -->
     <div id="sonucAlani" style="display:none;">
         <h2 id="planBaslik" style="font-size: 14px; border-bottom: 1px solid #000; padding-bottom: 5px;"></h2>
         <table>
@@ -107,26 +123,42 @@
 
         <div class="detaylar-section">
             <div class="detaylar-baslik">Önemli Detaylar</div>
-            <div class="detay-satir" id="detay-kasko"></div>
-            <div class="detay-satir" id="detay-sigorta"></div>
-            <div class="detay-satir" id="detay-tesis"></div>
+            <div id="detay-kasko" class="detay-satir"></div>
+            <div id="detay-sigorta" class="detay-satir"></div>
+            <div id="detay-tesis" class="detay-satir"></div>
         </div>
     </div>
 </div>
 
 <script>
-    window.onload = function() { periyotGuncelle(); };
+    // Sayfa yüklendiğinde varsayılanları ayarla
+    window.onload = function() { 
+        vergiGuncelle();
+        periyotGuncelle(); 
+    };
 
-    function ayliktanYilliga() {
-        const aylik = parseFloat(document.getElementById('faizAylik').value);
-        if (!isNaN(aylik)) document.getElementById('faizYillik').value = (aylik * 12).toFixed(2);
+    // Vergi oranlarını kredi türüne göre güncelle (Kullanıcı değiştiremez)
+    function vergiGuncelle() {
+        const tur = document.getElementById('krediTuru').value;
+        const kkdfLabel = document.getElementById('kkdfGosterge');
+        const bsmvLabel = document.getElementById('bsmvGosterge');
+        
+        if (tur === 'ticari') {
+            kkdfLabel.innerText = "%0";
+            bsmvLabel.innerText = "%5";
+        } else {
+            kkdfLabel.innerText = "%15";
+            bsmvLabel.innerText = "%15";
+        }
     }
 
+    // Faiz dönüşümü
     function yilliktanAyliga() {
         const yillik = parseFloat(document.getElementById('faizYillik').value);
         if (!isNaN(yillik)) document.getElementById('faizAylik').value = (yillik / 12).toFixed(3);
     }
 
+    // Kredi türüne göre ödeme periyotlarını filtrele
     function periyotGuncelle() {
         const tur = document.getElementById('krediTuru').value;
         const periyotSelect = document.getElementById('periyot');
@@ -138,10 +170,11 @@
         }
     }
 
+    // Ana hesaplama fonksiyonu
     function hesapla() {
         const tur = document.getElementById('krediTuru').value;
-        let kkdf = 0.15, bsmv = 0.15;
-        if (tur === 'ticari') { kkdf = 0; bsmv = 0.05; }
+        let kkdf = (tur === 'ticari') ? 0 : 0.15;
+        let bsmv = (tur === 'ticari') ? 0.05 : 0.15;
 
         const P = parseFloat(document.getElementById('tutar').value);
         const aylikFaiz = parseFloat(document.getElementById('faizAylik').value) / 100;
@@ -152,6 +185,8 @@
         const taksitSayisi = toplamVade / periyot;
         const donemlikFaiz = aylikFaiz * periyot;
         const i = donemlikFaiz * (1 + kkdf + bsmv);
+        
+        // Formül: [P * i * (1+i)^n] / [(1+i)^n - 1]
         const taksit = (P * i * Math.pow(1 + i, taksitSayisi)) / (Math.pow(1 + i, taksitSayisi) - 1);
         
         document.getElementById('planBaslik').innerText = "Ödeme Planı: " + document.getElementById('krediTuru').selectedOptions[0].text;
@@ -162,23 +197,17 @@
         document.getElementById('sonucAlani').style.display = 'block';
 
         let kalan = P;
-        let toplamTaksit = 0, toplamAnapara = 0, toplamFaiz = 0, toplamBsmv = 0, toplamKkdf = 0, toplamSub = 0;
+        let tTaksit = 0, tAnapara = 0, tFaiz = 0, tBsmv = 0, tKkdf = 0, tSub = 0;
 
         for (let j = 1; j <= taksitSayisi; j++) {
             const f = kalan * donemlikFaiz;
             const b = f * bsmv;
             const k = f * kkdf;
             let a = taksit - (f + b + k);
-            if (j === taksitSayisi) a = kalan;
+            if (j === taksitSayisi) a = kalan; // Son taksitte kuruş farklarını düzelt
             const subTaksit = taksit - ((f + b + k) * sRate);
             
-            toplamTaksit += taksit;
-            toplamAnapara += a;
-            toplamFaiz += f;
-            toplamBsmv += b;
-            toplamKkdf += k;
-            toplamSub += subTaksit;
-            
+            tTaksit += taksit; tAnapara += a; tFaiz += f; tBsmv += b; tKkdf += k; tSub += subTaksit;
             kalan -= a;
 
             tbody.innerHTML += `<tr>
@@ -193,26 +222,35 @@
             </tr>`;
         }
 
-        // Toplam Satırı
+        // TOPLAM SATIRI
         tfoot.innerHTML = `<tr>
             <td>TOPLAM</td>
-            <td>${toplamTaksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td>${toplamAnapara.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td>${toplamFaiz.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td>${toplamBsmv.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td>${toplamKkdf.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
-            <td style="background: #ddd;">${toplamSub.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td>${tTaksit.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td>${tAnapara.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td>${tFaiz.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td>${tBsmv.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td>${tKkdf.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
+            <td style="background: #ddd;">${tSub.toLocaleString('tr-TR', {minimumFractionDigits:2})}</td>
             <td>-</td>
         </tr>`;
 
+        // Önemli Detaylar (Yaklaşık İşareti ile)
         document.getElementById('detay-kasko').innerText = "Kasko: ~ " + (P * 0.03).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('detay-sigorta').innerText = "Hayat Sigortası: ~ " + (P * 0.02).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('detay-tesis').innerText = "Tesis Masrafı: ~ " + (P * 0.04).toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
     }
 
+    // PDF Kaydetme Fonksiyonu
     function indirPDF() {
         const element = document.getElementById('main-content');
-        html2pdf().set({ margin: 10, filename: 'kredi-plani.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
+        const opt = {
+            margin: 10,
+            filename: 'kredi-odeme-plani.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 </script>
 </body>
