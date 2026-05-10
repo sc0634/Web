@@ -71,7 +71,9 @@
         button { flex: 1; min-width: 140px; padding: 10px; border: 2px solid #000; border-radius: 4px; font-weight: bold; cursor: pointer; background: #fff; }
         button:hover:not(:disabled) { background: #000; color: #fff; }
         
-        /* Pasif Buton Stili */
+        .btn-clear { border-color: #d32f2f; color: #d32f2f; }
+        .btn-clear:hover:not(:disabled) { background: #d32f2f; color: #fff; }
+
         button:disabled {
             border-color: #ccc;
             color: #999;
@@ -139,6 +141,7 @@
 
             <div class="btn-group">
                 <button onclick="hesapla()">HESAPLA</button>
+                <button class="btn-clear" onclick="temizleForm()">TEMİZLE</button>
                 <button id="btnYazdir" onclick="window.print()" disabled>YAZDIR</button>
                 <button id="btnPdf" onclick="indirPDF()" disabled>PDF KAYDET</button>
             </div>
@@ -197,15 +200,24 @@
             document.getElementById('krediAlani').classList.add('active');
             document.getElementById('baslikText').innerText = tabName === 'traktor' ? 'Traktör Kredisi Hesaplama Sistemi' : 'Ticari Kredi Hesaplama Sistemi';
             document.getElementById('kkdfBilgi').innerText = tabName === 'traktor' ? 'KKDF: %0' : 'KKDF: %15';
-            resetButtons(); // Tür değişince tabloyu ve butonları sıfırla
+            resetButtons();
         }
     }
 
-    // Veriler değiştiğinde butonları pasif yap ve tabloyu gizle
     function resetButtons() {
         document.getElementById('btnYazdir').disabled = true;
         document.getElementById('btnPdf').disabled = true;
         document.getElementById('sonucAlani').style.display = 'none';
+    }
+
+    function temizleForm() {
+        if(confirm("Tüm verileri temizlemek istediğinize emin misiniz?")) {
+            document.getElementById('tutar').value = "";
+            document.getElementById('faizYillik').value = "40.50";
+            document.getElementById('subOran').value = "50";
+            document.getElementById('vadeYil').selectedIndex = 0;
+            resetButtons();
+        }
     }
 
     function formatTutar(input) {
@@ -264,7 +276,6 @@
                 </tr>`;
         }
 
-        // Hesaplama başarılıysa sonuç alanını göster ve butonları aktif et
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('btnYazdir').disabled = false;
         document.getElementById('btnPdf').disabled = false;
