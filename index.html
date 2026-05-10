@@ -35,15 +35,8 @@
         .masraf-satir { font-size: 12px; margin-bottom: 4px; font-weight: 500; }
         .masraf-toplam { margin-top: 8px; padding-top: 5px; border-top: 1px dashed #000; font-weight: bold; font-size: 13px; }
 
-        .signature {
-            display: none; 
-            text-align: right;
-            font-size: 12px;
-            font-style: italic;
-            font-weight: bold;
-            margin-top: 15px;
-            color: #333;
-        }
+        .disclaimer { margin-top: 15px; font-size: 11px; color: #555; font-style: italic; border-left: 3px solid #000; padding-left: 10px; }
+        .signature { display: none; text-align: right; font-size: 12px; font-style: italic; font-weight: bold; margin-top: 10px; color: #333; }
         
         @media print {
             .no-print, .btn-group, h1, .input-grid, .vergi-bilgi-satiri { display: none !important; }
@@ -144,6 +137,10 @@
             <div id="masraf-toplam" class="masraf-toplam"></div>
         </div>
 
+        <div class="disclaimer">
+            * Kredi hesaplamaları ve masraflar yaklaşık değerler olup kesin rakamlar için ilgili bankanın ilgili Şubesi ile görüşülmesi gerekmektedir.
+        </div>
+
         <div class="signature">Created by Süleyman Coşkun</div>
     </div>
 </div>
@@ -223,12 +220,9 @@
             <td>-</td>
         </tr>`;
 
-        // MASRAFLAR
-        const mTahsis = P * 0.0023; // Binde 2.30
-        const mKasko = P * 0.03;
-        const mSigorta = P * 0.02;
-        const mTarsim = P * 0.05;
-        const mDiger = P * 0.01;
+        // MASRAFLAR - Binde 40 (0.040)
+        const mTahsis = P * 0.040;
+        const mKasko = P * 0.03, mSigorta = P * 0.02, mTarsim = P * 0.05, mDiger = P * 0.01;
         const mToplam = mTahsis + mKasko + mSigorta + mTarsim + mDiger;
 
         document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti: " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
