@@ -44,7 +44,6 @@
         .signature { display: none; text-align: right; font-size: 12px; font-style: italic; font-weight: bold; margin-top: 10px; color: #333; }
         
         @media print {
-            /* Yazdırma sırasında sayfa yönünü yatay yapmaya zorla */
             @page { size: landscape; }
             .no-print, .btn-group, h1, .input-grid, .vergi-bilgi-satiri { display: none !important; }
             body { padding: 0; background: #fff; margin: 0; }
@@ -106,7 +105,7 @@
 
         <div class="btn-group">
             <button onclick="hesapla()">HESAPLA</button>
-            <button onclick="window.print()">YAZICIDAN ÇIKART (B&W)</button>
+            <button onclick="window.print()">YAZICIDAN ÇIKART (Siyah-Beyaz)</button>
             <button onclick="indirPDF()">PDF OLARAK KAYDET</button>
         </div>
     </div>
@@ -145,10 +144,10 @@
         </div>
 
         <div class="disclaimer">
-            * Kredi hesaplamaları ve masraflar yaklaşık değerler olup kesin rakamlar için ilgili bankanın ilgili Şubesi ile görüşülmesi gerekmektedir.
+            * Kredi hesaplamaları ve masraflar yaklaşık değerler olup kesin rakamlar için ilgili bankanın ilgili şubesi ile görüşülmesi gerekmektedir.
         </div>
 
-        <div class="signature">Created by Süleyman Coşkun</div>
+        <div class="signature">Süleyman Coşkun Tarafından Hazırlanmıştır</div>
     </div>
 </div>
 
@@ -186,7 +185,7 @@
         const i = donemlikFaiz * (1 + 0.05); 
         const taksit = (P * i * Math.pow(1 + i, taksitSayisi)) / (Math.pow(1 + i, taksitSayisi) - 1);
         
-        document.getElementById('planBaslik').innerText = "KREDİ ÖDEME PLANI (" + document.getElementById('krediTuru').selectedOptions[0].text + ")";
+        document.getElementById('planBaslik').innerText = "KREDİ ÖDEME PLANI (" + document.getElementById('krediTuru').selectedOptions[0].text.toUpperCase() + ")";
         const tbody = document.getElementById('planBody');
         tbody.innerHTML = '';
         document.getElementById('sonucAlani').style.display = 'block';
@@ -227,6 +226,7 @@
             <td>-</td>
         </tr>`;
 
+        // Masraflar - Binde 40 (0.040)
         const mTahsis = P * 0.040;
         const mKasko = P * 0.03, mSigorta = P * 0.02, mTarsim = P * 0.05, mDiger = P * 0.01;
         const mToplam = mTahsis + mKasko + mSigorta + mTarsim + mDiger;
@@ -252,7 +252,7 @@
             filename: 'kredi_odeme_plani.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } // PDF için yatay ayarı
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
