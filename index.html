@@ -16,7 +16,6 @@
             background: none; cursor: pointer; font-weight: bold; display: flex; 
             flex-direction: column; align-items: center; font-size: 10px;
         }
-        /* İkonlar %50 küçültüldü (2.25em -> 1.15em) */
         .tab-link span { display: block; font-size: 1.15em; margin-bottom: 4px; }
         .tab-link.active { background: #3498db; color: #fff; }
 
@@ -61,18 +60,15 @@
         @media print {
             .tabs, .btn-group, .no-print { display: none !important; }
             .container { box-shadow: none; margin: 0; padding: 0; width: 100%; }
-            .input-grid { grid-template-columns: 1fr 1fr 1fr !important; border: 1px solid #ddd !important; }
-            input, select { border: none !important; font-weight: bold; background: transparent !important; }
         }
 
         @media (max-width: 600px) {
             .input-grid { grid-template-columns: 1fr; }
             .summary-box { grid-template-columns: 1fr; }
-            .summary-item { border-right: none; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         }
     </style>
 </head>
-<body onload="vadeYukle()">
+<body onload="vadeYukle(); yilliktanAyliga();">
 
 <div class="tabs no-print" id="navbar">
     <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Zirai Traktör</button>
@@ -93,7 +89,10 @@
                 <div class="field"><label id="vadeLabel">Vade (Yıl) :</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
                 <div class="field"><label>Ödeme Sıklığı :</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda Bir</option><option value="2">6 Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="12">Ayda Bir</option></select></div>
                 <div class="field"><label>Ödeme Planı :</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksitli</option><option value="esit_anapara">Anapara Eşit Taksitli</option></select></div>
-                <div class="field"><label>Yıllık Faiz (%) :</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
+                
+                <div class="field"><label>Aylık Faiz (%) :</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga(); resetButtons();"></div>
+                <div class="field"><label>Yıllık Faiz (%) :</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga(); resetButtons();"></div>
+                
                 <div class="field" id="subContainer"><label>Sübvansiyon (%) :</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
             </div>
             
@@ -122,7 +121,7 @@
                             <th>Faiz Tutarı</th>
                             <th>BSMV</th>
                             <th>KKDF</th>
-                            <th id="thSub" style="background:#2c3e50; color:#fff;">Sübvansiyonlu Taksit</th>
+                            <th id="thSub">Sübvansiyonlu Taksit</th>
                             <th>Kalan Anapara</th>
                         </tr>
                     </thead>
@@ -139,12 +138,22 @@
 
     <div id="hakkimdaAlani" class="tab-content">
         <h1>Süleyman Coşkun</h1>
-        <p style="text-align:center;">Finansal Analiz Uzmanı & Bankacılık Çözümleri</p>
+        <p style="text-align:center;">Finansal Analiz Uzmanı</p>
     </div>
 </div>
 
 <script>
     let currentType = 'traktor';
+
+    function yilliktanAyliga() {
+        const y = parseFloat(document.getElementById('faizYillik').value);
+        if (!isNaN(y)) document.getElementById('faizAylik').value = (y / 12).toFixed(2);
+    }
+
+    function ayliktanYilliga() {
+        const a = parseFloat(document.getElementById('faizAylik').value);
+        if (!isNaN(a)) document.getElementById('faizYillik').value = (a * 12).toFixed(2);
+    }
 
     function vadeYukle() {
         const select = document.getElementById('vadeSecim');
@@ -181,12 +190,7 @@
         } else {
             document.getElementById('krediAlani').classList.add('active');
             currentType = tabName;
-            const titles = {
-                'traktor':'Zirai Traktör Kredisi',
-                'ticari':'Ticari Kredi',
-                'zirai':'Çiftçi Tüketici Kredisi',
-                'tuketici':'Tüketici Kredisi'
-            };
+            const titles = {'traktor':'Zirai Traktör Kredisi','ticari':'Ticari Kredi','zirai':'Çiftçi Tüketici Kredisi','tuketici':'Tüketici Kredisi'};
             document.getElementById('baslikText').innerText = titles[tabName] + " Hesaplama";
             document.getElementById('subContainer').style.visibility = tabName === 'traktor' ? 'visible' : 'hidden';
             
@@ -197,7 +201,7 @@
                 document.getElementById('faizYillik').value = "49.00";
                 document.getElementById('subOran').value = "0";
             }
-            vadeYukle(); resetButtons();
+            yilliktanAyliga(); vadeYukle(); resetButtons();
         }
     }
 
