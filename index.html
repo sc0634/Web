@@ -76,7 +76,7 @@
 <div class="tabs no-print" id="navbar">
     <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Traktör</button>
     <button class="tab-link" onclick="openTab(event, 'ticari')"><span>💼</span>Ticari</button>
-    <button class="tab-link" onclick="openTab(event, 'zirai')"><span>👨‍🌾</span>Zirai</button>
+    <button class="tab-link" onclick="openTab(event, 'zirai')"><span>👨‍🌾</span>Çiftçi Tüketici</button>
     <button class="tab-link" onclick="openTab(event, 'zirai_isletme')"><span>🏦</span>Zirai/İşletme</button>
     <button class="tab-link" onclick="openTab(event, 'tuketici')"><span>🛒💳</span>Tüketici</button>
     <button class="tab-link" onclick="openTab(event, 'hakkimda')"><span>👤</span>Hakkımda</button>
@@ -183,14 +183,13 @@
             const titles = {
                 'traktor':'Traktör Kredisi',
                 'ticari':'Ticari Kredi',
-                'zirai':'Zirai/Çiftçi Tarım Kredisi',
+                'zirai':'Çiftçi Tüketici Kredisi',
                 'tuketici':'Tüketici Kredisi'
             };
             document.getElementById('baslikText').innerText = titles[tabName] + " Hesaplama";
             document.getElementById('subContainer').style.visibility = tabName === 'traktor' ? 'visible' : 'hidden';
             document.getElementById('subOran').value = tabName === 'traktor' ? "50" : "0";
-            vadeYukle(); 
-            resetButtons();
+            vadeYukle(); resetButtons();
         }
     }
 
