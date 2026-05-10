@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Süleyman Coşkun - Finansal Portfolyo</title>
+    <title>Finansal Analiz Paneli</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        /* YAZDIRMA AYARLARI - YATAY */
         @page { size: A4 landscape; margin: 10mm; }
+        
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f0f2f5; 
@@ -14,7 +16,7 @@
             display: flex; flex-direction: column; min-height: 100vh;
         }
         
-        /* EKRAN TASARIMI (RENKLİ) */
+        /* EKRAN TASARIMI */
         .tabs { 
             display: flex; background: #1a252f; padding: 0 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             position: sticky; top: 0; z-index: 1000;
@@ -51,16 +53,34 @@
         td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
         .sub-row { background: #ebf5fb; font-weight: bold; color: #2980b9; }
 
-        /* YAZDIRMA TASARIMI (SİYAH-BEYAZ) */
+        /* YAZDIRMA VE ÇIKTI TASARIMI */
+        .print-only { display: none; }
+
         @media print {
+            @page { size: landscape; }
             .tabs, .no-print, .btn-group, .input-grid, h1 { display: none !important; }
             body { background: #fff; color: #000; font-family: 'Courier New', monospace; }
-            .container { box-shadow: none; border: none; width: 100%; padding: 0; }
-            .print-header { display: block !important; text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; }
-            table { border: 1px solid #000; width: 100%; }
+            .container { box-shadow: none; border: none; width: 100%; padding: 0; margin: 0; }
+            
+            .print-header { display: block !important; text-align: center; border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 5px; }
+            .print-header h2 { margin: 0; font-size: 18px; text-transform: uppercase; }
+            
+            table { border: 1px solid #000; width: 100%; font-size: 10px; }
             th { background: #000 !important; color: #fff !important; border: 1px solid #000; }
             td { border: 1px solid #000; color: #000 !important; background: #fff !important; }
-            .sub-row { color: #000 !important; text-decoration: underline; }
+            
+            .sub-row { color: #000 !important; font-weight: bold; border: 2px solid #000; }
+            
+            /* Sağ Alt İmza Bölümü */
+            .print-footer { 
+                display: block !important; 
+                margin-top: 20px; 
+                text-align: right; 
+                font-size: 11px; 
+                font-weight: bold;
+                border-top: 1px solid #eee;
+                padding-top: 5px;
+            }
         }
     </style>
 </head>
@@ -69,16 +89,14 @@
 <div class="tabs no-print">
     <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Traktör Kredisi</button>
     <button class="tab-link" onclick="openTab(event, 'ticari')">💼 Ticari Kredi</button>
-    <button class="tab-link" onclick="openTab(event, 'hakkimda')">👤 Hakkımda</button>
 </div>
 
 <div id="krediAlani" class="tab-content active">
     <div class="container" id="main-content">
         
-        <div class="print-header" style="display:none;">
-            <h2 style="margin:0;">KREDİ ÖDEME PLANI RAPORU</h2>
-            <p>Süleyman Coşkun - Finansal Analiz</p>
-            <p id="pDate"></p>
+        <div class="print-header print-only">
+            <h2 id="printTitle">KREDİ ÖDEME PLANI RAPORU</h2>
+            <p id="pDate" style="font-size:10px; margin: 2px 0;"></p>
         </div>
 
         <div class="no-print">
@@ -112,7 +130,7 @@
                     <input type="number" id="faizYillik" step="0.01" value="40.50" oninput="resetButtons();">
                 </div>
                 <div class="field">
-                    <label>Sübvansiyon (%)</label>
+                    <label>Sübvansiyon Oranı (%)</label>
                     <input type="number" id="subOran" value="50" oninput="resetButtons();">
                 </div>
             </div>
@@ -135,12 +153,16 @@
                         <th>Faiz</th>
                         <th>BSMV</th>
                         <th class="kkdf-col">KKDF</th>
-                        <th style="background:#2c3e50; color:#fff;">Sübvansiyonlu Taksit</th>
+                        <th style="background:#2c3e50; color:#fff;">Sübvansiyonlu Taksit Tutarı</th>
                         <th>Kalan Anapara</th>
                     </tr>
                 </thead>
                 <tbody id="planBody"></tbody>
             </table>
+            
+            <div class="print-footer print-only">
+                Süleyman Coşkun
+            </div>
         </div>
     </div>
 </div>
@@ -158,10 +180,12 @@
         
         if (tabName === 'traktor') {
             document.getElementById('baslikText').innerText = 'Traktör Kredisi Hesaplama';
-            periyotSelect.value = "1"; // Yılda Bir
+            document.getElementById('printTitle').innerText = 'TRAKTÖR KREDİSİ ÖDEME PLANI';
+            periyotSelect.value = "1"; 
         } else {
             document.getElementById('baslikText').innerText = 'Ticari Kredi Hesaplama';
-            periyotSelect.value = "12"; // Ayda Bir
+            document.getElementById('printTitle').innerText = 'TİCARİ KREDİ ÖDEME PLANI';
+            periyotSelect.value = "12"; 
         }
         resetButtons();
     }
@@ -178,16 +202,14 @@
     }
 
     function hesapla() {
-        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const tutarStr = document.getElementById('tutar').value.replace(/\./g, "");
+        const tutar = parseFloat(tutarStr);
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeYil').value);
         const periyot = parseInt(document.getElementById('periyot').value);
         const toplamTaksit = vade * periyot;
         const bsmv = 0.05, kkdf = (currentType === 'traktor' ? 0 : 0.15);
-
-        const kkdfCols = document.querySelectorAll('.kkdf-col');
-        kkdfCols.forEach(el => currentType === 'traktor' ? el.style.display='none' : el.style.display='table-cell');
 
         const i = (yFaiz / periyot) * (1 + bsmv + kkdf);
         const taksit = (tutar * i * Math.pow(1+i, toplamTaksit)) / (Math.pow(1+i, toplamTaksit)-1);
@@ -210,16 +232,21 @@
                 <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
         document.getElementById('planBody').innerHTML = body;
+        
+        // KKDF Sütunlarını Gizle/Göster
+        const kkdfCols = document.querySelectorAll('.kkdf-col');
+        kkdfCols.forEach(el => currentType === 'traktor' ? el.style.display='none' : el.style.display='table-cell');
+
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('btnYazdir').disabled = false;
         document.getElementById('btnPdf').disabled = false;
-        document.getElementById('pDate').innerText = "Rapor Tarihi: " + new Date().toLocaleDateString('tr-TR');
+        document.getElementById('pDate').innerText = "Oluşturulma Tarihi: " + new Date().toLocaleDateString('tr-TR');
     }
 
     function indirPDF() {
         const element = document.getElementById('main-content');
         html2pdf().set({ 
-            margin: 5, filename: 'odeme_plani.pdf', 
+            margin: 5, filename: 'kredi_plani.pdf', 
             html2canvas: { scale: 2 }, 
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
         }).from(element).save();
