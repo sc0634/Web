@@ -6,15 +6,15 @@
     <title>Süleyman Coşkun - Finansal Analiz</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* --- YAZDIRMA AYARLARI (YATAY & TEK SAYFA) --- */
+        /* --- YAZDIRMA AYARLARI --- */
         @media print {
             @page { size: landscape; margin: 5mm; }
             html, body { width: 297mm; background: #fff !important; color: #000 !important; }
             .no-print, .tabs, .btn-group, .input-grid, h1 { display: none !important; }
             .container { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; border: none !important; }
-            table { width: 100% !important; table-layout: fixed; font-size: 9pt !important; border-collapse: collapse !important; }
-            th, td { border: 1px solid #000 !important; padding: 5px !important; word-wrap: break-word !important; }
-            th { background: #f2f2f2 !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+            table { width: 100% !important; table-layout: fixed; font-size: 8.5pt !important; border-collapse: collapse !important; }
+            th, td { border: 1px solid #000 !important; padding: 4px !important; }
+            th { background: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
             .print-header { display: block !important; text-align: center; border-bottom: 2px solid #000; margin-bottom: 10px; }
             .print-footer { display: block !important; text-align: right; margin-top: 15px; font-weight: bold; font-size: 11pt; }
         }
@@ -27,16 +27,17 @@
         .container { max-width: 1200px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        h1 { color: #2c3e50; text-align: center; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 20px; }
         .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3498db; }
         .field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
         .btn-group { display: flex; gap: 10px; margin-bottom: 25px; }
-        button { flex: 1; padding: 14px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: #fff; }
-        .btn-calc { background: #27ae60; } .btn-clear { background: #e74c3c; }
+        button { flex: 1; padding: 14px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: #fff; transition: 0.3s; }
+        .btn-calc { background: #27ae60; } .btn-calc:hover { background: #219150; }
+        .btn-clear { background: #e74c3c; }
         #btnPdf { background: #3498db; } #btnYazdir { background: #f39c12; }
-        button:disabled { background: #ccc !important; }
-        table { width: 100%; border-collapse: collapse; }
+        button:disabled { background: #ccc !important; cursor: not-allowed; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { background: #34495e; color: #fff; padding: 12px; font-size: 13px; }
         td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; font-size: 13px; }
         .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
@@ -56,7 +57,8 @@
         <div class="print-header print-only">
             <h3 style="margin: 0; color: #555;">Süleyman Coşkun</h3>
             <h2 id="printTitle">TRAKTÖR KREDİSİ ÖDEME PLANI</h2>
-            <p id="pDate" style="font-size: 10px;"></p>
+            <p id="pMethod" style="margin: 0; font-weight: normal;"></p>
+            <p id="pDate" style="font-size: 10px; margin-top: 5px;"></p>
         </div>
 
         <div class="no-print">
@@ -73,6 +75,13 @@
                     <label>Ödeme Sıklığı</label>
                     <select id="periyot" onchange="resetButtons();">
                         <option value="1">Yılda Bir</option><option value="2">6 Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="12">Ayda Bir</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Ödeme Planı</label>
+                    <select id="planTipi" onchange="resetButtons();">
+                        <option value="esit_taksit" selected>Eşit Taksitli</option>
+                        <option value="esit_anapara">Anapara Eşit Taksitli</option>
                     </select>
                 </div>
                 <div class="field"><label>Yıllık Faiz (%)</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
@@ -152,35 +161,58 @@
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeYil').value);
         const per = parseInt(document.getElementById('periyot').value);
+        const planTipi = document.getElementById('planTipi').value;
         const toplamTaksit = vade * per;
         
-        // Ticari kredide KKDF 0 olduğu için her iki tipte de kkdfOran 0 oldu.
         const bsmvOran = 0.05, kkdfOran = 0; 
+        const donemFaizOranı = (yFaiz / per);
+        const i_vergi_dahil = donemFaizOranı * (1 + bsmvOran + kkdfOran);
 
-        const i = (yFaiz / per) * (1 + bsmvOran + kkdfOran);
-        const taksit = (tutar * i * Math.pow(1+i, toplamTaksit)) / (Math.pow(1+i, toplamTaksit)-1);
+        let body = ''; 
+        let kalanAnapara = tutar;
+        let sabitAnapara = tutar / toplamTaksit;
 
-        let body = ''; let kalan = tutar;
         for(let j=1; j<=toplamTaksit; j++){
-            let f = kalan * (yFaiz / per), b = f * bsmvOran;
-            let a = taksit - (f + b);
-            if(j === toplamTaksit) a = kalan;
-            let sTaksit = taksit - ((f+b)*sub);
-            kalan -= a;
+            let faiz, bsmv, anapara, taksit;
+
+            if(planTipi === 'esit_taksit') {
+                // Anuitet Hesaplama
+                taksit = (tutar * i_vergi_dahil * Math.pow(1+i_vergi_dahil, toplamTaksit)) / (Math.pow(1+i_vergi_dahil, toplamTaksit)-1);
+                faiz = kalanAnapara * donemFaizOranı;
+                bsmv = faiz * bsmvOran;
+                anapara = taksit - (faiz + bsmv);
+                if(j === toplamTaksit) anapara = kalanAnapara; // Kuruş farkı temizleme
+                taksit = anapara + faiz + bsmv;
+            } else {
+                // Eşit Anapara Hesaplama
+                anapara = sabitAnapara;
+                faiz = kalanAnapara * donemFaizOranı;
+                bsmv = faiz * bsmvOran;
+                taksit = anapara + faiz + bsmv;
+                if(j === toplamTaksit) anapara = kalanAnapara;
+            }
+
+            let sTaksit = taksit - ((faiz + bsmv) * sub);
+            kalanAnapara -= anapara;
+
             body += `<tr><td>${j}</td>
                 <td>${Math.round(taksit).toLocaleString('tr-TR')} ₺</td>
-                <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
-                <td>${Math.round(f).toLocaleString('tr-TR')} ₺</td>
-                <td>${Math.round(b).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(anapara).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(faiz).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(bsmv).toLocaleString('tr-TR')} ₺</td>
                 <td class="sub-row">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
-                <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
+                <td>${Math.max(0, Math.round(kalanAnapara)).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
+
         document.getElementById('planBody').innerHTML = body;
-        
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('sonucAlani').scrollIntoView({ behavior: 'smooth' });
+        
         document.getElementById('btnYazdir').disabled = false;
         document.getElementById('btnPdf').disabled = false;
+        
+        // Rapor detaylarını güncelle
+        document.getElementById('pMethod').innerText = "Ödeme Tipi: " + (planTipi === 'esit_taksit' ? "Eşit Taksitli" : "Eşit Anapara Ödemeli");
         document.getElementById('pDate').innerText = "Rapor Tarihi: " + new Date().toLocaleDateString('tr-TR');
     }
 
