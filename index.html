@@ -6,6 +6,7 @@
     <title>Süleyman Coşkun - Finansal Analiz</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        /* --- SEKME TASARIMI --- */
         .tabs { 
             display: flex; 
             flex-wrap: wrap; 
@@ -36,6 +37,7 @@
         }
         .tab-link.active { background: #3498db; color: #fff; }
 
+        /* --- YAN YANA LABEL & BOX DÜZENİ --- */
         .input-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -48,8 +50,9 @@
         }
         .field { display: flex; align-items: center; }
         .field label { flex: 0 0 140px; font-size: 13px; font-weight: 600; color: #34495e; }
-        input, select { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; outline: none; }
+        input, select { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; outline: none; background: #fff; }
 
+        /* --- GENEL TASARIM --- */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
         .container { max-width: 1200px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
@@ -68,11 +71,12 @@
         td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; font-size: 12px; }
         .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
 
-        /* YAZDIRMA VE PDF AYARLARI */
+        /* YAZDIRMA VE PDF ÇIKTI AYARLARI */
         @media print {
-            .no-print, .tabs, .btn-group { display: none !important; }
+            .tabs, .btn-group { display: none !important; } /* Sadece sekmeler ve butonlar gizlenir */
+            .input-grid { background: #fff !important; border: 1px solid #eee !important; } /* Kredi bilgileri kutusu temiz görünür */
             .container { box-shadow: none; margin: 0; width: 100%; max-width: none; }
-            body { background: white; }
+            input, select { border: none !important; appearance: none; -webkit-appearance: none; background: transparent !important; }
         }
 
         @media (max-width: 768px) {
@@ -94,7 +98,7 @@
     <div id="krediAlani" class="tab-content active">
         <h1 id="baslikText">Traktör Kredisi Hesaplama</h1>
         
-        <div class="input-area no-print">
+        <div class="input-section">
             <div class="input-grid">
                 <div class="field"><label>Kredi Tutarı (₺) :</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
                 <div class="field"><label>Vade (Yıl) :</label><select id="vadeYil" onchange="resetButtons();"><option value="1">1 Yıl</option><option value="2">2 Yıl</option><option value="3">3 Yıl</option><option value="4">4 Yıl</option><option value="5" selected>5 Yıl</option></select></div>
@@ -192,7 +196,7 @@
         const element = document.getElementById('main-content');
         html2pdf().set({ 
             margin: 5, 
-            filename: `Kredi_Odeme_Plani.pdf`, 
+            filename: `Finansal_Rapor.pdf`, 
             html2canvas: { scale: 2 }, 
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
         }).from(element).save();
