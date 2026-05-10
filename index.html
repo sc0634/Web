@@ -99,8 +99,8 @@
         </div>
 
         <div class="vergi-bilgi-satiri">
-            <div>KKDF: <span id="kkdfGosterge">%0</span></div>
-            <div>BSMV: <span id="bsmvGosterge">%5</span></div>
+            <div>KKDF: %0</div>
+            <div>BSMV: %5</div>
             <input type="hidden" id="faizAylik" value="3.375">
         </div>
 
@@ -150,16 +150,9 @@
 
 <script>
     window.onload = function() { 
-        vergiGuncelle();
         periyotGuncelle(); 
         document.getElementById('tarihGosterge').innerText = "Tarih: " + new Date().toLocaleDateString('tr-TR');
     };
-
-    function vergiGuncelle() {
-        const tur = document.getElementById('krediTuru').value;
-        document.getElementById('kkdfGosterge').innerText = "%0";
-        document.getElementById('bsmvGosterge').innerText = "%5";
-    }
 
     function yilliktanAyliga() {
         const yillik = parseFloat(document.getElementById('faizYillik').value);
@@ -186,7 +179,7 @@
 
         const taksitSayisi = toplamVade / periyot;
         const donemlikFaiz = aylikFaiz * periyot;
-        const i = donemlikFaiz * (1 + 0.05); // BSMV dahil faiz oranı
+        const i = donemlikFaiz * (1 + 0.05); 
         const taksit = (P * i * Math.pow(1 + i, taksitSayisi)) / (Math.pow(1 + i, taksitSayisi) - 1);
         
         document.getElementById('planBaslik').innerText = "KREDİ ÖDEME PLANI (" + document.getElementById('krediTuru').selectedOptions[0].text + ")";
@@ -230,10 +223,15 @@
             <td>-</td>
         </tr>`;
 
-        const mTahsis = P * 0.005, mKasko = P * 0.03, mSigorta = P * 0.02, mTarsim = P * 0.05, mDiger = P * 0.01;
+        // MASRAFLAR
+        const mTahsis = P * 0.0023; // Binde 2.30 oranı (0.0023)
+        const mKasko = P * 0.03;
+        const mSigorta = P * 0.02;
+        const mTarsim = P * 0.05;
+        const mDiger = P * 0.01;
         const mToplam = mTahsis + mKasko + mSigorta + mTarsim + mDiger;
 
-        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti: " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti (%0,23): " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-kasko').innerText = "• Kasko: " + mKasko.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-sigorta').innerText = "• Hayat Sigortası: " + mSigorta.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-tarsim').innerText = "• Tarsim (%5): " + mTarsim.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
@@ -246,7 +244,6 @@
         const signature = document.querySelector('.signature');
         const element = document.getElementById('main-content');
 
-        // PDF oluşturmadan önce butonları ve ayarları gizle, imzayı aç
         setupArea.style.display = 'none';
         signature.style.display = 'block';
 
@@ -254,12 +251,11 @@
             margin: 5,
             filename: 'kredi_odeme_plani.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
+            html2canvas: { scale: 2 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
-            // İşlem bittikten sonra her şeyi ekranda eski haline getir
             setupArea.style.display = 'block';
             signature.style.display = 'none';
         });
