@@ -238,15 +238,17 @@
             <td>-</td>
         </tr>`;
 
-        // Limit tahsis ücreti binde 4 (0.004) olarak güncellendi
         const mTahsis = P * 0.004;
-        const mKasko = P * 0.03, mSigorta = P * 0.02, mTarsim = P * 0.05, mDiger = P * 0.01;
+        const mKasko = P * 0.03, mSigorta = P * 0.02, mDiger = P * 0.01;
+        // Tarsim oranı %4 (0.04) olarak güncellendi
+        const mTarsim = P * 0.04;
         const mToplam = mTahsis + mKasko + mSigorta + mTarsim + mDiger;
 
         document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti: " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-kasko').innerText = "• Kasko: " + mKasko.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-sigorta').innerText = "• Hayat Sigortası: " + mSigorta.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
-        document.getElementById('masraf-tarsim').innerText = "• Tarsim (%5): " + mTarsim.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        // Tarsim için oran ibaresi kaldırıldı
+        document.getElementById('masraf-tarsim').innerText = "• Tarsim: " + mTarsim.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-diger').innerText = "• Diğer Masraflar: " + mDiger.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-toplam').innerText = "MASRAFLAR TOPLAMI: " + mToplam.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
     }
