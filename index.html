@@ -3,74 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finansal Analiz Paneli</title>
+    <title>Süleyman Coşkun - Finansal Analiz</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* --- YAZDIRMA AYARLARI (YATAY VE SIĞDIRMA) --- */
+        /* --- YAZDIRMA VE PDF AYARLARI --- */
         @media print {
-            @page { 
-                size: landscape; 
-                margin: 5mm; 
-            }
-            html, body {
-                width: 297mm; /* A4 Yatay Genişliği */
-                height: 210mm;
-                background: #fff !important;
-                color: #000 !important;
-                font-size: 9pt; /* Yazıyı sığdırmak için küçültme */
-            }
-            .no-print, .tabs, .btn-group, .input-grid, h1 { 
-                display: none !important; 
-                visibility: hidden !important;
-            }
-            .container { 
-                width: 100% !important; 
-                max-width: none !important;
-                margin: 0 !important; 
-                padding: 0 !important;
-                border: none !important;
-                box-shadow: none !important;
-            }
-            table { 
-                width: 100% !important; 
-                table-layout: fixed; /* Sütunları sayfaya hapseder */
-                font-size: 8pt !important;
-                border-collapse: collapse !important;
-            }
-            th, td { 
-                word-wrap: break-word !important; 
-                padding: 4px !important;
-                border: 1px solid #000 !important;
-            }
+            @page { size: landscape; margin: 10mm; }
+            html, body { width: 297mm; background: #fff !important; color: #000 !important; font-size: 10pt; }
+            .no-print, .tabs, .btn-group, .input-grid, h1 { display: none !important; }
+            .container { width: 100% !important; max-width: none !important; border: none !important; box-shadow: none !important; }
+            table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed; }
+            th, td { border: 1px solid #000 !important; padding: 6px !important; }
             th { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact; }
-            .print-header { display: block !important; text-align: center; margin-bottom: 10px; }
-            .print-footer { display: block !important; text-align: right; margin-top: 10px; font-weight: bold; }
+            .print-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; }
+            .print-footer { display: block !important; text-align: right; margin-top: 30px; font-weight: bold; font-size: 12pt; }
         }
 
-        /* --- EKRAN TASARIMI (RENKLİ) --- */
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: #f0f2f5; 
-            margin: 0; padding: 0;
-        }
-        .tabs { display: flex; background: #1a252f; position: sticky; top: 0; z-index: 1000; }
-        .tab-link { padding: 15px 25px; color: #bdc3c7; border: none; background: none; cursor: pointer; font-weight: bold; }
-        .tab-link.active { color: #fff; background: #3498db; border-bottom: 3px solid #fff; }
-        .container { max-width: 1150px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-        h1 { color: #2c3e50; text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-left: 5px solid #3498db; border-radius: 8px; }
-        .field label { font-size: 12px; font-weight: 600; margin-bottom: 5px; display: block; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box; }
-        .btn-group { display: flex; gap: 10px; margin-bottom: 25px; }
-        button { flex: 1; padding: 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; }
-        .btn-calc { background: #2ecc71; } .btn-clear { background: #e74c3c; }
+        /* --- EKRAN TASARIMI --- */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+        .tabs { display: flex; background: #2c3e50; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .tab-link { padding: 15px 25px; color: #ecf0f1; border: none; background: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .tab-link.active { background: #3498db; color: #fff; }
+        .container { max-width: 1100px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 30px; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3498db; }
+        .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #34495e; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 30px; }
+        button { flex: 1; padding: 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: #fff; transition: 0.2s; }
+        .btn-calc { background: #27ae60; } .btn-calc:hover { background: #219150; }
+        .btn-clear { background: #e74c3c; }
         #btnPdf { background: #3498db; } #btnYazdir { background: #f39c12; }
-        button:disabled { background: #bdc3c7 !important; }
-        .table-responsive { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #34495e; color: #fff; padding: 12px; }
-        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
-        .sub-row { background: #ebf5fb; font-weight: bold; color: #2980b9; }
+        button:disabled { background: #ccc !important; cursor: not-allowed; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #34495e; color: #fff; padding: 12px; text-align: center; }
+        td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
+        .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
         .print-only { display: none; }
     </style>
 </head>
@@ -79,65 +49,86 @@
 <div class="tabs no-print">
     <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Traktör Kredisi</button>
     <button class="tab-link" onclick="openTab(event, 'ticari')">💼 Ticari Kredi</button>
+    <button class="tab-link" onclick="openTab(event, 'hakkimda')">👤 Hakkımda</button>
 </div>
 
 <div class="container" id="main-content">
-    <div class="print-header print-only">
-        <h2 id="printTitle">KREDİ ÖDEME PLANI RAPORU</h2>
-        <p id="pDate"></p>
-    </div>
-
-    <div class="no-print">
-        <h1 id="baslikText">Traktör Kredisi Hesaplama</h1>
-        <div class="input-grid">
-            <div class="field"><label>Kredi Tutarı (₺)</label><input type="text" id="tutar" value="2.000.000" oninput="formatTutar(this); resetButtons();"></div>
-            <div class="field">
-                <label>Vade (Yıl)</label>
-                <select id="vadeYil" onchange="resetButtons();">
-                    <option value="5">5 Yıl</option><option value="4">4 Yıl</option><option value="3">3 Yıl</option><option value="2">2 Yıl</option><option value="1">1 Yıl</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Ödeme Sıklığı</label>
-                <select id="periyot" onchange="resetButtons();">
-                    <option value="12">Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="2">6 Ayda Bir</option><option value="1" selected>Yılda Bir</option>
-                </select>
-            </div>
-            <div class="field"><label>Yıllık Faiz (%)</label><input type="number" id="faizYillik" value="40.50" oninput="resetButtons();"></div>
-            <div class="field"><label>Sübvansiyon Oranı (%)</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
+    <div id="krediAlani" class="tab-content active">
+        <div class="print-header print-only">
+            <h2 id="printTitle">TRAKTÖR KREDİSİ ÖDEME PLANI</h2>
+            <p id="pDate" style="font-size: 11px;"></p>
         </div>
 
-        <div class="btn-group">
-            <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
-            <button class="btn-clear" onclick="resetButtons()">TEMİZLE</button>
-            <button id="btnPdf" onclick="indirPDF()" disabled>PDF KAYDET</button>
-            <button id="btnYazdir" onclick="window.print()" disabled>YAZDIR</button>
+        <div class="no-print">
+            <h1 id="baslikText">Traktör Kredisi Hesaplama</h1>
+            <div class="input-grid">
+                <div class="field"><label>Kredi Tutarı (₺)</label><input type="text" id="tutar" value="2.000.000" oninput="formatTutar(this); resetButtons();"></div>
+                <div class="field">
+                    <label>Vade (Yıl)</label>
+                    <select id="vadeYil" onchange="resetButtons();">
+                        <option value="5">5 Yıl</option><option value="4">4 Yıl</option><option value="3">3 Yıl</option><option value="2">2 Yıl</option><option value="1">1 Yıl</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Ödeme Sıklığı</label>
+                    <select id="periyot" onchange="resetButtons();">
+                        <option value="1">Yılda Bir</option><option value="2">6 Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="12">Ayda Bir</option>
+                    </select>
+                </div>
+                <div class="field"><label>Yıllık Faiz (%)</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
+                <div class="field"><label>Sübvansiyon Oranı (%)</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
+                <button class="btn-clear" onclick="resetButtons()">TEMİZLE</button>
+                <button id="btnPdf" onclick="indirPDF()" disabled>PDF KAYDET</button>
+                <button id="btnYazdir" onclick="window.print()" disabled>YAZDIR</button>
+            </div>
+        </div>
+
+        <div id="sonucAlani" style="display:none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:40px;">No</th><th>Taksit Tutarı</th><th>Anapara</th><th>Faiz</th><th>BSMV</th><th class="kkdf-col">KKDF</th><th>Sübvansiyonlu Taksit</th><th>Kalan Anapara</th>
+                    </tr>
+                </thead>
+                <tbody id="planBody"></tbody>
+            </table>
+            <div class="print-footer print-only">Süleyman Coşkun</div>
         </div>
     </div>
 
-    <div id="sonucAlani" style="display:none;" class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 30px;">No</th><th>Taksit Tutarı</th><th>Anapara</th><th>Faiz</th><th>BSMV</th><th class="kkdf-col">KKDF</th><th>Sübvansiyonlu Taksit</th><th>Kalan Anapara</th>
-                </tr>
-            </thead>
-            <tbody id="planBody"></tbody>
-        </table>
-        <div class="print-footer print-only">Süleyman Coşkun</div>
+    <div id="hakkimdaAlani" class="tab-content">
+        <h1>Süleyman Coşkun</h1>
+        <p style="text-align:center; color: #7f8c8d;">Finansal Analiz ve Portföy Yönetimi</p>
+        <div style="margin-top: 20px; line-height: 1.6;">
+            Bu uygulama, bankacılık parametrelerine uygun (BSMV, KKDF ve Sübvansiyon Oranı hesaplamalı) profesyonel ödeme planları oluşturmak için Süleyman Coşkun tarafından geliştirilmiştir.
+        </div>
     </div>
 </div>
 
 <script>
     let currentType = 'traktor';
+
     function openTab(evt, tabName) {
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         evt.currentTarget.classList.add('active');
-        currentType = tabName;
-        document.getElementById('baslikText').innerText = tabName === 'traktor' ? 'Traktör Kredisi Hesaplama' : 'Ticari Kredi Hesaplama';
-        document.getElementById('printTitle').innerText = tabName === 'traktor' ? 'TRAKTÖR KREDİSİ PLANI' : 'TİCARİ KREDİ PLANI';
-        document.getElementById('periyot').value = tabName === 'traktor' ? "1" : "12";
-        resetButtons();
+
+        if(tabName === 'hakkimda') {
+            document.getElementById('hakkimdaAlani').classList.add('active');
+        } else {
+            document.getElementById('krediAlani').classList.add('active');
+            currentType = tabName;
+            const bText = tabName === 'traktor' ? 'Traktör Kredisi Hesaplama' : 'Ticari Kredi Hesaplama';
+            const pText = tabName === 'traktor' ? 'TRAKTÖR KREDİSİ ÖDEME PLANI' : 'TİCARİ KREDİ ÖDEME PLANI';
+            document.getElementById('baslikText').innerText = bText;
+            document.getElementById('printTitle').innerText = pText;
+            document.getElementById('periyot').value = tabName === 'traktor' ? "1" : "12";
+            resetButtons();
+        }
     }
 
     function resetButtons() {
@@ -146,7 +137,10 @@
         document.getElementById('sonucAlani').style.display = 'none';
     }
 
-    function formatTutar(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); }
+    function formatTutar(i) {
+        let v = i.value.replace(/\D/g, "");
+        if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
+    }
 
     function hesapla() {
         const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
@@ -167,7 +161,14 @@
             if(j === toplamTaksit) a = kalan;
             let sTaksit = taksit - ((f+b+k)*sub);
             kalan -= a;
-            body += `<tr><td>${j}</td><td>${Math.round(taksit).toLocaleString()} ₺</td><td>${Math.round(a).toLocaleString()} ₺</td><td>${Math.round(f).toLocaleString()} ₺</td><td>${Math.round(b).toLocaleString()} ₺</td><td class="kkdf-col" style="${currentType==='traktor'?'display:none':''}">${Math.round(k).toLocaleString()} ₺</td><td class="sub-row">${Math.round(sTaksit).toLocaleString()} ₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString()} ₺</td></tr>`;
+            body += `<tr><td>${j}</td>
+                <td>${Math.round(taksit).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(f).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(b).toLocaleString('tr-TR')} ₺</td>
+                <td class="kkdf-col" style="${currentType==='traktor'?'display:none':''}">${Math.round(k).toLocaleString('tr-TR')} ₺</td>
+                <td class="sub-row">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
         document.getElementById('planBody').innerHTML = body;
         document.querySelectorAll('.kkdf-col').forEach(el => el.style.display = currentType === 'traktor' ? 'none' : '');
@@ -179,7 +180,15 @@
 
     function indirPDF() {
         const element = document.getElementById('main-content');
-        html2pdf().set({ margin: 5, filename: 'plan.pdf', html2canvas: { scale: 2, ignoreElements: (el) => el.classList.contains('no-print') }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
+        const krediAdi = currentType === 'traktor' ? 'Traktor_Kredisi' : 'Ticari_Kredi';
+        const opt = {
+            margin: 5,
+            filename: `${krediAdi}_Odeme_Plani.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, ignoreElements: (el) => el.classList.contains('no-print') },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 </script>
 </body>
