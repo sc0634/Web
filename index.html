@@ -56,6 +56,7 @@
         .tab-content.active { display: block; }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; font-size: 22px; }
         
+        /* BUTON GRUBU */
         .btn-group { display: flex; gap: 10px; margin-bottom: 25px; }
         button { flex: 1; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: #fff; }
         .btn-calc { background: #27ae60; } .btn-clear { background: #e74c3c; }
@@ -66,6 +67,13 @@
         th { background: #34495e; color: #fff; padding: 10px 5px; font-size: 11px; text-align: center; }
         td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; font-size: 12px; }
         .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
+
+        /* YAZDIRMA VE PDF AYARLARI */
+        @media print {
+            .no-print, .tabs, .btn-group { display: none !important; }
+            .container { box-shadow: none; margin: 0; width: 100%; max-width: none; }
+            body { background: white; }
+        }
 
         @media (max-width: 768px) {
             .input-grid { grid-template-columns: 1fr; }
@@ -85,7 +93,8 @@
 <div class="container" id="main-content">
     <div id="krediAlani" class="tab-content active">
         <h1 id="baslikText">Traktör Kredisi Hesaplama</h1>
-        <div class="no-print">
+        
+        <div class="input-area no-print">
             <div class="input-grid">
                 <div class="field"><label>Kredi Tutarı (₺) :</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
                 <div class="field"><label>Vade (Yıl) :</label><select id="vadeYil" onchange="resetButtons();"><option value="1">1 Yıl</option><option value="2">2 Yıl</option><option value="3">3 Yıl</option><option value="4">4 Yıl</option><option value="5" selected>5 Yıl</option></select></div>
@@ -94,6 +103,7 @@
                 <div class="field"><label>Yıllık Faiz (%) :</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
                 <div class="field" id="subContainer"><label>Sübvansiyon (%) :</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
             </div>
+            
             <div class="btn-group">
                 <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
                 <button class="btn-clear" onclick="location.reload()">SIFIRLA</button>
@@ -101,6 +111,7 @@
                 <button id="btnYazdir" onclick="window.print()" disabled>YAZDIR</button>
             </div>
         </div>
+
         <div id="sonucAlani" style="display:none;">
             <table id="planTable">
                 <thead>
@@ -179,7 +190,12 @@
     }
     function indirPDF() {
         const element = document.getElementById('main-content');
-        html2pdf().set({ margin: 5, filename: `Kredi_Odeme_Plani.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
+        html2pdf().set({ 
+            margin: 5, 
+            filename: `Kredi_Odeme_Plani.pdf`, 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
+        }).from(element).save();
     }
 </script>
 </body>
