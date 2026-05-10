@@ -6,7 +6,6 @@
     <title>Kredi Hesaplama - Süleyman Coşkun</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* Yazıcı ve PDF için Yatay Mod Ayarı */
         @page { 
             size: A4 landscape; 
             margin: 10mm; 
@@ -41,7 +40,9 @@
         .masraf-toplam { margin-top: 8px; padding-top: 5px; border-top: 1px dashed #000; font-weight: bold; font-size: 13px; }
 
         .disclaimer { margin-top: 15px; font-size: 11px; color: #555; font-style: italic; border-left: 3px solid #000; padding-left: 10px; }
-        .signature { display: none; text-align: right; font-size: 12px; font-style: italic; font-weight: bold; margin-top: 10px; color: #333; }
+        
+        /* İmza Bölümü: İngilizce ve %50 Küçük (6px) */
+        .signature { display: none; text-align: right; font-size: 6px; font-style: italic; font-weight: bold; margin-top: 10px; color: #333; }
         
         @media print {
             @page { size: landscape; }
@@ -147,7 +148,7 @@
             * Kredi hesaplamaları ve masraflar yaklaşık değerler olup kesin rakamlar için ilgili bankanın ilgili şubesi ile görüşülmesi gerekmektedir.
         </div>
 
-        <div class="signature">Süleyman Coşkun Tarafından Hazırlanmıştır</div>
+        <div class="signature">Prepared by Süleyman Coşkun</div>
     </div>
 </div>
 
@@ -226,12 +227,11 @@
             <td>-</td>
         </tr>`;
 
-        // Masraflar - Binde 40 (0.040)
-        const mTahsis = P * 0.040;
+        const mTahsis = P * 0.0004;
         const mKasko = P * 0.03, mSigorta = P * 0.02, mTarsim = P * 0.05, mDiger = P * 0.01;
         const mToplam = mTahsis + mKasko + mSigorta + mTarsim + mDiger;
 
-        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti: " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti (Binde 0,40): " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-kasko').innerText = "• Kasko: " + mKasko.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-sigorta').innerText = "• Hayat Sigortası: " + mSigorta.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-tarsim').innerText = "• Tarsim (%5): " + mTarsim.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
