@@ -65,7 +65,7 @@
         <div class="input-grid">
             <div class="field">
                 <label>Kredi Türü</label>
-                <select id="krediTuru" onchange="vergiGuncelle(); periyotGuncelle();">
+                <select id="krediTuru" onchange="periyotGuncelle();">
                     <option value="traktor" selected>Traktör Kredisi</option>
                     <option value="ticari">Ticari Kredi</option>
                 </select>
@@ -224,19 +224,19 @@
         </tr>`;
 
         // MASRAFLAR
-        const mTahsis = P * 0.0023; // Binde 2.30 oranı (0.0023)
+        const mTahsis = P * 0.0023; // Binde 2.30
         const mKasko = P * 0.03;
         const mSigorta = P * 0.02;
         const mTarsim = P * 0.05;
         const mDiger = P * 0.01;
         const mToplam = mTahsis + mKasko + mSigorta + mTarsim + mDiger;
 
-        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti (%0,23): " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        document.getElementById('masraf-tahsis').innerText = "• Limit Tahsis Ücreti: " + mTahsis.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-kasko').innerText = "• Kasko: " + mKasko.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-sigorta').innerText = "• Hayat Sigortası: " + mSigorta.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-tarsim').innerText = "• Tarsim (%5): " + mTarsim.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
         document.getElementById('masraf-diger').innerText = "• Diğer Masraflar: " + mDiger.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
-        document.getElementById('masraf-toplam').innerText = "GENEL TOPLAM MASRAF: " + mToplam.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
+        document.getElementById('masraf-toplam').innerText = "MASRAFLAR TOPLAMI: " + mToplam.toLocaleString('tr-TR', {minimumFractionDigits:2}) + " ₺";
     }
 
     function indirPDF() {
