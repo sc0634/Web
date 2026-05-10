@@ -41,26 +41,33 @@
         #btnPdf { background: #3498db; } #btnYazdir { background: #f39c12; }
         button:disabled { background: #ccc !important; cursor: not-allowed; }
 
+        .summary-box { 
+            background: #fdfdfd; border: 2px solid #3498db; padding: 15px; 
+            border-radius: 8px; margin-bottom: 20px; display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;
+        }
+        .summary-item { text-align: center; border-right: 1px solid #eee; }
+        .summary-item:last-child { border-right: none; }
+        .summary-item strong { display: block; font-size: 11px; color: #7f8c8d; text-transform: uppercase; }
+        .summary-item span { font-size: 16px; font-weight: bold; color: #2c3e50; }
+
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 800px; }
-        th { background: #34495e; color: #fff; padding: 10px 4px; font-size: 10px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 850px; }
+        th { background: #34495e; color: #fff; padding: 12px 4px; font-size: 10px; text-align: center; }
         td { padding: 10px 4px; border-bottom: 1px solid #eee; text-align: center; font-size: 11px; color: #333; }
         .sub-row { background: #eef7ff; font-weight: bold; color: #2980b9; }
 
-        /* --- MOBİL VE ÇIKTI OPTİMİZASYONU --- */
         @media print {
             .tabs, .btn-group, .no-print { display: none !important; }
             .container { box-shadow: none; margin: 0; padding: 0; width: 100%; }
-            .input-grid { grid-template-columns: 1fr 1fr 1fr !important; border: 1px solid #ddd !important; background: white !important; }
-            input, select { border: none !important; font-weight: bold; background: transparent !important; appearance: none; }
-            th { background: #f2f2f2 !important; color: #000 !important; border: 1px solid #ddd; }
-            td { border: 1px solid #ddd; }
+            .input-grid { grid-template-columns: 1fr 1fr 1fr !important; border: 1px solid #ddd !important; }
+            input, select { border: none !important; font-weight: bold; background: transparent !important; }
         }
 
         @media (max-width: 600px) {
             .input-grid { grid-template-columns: 1fr; }
-            .field label { flex: 0 0 110px; }
-            button { width: 100%; flex: none; }
+            .summary-box { grid-template-columns: 1fr 1fr; }
+            .summary-item { border-right: none; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         }
     </style>
 </head>
@@ -85,6 +92,7 @@
                 <div class="field"><label>Ödeme Sıklığı :</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda Bir</option><option value="2">6 Ayda Bir</option><option value="4">3 Ayda Bir</option><option value="12">Ayda Bir</option></select></div>
                 <div class="field"><label>Ödeme Planı :</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksitli</option><option value="esit_anapara">Anapara Eşit Taksitli</option></select></div>
                 <div class="field"><label>Yıllık Faiz (%) :</label><input type="number" id="faizYillik" value="49.00" step="0.01" oninput="resetButtons();"></div>
+                <div class="field"><label>Masraf (₺) :</label><input type="text" id="masrafTutari" value="0" oninput="formatTutar(this); resetButtons();"></div>
                 <div class="field" id="subContainer"><label>Sübvansiyon (%) :</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
             </div>
             
@@ -97,6 +105,13 @@
         </div>
 
         <div id="sonucAlani" style="display:none;">
+            <div class="summary-box">
+                <div class="summary-item"><strong>Net Kredi</strong><span id="sumAnapara">0 ₺</span></div>
+                <div class="summary-item"><strong>Toplam Faiz+Vergi</strong><span id="sumFaiz">0 ₺</span></div>
+                <div class="summary-item"><strong>Kredi Masrafları</strong><span id="sumMasraf">0 ₺</span></div>
+                <div class="summary-item" style="color: #e67e22;"><strong>Genel Toplam</strong><span id="sumGenel">0 ₺</span></div>
+            </div>
+
             <div class="table-responsive">
                 <table id="planTable">
                     <thead>
@@ -129,14 +144,11 @@
         const select = document.getElementById('vadeSecim');
         const label = document.getElementById('vadeLabel');
         select.innerHTML = '';
-        
-        // Ticari ve Zirai krediler için Ay bazlı vade (1-60)
         if (currentType === 'ticari' || currentType === 'zirai') {
             label.innerText = "Vade (Ay) :";
             for (let i = 1; i <= 60; i++) {
                 let opt = document.createElement('option');
-                opt.value = i;
-                opt.innerHTML = i + " Ay";
+                opt.value = i; opt.innerHTML = i + " Ay";
                 if (i === 60) opt.selected = true;
                 select.appendChild(opt);
             }
@@ -144,8 +156,7 @@
             label.innerText = "Vade (Yıl) :";
             for (let i = 1; i <= 5; i++) {
                 let opt = document.createElement('option');
-                opt.value = i;
-                opt.innerHTML = i + " Yıl";
+                opt.value = i; opt.innerHTML = i + " Yıl";
                 if (i === 5) opt.selected = true;
                 select.appendChild(opt);
             }
@@ -160,18 +171,11 @@
         else {
             document.getElementById('krediAlani').classList.add('active');
             currentType = tabName;
-            const titles = {
-                'traktor': 'Traktör Kredisi', 
-                'ticari': 'Ticari Kredi', 
-                'zirai': 'Zirai/Çiftçi Taksitli Tarım Kredisi', 
-                'tuketici': 'Tüketici Kredisi'
-            };
+            const titles = {'traktor':'Traktör Kredisi','ticari':'Ticari Kredi','zirai':'Zirai Tarım Kredisi','tuketici':'Tüketici Kredisi'};
             document.getElementById('baslikText').innerText = titles[tabName] + " Hesaplama";
             document.getElementById('subContainer').style.visibility = tabName === 'traktor' ? 'visible' : 'hidden';
             document.getElementById('subOran').value = tabName === 'traktor' ? "50" : "0";
-            document.getElementById('periyot').value = "1";
-            vadeYukle();
-            resetButtons();
+            vadeYukle(); resetButtons();
         }
     }
 
@@ -179,27 +183,21 @@
     function formatTutar(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); }
     
     function hesapla() {
-        const tutarStr = document.getElementById('tutar').value.replace(/\./g, "");
-        const tutar = parseFloat(tutarStr);
+        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const masraf = parseFloat(document.getElementById('masrafTutari').value.replace(/\./g, "")) || 0;
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vadeDeger = parseInt(document.getElementById('vadeSecim').value);
         const per = parseInt(document.getElementById('periyot').value);
         const planTipi = document.getElementById('planTipi').value;
         
-        let toplamTaksit;
-        if (currentType === 'ticari' || currentType === 'zirai') {
-            toplamTaksit = Math.ceil(vadeDeger / (12 / per));
-        } else {
-            toplamTaksit = vadeDeger * per;
-        }
-
+        let toplamTaksit = (currentType === 'ticari' || currentType === 'zirai') ? Math.ceil(vadeDeger / (12 / per)) : vadeDeger * per;
         const bsmvOran = currentType === 'tuketici' ? 0.15 : 0.05;
         const kkdfOran = currentType === 'tuketici' ? 0.15 : 0;
         const donemFaiz = yFaiz / per;
         const i_vergi = donemFaiz * (1 + bsmvOran + kkdfOran);
         
-        let body = ''; let kalan = tutar; let sabitA = tutar / toplamTaksit;
+        let body = ''; let kalan = tutar; let toplamGeriOdeme = 0;
         document.getElementById('thSub').style.display = sub > 0 ? '' : 'none';
         
         for(let j=1; j<=toplamTaksit; j++){
@@ -210,39 +208,32 @@
             if(planTipi === 'esit_taksit') {
                 t = (tutar * i_vergi * Math.pow(1+i_vergi, toplamTaksit)) / (Math.pow(1+i_vergi, toplamTaksit)-1);
                 a = t - (netFaiz + bsmv + kkdf);
-            } else { a = sabitA; t = a + netFaiz + bsmv + kkdf; }
+            } else { a = tutar / toplamTaksit; t = a + netFaiz + bsmv + kkdf; }
             if(j === toplamTaksit) a = kalan;
             t = a + netFaiz + bsmv + kkdf;
             let sTaksit = t - ((netFaiz + bsmv + kkdf) * sub);
+            toplamGeriOdeme += (sub > 0 ? sTaksit : t);
             kalan -= a;
             body += `<tr><td>${j}</td><td>${Math.round(t).toLocaleString('tr-TR')} ₺</td><td>${Math.round(a).toLocaleString('tr-TR')} ₺</td><td>${Math.round(netFaiz).toLocaleString('tr-TR')} ₺</td><td>${Math.round(bsmv).toLocaleString('tr-TR')} ₺</td><td>${Math.round(kkdf).toLocaleString('tr-TR')} ₺</td><td class="sub-row" style="${sub > 0 ? '' : 'display:none'}">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
+        
+        document.getElementById('sumAnapara').innerText = Math.round(tutar).toLocaleString('tr-TR') + " ₺";
+        document.getElementById('sumFaiz').innerText = Math.round(toplamGeriOdeme - tutar).toLocaleString('tr-TR') + " ₺";
+        document.getElementById('sumMasraf').innerText = Math.round(masraf).toLocaleString('tr-TR') + " ₺";
+        document.getElementById('sumGenel').innerText = Math.round(toplamGeriOdeme + masraf).toLocaleString('tr-TR') + " ₺";
+
         document.getElementById('planBody').innerHTML = body;
         document.getElementById('sonucAlani').style.display = 'block';
-        document.getElementById('btnYazdir').disabled = false;
-        document.getElementById('btnPdf').disabled = false;
+        document.getElementById('btnYazdir').disabled = false; document.getElementById('btnPdf').disabled = false;
     }
     
     function indirPDF() {
         const element = document.getElementById('main-content');
-        const buttons = document.getElementById('action-buttons');
         const nav = document.getElementById('navbar');
-
-        buttons.style.visibility = 'hidden';
-        nav.style.display = 'none';
-
-        const opt = {
-            margin: [10, 5, 10, 5],
-            filename: 'Kredi_Plani.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-        };
-
-        html2pdf().set(opt).from(element).save().then(() => {
-            buttons.style.visibility = 'visible';
-            nav.style.display = 'flex';
-        });
+        const btns = document.getElementById('action-buttons');
+        nav.style.display = 'none'; btns.style.visibility = 'hidden';
+        const opt = { margin: [10, 5, 10, 5], filename: 'Kredi_Plani.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
+        html2pdf().set(opt).from(element).save().then(() => { nav.style.display = 'flex'; btns.style.visibility = 'visible'; });
     }
 </script>
 </body>
