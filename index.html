@@ -12,11 +12,11 @@
             position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid #3498db;
         }
         .tab-link { 
-            flex: 1; min-width: 80px; padding: 12px 2px; color: #ecf0f1; border: none; 
+            flex: 1; min-width: 70px; padding: 12px 2px; color: #ecf0f1; border: none; 
             background: none; cursor: pointer; font-weight: bold; display: flex; 
-            flex-direction: column; align-items: center; font-size: 11px;
+            flex-direction: column; align-items: center; font-size: 10px;
         }
-        .tab-link span { display: block; font-size: 1.53em; margin-bottom: 4px; }
+        .tab-link span { display: block; font-size: 1.5em; margin-bottom: 4px; }
         .tab-link.active { background: #3498db; color: #fff; }
 
         .input-grid { 
@@ -69,6 +69,7 @@
 <div class="tabs no-print" id="navbar">
     <button class="tab-link active" onclick="openTab(event, 'traktor')"><span>🚜</span>Traktör</button>
     <button class="tab-link" onclick="openTab(event, 'ticari')"><span>💼</span>Ticari</button>
+    <button class="tab-link" onclick="openTab(event, 'zirai')"><span>👨‍🌾</span>Zirai</button>
     <button class="tab-link" onclick="openTab(event, 'tuketici')"><span>🛒💳</span>Tüketici</button>
     <button class="tab-link" onclick="openTab(event, 'hakkimda')"><span>👤</span>Hakkımda</button>
 </div>
@@ -129,7 +130,8 @@
         const label = document.getElementById('vadeLabel');
         select.innerHTML = '';
         
-        if (currentType === 'ticari') {
+        // Ticari ve Zirai krediler için Ay bazlı vade (1-60)
+        if (currentType === 'ticari' || currentType === 'zirai') {
             label.innerText = "Vade (Ay) :";
             for (let i = 1; i <= 60; i++) {
                 let opt = document.createElement('option');
@@ -158,7 +160,12 @@
         else {
             document.getElementById('krediAlani').classList.add('active');
             currentType = tabName;
-            const titles = {'traktor': 'Traktör Kredisi', 'ticari': 'Ticari Kredi', 'tuketici': 'Tüketici Kredisi'};
+            const titles = {
+                'traktor': 'Traktör Kredisi', 
+                'ticari': 'Ticari Kredi', 
+                'zirai': 'Zirai/Çiftçi Taksitli Tarım Kredisi', 
+                'tuketici': 'Tüketici Kredisi'
+            };
             document.getElementById('baslikText').innerText = titles[tabName] + " Hesaplama";
             document.getElementById('subContainer').style.visibility = tabName === 'traktor' ? 'visible' : 'hidden';
             document.getElementById('subOran').value = tabName === 'traktor' ? "50" : "0";
@@ -181,7 +188,7 @@
         const planTipi = document.getElementById('planTipi').value;
         
         let toplamTaksit;
-        if (currentType === 'ticari') {
+        if (currentType === 'ticari' || currentType === 'zirai') {
             toplamTaksit = Math.ceil(vadeDeger / (12 / per));
         } else {
             toplamTaksit = vadeDeger * per;
