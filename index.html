@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Finansal Planlama</title>
+    <title>Süleyman Coşkun - Vergi Dahil Ödeme Planı</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
@@ -28,7 +28,7 @@
 
         /* Giriş Paneli */
         .input-grid { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 12px; background: var(--light); border-radius: 10px; margin: 10px 0; }
-        @media (min-width: 768px) { .input-grid { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 768px) { .input-grid { grid-template-columns: 1fr 1fr 1fr; } }
         
         .field { display: flex; flex-direction: column; gap: 4px; }
         label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
@@ -45,26 +45,13 @@
 
         /* Tablo Tasarımı */
         .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 750px; }
-        th { background: #f8fafc; padding: 12px; text-align: center; color: #64748b; border-bottom: 2px solid #e2e8f0; white-space: normal; vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 800px; }
+        th { background: #f8fafc; padding: 12px; text-align: center; color: #64748b; border-bottom: 2px solid #e2e8f0; }
         td { padding: 10px; text-align: center; border-bottom: 1px solid #f1f5f9; }
 
         /* Masraflar Alanı */
-        .masraf-container {
-            margin-top: 15px;
-            padding: 15px;
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            background: #fdfdfd;
-            min-height: 100px;
-        }
-        .masraf-header {
-            font-size: 13px;
-            font-weight: 800;
-            color: #475569;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
+        .masraf-container { margin-top: 15px; padding: 15px; border: 2px dashed #cbd5e1; border-radius: 12px; background: #fdfdfd; min-height: 100px; }
+        .masraf-header { font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 10px; text-transform: uppercase; }
 
         @media print {
             .no-print { display: none !important; }
@@ -96,9 +83,9 @@
             <option value="12">Ayda 1</option>
         </select></div>
         <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
-        <div class="field" id="subContainer"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50"></div>
-        <input type="hidden" id="kkdfOran" value="0">
-        <input type="hidden" id="bsmvOran" value="5">
+        <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" step="0.01" oninput="resetButtons();"></div>
+        <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" step="0.01" oninput="resetButtons();"></div>
+        <div class="field" id="subContainer"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
     </div>
 
     <div class="btn-group no-print" id="buttonGroup">
@@ -117,7 +104,7 @@
                         <th>Taksit Tutarı</th>
                         <th>Anapara</th>
                         <th>Faiz</th>
-                        <th>Vergi</th>
+                        <th>Vergi (KKDF+BSMV)</th>
                         <th id="thSub">Sübv. Taksit</th>
                         <th>Taksit Sonrası Kalan Borç</th>
                     </tr>
@@ -164,9 +151,20 @@
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         evt.currentTarget.classList.add('active');
         currentType = tabName;
+        
+        // Vergi Oranlarını Sekmeye Göre Güncelle
+        const kkdfInput = document.getElementById('kkdfOran');
+        const bsmvInput = document.getElementById('bsmvOran');
+        
+        if(tabName === 'tuketici') {
+            kkdfInput.value = 15; bsmvInput.value = 15;
+        } else if(tabName === 'zirai') {
+            kkdfInput.value = 15; bsmvInput.value = 15;
+        } else {
+            kkdfInput.value = 0; bsmvInput.value = 5;
+        }
+
         document.getElementById('subContainer').style.display = (tabName === 'traktor') ? 'flex' : 'none';
-        document.getElementById('kkdfOran').value = (tabName === 'tuketici' || tabName === 'zirai') ? 15 : 0;
-        document.getElementById('bsmvOran').value = (tabName === 'tuketici' || tabName === 'zirai') ? 15 : 5;
         vadeYukle(); resetButtons();
     }
 
