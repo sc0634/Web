@@ -88,29 +88,44 @@
     </div>
 
     <div class="input-grid">
+        <!-- Satır 1: Tutar ve Vade -->
         <div class="row">
             <div class="field" style="flex: 2;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
             <div class="field" style="flex: 1;"><label>Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
         </div>
 
+        <!-- Satır 2: Faiz ve BSMV -->
         <div class="row">
             <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
             <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" step="0.01" oninput="resetButtons();"></div>
         </div>
 
+        <!-- Satır 3: KKDF yukarı geldi -->
         <div class="row">
+            <div class="field" style="visibility: hidden;"></div> <!-- Simetri için boşluk -->
+            <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" step="0.01" oninput="resetButtons();"></div>
+        </div>
+
+        <!-- Satır 4: Sıklık ve Sübvansiyon (Yer değiştiler) -->
+        <div class="row" id="subContainer">
             <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();">
                 <option value="1">Yılda 1</option>
                 <option value="2">6 Ayda 1</option>
                 <option value="4">3 Ayda 1</option>
                 <option value="12">Ayda 1</option>
             </select></div>
-            <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" step="0.01" oninput="resetButtons();"></div>
+            <div class="field"><label>Sübvansiyon Oranı %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
 
-        <div class="row" id="subContainer">
-            <div class="field" style="visibility: hidden;"></div> 
-            <div class="field"><label>Sübvansiyon Oranı %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
+        <!-- Ticari/Zirai/Tüketici için Sıklık Satırı (Sübvansiyon gizlendiğinde sadece bu görünür) -->
+        <div class="row" id="sıklıkRowNormal" style="display:none;">
+            <div class="field"><label>Ödeme Sıklığı</label><select id="periyotYedek" onchange="syncPeriyot(this); resetButtons();">
+                <option value="1">Yılda 1</option>
+                <option value="2">6 Ayda 1</option>
+                <option value="4">3 Ayda 1</option>
+                <option value="12">Ayda 1</option>
+            </select></div>
+            <div class="field" style="visibility: hidden;"></div>
         </div>
     </div>
 
@@ -155,6 +170,12 @@
         document.getElementById('btnPrint').disabled = true;
     }
 
+    // İki farklı yerdeki periyot seçimini senkronize tutar
+    function syncPeriyot(src) {
+        document.getElementById('periyot').value = src.value;
+        document.getElementById('periyotYedek').value = src.value;
+    }
+
     function vadeYukle() {
         const select = document.getElementById('vadeSecim');
         select.innerHTML = '';
@@ -173,7 +194,18 @@
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         evt.currentTarget.classList.add('active');
         currentType = tabName;
-        document.getElementById('subContainer').style.display = (tabName === 'traktor') ? 'flex' : 'none';
+        
+        const subCont = document.getElementById('subContainer');
+        const normalRow = document.getElementById('sıklıkRowNormal');
+        
+        if (tabName === 'traktor') {
+            subCont.style.display = 'flex';
+            normalRow.style.display = 'none';
+        } else {
+            subCont.style.display = 'none';
+            normalRow.style.display = 'flex';
+        }
+        
         vadeYukle(); resetButtons();
     }
 
@@ -213,7 +245,6 @@
             </tr>`;
         }
         
-        // Başlıkları Yönet
         document.getElementById('thNormalTaksit').style.display = (currentType === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('thSubCol').style.display = (currentType === 'traktor') ? 'table-cell' : 'none';
         
