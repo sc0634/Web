@@ -22,11 +22,16 @@
         .tab-link.active { background: var(--blue); color: #fff; }
 
         .input-grid { display: flex; flex-direction: column; gap: 10px; padding: 15px; background: #f1f5f9; border-radius: 8px; margin-bottom: 15px; }
-        .row { display: flex; gap: 10px; width: 100%; }
+        .row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
         .row .field { flex: 1; }
 
         label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 4px; display: block; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
+
+        /* Checkbox Tasarımı */
+        .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 10px; background: #fff; border-radius: 6px; border: 1px dashed #cbd5e1; }
+        .checkbox-row input { width: 20px; height: 20px; cursor: pointer; }
+        .status-text { font-weight: 700; font-size: 14px; color: var(--navy); }
 
         .btn-group { display: flex; gap: 8px; margin-bottom: 20px; }
         button { flex: 1; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; color: #fff; text-transform: uppercase; }
@@ -44,32 +49,20 @@
             body { background: #fff; zoom: 98%; transform: scale(0.98); transform-origin: top center; }
             .no-print { display: none !important; }
             .container { width: 100%; padding: 0; }
-            
-            .print-header { 
-                display: flex !important; justify-content: space-between; align-items: center;
-                border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;
-            }
+            .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
             .print-header h1 { font-size: 18px; margin: 0; color: #000; }
-
-            .input-grid { 
-                background: #fff !important; border: 1px solid #000 !important; 
-                display: block !important;
-                padding: 10px !important; margin-bottom: 15px !important;
-            }
+            .input-grid { background: #fff !important; border: 1px solid #000 !important; display: block !important; padding: 10px !important; margin-bottom: 15px !important; }
             .row { display: flex !important; margin-bottom: 5px; }
             .field { border: 0.5px solid #eee; padding: 5px; flex: 1; }
             input, select { border: none !important; font-weight: bold !important; font-size: 12px !important; padding: 0 !important; height: auto; }
             label { font-size: 8px !important; color: #000 !important; }
-
-            th { background: #f0f0f0 !important; border: 1px solid #000 !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+            th { background: #f0f0f0 !important; border: 1px solid #000 !important; color: #000 !important; }
             td { border: 1px solid #000 !important; color: #000 !important; }
-            .masraf-container { margin-top: 20px; border: 1px solid #000 !important; min-height: 150px !important; padding: 10px; page-break-inside: avoid; }
         }
-
         .print-header { display: none; }
     </style>
 </head>
-<body onload="vadeYukle();">
+<body onload="vadeYukle(); updateBuyBackText();">
 
 <div class="container" id="printable-area">
     
@@ -100,13 +93,13 @@
             <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" step="0.01" oninput="resetButtons();"></div>
         </div>
 
-        <!-- Satır 3: KKDF yukarı geldi -->
+        <!-- Satır 3: KKDF -->
         <div class="row">
-            <div class="field" style="visibility: hidden;"></div> <!-- Simetri için boşluk -->
+            <div class="field" style="visibility: hidden;"></div> 
             <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" step="0.01" oninput="resetButtons();"></div>
         </div>
 
-        <!-- Satır 4: Sıklık ve Sübvansiyon (Yer değiştiler) -->
+        <!-- Satır 4: Sıklık ve Sübvansiyon -->
         <div class="row" id="subContainer">
             <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();">
                 <option value="1">Yılda 1</option>
@@ -117,7 +110,7 @@
             <div class="field"><label>Sübvansiyon Oranı %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
 
-        <!-- Ticari/Zirai/Tüketici için Sıklık Satırı (Sübvansiyon gizlendiğinde sadece bu görünür) -->
+        <!-- Diğer Sekmeler İçin Sıklık -->
         <div class="row" id="sıklıkRowNormal" style="display:none;">
             <div class="field"><label>Ödeme Sıklığı</label><select id="periyotYedek" onchange="syncPeriyot(this); resetButtons();">
                 <option value="1">Yılda 1</option>
@@ -126,6 +119,13 @@
                 <option value="12">Ayda 1</option>
             </select></div>
             <div class="field" style="visibility: hidden;"></div>
+        </div>
+
+        <!-- Buy Back Checkbox Alanı -->
+        <div class="checkbox-row">
+            <input type="checkbox" id="buyBackCheck" checked onchange="updateBuyBackText()">
+            <label for="buyBackCheck" style="margin:0; cursor:pointer;">Buy Back Kapsamında mı?</label>
+            <span id="buyBackStatus" class="status-text"></span>
         </div>
     </div>
 
@@ -151,14 +151,31 @@
             <tbody id="planBody"></tbody>
         </table>
 
-        <div class="masraf-container">
+        <div class="masraf-container" style="margin-top: 20px; border: 1px solid var(--border); padding: 15px; border-radius: 8px;">
             <strong style="font-size: 12px; text-decoration: underline;">NOTLAR VE MASRAF DETAYLARI:</strong>
+            <p id="printBuyBackInfo" style="font-size: 13px; font-weight: bold; margin-top: 10px; color: var(--blue);"></p>
         </div>
     </div>
 </div>
 
 <script>
     let currentType = 'traktor';
+
+    function updateBuyBackText() {
+        const isChecked = document.getElementById('buyBackCheck').checked;
+        const statusSpan = document.getElementById('buyBackStatus');
+        const printInfo = document.getElementById('printBuyBackInfo');
+        
+        const text = isChecked ? "Kredi Sabit Faizlidir" : "Kredi Değişken Faizlidir";
+        statusSpan.innerText = "— " + text;
+        printInfo.innerText = "• " + text;
+        
+        if(isChecked) {
+            statusSpan.style.color = "#10b981";
+        } else {
+            statusSpan.style.color = "#ef4444";
+        }
+    }
 
     function formatTutar(i) {
         let v = i.value.replace(/\D/g, "");
@@ -170,10 +187,8 @@
         document.getElementById('btnPrint').disabled = true;
     }
 
-    // İki farklı yerdeki periyot seçimini senkronize tutar
     function syncPeriyot(src) {
         document.getElementById('periyot').value = src.value;
-        document.getElementById('periyotYedek').value = src.value;
     }
 
     function vadeYukle() {
