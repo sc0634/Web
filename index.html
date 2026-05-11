@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Ödeme Planı ve Masraflar</title>
+    <title>Süleyman Coşkun - Finansal Planlama</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
@@ -21,11 +21,12 @@
             background: #fff; padding: 12px; min-height: 100vh;
         }
 
-        /* Navigasyon / Giriş Alanları */
+        /* Sekmeler */
         .tabs { display: flex; background: var(--primary); border-radius: 10px; padding: 3px; gap: 3px; overflow-x: auto; scrollbar-width: none; }
         .tab-link { flex: 1; padding: 10px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 7px; font-size: 12px; white-space: nowrap; cursor: pointer; }
         .tab-link.active { background: var(--secondary); color: #fff; }
 
+        /* Giriş Paneli */
         .input-grid { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 12px; background: var(--light); border-radius: 10px; margin: 10px 0; }
         @media (min-width: 768px) { .input-grid { grid-template-columns: 1fr 1fr; } }
         
@@ -44,40 +45,33 @@
 
         /* Tablo Tasarımı */
         .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 650px; }
-        th { background: #f8fafc; padding: 12px; text-align: center; color: #64748b; border-bottom: 2px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 750px; }
+        th { background: #f8fafc; padding: 12px; text-align: center; color: #64748b; border-bottom: 2px solid #e2e8f0; white-space: normal; vertical-align: middle; }
         td { padding: 10px; text-align: center; border-bottom: 1px solid #f1f5f9; }
 
-        /* MASRAFLAR KONTEYNERI (YENİ) */
+        /* Masraflar Alanı */
         .masraf-container {
             margin-top: 15px;
             padding: 15px;
             border: 2px dashed #cbd5e1;
             border-radius: 12px;
             background: #fdfdfd;
-            min-height: 100px; /* Boş göründüğünde yer kaplaması için */
+            min-height: 100px;
         }
         .masraf-header {
             font-size: 13px;
             font-weight: 800;
             color: #475569;
             margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
             text-transform: uppercase;
         }
 
-        /* YAZICI AYARLARI */
         @media print {
-            body { background: #fff; }
             .no-print { display: none !important; }
             .container { padding: 0; width: 100%; }
-            .table-responsive { overflow: visible !important; border: none; }
             table { min-width: 100% !important; border: 1px solid #000; }
-            th, td { border: 1px solid #ddd; padding: 8px; font-size: 11px; }
+            th, td { border: 1px solid #ddd; padding: 8px; font-size: 10px; }
             .masraf-container { border: 1px solid #000; min-height: 150px; }
-            @page { margin: 1cm; }
         }
     </style>
 </head>
@@ -125,17 +119,15 @@
                         <th>Faiz</th>
                         <th>Vergi</th>
                         <th id="thSub">Sübv. Taksit</th>
-                        <th>Kalan Borç</th>
+                        <th>Taksit Sonrası Kalan Borç</th>
                     </tr>
                 </thead>
                 <tbody id="planBody"></tbody>
             </table>
         </div>
 
-        <!-- EN ALTTA BOŞ MASRAFLAR KONTEYNERI -->
         <div class="masraf-container">
             <div class="masraf-header">📑 MASRAFLAR VE NOTLAR</div>
-            <!-- Burası şu an boş, kullanıcı elle not alabilir veya çıktı sonrası yazılabilir -->
         </div>
     </div>
 </div>
@@ -226,15 +218,13 @@
         });
     }
 
-    function yazdir() {
-        window.print();
-    }
+    function yazdir() { window.print(); }
 
     function indirPDF() {
         const element = document.getElementById('printable-area');
         const opt = {
             margin: 5,
-            filename: 'kredi_plani_ve_masraflar.pdf',
+            filename: 'kredi_plani.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
