@@ -10,35 +10,16 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
         .container { width: 100%; max-width: 1100px; margin: 0 auto; background: #fff; padding: 10px; box-sizing: border-box; }
 
-        /* --- Sekme Sistemi (Tam İsimler ve Kaydırma Desteği) --- */
-        .tabs { 
-            display: flex; 
-            background: var(--primary); 
-            overflow-x: auto; 
-            white-space: nowrap; 
-            -webkit-overflow-scrolling: touch;
-        }
-        .tab-link { 
-            flex: 0 0 auto; 
-            padding: 12px 15px; 
-            color: #ecf0f1; 
-            border: none; 
-            background: none; 
-            font-weight: bold; 
-            font-size: 12px; 
-            cursor: pointer; 
-            text-align: center;
-            transition: 0.2s;
-        }
+        /* --- Sekme Sistemi --- */
+        .tabs { display: flex; background: var(--primary); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .tab-link { flex: 0 0 auto; padding: 12px 15px; color: #ecf0f1; border: none; background: none; font-weight: bold; font-size: 12px; cursor: pointer; }
         .tab-link.active { background: var(--secondary); color: #fff; box-shadow: inset 0 -3px 0 #fff; }
-        .tabs::-webkit-scrollbar { height: 4px; }
-        .tabs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
 
         /* --- Form Yapısı --- */
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #2c3e50; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; outline: none; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
         input[readonly] { background-color: #eeeeee; color: #7f8c8d; cursor: not-allowed; border: 1px dashed #bbb; }
 
         /* --- Butonlar --- */
@@ -49,28 +30,39 @@
         #btnPdf { background: var(--secondary); }
         #btnYazdir { background: #f39c12; grid-column: span 2; }
 
-        /* --- Tablo --- */
-        .table-responsive { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 10px; min-width: 750px; }
+        /* --- Otomatik Sığan Tablo Alanı --- */
+        .table-wrapper { 
+            width: 100%; 
+            overflow: hidden; /* Taşmayı engelle */
+            margin-top: 15px;
+        }
+        
+        #sonucTablosu { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 11px; 
+            min-width: 800px; /* Hesaplama için temel genişlik */
+            transform-origin: top left; /* Küçültme merkezi */
+        }
+
         th { background: var(--primary); color: #fff; padding: 10px 5px; }
         td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; }
 
-        /* --- Gizleme Kuralları --- */
-        @media print { .no-print, .tabs, .btn-group, .input-grid { display: none !important; } .container { border: none; padding: 0; } }
+        /* --- Gizleme ve Mobil Ayarlar --- */
+        @media print { .no-print, .tabs, .btn-group, .input-grid { display: none !important; } }
         .force-hide { display: none !important; }
 
         @media (min-width: 768px) {
-            .container { padding: 20px; margin-top: 10px; border-radius: 8px; }
+            .container { padding: 20px; border-radius: 8px; margin-top: 10px; }
             .field { flex-direction: row; align-items: center; }
             .field label { flex: 0 0 110px; margin-bottom: 0; }
             .btn-group { grid-template-columns: repeat(4, 1fr); }
             .btn-calc, #btnYazdir { grid-column: auto; }
-            table { font-size: 11px; }
             .tab-link { flex: 1; }
         }
     </style>
 </head>
-<body onload="vadeYukle(); yilliktanAyliga();">
+<body onload="vadeYukle(); yilliktanAyliga();" onresize="tabloyuSigdir()">
 
 <div class="tabs no-print">
     <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Zirai Traktör</button>
@@ -92,10 +84,8 @@
             <div class="field"><label>Plan Tipi</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksit</option><option value="esit_anapara">Eşit Anapara</option></select></div>
             <div class="field"><label>Aylık Faiz %</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga(); resetButtons();"></div>
             <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga(); resetButtons();"></div>
-            
             <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" readonly></div>
             <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" readonly></div>
-            
             <div class="field" id="subContainer"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
 
@@ -107,8 +97,8 @@
         </div>
 
         <div id="sonucAlani" style="display:none;">
-            <div class="table-responsive">
-                <table>
+            <div class="table-wrapper" id="wrapper">
+                <table id="sonucTablosu">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -130,6 +120,25 @@
 
 <script>
     let currentType = 'traktor';
+
+    // Tabloyu ekrana sığdırmak için orantılı küçültme fonksiyonu
+    function tabloyuSigdir() {
+        const wrapper = document.getElementById('wrapper');
+        const tablo = document.getElementById('sonucTablosu');
+        if (!wrapper || !tablo || document.getElementById('sonucAlani').style.display === 'none') return;
+
+        const wrapperWidth = wrapper.offsetWidth;
+        const tabloWidth = 800; // Tablonun sığması gereken min-width değeri
+
+        if (wrapperWidth < tabloWidth) {
+            const oran = wrapperWidth / tabloWidth;
+            tablo.style.transform = `scale(${oran})`;
+            wrapper.style.height = (tablo.offsetHeight * oran) + "px";
+        } else {
+            tablo.style.transform = "scale(1)";
+            wrapper.style.height = "auto";
+        }
+    }
 
     function yilliktanAyliga() {
         const y = parseFloat(document.getElementById('faizYillik').value);
@@ -168,21 +177,14 @@
         currentType = tabName;
 
         if(tabName === 'hakkimda' || tabName === 'zirai_isletme') {
-            const label = (tabName === 'hakkimda') ? "Süleyman Coşkun" : "Zirai/İşletme Kredisi";
-            document.getElementById('baslikText').innerText = label;
+            document.getElementById('baslikText').innerText = (tabName === 'hakkimda') ? "Süleyman Coşkun" : "Zirai/İşletme Kredisi";
             document.getElementById('inputSection').classList.add('force-hide');
             document.getElementById('buttonGroup').classList.add('force-hide');
             document.getElementById('sonucAlani').style.display = 'none';
         } else {
             document.getElementById('inputSection').classList.remove('force-hide');
             document.getElementById('buttonGroup').classList.remove('force-hide');
-            
-            const titles = {
-                'traktor': 'Zirai Traktör Kredisi Hesaplama',
-                'ticari': 'Ticari Kredi Hesaplama',
-                'zirai': 'Çiftçi Tüketici Kredisi Hesaplama',
-                'tuketici': 'Tüketici Kredisi Hesaplama'
-            };
+            const titles = {'traktor':'Zirai Traktör Kredisi Hesaplama','ticari':'Ticari Kredi Hesaplama','zirai':'Çiftçi Tüketici Kredisi Hesaplama','tuketici':'Tüketici Kredisi Hesaplama'};
             document.getElementById('baslikText').innerText = titles[tabName];
             
             const faizInput = document.getElementById('faizYillik');
@@ -192,26 +194,13 @@
             const bsmv = document.getElementById('bsmvOran');
 
             subContainer.style.display = (tabName === 'traktor') ? 'flex' : 'none';
+            if (tabName === 'ticari') { faizInput.value = "49.00"; periyotSelect.value = "12"; }
+            else if (tabName === 'traktor') { faizInput.value = "40.50"; periyotSelect.value = "1"; }
+            else if (tabName === 'zirai') { faizInput.value = "45.00"; periyotSelect.value = "1"; }
+            else { faizInput.value = "49.00"; periyotSelect.value = "12"; }
 
-            if (tabName === 'ticari') {
-                faizInput.value = "49.00";
-                periyotSelect.value = "12";
-            } else if (tabName === 'traktor') {
-                faizInput.value = "40.50";
-                periyotSelect.value = "1";
-            } else if (tabName === 'zirai') {
-                faizInput.value = "45.00";
-                periyotSelect.value = "1";
-            } else {
-                faizInput.value = "49.00";
-                periyotSelect.value = "12";
-            }
-
-            if (tabName === 'tuketici' || tabName === 'zirai') {
-                kkdf.value = 15; bsmv.value = 15;
-            } else {
-                kkdf.value = 0; bsmv.value = 5;
-            }
+            if (tabName === 'tuketici' || tabName === 'zirai') { kkdf.value = 15; bsmv.value = 15; }
+            else { kkdf.value = 0; bsmv.value = 5; }
             
             vadeYukle(); yilliktanAyliga(); resetButtons();
         }
@@ -247,18 +236,28 @@
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('btnYazdir').disabled = false;
         document.getElementById('btnPdf').disabled = false;
+        
+        // Tablo oluştuktan sonra sığdırma fonksiyonunu tetikle
+        setTimeout(tabloyuSigdir, 100);
     }
 
     function indirPDF() {
         const btnGroup = document.getElementById('buttonGroup');
         const inputSec = document.getElementById('inputSection');
         const tabs = document.querySelector('.tabs');
+        const tablo = document.getElementById('sonucTablosu');
+        const wrapper = document.getElementById('wrapper');
+
+        // PDF için transformu sıfırla ki net çıksın
+        tablo.style.transform = "scale(1)";
+        wrapper.style.height = "auto";
+        
         btnGroup.classList.add('force-hide');
         inputSec.classList.add('force-hide');
         tabs.classList.add('force-hide');
 
         const opt = { 
-            margin: 10, 
+            margin: 5, 
             filename: 'kredi_plani.pdf', 
             html2canvas: { scale: 2 }, 
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
@@ -268,6 +267,7 @@
             btnGroup.classList.remove('force-hide');
             inputSec.classList.remove('force-hide');
             tabs.classList.remove('force-hide');
+            tabloyuSigdir(); // Mobildeki görünümü geri yükle
         });
     }
 </script>
