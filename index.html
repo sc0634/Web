@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Süleyman Coşkun - Mobil Finansal Analiz</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
     <style>
         :root { 
@@ -20,82 +19,67 @@
         
         .container { 
             width: 100%; max-width: 1400px; margin: 0 auto; 
-            background: #fff; padding: 16px; min-height: 100vh;
+            background: #fff; padding: 12px; min-height: 100vh;
         }
 
-        /* Sekmeler - Mobil Kaydırma Dostu */
+        /* Sekmeler */
         .tabs { 
-            display: flex; background: var(--primary); border-radius: 12px; 
-            padding: 4px; gap: 4px; overflow-x: auto; scrollbar-width: none;
+            display: flex; background: var(--primary); border-radius: 10px; 
+            padding: 3px; gap: 3px; overflow-x: auto; scrollbar-width: none;
         }
         .tabs::-webkit-scrollbar { display: none; }
         .tab-link { 
-            flex: 1; padding: 12px 16px; color: #cbd5e1; border: none; 
+            flex: 1; padding: 10px 12px; color: #cbd5e1; border: none; 
             background: transparent; font-weight: 600; cursor: pointer; 
-            border-radius: 8px; transition: 0.2s; white-space: nowrap; font-size: 13px;
+            border-radius: 7px; transition: 0.2s; white-space: nowrap; font-size: 12px;
         }
         .tab-link.active { background: var(--secondary); color: #fff; }
 
-        /* Giriş Alanları - Dokunmatik Odaklı */
+        /* Giriş Paneli */
         .input-grid { 
-            display: grid; grid-template-columns: 1fr; gap: 12px; 
-            padding: 16px; background: var(--light); border-radius: 12px; margin: 16px 0;
+            display: grid; grid-template-columns: 1fr; gap: 8px; 
+            padding: 12px; background: var(--light); border-radius: 10px; margin: 10px 0;
         }
         @media (min-width: 768px) { .input-grid { grid-template-columns: 1fr 1fr; } }
 
-        .field { display: flex; flex-direction: column; gap: 6px; }
-        .field label { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+        .field { display: flex; flex-direction: column; gap: 4px; }
+        .field label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
         input, select { 
-            padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; 
-            font-size: 16px; /* İOS Zoom problemini önlemek için min 16px */
-            background: #fff; appearance: none;
+            padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; 
+            font-size: 16px; background: #fff;
         }
-        input:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
 
-        /* Buton Grubu - Tek Satır & Kaydırılabilir */
+        /* Butonlar - Alt Boşluk 5px Ayarlandı */
         .btn-group { 
-            display: flex; gap: 8px; margin-bottom: 20px; 
-            overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
+            display: flex; gap: 6px; margin-bottom: 5px; 
+            overflow-x: auto; padding-bottom: 2px; scrollbar-width: none;
         }
         .btn-group::-webkit-scrollbar { display: none; }
         button { 
-            flex: 1; min-width: 100px; padding: 14px 10px; border: none; border-radius: 10px; 
-            cursor: pointer; font-weight: 700; color: #fff; font-size: 13px;
-            white-space: nowrap; text-transform: uppercase; transition: transform 0.1s;
+            flex: 1; min-width: 90px; padding: 12px 8px; border: none; border-radius: 8px; 
+            cursor: pointer; font-weight: 700; color: #fff; font-size: 12px;
+            white-space: nowrap; text-transform: uppercase;
         }
-        button:active { transform: scale(0.96); }
-        .btn-calc { background: var(--success); min-width: 140px; }
+        .btn-calc { background: var(--success); min-width: 120px; }
         .btn-clear { background: #64748b; }
         .btn-pdf { background: var(--secondary); }
         .btn-excel { background: #059669; }
-        .btn-print { background: var(--warning); }
         button:disabled { opacity: 0.3; filter: grayscale(1); }
 
-        /* Özet Kartları */
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-        @media (min-width: 768px) { .summary-grid { grid-template-columns: repeat(4, 1fr); } }
-        .summary-card { padding: 16px; border-radius: 12px; background: #fff; border: 1px solid #e2e8f0; text-align: center; }
-        .summary-card.highlight { background: var(--primary); color: #fff; }
-        .summary-value { font-size: 18px; font-weight: 800; margin-top: 4px; }
-        .summary-label { font-size: 10px; opacity: 0.7; font-weight: 600; letter-spacing: 0.5px; }
-
-        /* Grafikler */
-        .chart-container { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 16px 0; }
-        .chart-wrapper { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; height: 300px; }
-
-        /* Tablo */
-        .table-responsive { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px; }
-        th { background: #f8fafc; padding: 14px; text-align: center; color: #64748b; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 12px; text-align: center; border-bottom: 1px solid #f1f5f9; }
+        /* Tablo Alanı - 5px Boşlukla Yukarı Çekildi */
+        #sonucAlani { margin-top: 0; }
+        .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 650px; }
+        th { background: #f8fafc; padding: 12px; text-align: center; color: #64748b; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 10px; text-align: center; border-bottom: 1px solid #f1f5f9; }
         
-        /* Çıktı Modu */
-        @media print { .no-print { display: none !important; } .container { padding: 0; } }
+        @media print { .no-print { display: none !important; } }
     </style>
 </head>
-<body onload="vadeYukle(); yilliktanAyliga();">
+<body onload="vadeYukle();">
 
 <div class="container" id="pdf-area">
+    <!-- Sekmeler -->
     <div class="tabs no-print">
         <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Traktör</button>
         <button class="tab-link" onclick="openTab(event, 'ticari')">💼 Ticari</button>
@@ -103,17 +87,18 @@
         <button class="tab-link" onclick="openTab(event, 'tuketici')">🛒 Tüketici</button>
     </div>
 
+    <!-- Girişler -->
     <div class="input-grid no-print" id="inputSection">
-        <div class="field"><label>Kredi Tutarı (₺)</label><input type="text" id="tutar" inputmode="numeric" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
+        <div class="field"><label>Tutar (₺)</label><input type="text" id="tutar" inputmode="numeric" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
         <div class="field"><label>Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
-        <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();"><option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12" selected>Ayda 1</option></select></div>
-        <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga(); resetButtons();"></div>
+        <div class="field"><label>Sıklık</label><select id="periyot" onchange="resetButtons();"><option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12" selected>Ayda 1</option></select></div>
+        <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
         <div class="field" id="subContainer"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50"></div>
-        <input type="hidden" id="faizAylik">
         <input type="hidden" id="kkdfOran" value="0">
         <input type="hidden" id="bsmvOran" value="5">
     </div>
 
+    <!-- Butonlar (Altında 5px boşluk var) -->
     <div class="btn-group no-print" id="buttonGroup">
         <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
         <button class="btn-clear" onclick="location.reload()">Sıfırla</button>
@@ -121,31 +106,18 @@
         <button class="btn-excel" id="btnExcel" onclick="indirExcel()" disabled>EXCEL</button>
     </div>
 
-    <div id="ozet-alani" style="display:none;">
-        <div class="summary-grid">
-            <div class="summary-card highlight"><div class="summary-label">Taksit Sayısı</div><div id="toplamTaksit" class="summary-value">0</div></div>
-            <div class="summary-card"><div class="summary-label">Faiz Toplamı</div><div id="toplamFaiz" class="summary-value">0</div></div>
-            <div class="summary-card highlight"><div class="summary-label">Geri Ödeme</div><div id="toplamOdenecek" class="summary-value">0</div></div>
-            <div class="summary-card"><div class="summary-label">Aylık Taksit</div><div id="ilkTaksit" class="summary-value">0</div></div>
-        </div>
-    </div>
-
-    <div id="grafik-alani" class="chart-container" style="display:none;">
-        <div class="chart-wrapper"><canvas id="dagitimChart"></canvas></div>
-        <div class="chart-wrapper"><canvas id="kumulatifChart"></canvas></div>
-    </div>
-
+    <!-- Tablo (Direkt butonların 5px altında) -->
     <div id="sonucAlani" style="display:none;">
         <div class="table-responsive">
             <table id="planTable">
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Taksit Tutarı</th>
+                        <th>Taksit</th>
                         <th>Anapara</th>
                         <th>Faiz</th>
                         <th>Vergi</th>
-                        <th id="thSub">Sübvansiyonlu</th>
+                        <th id="thSub">Sübv.</th>
                         <th>Kalan Borç</th>
                     </tr>
                 </thead>
@@ -157,16 +129,10 @@
 
 <script>
     let currentType = 'traktor';
-    let charts = {};
 
     function formatTutar(i) {
         let v = i.value.replace(/\D/g, "");
         if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
-    }
-
-    function yilliktanAyliga() {
-        const y = parseFloat(document.getElementById('faizYillik').value);
-        if (!isNaN(y)) document.getElementById('faizAylik').value = (y / 12).toFixed(4);
     }
 
     function resetButtons() {
@@ -214,59 +180,27 @@
         
         const taksitSabit = (tutar * i_vergi * Math.pow(1+i_vergi, toplamTaksit)) / (Math.pow(1+i_vergi, toplamTaksit)-1);
         
-        let body = '', kalan = tutar, tAna = 0, tFz = 0, tVrg = 0;
-        let cData = { labels: [], taksitler: [], kalanlar: [] };
+        let body = '', kalan = tutar;
 
         for(let j=1; j<=toplamTaksit; j++){
             let f = kalan * dFaiz;
             let v = f * (bsmv + kkdf);
             let a = taksitSabit - (f + v);
             if(j === toplamTaksit) a = kalan;
-            
             let t = a + f + v;
             let subT = t - ((f+v)*sub);
             kalan -= a;
             
-            tAna += a; tFz += f; tVrg += v;
-            cData.labels.push(j); cData.kalanlar.push(kalan);
-
             body += `<tr><td>${j}</td><td><b>${Math.round(t).toLocaleString('tr-TR')}₺</b></td><td>${Math.round(a).toLocaleString('tr-TR')}₺</td><td>${Math.round(f).toLocaleString('tr-TR')}₺</td><td>${Math.round(v).toLocaleString('tr-TR')}₺</td><td style="${currentType==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}₺</td></tr>`;
         }
 
         document.getElementById('planBody').innerHTML = body;
-        document.getElementById('toplamTaksit').innerText = toplamTaksit;
-        document.getElementById('toplamFaiz').innerText = Math.round(tFz).toLocaleString('tr-TR') + " ₺";
-        document.getElementById('toplamOdenecek').innerText = Math.round(tAna+tFz+tVrg).toLocaleString('tr-TR') + " ₺";
-        document.getElementById('ilkTaksit').innerText = Math.round(taksitSabit).toLocaleString('tr-TR') + " ₺";
-        
-        document.getElementById('ozet-alani').style.display = 'block';
         document.getElementById('sonucAlani').style.display = 'block';
-        document.getElementById('grafik-alani').style.display = 'grid';
         ['btnPdf', 'btnExcel'].forEach(id => document.getElementById(id).disabled = false);
-
-        updateCharts(tAna, tFz, tVrg, cData);
-    }
-
-    function updateCharts(ana, fz, vrg, cData) {
-        if(charts.d) charts.d.destroy();
-        if(charts.k) charts.k.destroy();
-
-        charts.d = new Chart(document.getElementById('dagitimChart'), {
-            type: 'doughnut',
-            data: { labels: ['Anapara', 'Faiz', 'Vergi'], datasets: [{ data: [ana, fz, vrg], backgroundColor: ['#10b981', '#ef4444', '#f59e0b'] }] },
-            options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-        });
-
-        charts.k = new Chart(document.getElementById('kumulatifChart'), {
-            type: 'line',
-            data: { labels: cData.labels, datasets: [{ label: 'Kalan Borç', data: cData.kalanlar, borderColor: '#3b82f6', tension: 0.3, fill: true, backgroundColor: 'rgba(59,130,246,0.1)' }] },
-            options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-        });
     }
 
     function indirPDF() {
-        const element = document.getElementById('pdf-area');
-        html2pdf().from(element).set({ margin: 5, filename: 'kredi_plani.pdf', html2canvas: { scale: 2 } }).save();
+        html2pdf().from(document.getElementById('pdf-area')).set({ margin: 5, filename: 'kredi_plani.pdf', html2canvas: { scale: 2 } }).save();
     }
 
     function indirExcel() {
