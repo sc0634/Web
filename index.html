@@ -6,12 +6,12 @@
     <title>Süleyman Coşkun - Profesyonel Ödeme Planı</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; }
+        :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; touch-action: manipulation; }
         body { background: #f8fafc; margin: 0; color: #1e293b; }
         .container { width: 100%; max-width: 900px; margin: 0 auto; background: #fff; padding: 15px 25px; min-height: 100vh; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         .no-print-tabs { display: flex; background: var(--navy); border-radius: 10px; padding: 4px; gap: 4px; margin-bottom: 12px; }
-        .tab-link { flex: 1; padding: 8px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 12px; cursor: pointer; }
+        .tab-link { flex: 1; padding: 8px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 11px; cursor: pointer; }
         .tab-link.active { background: var(--blue); color: #fff; }
         .input-grid { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f1f5f9; border-radius: 12px; margin-bottom: 15px; }
         .row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
@@ -19,32 +19,37 @@
         label { font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 4px; display: block; }
         input, select { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; background: #fff; }
         input[readonly] { background-color: #e2e8f0; color: #94a3b8; }
-        #traktorOptions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
-        .opt-box { background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); }
-        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; }
-        .status-line { font-weight: 800; font-size: 10px; text-transform: uppercase; border-top: 1px solid #f1f5f9; padding-top: 4px; margin-top: 4px; }
-        .btn-group { display: flex; gap: 8px; margin-bottom: 15px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; color: #fff; font-size: 12px; }
+        
+        .btn-group { display: flex; gap: 8px; margin-bottom: 12px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; color: #fff; font-size: 12px; text-transform: uppercase; }
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #6366f1; }
         .btn-print { background: var(--navy); }
+        .btn-apply { background: var(--accent); color: #fff; flex: 2; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Yeni Başvuru Alanı Tasarımı */
+        .apply-box { display: flex; gap: 10px; padding: 12px; background: #fff; border: 2px solid var(--border); border-radius: 12px; align-items: center; margin-bottom: 15px; }
+        .tc-input { flex: 1; letter-spacing: 2px; font-weight: 700; border: 1px solid var(--blue); }
+
         table { width: 100%; border-collapse: collapse; margin-top: 10px; border-radius: 8px; overflow: hidden; }
-        th { background: var(--navy); padding: 10px 5px; color: #fff; font-size: 10px; text-transform: uppercase; }
+        th { background: var(--navy); padding: 10px 5px; color: #fff; font-size: 9px; text-transform: uppercase; }
         td { padding: 8px 4px; text-align: center; border-bottom: 1px solid var(--border); font-size: 12px; }
         .masraf-container { margin-top: 15px; border-left: 4px solid var(--blue); background: #f1f5f9; padding: 10px 15px; }
-        @media print { .no-print, .no-print-tabs, .btn-group, #traktorOptions { display: none !important; } .print-header { display: flex !important; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; } }
+        
+        @media print { .no-print, .no-print-tabs, .btn-group, .apply-box, #traktorOptions { display: none !important; } }
         .print-header { display: none; }
     </style>
 </head>
 <body onload="vadeYukle(); updateYerliMali(); lockKKDF();">
 <div class="container" id="printable-area">
-    <div class="print-header"><div><h1>ÖDEME PLANI</h1></div><div id="p-date"></div></div>
     <div class="no-print-tabs no-print">
         <button class="tab-link active" onclick="openTab(event, 'traktor')">TRAKTÖR</button>
         <button class="tab-link" onclick="openTab(event, 'ticari')">TİCARİ</button>
         <button class="tab-link" onclick="openTab(event, 'zirai')">ÇİFTÇİ</button>
         <button class="tab-link" onclick="openTab(event, 'tuketici')">TÜKETİCİ</button>
     </div>
+
     <div class="input-grid">
         <div class="row">
             <div class="field" style="flex: 2;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
@@ -65,67 +70,61 @@
             </select></div>
             <div class="field" id="subOranWrapper"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
-        <div id="traktorOptions" class="no-print">
-            <div class="opt-box">
-                <div class="checkbox-wrapper"><input type="checkbox" id="yerliCheck" checked onchange="updateYerliMali()"><label>Yerli Malı</label></div>
-                <div id="yerliStatus" class="status-line"></div>
-            </div>
-            <div class="opt-box">
-                <div class="checkbox-wrapper"><input type="checkbox" id="buyBackCheck" checked onchange="updateBuyBackText()"><label>Buy Back</label></div>
-                <div id="buyBackStatus" class="status-line"></div>
-            </div>
-        </div>
     </div>
+
     <div class="btn-group no-print">
         <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
         <button class="btn-pdf" id="btnPdf" onclick="indirPDF()" disabled>PDF</button>
         <button class="btn-print" id="btnPrint" onclick="yazdir()" disabled>YAZDIR</button>
     </div>
+
+    <!-- Yeni Başvuru Paneli -->
+    <div class="apply-box no-print" id="applyPanel">
+        <div style="flex:1;">
+            <label>T.C. KİMLİK NO</label>
+            <input type="text" id="tcNo" class="tc-input" maxlength="11" placeholder="00000000000" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+        </div>
+        <button class="btn-apply" id="btnApply" onclick="basvuruYap()" disabled>ŞİMDİ BAŞVUR</button>
+    </div>
+
     <div id="sonucAlani" style="display:none;">
         <table>
             <thead><tr><th>Taksit</th><th id="thNormalTaksit">Tutar</th><th>Anapara</th><th>Faiz</th><th>Vergi</th><th id="thSubCol">Sübv. Taksit</th><th>Kalan Borç</th></tr></thead>
             <tbody id="planBody"></tbody>
         </table>
-        <div class="masraf-container" id="notlarKutusu">
-            <p id="printYerliInfo" style="font-size: 12px; font-weight: 700; margin: 0; color: var(--navy);"></p>
-            <p id="printBuyBackInfo" style="font-size: 12px; font-weight: 700; margin: 0; color: var(--navy);"></p>
-        </div>
     </div>
 </div>
+
 <script>
     let currentType = 'traktor';
     function formatTutar(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); }
-    function resetButtons() { document.getElementById('btnPdf').disabled = true; document.getElementById('btnPrint').disabled = true; document.getElementById('sonucAlani').style.display = 'none'; }
-    function lockKKDF() { const k = document.getElementById('kkdfOran'); k.value = (currentType === 'traktor') ? 0 : k.value; k.readOnly = (currentType === 'traktor'); }
-    function updateYerliMali() {
-        const isY = document.getElementById('yerliCheck').checked;
-        document.getElementById('subOran').value = isY ? 50 : 25;
-        document.getElementById('yerliStatus').innerText = isY ? "YERLİ (%50)" : "İTHAL (%25)";
-        document.getElementById('printYerliInfo').innerText = "• " + (isY ? "Yerli" : "İthal") + " üretim teşviği uygulanmıştır.";
-        resetButtons();
+    
+    function resetButtons() { 
+        document.getElementById('btnPdf').disabled = true; 
+        document.getElementById('btnPrint').disabled = true; 
+        document.getElementById('btnApply').disabled = true;
+        document.getElementById('sonucAlani').style.display = 'none'; 
     }
-    function updateBuyBackText() {
-        const isB = document.getElementById('buyBackCheck').checked;
-        document.getElementById('buyBackStatus').innerText = isB ? "SABİT FAİZ" : "DEĞİŞKEN FAİZ";
-        document.getElementById('printBuyBackInfo').innerText = "• " + (isB ? "Sabit" : "Değişken") + " faizli ödeme planı.";
+
+    function lockKKDF() { 
+        const k = document.getElementById('kkdfOran'); 
+        if(currentType === 'traktor') { k.value = 0; k.readOnly = true; } else { k.readOnly = false; }
     }
+
     function vadeYukle() {
         const s = document.getElementById('vadeSecim'); s.innerHTML = '';
         let l = (currentType === 'ticari' || currentType === 'zirai') ? 60 : 5;
         let suf = (currentType === 'ticari' || currentType === 'zirai') ? " Ay" : " Yıl";
         for (let i = 1; i <= l; i++) { let o = document.createElement('option'); o.value = i; o.innerText = i + suf; if (i === l) o.selected = true; s.appendChild(o); }
-        document.getElementById('p-date').innerText = new Date().toLocaleDateString('tr-TR');
     }
+
     function openTab(e, n) {
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         e.currentTarget.classList.add('active'); currentType = n;
-        const isT = (n === 'traktor');
-        document.getElementById('subOranWrapper').style.visibility = isT ? 'visible' : 'hidden';
-        document.getElementById('traktorOptions').style.display = isT ? 'grid' : 'none';
-        document.getElementById('notlarKutusu').style.display = isT ? 'block' : 'none';
-        if(isT) { updateYerliMali(); updateBuyBackText(); }
+        document.getElementById('subOranWrapper').style.visibility = (n === 'traktor') ? 'visible' : 'hidden';
         lockKKDF(); vadeYukle(); resetButtons();
     }
+
     function hesapla() {
         const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
@@ -147,30 +146,35 @@
             let f = kalan * dFaiz;
             let v = f * (bsmv + kkdf);
             let a, t;
-
             if(tip === 'esitTaksit') {
                 const taksitSabit = (tutar * i_v * Math.pow(1+i_v, toplamTaksit)) / (Math.pow(1+i_v, toplamTaksit)-1);
-                t = taksitSabit;
-                a = t - (f + v);
+                t = taksitSabit; a = t - (f + v);
             } else {
-                a = esitAnaparaTutari;
-                t = a + f + v;
+                a = esitAnaparaTutari; t = a + f + v;
             }
-
             if(j === toplamTaksit) a = kalan;
             let subT = t - ((f+v)*sub);
             kalan -= a;
-            
             body += `<tr><td>${j}</td><td style="${currentType==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}₺</td><td>${Math.round(a).toLocaleString('tr-TR')}₺</td><td>${Math.round(f).toLocaleString('tr-TR')}₺</td><td>${Math.round(v).toLocaleString('tr-TR')}₺</td><td style="${currentType==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}₺</td></tr>`;
         }
         document.getElementById('thNormalTaksit').style.display = (currentType === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('thSubCol').style.display = (currentType === 'traktor') ? 'table-cell' : 'none';
         document.getElementById('planBody').innerHTML = body;
         document.getElementById('sonucAlani').style.display = 'block';
-        document.getElementById('btnPdf').disabled = false; document.getElementById('btnPrint').disabled = false;
+        document.getElementById('btnPdf').disabled = false; 
+        document.getElementById('btnPrint').disabled = false;
+        document.getElementById('btnApply').disabled = false;
     }
+
+    function basvuruYap() {
+        const tc = document.getElementById('tcNo').value;
+        if(tc.length !== 11) { alert("Lütfen 11 haneli T.C. Kimlik numaranızı giriniz."); return; }
+        alert(tc + " numaralı kimlik için ön başvurunuz alınmıştır. En kısa sürede tarafınıza dönüş yapılacaktır.");
+    }
+
     function yazdir() { window.print(); }
-    function indirPDF() { html2pdf().from(document.getElementById('printable-area')).set({ margin: 10, filename: 'plan.pdf', html2canvas: { scale: 3 } }).save(); }
+    function indirPDF() { html2pdf().from(document.getElementById('printable-area')).set({ margin: 10, filename: 'odeme-plani.pdf', html2canvas: { scale: 3 } }).save(); }
+    function updateYerliMali() { document.getElementById('subOran').value = document.getElementById('yerliCheck')?.checked ? 50 : 25; }
 </script>
 </body>
 </html>
