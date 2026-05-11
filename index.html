@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Ödeme Planı Çıktısı</title>
+    <title>Süleyman Coşkun - Ödeme Planı ve Masraflar</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
@@ -22,8 +22,8 @@
         }
 
         /* Navigasyon / Giriş Alanları */
-        .tabs { display: flex; background: var(--primary); border-radius: 10px; padding: 3px; gap: 3px; overflow-x: auto; }
-        .tab-link { flex: 1; padding: 10px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 7px; font-size: 12px; white-space: nowrap; }
+        .tabs { display: flex; background: var(--primary); border-radius: 10px; padding: 3px; gap: 3px; overflow-x: auto; scrollbar-width: none; }
+        .tab-link { flex: 1; padding: 10px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 7px; font-size: 12px; white-space: nowrap; cursor: pointer; }
         .tab-link.active { background: var(--secondary); color: #fff; }
 
         .input-grid { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 12px; background: var(--light); border-radius: 10px; margin: 10px 0; }
@@ -34,12 +34,12 @@
         input, select { padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 16px; background: #fff; }
 
         /* Buton Grubu */
-        .btn-group { display: flex; gap: 6px; margin-bottom: 5px; overflow-x: auto; }
+        .btn-group { display: flex; gap: 6px; margin-bottom: 5px; overflow-x: auto; scrollbar-width: none; }
         button { flex: 1; min-width: 90px; padding: 12px 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; color: #fff; font-size: 12px; text-transform: uppercase; }
         .btn-calc { background: var(--success); min-width: 120px; }
         .btn-clear { background: #64748b; }
         .btn-pdf { background: var(--secondary); }
-        .btn-print { background: #475569; } /* Yazdır butonu rengi */
+        .btn-print { background: #475569; }
         button:disabled { opacity: 0.3; filter: grayscale(1); }
 
         /* Tablo Tasarımı */
@@ -48,15 +48,35 @@
         th { background: #f8fafc; padding: 12px; text-align: center; color: #64748b; border-bottom: 2px solid #e2e8f0; }
         td { padding: 10px; text-align: center; border-bottom: 1px solid #f1f5f9; }
 
-        /* YAZICI AYARLARI (PRINT SETTINGS) */
+        /* MASRAFLAR KONTEYNERI (YENİ) */
+        .masraf-container {
+            margin-top: 15px;
+            padding: 15px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            background: #fdfdfd;
+            min-height: 100px; /* Boş göründüğünde yer kaplaması için */
+        }
+        .masraf-header {
+            font-size: 13px;
+            font-weight: 800;
+            color: #475569;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-transform: uppercase;
+        }
+
+        /* YAZICI AYARLARI */
         @media print {
             body { background: #fff; }
-            .no-print { display: none !important; } /* Girişler ve butonlar gizlenir */
-            .container { padding: 0; width: 100%; max-width: 100%; }
+            .no-print { display: none !important; }
+            .container { padding: 0; width: 100%; }
             .table-responsive { overflow: visible !important; border: none; }
             table { min-width: 100% !important; border: 1px solid #000; }
-            th, td { border: 1px solid #ddd; padding: 8px; color: #000 !important; font-size: 11px; }
-            th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+            th, td { border: 1px solid #ddd; padding: 8px; font-size: 11px; }
+            .masraf-container { border: 1px solid #000; min-height: 150px; }
             @page { margin: 1cm; }
         }
     </style>
@@ -64,7 +84,7 @@
 <body onload="vadeYukle();">
 
 <div class="container" id="printable-area">
-    <!-- Mobil Arayüzde Görünen, Yazıcıda Gizlenen Alanlar -->
+    
     <div class="tabs no-print">
         <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Traktör</button>
         <button class="tab-link" onclick="openTab(event, 'ticari')">💼 Ticari</button>
@@ -94,9 +114,7 @@
         <button class="btn-print" id="btnPrint" onclick="yazdir()" disabled>YAZDIR</button>
     </div>
 
-    <!-- Yazdırılacak Ana Tablo Alanı -->
     <div id="sonucAlani" style="display:none; margin-top: 5px;">
-        <h4 class="no-mobile" style="display:none; text-align:center;" id="printTitle">ÖDEME PLANI</h4>
         <div class="table-responsive">
             <table id="planTable">
                 <thead>
@@ -113,6 +131,12 @@
                 <tbody id="planBody"></tbody>
             </table>
         </div>
+
+        <!-- EN ALTTA BOŞ MASRAFLAR KONTEYNERI -->
+        <div class="masraf-container">
+            <div class="masraf-header">📑 MASRAFLAR VE NOTLAR</div>
+            <!-- Burası şu an boş, kullanıcı elle not alabilir veya çıktı sonrası yazılabilir -->
+        </div>
     </div>
 </div>
 
@@ -125,7 +149,10 @@
     }
 
     function resetButtons() {
-        ['btnPdf', 'btnPrint'].forEach(id => document.getElementById(id).disabled = true);
+        ['btnPdf', 'btnPrint'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.disabled = true;
+        });
     }
 
     function vadeYukle() {
@@ -193,22 +220,21 @@
 
         document.getElementById('planBody').innerHTML = body;
         document.getElementById('sonucAlani').style.display = 'block';
-        ['btnPdf', 'btnPrint'].forEach(id => document.getElementById(id).disabled = false);
+        ['btnPdf', 'btnPrint'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.disabled = false;
+        });
     }
 
     function yazdir() {
-        // Yazdırılmadan önce başlığı göster
-        const title = document.getElementById('printTitle');
-        title.style.display = 'block';
         window.print();
-        title.style.display = 'none';
     }
 
     function indirPDF() {
         const element = document.getElementById('printable-area');
         const opt = {
             margin: 5,
-            filename: 'kredi_plani.pdf',
+            filename: 'kredi_plani_ve_masraflar.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
