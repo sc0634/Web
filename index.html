@@ -3,32 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Eksiksiz Ödeme Planı</title>
+    <title>Süleyman Coşkun - Profesyonel Ödeme Planı</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #f8fafc; margin: 0; padding: 10px; color: #1e293b; }
-        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); min-height: 100vh; }
         
-        /* Tab Tasarımı */
         .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 15px; }
         .tab-btn { flex: 1; padding: 8px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 11px; cursor: pointer; }
         .tab-btn.active { background: var(--blue); color: #fff; }
 
-        /* Giriş Alanları */
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; }
         .field { display: flex; flex-direction: column; gap: 4px; }
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
-        input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
-        input:focus { border-color: var(--blue); }
+        input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #fff; }
 
-        /* Opsiyonlar (Yerli Malı / Buy Back) */
         .options-row { grid-column: span 3; display: flex; gap: 10px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
         .opt { flex: 1; display: flex; align-items: center; gap: 8px; background: #fff; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); }
-        .opt label { margin: 0; font-size: 11px; color: var(--navy); cursor: pointer; }
+        .opt label { margin: 0; font-size: 11px; color: var(--navy); cursor: pointer; text-transform: none; }
 
-        /* Butonlar */
         .actions { display: flex; gap: 8px; margin: 15px 0; }
         .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; color: #fff; text-transform: uppercase; font-size: 12px; }
         .btn-calc { background: var(--success); flex: 2; }
@@ -36,23 +31,21 @@
         .btn-print { background: var(--navy); }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        /* Başvuru Paneli */
-        .apply-panel { background: #fff; border: 2px solid var(--blue); padding: 15px; border-radius: 10px; display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 10px; align-items: flex-end; margin-bottom: 15px; }
+        /* Başvuru Paneli - Tablonun Altı İçin Stil */
+        .apply-panel { background: #f8fafc; border: 2px solid var(--blue); padding: 15px; border-radius: 10px; display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 10px; align-items: flex-end; margin-top: 20px; }
         .btn-apply { background: var(--accent); height: 38px; }
 
-        /* Tablo */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
         th { background: var(--navy); color: #fff; padding: 10px 5px; font-size: 10px; }
         td { padding: 8px 5px; text-align: center; border-bottom: 1px solid var(--border); }
         tr:nth-child(even) { background: #f8fafc; }
 
-        @media print { .no-print, .tabs, .actions, .apply-panel, .options-row { display: none !important; } }
+        @media print { .no-print { display: none !important; } }
     </style>
 </head>
 <body onload="initApp()">
 
 <div class="container" id="pdf-area">
-    <!-- Tablar -->
     <div class="tabs no-print">
         <button class="tab-btn active" onclick="switchTab(this, 'traktor')">TRAKTÖR</button>
         <button class="tab-btn" onclick="switchTab(this, 'ticari')">TİCARİ</button>
@@ -60,58 +53,42 @@
         <button class="tab-btn" onclick="switchTab(this, 'tuketici')">TÜKETİCİ</button>
     </div>
 
-    <!-- Giriş Formu -->
-    <div class="grid">
+    <div class="grid no-print">
         <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field"><label>Vade</label><select id="vade"></select></div>
+        <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
         <div class="field"><label>Ödeme Sıklığı</label>
-            <select id="periyot" onchange="checkLocks()">
+            <select id="periyot" onchange="checkLocks(); reset();">
                 <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
             </select>
         </div>
-        <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01"></div>
-        <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50"></div>
+        <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
+        <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         <div class="field"><label>Ödeme Tipi</label>
-            <select id="tip">
+            <select id="tip" onchange="reset()">
                 <option value="esit">Eşit Taksit</option>
                 <option value="anapara">Anapara Eşit</option>
             </select>
         </div>
 
-        <!-- Traktör Özel -->
-        <div class="options-row no-print" id="traktorOpts">
+        <div class="options-row" id="traktorOpts">
             <div class="opt">
-                <input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25">
+                <input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25; reset();">
                 <label for="yerli">Yerli Malı (%50 Sübv.)</label>
             </div>
             <div class="opt">
-                <input type="checkbox" id="buyback" checked>
+                <input type="checkbox" id="buyback" checked onchange="reset()">
                 <label for="buyback">Buy Back Uygula</label>
             </div>
         </div>
     </div>
 
-    <!-- İşlem Butonları -->
     <div class="actions no-print">
         <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
         <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF</button>
         <button class="btn btn-print" id="printBtn" onclick="yazdir()" disabled>YAZDIR</button>
     </div>
 
-    <!-- Başvuru Alanı -->
-    <div class="apply-panel no-print">
-        <div class="field">
-            <label>T.C. KİMLİK NO</label>
-            <input type="text" id="tc" maxlength="11" placeholder="11 Hane" oninput="onlyNum(this); checkApply()">
-        </div>
-        <div class="field">
-            <label>CEP TELEFONU</label>
-            <input type="text" id="tel" maxlength="10" placeholder="5xx xxxxxxx" oninput="onlyNum(this); checkApply()">
-        </div>
-        <button class="btn btn-apply" id="applyBtn" onclick="send()" disabled>BAŞVUR</button>
-    </div>
-
-    <!-- Sonuç Tablosu -->
+    <!-- Tablo Alanı -->
     <div id="result" style="display:none;">
         <table id="table">
             <thead>
@@ -127,6 +104,19 @@
             </thead>
             <tbody id="plan"></tbody>
         </table>
+
+        <!-- BAŞVURU PANELİ - ARTIK TABLONUN ALTINDA -->
+        <div class="apply-panel no-print">
+            <div class="field">
+                <label>T.C. KİMLİK NO</label>
+                <input type="text" id="tc" maxlength="11" placeholder="11 Hane" oninput="onlyNum(this); checkApply()">
+            </div>
+            <div class="field">
+                <label>CEP TELEFONU</label>
+                <input type="text" id="tel" maxlength="10" placeholder="5xx xxxxxxx" oninput="onlyNum(this); checkApply()">
+            </div>
+            <button class="btn btn-apply" id="applyBtn" onclick="send()" disabled>BAŞVURUYU TAMAMLA</button>
+        </div>
     </div>
 </div>
 
@@ -135,13 +125,11 @@
     let calculated = false;
 
     function initApp() { fmtMoney(document.getElementById('tutar')); fillVade(); checkLocks(); }
-
     function fmtMoney(i) { 
         let v = i.value.replace(/\D/g, ""); 
         if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
         reset();
     }
-
     function onlyNum(i) { i.value = i.value.replace(/[^0-9]/g,''); }
 
     function fillVade() {
@@ -166,7 +154,6 @@
     }
 
     function checkLocks() {
-        // Vergileri mode'a göre içeride yönetiyoruz
         window.bsmv = (mode === 'tuketici') ? 0.15 : 0.05;
         window.kkdf = (mode === 'traktor') ? 0 : 0.15;
     }
@@ -239,7 +226,7 @@
         checkApply();
     }
 
-    function send() { alert("Başvurunuz Süleyman Coşkun sistemine iletildi."); }
+    function send() { alert("Başvurunuz başarıyla iletildi. Teşekkür ederiz."); }
     function yazdir() { window.print(); }
     function indir() {
         const element = document.getElementById('pdf-area');
