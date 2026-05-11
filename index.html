@@ -10,18 +10,35 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
         .container { width: 100%; max-width: 1100px; margin: 0 auto; background: #fff; padding: 10px; box-sizing: border-box; }
 
-        /* --- Sekme Sistemi --- */
-        .tabs { display: flex; background: var(--primary); overflow-x: auto; white-space: nowrap; }
-        .tab-link { flex: 1; padding: 12px 5px; color: #ecf0f1; border: none; background: none; font-weight: bold; font-size: 11px; cursor: pointer; text-align: center; }
-        .tab-link.active { background: var(--secondary); color: #fff; }
+        /* --- Sekme Sistemi (Tam İsimler ve Kaydırma Desteği) --- */
+        .tabs { 
+            display: flex; 
+            background: var(--primary); 
+            overflow-x: auto; 
+            white-space: nowrap; 
+            -webkit-overflow-scrolling: touch;
+        }
+        .tab-link { 
+            flex: 0 0 auto; 
+            padding: 12px 15px; 
+            color: #ecf0f1; 
+            border: none; 
+            background: none; 
+            font-weight: bold; 
+            font-size: 12px; 
+            cursor: pointer; 
+            text-align: center;
+            transition: 0.2s;
+        }
+        .tab-link.active { background: var(--secondary); color: #fff; box-shadow: inset 0 -3px 0 #fff; }
+        .tabs::-webkit-scrollbar { height: 4px; }
+        .tabs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
 
-        /* --- Form Yapısı (Mobil Yan Yana) --- */
+        /* --- Form Yapısı --- */
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #2c3e50; }
         input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; outline: none; }
-        
-        /* Readonly Alanlar */
         input[readonly] { background-color: #eeeeee; color: #7f8c8d; cursor: not-allowed; border: 1px dashed #bbb; }
 
         /* --- Butonlar --- */
@@ -34,46 +51,44 @@
 
         /* --- Tablo --- */
         .table-responsive { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 10px; min-width: 700px; }
+        table { width: 100%; border-collapse: collapse; font-size: 10px; min-width: 750px; }
         th { background: var(--primary); color: #fff; padding: 10px 5px; }
         td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; }
 
         /* --- Gizleme Kuralları --- */
-        @media print {
-            .no-print, .tabs, .btn-group, .input-grid { display: none !important; }
-            .container { border: none; padding: 0; }
-        }
+        @media print { .no-print, .tabs, .btn-group, .input-grid { display: none !important; } .container { border: none; padding: 0; } }
         .force-hide { display: none !important; }
 
         @media (min-width: 768px) {
             .container { padding: 20px; margin-top: 10px; border-radius: 8px; }
             .field { flex-direction: row; align-items: center; }
-            .field label { flex: 0 0 100px; margin-bottom: 0; }
+            .field label { flex: 0 0 110px; margin-bottom: 0; }
             .btn-group { grid-template-columns: repeat(4, 1fr); }
             .btn-calc, #btnYazdir { grid-column: auto; }
             table { font-size: 11px; }
+            .tab-link { flex: 1; }
         }
     </style>
 </head>
 <body onload="vadeYukle(); yilliktanAyliga();">
 
 <div class="tabs no-print">
-    <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Traktör</button>
-    <button class="tab-link" onclick="openTab(event, 'ticari')">💼 Ticari</button>
-    <button class="tab-link" onclick="openTab(event, 'zirai')">👨‍🌾 Çiftçi</button>
-    <button class="tab-link" onclick="openTab(event, 'zirai_isletme')">🏚️ İşletme</button>
-    <button class="tab-link" onclick="openTab(event, 'tuketici')">🛒 Tüketici</button>
+    <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Zirai Traktör</button>
+    <button class="tab-link" onclick="openTab(event, 'ticari')">💼 Ticari Kredi</button>
+    <button class="tab-link" onclick="openTab(event, 'zirai')">👨‍🌾 Çiftçi Tüketici</button>
+    <button class="tab-link" onclick="openTab(event, 'zirai_isletme')">🏚️ Zirai/İşletme</button>
+    <button class="tab-link" onclick="openTab(event, 'tuketici')">🛒 Tüketici Kredisi</button>
     <button class="tab-link" onclick="openTab(event, 'hakkimda')">👤 Hakkımda</button>
 </div>
 
 <div class="container" id="pdf-area">
     <div id="calc-container" class="tab-content active">
-        <h2 id="baslikText" style="text-align:center; font-size: 18px; margin: 10px 0;">Zirai Traktör Kredisi</h2>
+        <h2 id="baslikText" style="text-align:center; font-size: 18px; margin: 10px 0;">Zirai Traktör Kredisi Hesaplama</h2>
         
         <div class="input-grid no-print" id="inputSection">
             <div class="field"><label>Tutar (₺)</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
             <div class="field"><label id="vadeLabel">Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
-            <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();"><option value="1" selected>Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option></select></div>
+            <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();"><option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option></select></div>
             <div class="field"><label>Plan Tipi</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksit</option><option value="esit_anapara">Eşit Anapara</option></select></div>
             <div class="field"><label>Aylık Faiz %</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga(); resetButtons();"></div>
             <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga(); resetButtons();"></div>
@@ -110,11 +125,6 @@
                 </table>
             </div>
         </div>
-    </div>
-
-    <div id="empty-container" class="tab-content">
-        <h2 id="emptyBaslik" style="text-align:center;"></h2>
-        <div style="padding: 20px; border: 1px dashed #ccc; text-align: center; color: #777;">Süleyman Coşkun - Finansal Analiz Sistemi</div>
     </div>
 </div>
 
@@ -154,34 +164,61 @@
 
     function openTab(evt, tabName) {
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         evt.currentTarget.classList.add('active');
         currentType = tabName;
 
         if(tabName === 'hakkimda' || tabName === 'zirai_isletme') {
-            document.getElementById('empty-container').classList.add('active');
-            document.getElementById('emptyBaslik').innerText = (tabName === 'hakkimda') ? "Süleyman Coşkun" : "Zirai/İşletme";
+            const label = (tabName === 'hakkimda') ? "Süleyman Coşkun" : "Zirai/İşletme Kredisi";
+            document.getElementById('baslikText').innerText = label;
+            document.getElementById('inputSection').classList.add('force-hide');
+            document.getElementById('buttonGroup').classList.add('force-hide');
+            document.getElementById('sonucAlani').style.display = 'none';
         } else {
-            document.getElementById('calc-container').classList.add('active');
-            const titles = {'traktor':'Zirai Traktör','ticari':'Ticari Kredi','zirai':'Çiftçi Tüketici','tuketici':'Tüketici Kredisi'};
-            document.getElementById('baslikText').innerText = titles[tabName];
-            document.getElementById('subContainer').style.display = (tabName === 'traktor') ? 'flex' : 'none';
+            document.getElementById('inputSection').classList.remove('force-hide');
+            document.getElementById('buttonGroup').classList.remove('force-hide');
             
+            const titles = {
+                'traktor': 'Zirai Traktör Kredisi Hesaplama',
+                'ticari': 'Ticari Kredi Hesaplama',
+                'zirai': 'Çiftçi Tüketici Kredisi Hesaplama',
+                'tuketici': 'Tüketici Kredisi Hesaplama'
+            };
+            document.getElementById('baslikText').innerText = titles[tabName];
+            
+            const faizInput = document.getElementById('faizYillik');
+            const periyotSelect = document.getElementById('periyot');
+            const subContainer = document.getElementById('subContainer');
             const kkdf = document.getElementById('kkdfOran');
             const bsmv = document.getElementById('bsmvOran');
-            
+
+            subContainer.style.display = (tabName === 'traktor') ? 'flex' : 'none';
+
+            if (tabName === 'ticari') {
+                faizInput.value = "49.00";
+                periyotSelect.value = "12";
+            } else if (tabName === 'traktor') {
+                faizInput.value = "40.50";
+                periyotSelect.value = "1";
+            } else if (tabName === 'zirai') {
+                faizInput.value = "45.00";
+                periyotSelect.value = "1";
+            } else {
+                faizInput.value = "49.00";
+                periyotSelect.value = "12";
+            }
+
             if (tabName === 'tuketici' || tabName === 'zirai') {
                 kkdf.value = 15; bsmv.value = 15;
             } else {
                 kkdf.value = 0; bsmv.value = 5;
             }
-            vadeYukle(); resetButtons();
+            
+            vadeYukle(); yilliktanAyliga(); resetButtons();
         }
     }
 
     function hesapla() {
-        const tutarStr = document.getElementById('tutar').value.replace(/\./g, "");
-        const tutar = parseFloat(tutarStr);
+        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeSecim').value);
@@ -216,7 +253,6 @@
         const btnGroup = document.getElementById('buttonGroup');
         const inputSec = document.getElementById('inputSection');
         const tabs = document.querySelector('.tabs');
-        
         btnGroup.classList.add('force-hide');
         inputSec.classList.add('force-hide');
         tabs.classList.add('force-hide');
