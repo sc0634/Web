@@ -24,7 +24,6 @@
         .input-grid { display: flex; flex-direction: column; gap: 10px; padding: 15px; background: #f1f5f9; border-radius: 8px; margin-bottom: 15px; }
         .row { display: flex; gap: 10px; width: 100%; }
         .row .field { flex: 1; }
-        .full-row { width: 100%; margin-top: 5px; }
 
         label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 4px; display: block; }
         input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
@@ -95,25 +94,26 @@
             <div class="field" style="flex: 1;"><label>Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
         </div>
 
-        <!-- Satır 2: Faiz ve Sıklık (Yerler Değişti) -->
+        <!-- Satır 2: Faiz ve BSMV (Bsmv yukarı geldi) -->
         <div class="row">
             <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
+            <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" step="0.01" oninput="resetButtons();"></div>
+        </div>
+
+        <!-- Satır 3: Ödeme Sıklığı ve KKDF (Sıklık buraya geldi) -->
+        <div class="row">
             <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();">
                 <option value="1">Yılda 1</option>
                 <option value="2">6 Ayda 1</option>
                 <option value="4">3 Ayda 1</option>
                 <option value="12">Ayda 1</option>
             </select></div>
-        </div>
-
-        <!-- Satır 3: KKDF ve BSMV -->
-        <div class="row">
             <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" step="0.01" oninput="resetButtons();"></div>
-            <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" step="0.01" oninput="resetButtons();"></div>
         </div>
 
-        <!-- Satır 4: Sübvansiyon -->
-        <div class="full-row" id="subContainer">
+        <!-- Satır 4: Boşluk ve Sübvansiyon (KKDF Hizasına göre ayarlandı) -->
+        <div class="row" id="subContainer">
+            <div class="field" style="visibility: hidden;"></div> 
             <div class="field"><label>Sübvansiyon Oranı %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
     </div>
@@ -177,7 +177,7 @@
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         evt.currentTarget.classList.add('active');
         currentType = tabName;
-        document.getElementById('subContainer').style.display = (tabName === 'traktor') ? 'block' : 'none';
+        document.getElementById('subContainer').style.display = (tabName === 'traktor') ? 'flex' : 'none';
         vadeYukle(); resetButtons();
     }
 
