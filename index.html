@@ -2,185 +2,109 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Finansal Analiz</title>
+    <title>Süleyman Coşkun - Kredi Hesaplama</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; --danger: #e74c3c; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
-        .container { width: 100%; max-width: 1150px; margin: 0 auto; background: #fff; padding: 10px; box-sizing: border-box; }
-        .tabs { display: flex; background: var(--primary); overflow-x: auto; white-space: nowrap; }
-        .tab-link { flex: 0 0 auto; padding: 12px 15px; color: #ecf0f1; border: none; background: none; font-weight: bold; font-size: 12px; cursor: pointer; }
-        .tab-link.active { background: var(--secondary); color: #fff; }
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; }
+        body { font-family: sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 5px; }
         .field { display: flex; flex-direction: column; }
-        .field-row { flex-direction: row !important; align-items: center; gap: 5px; }
-        .field label { font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #2c3e50; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 15px 0; }
-        button { padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; color: #fff; }
-        .btn-calc { background: var(--success); grid-column: span 2; }
-        .btn-clear { background: var(--danger); }
-        #btnPdf { background: var(--secondary); }
-        #btnYazdir { background: #f39c12; grid-column: span 2; }
-        .table-wrapper { width: 100%; overflow: hidden; margin-top: 15px; }
-        #sonucTablosu { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1000px; transform-origin: top left; }
-        th { background: var(--primary); color: #fff; padding: 10px 5px; border: 1px solid #444; }
-        td { padding: 8px 5px; border: 1px solid #eee; text-align: right; }
-        
-        /* Yeni Masraflar Bölümü Stili */
-        .masraf-section { margin-top: 25px; padding: 15px; border: 2px solid #eee; border-radius: 8px; background: #fff; }
-        .masraf-title { font-size: 14px; font-weight: bold; color: var(--primary); border-bottom: 2px solid var(--secondary); padding-bottom: 5px; margin-bottom: 10px; }
-        .masraf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .masraf-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dashed #ddd; }
-        .masraf-item label { font-size: 12px; font-weight: 600; }
-        .masraf-item input { width: 100px; text-align: right; border: 1px solid #ccc; padding: 4px; }
-        .total-cost { margin-top: 10px; text-align: right; font-weight: bold; color: var(--danger); font-size: 14px; }
+        label { font-size: 12px; font-weight: bold; margin-bottom: 5px; }
+        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+        th { background: #2c3e50; color: white; padding: 10px; }
+        td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 4px; background: #27ae60; color: white; font-weight: bold; }
+        #btnPdf { background: #3498db; }
+        #btnSifirla { background: #e74c3c; }
 
-        @media print { .no-print, .tabs, .btn-group, .input-grid { display: none !important; } }
+        /* Masraf Bölümü */
+        .masraf-box { margin-top: 30px; border-top: 2px solid #2c3e50; padding-top: 15px; }
+        .masraf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .masraf-item { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 5px 10px; border: 1px solid #ddd; }
+        .masraf-item input { width: 120px; text-align: right; }
     </style>
 </head>
-<body onload="vadeYukle(); yilliktanAyliga();">
-
-<div class="tabs no-print">
-    <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Zirai Traktör</button>
-    <button class="tab-link" onclick="openTab(event, 'ticari')">💼 Ticari Kredi</button>
-    <button class="tab-link" onclick="openTab(event, 'zirai')">👨‍🌾 Çiftçi Tüketici</button>
-    <button class="tab-link" onclick="openTab(event, 'zirai_isletme')">🏚️ Zirai/İşletme</button>
-    <button class="tab-link" onclick="openTab(event, 'tuketici')">🛒 Tüketici Kredisi</button>
-</div>
+<body>
 
 <div class="container" id="pdf-area">
-    <div id="calc-container">
-        <h2 id="baslikText" style="text-align:center; font-size: 18px; margin: 10px 0;">Zirai Traktör Kredisi Hesaplama</h2>
-        
-        <div class="input-grid no-print">
-            <div class="field"><label>Tutar (₺)</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this);"></div>
-            <div class="field"><label>Vade</label><select id="vadeSecim"></select></div>
-            <div class="field field-row"><label>Ödeme Sıklığı</label><select id="periyot"><option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option></select></div>
-            <div class="field field-row"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01"></div>
-            <input type="hidden" id="faizAylik">
-            <div class="field field-row"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" readonly></div>
-            <div class="field field-row"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" readonly></div>
-            <div class="field field-row" id="subContainer"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50"></div>
-        </div>
+    <h2 style="text-align: center;">Kredi Ödeme Planı</h2>
+    
+    <div class="input-grid no-print">
+        <div class="field"><label>Kredi Tutarı (₺)</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this)"></div>
+        <div class="field"><label>Yıllık Faiz (%)</label><input type="number" id="faiz" value="40.50" step="0.01"></div>
+        <div class="field"><label>Vade (Yıl)</label><input type="number" id="vade" value="5"></div>
+        <div class="field"><label>BSMV (%)</label><input type="number" id="bsmv" value="5"></div>
+        <div class="field"><label>KKDF (%)</label><input type="number" id="kkdf" value="0"></div>
+    </div>
 
-        <div class="btn-group no-print">
-            <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
-            <button class="btn-clear" onclick="location.reload()">SIFIRLA</button>
-            <button id="btnPdf" onclick="indirPDF()" disabled>PDF KAYDET</button>
-            <button id="btnYazdir" onclick="window.print()" disabled>YAZDIR</button>
-        </div>
+    <div class="btn-group no-print">
+        <button onclick="hesapla()">HESAPLA</button>
+        <button id="btnSifirla" onclick="location.reload()">SIFIRLA</button>
+        <button id="btnPdf" onclick="indirPDF()">PDF İNDİR</button>
+    </div>
 
-        <div id="sonucAlani" style="display:none;">
-            <div class="table-wrapper">
-                <table id="sonucTablosu">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Anapara</th>
-                            <th>Brüt Faiz</th>
-                            <th>İndirimli Faiz</th>
-                            <th>BSMV</th>
-                            <th>KKDF</th>
-                            <th>İndirimli Taksit</th>
-                            <th>Brüt Taksit</th>
-                            <th>Borç Bakiye</th>
-                        </tr>
-                    </thead>
-                    <tbody id="planBody"></tbody>
-                </table>
-            </div>
+    <table id="planTablosu">
+        <thead>
+            <tr>
+                <th>Taksit No</th>
+                <th>Anapara</th>
+                <th>Faiz</th>
+                <th>BSMV+KKDF</th>
+                <th>Taksit Tutarı</th>
+                <th>Kalan Borç</th>
+            </tr>
+        </thead>
+        <tbody id="planBody"></tbody>
+    </table>
 
-            <div class="masraf-section">
-                <div class="masraf-title">EK MASRAFLAR VE GİDERLER</div>
-                <div class="masraf-grid">
-                    <div class="masraf-item">
-                        <label>Dosya Masrafı:</label>
-                        <input type="text" placeholder="0 ₺" oninput="formatTutar(this); toplamMasrafHesapla();">
-                    </div>
-                    <div class="masraf-item">
-                        <label>Hayat Sigortası:</label>
-                        <input type="text" placeholder="0 ₺" oninput="formatTutar(this); toplamMasrafHesapla();">
-                    </div>
-                    <div class="masraf-item">
-                        <label>Kasko / Rehin:</label>
-                        <input type="text" placeholder="0 ₺" oninput="formatTutar(this); toplamMasrafHesapla();">
-                    </div>
-                    <div class="masraf-item">
-                        <label>Diğer Giderler:</label>
-                        <input type="text" placeholder="0 ₺" oninput="formatTutar(this); toplamMasrafHesapla();">
-                    </div>
-                </div>
-                <div class="total-cost" id="toplamMasrafGosterge">Toplam Masraf: 0 ₺</div>
-            </div>
+    <div class="masraf-box">
+        <h4 style="margin-top: 0;">EK MASRAFLAR</h4>
+        <div class="masraf-grid">
+            <div class="masraf-item"><label>Ekspertiz / Dosya:</label><input type="text" oninput="formatTutar(this)"></div>
+            <div class="masraf-item"><label>Sigorta Giderleri:</label><input type="text" oninput="formatTutar(this)"></div>
+            <div class="masraf-item"><label>İpotek / Rehin:</label><input type="text" oninput="formatTutar(this)"></div>
+            <div class="masraf-item"><label>Diğer Masraflar:</label><input type="text" oninput="formatTutar(this)"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // Mevcut hesaplama fonksiyonları ve tablo mantığı değiştirilmeden korunmuştur
     function formatTutar(i) {
         let v = i.value.replace(/\D/g, "");
-        if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
-    }
-
-    function toplamMasrafHesapla() {
-        let toplam = 0;
-        document.querySelectorAll('.masraf-item input').forEach(input => {
-            let val = parseFloat(input.value.replace(/\./g, "")) || 0;
-            toplam += val;
-        });
-        document.getElementById('toplamMasrafGosterge').innerText = "Toplam Masraf: " + toplam.toLocaleString('tr-TR') + " ₺";
-    }
-
-    function vadeYukle() {
-        const select = document.getElementById('vadeSecim');
-        for (let i = 1; i <= 5; i++) {
-            let opt = document.createElement('option');
-            opt.value = i; opt.innerText = i + " Yıl";
-            if (i === 5) opt.selected = true;
-            select.appendChild(opt);
-        }
+        i.value = v ? new Intl.NumberFormat('tr-TR').format(v) : "";
     }
 
     function hesapla() {
         const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
-        const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
-        const subOran = parseFloat(document.getElementById('subOran').value) / 100;
-        const vade = parseInt(document.getElementById('vadeSecim').value);
-        const per = parseInt(document.getElementById('periyot').value);
-        const bsmv_r = parseFloat(document.getElementById('bsmvOran').value) / 100;
-        const kkdf_r = parseFloat(document.getElementById('kkdfOran').value) / 100;
+        const yFaiz = parseFloat(document.getElementById('faiz').value) / 100;
+        const vade = parseInt(document.getElementById('vade').value);
+        const bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
+        const kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
 
-        let toplamTaksit = vade * per;
-        const dFaiz = yFaiz / per;
-        const i_vergi = dFaiz * (1 + bsmv_r + kkdf_r);
-        const brutTaksit = (tutar * i_vergi * Math.pow(1+i_vergi, toplamTaksit)) / (Math.pow(1+i_vergi, toplamTaksit)-1);
+        const brutFaiz = yFaiz * (1 + bsmv + kkdf);
+        const taksit = (tutar * brutFaiz) / (1 - Math.pow(1 + brutFaiz, -vade));
         
-        let body = '', kalanAnapara = tutar;
+        let body = "";
+        let bakiye = tutar;
 
-        for(let j=1; j<=toplamTaksit; j++){
-            let brutFaiz = kalanAnapara * dFaiz;
-            let bsmv = brutFaiz * bsmv_r;
-            let kkdf = brutFaiz * kkdf_r;
-            let anapara = brutTaksit - (brutFaiz + bsmv + kkdf);
-            if(j === toplamTaksit) anapara = kalanAnapara;
-            let indirimliFaiz = brutFaiz * (1 - subOran);
-            let indirimliTaksit = anapara + indirimliFaiz + bsmv + kkdf;
-            kalanAnapara -= anapara;
-            body += `<tr><td>${j}</td><td>${anapara.toLocaleString('tr-TR')}₺</td><td>${brutFaiz.toLocaleString('tr-TR')}₺</td><td>${indirimliFaiz.toLocaleString('tr-TR')}₺</td><td>${bsmv.toLocaleString('tr-TR')}₺</td><td>${kkdf.toLocaleString('tr-TR')}₺</td><td>${indirimliTaksit.toLocaleString('tr-TR')}₺</td><td>${brutTaksit.toLocaleString('tr-TR')}₺</td><td>${Math.abs(kalanAnapara).toLocaleString('tr-TR')}₺</td></tr>`;
+        for (let i = 1; i <= vade; i++) {
+            let fYukü = bakiye * yFaiz;
+            let vYükü = fYukü * (bsmv + kkdf);
+            let ana = taksit - (fYükü + vYükü);
+            if (i === vade) ana = bakiye;
+            bakiye -= ana;
+            body += `<tr><td>${i}</td><td>${ana.toLocaleString('tr-TR')} ₺</td><td>${fYükü.toLocaleString('tr-TR')} ₺</td><td>${vYükü.toLocaleString('tr-TR')} ₺</td><td>${taksit.toLocaleString('tr-TR')} ₺</td><td>${Math.abs(bakiye).toLocaleString('tr-TR')} ₺</td></tr>`;
         }
         document.getElementById('planBody').innerHTML = body;
-        document.getElementById('sonucAlani').style.display = 'block';
-        document.getElementById('btnYazdir').disabled = false;
-        document.getElementById('btnPdf').disabled = false;
     }
 
     function indirPDF() {
-        const opt = { margin: 5, filename: 'kredi_plani.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
-        html2pdf().set(opt).from(document.getElementById('pdf-area')).save();
+        const element = document.getElementById('pdf-area');
+        html2pdf().from(element).save('kredi_plani.pdf');
     }
 </script>
+
 </body>
 </html>
