@@ -19,7 +19,9 @@
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #2c3e50; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; outline: none; }
+        
+        /* Readonly Stili */
         input[readonly] { background-color: #eeeeee; color: #7f8c8d; cursor: not-allowed; border: 1px dashed #bbb; }
 
         /* --- Butonlar --- */
@@ -30,25 +32,13 @@
         #btnPdf { background: var(--secondary); }
         #btnYazdir { background: #f39c12; grid-column: span 2; }
 
-        /* --- Otomatik Sığan Tablo Alanı --- */
-        .table-wrapper { 
-            width: 100%; 
-            overflow: hidden; /* Taşmayı engelle */
-            margin-top: 15px;
-        }
-        
-        #sonucTablosu { 
-            width: 100%; 
-            border-collapse: collapse; 
-            font-size: 11px; 
-            min-width: 800px; /* Hesaplama için temel genişlik */
-            transform-origin: top left; /* Küçültme merkezi */
-        }
-
+        /* --- Otomatik Sığan Tablo --- */
+        .table-wrapper { width: 100%; overflow: hidden; margin-top: 15px; }
+        #sonucTablosu { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 800px; transform-origin: top left; }
         th { background: var(--primary); color: #fff; padding: 10px 5px; }
         td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; }
 
-        /* --- Gizleme ve Mobil Ayarlar --- */
+        /* --- Gizleme Kuralları --- */
         @media print { .no-print, .tabs, .btn-group, .input-grid { display: none !important; } }
         .force-hide { display: none !important; }
 
@@ -121,15 +111,12 @@
 <script>
     let currentType = 'traktor';
 
-    // Tabloyu ekrana sığdırmak için orantılı küçültme fonksiyonu
     function tabloyuSigdir() {
         const wrapper = document.getElementById('wrapper');
         const tablo = document.getElementById('sonucTablosu');
         if (!wrapper || !tablo || document.getElementById('sonucAlani').style.display === 'none') return;
-
         const wrapperWidth = wrapper.offsetWidth;
-        const tabloWidth = 800; // Tablonun sığması gereken min-width değeri
-
+        const tabloWidth = 800;
         if (wrapperWidth < tabloWidth) {
             const oran = wrapperWidth / tabloWidth;
             tablo.style.transform = `scale(${oran})`;
@@ -187,17 +174,21 @@
             const titles = {'traktor':'Zirai Traktör Kredisi Hesaplama','ticari':'Ticari Kredi Hesaplama','zirai':'Çiftçi Tüketici Kredisi Hesaplama','tuketici':'Tüketici Kredisi Hesaplama'};
             document.getElementById('baslikText').innerText = titles[tabName];
             
-            const faizInput = document.getElementById('faizYillik');
+            const faizAylik = document.getElementById('faizAylik');
+            const faizYillik = document.getElementById('faizYillik');
             const periyotSelect = document.getElementById('periyot');
             const subContainer = document.getElementById('subContainer');
             const kkdf = document.getElementById('kkdfOran');
             const bsmv = document.getElementById('bsmvOran');
 
+            // Çiftçi Tüketici (zirai) durumunda Aylık Faiz readonly yapılır
+            faizAylik.readOnly = (tabName === 'zirai');
+
             subContainer.style.display = (tabName === 'traktor') ? 'flex' : 'none';
-            if (tabName === 'ticari') { faizInput.value = "49.00"; periyotSelect.value = "12"; }
-            else if (tabName === 'traktor') { faizInput.value = "40.50"; periyotSelect.value = "1"; }
-            else if (tabName === 'zirai') { faizInput.value = "45.00"; periyotSelect.value = "1"; }
-            else { faizInput.value = "49.00"; periyotSelect.value = "12"; }
+            if (tabName === 'ticari') { faizYillik.value = "49.00"; periyotSelect.value = "12"; }
+            else if (tabName === 'traktor') { faizYillik.value = "40.50"; periyotSelect.value = "1"; }
+            else if (tabName === 'zirai') { faizYillik.value = "45.00"; periyotSelect.value = "1"; }
+            else { faizYillik.value = "49.00"; periyotSelect.value = "12"; }
 
             if (tabName === 'tuketici' || tabName === 'zirai') { kkdf.value = 15; bsmv.value = 15; }
             else { kkdf.value = 0; bsmv.value = 5; }
@@ -236,8 +227,6 @@
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('btnYazdir').disabled = false;
         document.getElementById('btnPdf').disabled = false;
-        
-        // Tablo oluştuktan sonra sığdırma fonksiyonunu tetikle
         setTimeout(tabloyuSigdir, 100);
     }
 
@@ -247,27 +236,17 @@
         const tabs = document.querySelector('.tabs');
         const tablo = document.getElementById('sonucTablosu');
         const wrapper = document.getElementById('wrapper');
-
-        // PDF için transformu sıfırla ki net çıksın
         tablo.style.transform = "scale(1)";
         wrapper.style.height = "auto";
-        
         btnGroup.classList.add('force-hide');
         inputSec.classList.add('force-hide');
         tabs.classList.add('force-hide');
-
-        const opt = { 
-            margin: 5, 
-            filename: 'kredi_plani.pdf', 
-            html2canvas: { scale: 2 }, 
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-        };
-        
+        const opt = { margin: 5, filename: 'kredi_plani.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
         html2pdf().set(opt).from(document.getElementById('pdf-area')).save().then(() => {
             btnGroup.classList.remove('force-hide');
             inputSec.classList.remove('force-hide');
             tabs.classList.remove('force-hide');
-            tabloyuSigdir(); // Mobildeki görünümü geri yükle
+            tabloyuSigdir();
         });
     }
 </script>
