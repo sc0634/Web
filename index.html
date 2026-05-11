@@ -17,7 +17,7 @@
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; }
         .field { display: flex; flex-direction: column; }
         
-        /* Faiz alanlarını yan yana getiren özel stil */
+        /* Satır içi (label yan yana) stil düzenlemesi */
         .field-row { flex-direction: row !important; align-items: center; gap: 5px; }
         .field-row label { flex: 0 0 85px; margin-bottom: 0 !important; }
 
@@ -44,7 +44,7 @@
             .container { padding: 20px; border-radius: 8px; margin-top: 10px; }
             .field { flex-direction: row; align-items: center; }
             .field label { flex: 0 0 110px; margin-bottom: 0; }
-            .field-row label { flex: 0 0 110px; } /* Masaüstünde genişlik uyumu */
+            .field-row label { flex: 0 0 110px; }
             .btn-group { grid-template-columns: repeat(4, 1fr); }
             .btn-calc, #btnYazdir { grid-column: auto; }
             .tab-link { flex: 1; }
@@ -69,14 +69,16 @@
         <div class="input-grid no-print" id="inputSection">
             <div class="field"><label>Tutar (₺)</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
             <div class="field"><label id="vadeLabel">Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
-            <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();"><option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option></select></div>
-            <div class="field"><label>Plan Tipi</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksit</option><option value="esit_anapara">Eşit Anapara</option></select></div>
+            
+            <div class="field field-row"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();"><option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option></select></div>
+            <div class="field field-row"><label>Plan Tipi</label><select id="planTipi" onchange="resetButtons();"><option value="esit_taksit" selected>Eşit Taksit</option><option value="esit_anapara">Eşit Anapara</option></select></div>
+            
             <div class="field field-row"><label>Aylık Faiz %</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga(); resetButtons();"></div>
             <div class="field field-row"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga(); resetButtons();"></div>
+            <div class="field field-row"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" readonly></div>
+            <div class="field field-row"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" readonly></div>
             
-            <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" readonly></div>
-            <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" readonly></div>
-            <div class="field" id="subContainer"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
+            <div class="field field-row" id="subContainer"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
 
         <div class="btn-group no-print" id="buttonGroup">
