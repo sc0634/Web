@@ -20,8 +20,6 @@
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #2c3e50; }
         input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; outline: none; }
-        
-        /* Readonly Stili */
         input[readonly] { background-color: #eeeeee; color: #7f8c8d; cursor: not-allowed; border: 1px dashed #bbb; }
 
         /* --- Butonlar --- */
@@ -34,11 +32,10 @@
 
         /* --- Otomatik Sığan Tablo --- */
         .table-wrapper { width: 100%; overflow: hidden; margin-top: 15px; }
-        #sonucTablosu { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 800px; transform-origin: top left; }
+        #sonucTablosu { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 850px; transform-origin: top left; }
         th { background: var(--primary); color: #fff; padding: 10px 5px; }
         td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; }
 
-        /* --- Gizleme Kuralları --- */
         @media print { .no-print, .tabs, .btn-group, .input-grid { display: none !important; } }
         .force-hide { display: none !important; }
 
@@ -92,12 +89,12 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Taksit Tutarı</th>
+                            <th id="thTaksit">Taksit Tutarı</th>
                             <th>Anapara</th>
                             <th>Faiz</th>
                             <th>BSMV</th>
                             <th>KKDF</th>
-                            <th id="thSub">Sübvansiyonlu</th>
+                            <th id="thSub">İndirim Sonrası Taksit Tutarı</th>
                             <th>Kalan Anapara</th>
                         </tr>
                     </thead>
@@ -116,7 +113,7 @@
         const tablo = document.getElementById('sonucTablosu');
         if (!wrapper || !tablo || document.getElementById('sonucAlani').style.display === 'none') return;
         const wrapperWidth = wrapper.offsetWidth;
-        const tabloWidth = 800;
+        const tabloWidth = 850;
         if (wrapperWidth < tabloWidth) {
             const oran = wrapperWidth / tabloWidth;
             tablo.style.transform = `scale(${oran})`;
@@ -174,6 +171,10 @@
             const titles = {'traktor':'Zirai Traktör Kredisi Hesaplama','ticari':'Ticari Kredi Hesaplama','zirai':'Çiftçi Tüketici Kredisi Hesaplama','tuketici':'Tüketici Kredisi Hesaplama'};
             document.getElementById('baslikText').innerText = titles[tabName];
             
+            // Traktör sekmesine özel başlık güncellemesi
+            document.getElementById('thTaksit').innerText = (tabName === 'traktor') ? 'İndirimsiz Taksit Tutarı' : 'Taksit Tutarı';
+            document.getElementById('thSub').innerText = (tabName === 'traktor') ? 'İndirim Sonrası Taksit Tutarı' : 'Sübvansiyonlu';
+
             const faizAylik = document.getElementById('faizAylik');
             const faizYillik = document.getElementById('faizYillik');
             const periyotSelect = document.getElementById('periyot');
@@ -181,7 +182,6 @@
             const kkdf = document.getElementById('kkdfOran');
             const bsmv = document.getElementById('bsmvOran');
 
-            // Çiftçi Tüketici (zirai) durumunda Aylık Faiz readonly yapılır
             faizAylik.readOnly = (tabName === 'zirai');
 
             subContainer.style.display = (tabName === 'traktor') ? 'flex' : 'none';
