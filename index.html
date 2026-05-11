@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dinamik Kredi Hesaplama</title>
+    <title>Kredi Hesaplama - Sade Versiyon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -21,8 +21,11 @@
 <body class="bg-gray-100 font-sans p-4">
 
     <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden border border-gray-200">
+        
         <div class="flex bg-blue-900 text-white text-sm font-semibold">
-            <button class="flex-1 py-4 bg-blue-600 border-b-4 border-yellow-400 flex items-center justify-center gap-2"><i class="fas fa-tractor"></i> Traktör</button>
+            <button class="flex-1 py-4 bg-blue-600 border-b-4 border-yellow-400 flex items-center justify-center gap-2">
+                <i class="fas fa-tractor"></i> Traktör
+            </button>
             <button class="flex-1 py-4 hover:bg-blue-800">Ticari</button>
             <button class="flex-1 py-4 hover:bg-blue-800">Çiftçi</button>
             <button class="flex-1 py-4 hover:bg-blue-800">Tüketici</button>
@@ -30,31 +33,47 @@
 
         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             <div class="space-y-3">
-                <div class="flex items-center justify-between"><label class="text-sm font-bold text-gray-700">Kredi Tutarı (₺)</label>
-                    <input type="number" id="tutar" value="1000000" class="form-control"></div>
-                <div class="flex items-center justify-between"><label class="text-sm font-bold text-gray-700">Aylık Faiz %</label>
-                    <input type="number" step="0.01" id="aylikFaiz" value="3.38" class="form-control"></div>
-                <div class="flex items-center justify-between"><label class="text-sm font-bold text-gray-700">Sübvansiyon %</label>
-                    <input type="number" id="subvansiyon" value="50" class="form-control text-blue-600 font-bold"></div>
+                <div class="flex items-center justify-between">
+                    <label class="text-sm font-bold text-gray-700">Kredi Tutarı (₺)</label>
+                    <input type="number" id="tutar" value="1000000" class="form-control">
+                </div>
+                <div class="flex items-center justify-between">
+                    <label class="text-sm font-bold text-gray-700">Aylık Faiz %</label>
+                    <input type="number" step="0.01" id="aylikFaiz" value="3.38" class="form-control">
+                </div>
+                <div class="flex items-center justify-between">
+                    <label class="text-sm font-bold text-gray-700">Sübvansiyon %</label>
+                    <input type="number" id="subvansiyon" value="50" class="form-control text-blue-600 font-bold">
+                </div>
             </div>
             <div class="space-y-3">
-                <div class="flex items-center justify-between"><label class="text-sm font-bold text-gray-700">Vade (Ay)</label>
-                    <input type="number" id="vade" value="60" class="form-control"></div>
-                <div class="flex items-center justify-between"><label class="text-sm font-bold text-gray-700">BSMV %</label>
-                    <input type="number" id="bsmv" value="5" class="form-control"></div>
-                <div class="flex items-center justify-between"><label class="text-sm font-bold text-gray-700">KKDF %</label>
-                    <input type="number" id="kkdf" value="0" class="form-control"></div>
+                <div class="flex items-center justify-between">
+                    <label class="text-sm font-bold text-gray-700">Vade (Ay)</label>
+                    <input type="number" id="vade" value="60" class="form-control">
+                </div>
+                <div class="flex items-center justify-between">
+                    <label class="text-sm font-bold text-gray-700">BSMV %</label>
+                    <input type="number" id="bsmv" value="5" class="form-control">
+                </div>
+                <div class="flex items-center justify-between">
+                    <label class="text-sm font-bold text-gray-700">KKDF %</label>
+                    <input type="number" id="kkdf" value="0" class="form-control">
+                </div>
             </div>
         </div>
 
-        <div class="px-6 pb-6 border-b border-gray-100">
-            <button onclick="hesapla()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-md transition">
+        <div class="px-6">
+            <button onclick="hesapla()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-t-lg flex items-center justify-center gap-2 shadow-md transition">
                 <i class="fas fa-calculator"></i> HESAPLA
             </button>
         </div>
 
-        <div class="p-6">
-            <div class="bg-blue-950 text-white p-3 rounded-t-lg font-bold text-sm">AMORTİSMAN PLANI</div>
+        <div class="px-6 pb-6">
+            <div class="bg-blue-950 text-white p-3 flex items-center justify-between font-bold text-sm border-x border-blue-950">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-list-ol"></i> AMORTİSMAN PLANI
+                </div>
+            </div>
             <div class="overflow-x-auto border border-gray-200 rounded-b-lg">
                 <table class="w-full text-[11px] text-left">
                     <thead class="bg-blue-900 text-white uppercase">
@@ -63,7 +82,6 @@
                             <th class="p-3 border-r border-blue-800">Taksit Tutarı</th>
                             <th class="p-3 border-r border-blue-800">Anapara</th>
                             <th class="p-3 border-r border-blue-800">Faiz</th>
-                            <th class="p-3 border-r border-blue-800">Vergiler</th>
                             <th class="p-3 border-r border-blue-800 text-yellow-300">Sübvansiyonlu</th>
                             <th class="p-3">Kalan Anapara</th>
                         </tr>
@@ -85,43 +103,32 @@
             const subOran = parseFloat(document.getElementById('subvansiyon').value) / 100;
 
             const brütOran = aylikOran * (1 + bsmvOran + kkdfOran);
-            
-            // Taksit Formülü: P * [i(1+i)^n] / [(1+i)^n - 1]
             const taksit = P * (brütOran * Math.pow(1 + brütOran, n)) / (Math.pow(1 + brütOran, n) - 1);
             
             let kalanAnapara = P;
             const tabloGövde = document.getElementById('tabloGövde');
-            tabloGövde.innerHTML = ''; // Tabloyu temizle
+            tabloGövde.innerHTML = '';
 
             for (let i = 1; i <= n; i++) {
                 let faiz = kalanAnapara * aylikOran;
-                let bsmv = faiz * bsmvOran;
-                let kkdf = faiz * kkdfOran;
-                let anapara = taksit - (faiz + bsmv + kkdf);
-                
-                // Sübvansiyonlu taksit hesaplama (indirimli faiz üzerinden)
-                let indirimliFaiz = faiz * (1 - subOran);
-                let subTaksit = anapara + indirimliFaiz + bsmv + kkdf;
+                let vergiler = faiz * (bsmvOran + kkdfOran);
+                let anapara = taksit - (faiz + vergiler);
+                let subTaksit = anapara + (faiz * (1 - subOran)) + vergiler;
 
                 kalanAnapara -= anapara;
                 if (kalanAnapara < 0) kalanAnapara = 0;
 
-                const row = `
+                tabloGövde.innerHTML += `
                     <tr class="hover:bg-gray-50">
                         <td class="p-3 font-bold">${i}</td>
                         <td class="p-3 font-bold">${taksit.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₺</td>
                         <td class="p-3">${anapara.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₺</td>
                         <td class="p-3">${faiz.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₺</td>
-                        <td class="p-3">${(bsmv + kkdf).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₺</td>
                         <td class="p-3 text-blue-700 font-bold bg-blue-50">${subTaksit.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₺</td>
                         <td class="p-3 font-mono">${kalanAnapara.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₺</td>
-                    </tr>
-                `;
-                tabloGövde.innerHTML += row;
+                    </tr>`;
             }
         }
-        
-        // Sayfa açıldığında otomatik bir kez hesapla
         window.onload = hesapla;
     </script>
 </body>
