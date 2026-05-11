@@ -3,44 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Profesyonel Ödeme Planı</title>
+    <title>Süleyman Coşkun - Mobil Uyumlu Panel</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f8fafc; margin: 0; padding: 10px; color: #1e293b; }
-        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); min-height: 100vh; }
+        body { background: #f8fafc; margin: 0; padding: 5px; color: #1e293b; }
+        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 12px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         
-        .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 8px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 11px; cursor: pointer; }
+        .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 12px; }
+        .tab-btn { flex: 1; padding: 8px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 10px; cursor: pointer; }
         .tab-btn.active { background: var(--blue); color: #fff; }
 
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; }
-        .field { display: flex; flex-direction: column; gap: 4px; }
-        label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
-        input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #fff; }
+        /* Mobil 1 Satırda 2 Veri Düzeni */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f1f5f9; padding: 12px; border-radius: 10px; }
+        .field { display: flex; flex-direction: column; gap: 3px; }
+        .full-width { grid-column: span 2; } /* Bazı alanlar tam satır kalsın istersek */
+        
+        label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
+        input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #fff; width: 100%; }
 
-        .options-row { grid-column: span 3; display: flex; gap: 10px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .opt { flex: 1; display: flex; align-items: center; gap: 8px; background: #fff; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); }
-        .opt label { margin: 0; font-size: 11px; color: var(--navy); cursor: pointer; text-transform: none; }
+        .options-row { grid-column: span 2; display: flex; gap: 8px; margin-top: 5px; padding-top: 8px; border-top: 1px solid #e2e8f0; }
+        .opt { flex: 1; display: flex; align-items: center; gap: 5px; background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border); }
+        .opt label { margin: 0; font-size: 9px; color: var(--navy); cursor: pointer; text-transform: none; }
 
-        .actions { display: flex; gap: 8px; margin: 15px 0; }
-        .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; color: #fff; text-transform: uppercase; font-size: 12px; }
-        .btn-calc { background: var(--success); flex: 2; }
+        .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px; margin: 12px 0; }
+        .btn { padding: 12px 5px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 11px; }
+        .btn-calc { background: var(--success); }
         .btn-pdf { background: #6366f1; }
         .btn-print { background: var(--navy); }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        /* Başvuru Paneli - Tablonun Altı İçin Stil */
-        .apply-panel { background: #f8fafc; border: 2px solid var(--blue); padding: 15px; border-radius: 10px; display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 10px; align-items: flex-end; margin-top: 20px; }
-        .btn-apply { background: var(--accent); height: 38px; }
+        /* Başvuru Paneli - Mobil 1 Satır 2 Veri */
+        .apply-panel { background: #f8fafc; border: 2px solid var(--blue); padding: 12px; border-radius: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
+        .btn-apply { background: var(--accent); grid-column: span 2; height: 40px; margin-top: 5px; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-        th { background: var(--navy); color: #fff; padding: 10px 5px; font-size: 10px; }
-        td { padding: 8px 5px; text-align: center; border-bottom: 1px solid var(--border); }
-        tr:nth-child(even) { background: #f8fafc; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        th { background: var(--navy); color: #fff; padding: 8px 4px; font-size: 9px; }
+        td { padding: 6px 3px; text-align: center; border-bottom: 1px solid var(--border); }
 
         @media print { .no-print { display: none !important; } }
+        
+        /* Büyük ekranlarda 3'lü izgara */
+        @media (min-width: 600px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+            .apply-panel { grid-template-columns: 2fr 2fr 1fr; }
+            .btn-apply { grid-column: span 1; }
+        }
     </style>
 </head>
 <body onload="initApp()">
@@ -54,7 +63,7 @@
     </div>
 
     <div class="grid no-print">
-        <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
+        <div class="field full-width"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
         <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
         <div class="field"><label>Ödeme Sıklığı</label>
             <select id="periyot" onchange="checkLocks(); reset();">
@@ -63,7 +72,7 @@
         </div>
         <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
         <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
-        <div class="field"><label>Ödeme Tipi</label>
+        <div class="field full-width"><label>Ödeme Tipi</label>
             <select id="tip" onchange="reset()">
                 <option value="esit">Eşit Taksit</option>
                 <option value="anapara">Anapara Eşit</option>
@@ -73,11 +82,11 @@
         <div class="options-row" id="traktorOpts">
             <div class="opt">
                 <input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25; reset();">
-                <label for="yerli">Yerli Malı (%50 Sübv.)</label>
+                <label for="yerli">Yerli Malı</label>
             </div>
             <div class="opt">
                 <input type="checkbox" id="buyback" checked onchange="reset()">
-                <label for="buyback">Buy Back Uygula</label>
+                <label for="buyback">Buy Back</label>
             </div>
         </div>
     </div>
@@ -88,7 +97,6 @@
         <button class="btn btn-print" id="printBtn" onclick="yazdir()" disabled>YAZDIR</button>
     </div>
 
-    <!-- Tablo Alanı -->
     <div id="result" style="display:none;">
         <table id="table">
             <thead>
@@ -97,15 +105,13 @@
                     <th id="hTutar">Taksit</th>
                     <th>Anapara</th>
                     <th>Faiz</th>
-                    <th>Vergi</th>
-                    <th id="hSub">Sübv. Taksit</th>
-                    <th>Kalan Borç</th>
+                    <th id="hSub">Sübv.Taksit</th>
+                    <th>Kalan</th>
                 </tr>
             </thead>
             <tbody id="plan"></tbody>
         </table>
 
-        <!-- BAŞVURU PANELİ - ARTIK TABLONUN ALTINDA -->
         <div class="apply-panel no-print">
             <div class="field">
                 <label>T.C. KİMLİK NO</label>
@@ -206,12 +212,11 @@
 
             html += `<tr>
                 <td>${i}</td>
-                <td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}₺</td>
-                <td>${Math.round(a).toLocaleString('tr-TR')}₺</td>
-                <td>${Math.round(f).toLocaleString('tr-TR')}₺</td>
-                <td>${Math.round(v).toLocaleString('tr-TR')}₺</td>
-                <td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}₺</td>
-                <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}₺</td>
+                <td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td>
+                <td>${Math.round(a).toLocaleString('tr-TR')}</td>
+                <td>${Math.round(f).toLocaleString('tr-TR')}</td>
+                <td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td>
+                <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td>
             </tr>`;
         }
 
@@ -226,12 +231,12 @@
         checkApply();
     }
 
-    function send() { alert("Başvurunuz başarıyla iletildi. Teşekkür ederiz."); }
+    function send() { alert("Başvurunuz başarıyla iletildi."); }
     function yazdir() { window.print(); }
     function indir() {
         const element = document.getElementById('pdf-area');
         html2pdf().from(element).set({
-            margin: 10,
+            margin: 5,
             filename: 'Odeme_Plani.pdf',
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
