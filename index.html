@@ -9,39 +9,44 @@
         :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; touch-action: manipulation; }
         body { background: #f8fafc; margin: 0; color: #1e293b; }
-        .container { width: 100%; max-width: 900px; margin: 0 auto; background: #fff; padding: 15px 25px; min-height: 100vh; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        .no-print-tabs { display: flex; background: var(--navy); border-radius: 10px; padding: 4px; gap: 4px; margin-bottom: 12px; }
-        .tab-link { flex: 1; padding: 8px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 11px; cursor: pointer; }
-        .tab-link.active { background: var(--blue); color: #fff; }
-        .input-grid { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #f1f5f9; border-radius: 12px; margin-bottom: 15px; }
-        .row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
-        .row .field { flex: 1; }
-        label { font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 4px; display: block; }
-        input, select { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; background: #fff; }
-        input[readonly] { background-color: #e2e8f0; color: #94a3b8; }
+        .container { width: 100%; max-width: 900px; margin: 0 auto; background: #fff; padding: 10px 20px; min-height: 100vh; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         
-        .btn-group { display: flex; gap: 8px; margin-bottom: 12px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; color: #fff; font-size: 12px; text-transform: uppercase; }
+        .no-print-tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 10px; }
+        .tab-link { flex: 1; padding: 6px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 5px; font-size: 11px; cursor: pointer; }
+        .tab-link.active { background: var(--blue); color: #fff; }
+
+        .input-grid { display: flex; flex-direction: column; gap: 6px; padding: 10px; background: #f1f5f9; border-radius: 10px; margin-bottom: 10px; }
+        .row { display: flex; gap: 8px; width: 100%; align-items: flex-end; }
+        .field { flex: 1; }
+        
+        label { font-size: 9px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 3px; display: block; }
+        input, select { width: 100%; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; background: #fff; }
+
+        .traktor-extra { display: flex; gap: 10px; margin-top: 4px; padding-top: 4px; border-top: 1px solid #e2e8f0; }
+        .opt-check { display: flex; align-items: center; gap: 5px; background: #fff; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); flex: 1; }
+        .opt-check label { margin: 0; cursor: pointer; font-size: 10px; color: var(--navy); white-space: nowrap; }
+
+        .btn-group { display: flex; gap: 6px; margin-bottom: 10px; }
+        button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; color: #fff; font-size: 11px; text-transform: uppercase; }
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #6366f1; }
         .btn-print { background: var(--navy); }
-        .btn-apply { background: var(--accent); color: #fff; flex: 2; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        /* Yeni Başvuru Alanı Tasarımı */
-        .apply-box { display: flex; gap: 10px; padding: 12px; background: #fff; border: 2px solid var(--border); border-radius: 12px; align-items: center; margin-bottom: 15px; }
-        .tc-input { flex: 1; letter-spacing: 2px; font-weight: 700; border: 1px solid var(--blue); }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; border-radius: 8px; overflow: hidden; }
-        th { background: var(--navy); padding: 10px 5px; color: #fff; font-size: 9px; text-transform: uppercase; }
-        td { padding: 8px 4px; text-align: center; border-bottom: 1px solid var(--border); font-size: 12px; }
-        .masraf-container { margin-top: 15px; border-left: 4px solid var(--blue); background: #f1f5f9; padding: 10px 15px; }
         
-        @media print { .no-print, .no-print-tabs, .btn-group, .apply-box, #traktorOptions { display: none !important; } }
-        .print-header { display: none; }
+        /* Başvuru Paneli - Yeni Düzen */
+        .apply-box { padding: 12px; background: #fff; border: 2px solid var(--blue); border-radius: 10px; margin-bottom: 10px; }
+        .apply-row { display: flex; gap: 10px; align-items: flex-end; }
+        .btn-apply { background: var(--accent); flex: 0.5; height: 33px; font-size: 10px; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; background: #94a3b8; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        th { background: var(--navy); padding: 8px 4px; color: #fff; font-size: 9px; }
+        td { padding: 6px 4px; text-align: center; border-bottom: 1px solid var(--border); font-size: 12px; }
+
+        @media print { .no-print, .no-print-tabs, .btn-group, .apply-box, .traktor-extra { display: none !important; } }
     </style>
 </head>
-<body onload="vadeYukle(); updateYerliMali(); lockKKDF();">
+<body onload="vadeYukle(); lockKKDF(); validateApply();">
+
 <div class="container" id="printable-area">
     <div class="no-print-tabs no-print">
         <button class="tab-link active" onclick="openTab(event, 'traktor')">TRAKTÖR</button>
@@ -52,23 +57,30 @@
 
     <div class="input-grid">
         <div class="row">
-            <div class="field" style="flex: 2;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
-            <div class="field" style="flex: 1;"><label>Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
-        </div>
-        <div class="row">
-            <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
-            <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" step="0.01" oninput="resetButtons();"></div>
-            <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" step="0.01" oninput="resetButtons();"></div>
-        </div>
-        <div class="row">
-            <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();">
-                <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
-            </select></div>
+            <div class="field" style="flex: 1.5;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
+            <div class="field"><label>Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
             <div class="field"><label>Ödeme Tipi</label><select id="odemeTipi" onchange="resetButtons();">
                 <option value="esitTaksit">Eşit Taksit</option>
-                <option value="esitAnapara">Anapara Eşit Taksit</option>
+                <option value="esitAnapara">Anapara Eşit</option>
             </select></div>
-            <div class="field" id="subOranWrapper"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
+        </div>
+        <div class="row">
+            <div class="field"><label>Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
+            <div class="field"><label>Sıklık</label><select id="periyot" onchange="resetButtons();">
+                <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
+            </select></div>
+            <div class="field" id="subWrapper"><label>Sübv %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
+        </div>
+
+        <div id="traktorOptions" class="traktor-extra no-print">
+            <div class="opt-check">
+                <input type="checkbox" id="yerliCheck" checked onchange="document.getElementById('subOran').value=this.checked?50:25; resetButtons();">
+                <label for="yerliCheck">Yerli Malı (%50)</label>
+            </div>
+            <div class="opt-check">
+                <input type="checkbox" id="buyBackCheck" checked onchange="resetButtons();">
+                <label for="buyBackCheck">Buy Back (Sabit)</label>
+            </div>
         </div>
     </div>
 
@@ -78,18 +90,23 @@
         <button class="btn-print" id="btnPrint" onclick="yazdir()" disabled>YAZDIR</button>
     </div>
 
-    <!-- Yeni Başvuru Paneli -->
-    <div class="apply-box no-print" id="applyPanel">
-        <div style="flex:1;">
-            <label>T.C. KİMLİK NO</label>
-            <input type="text" id="tcNo" class="tc-input" maxlength="11" placeholder="00000000000" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+    <div class="apply-box no-print">
+        <div class="apply-row">
+            <div class="field">
+                <label>T.C. KİMLİK NO</label>
+                <input type="text" id="tcNo" maxlength="11" placeholder="11 Hane" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateApply();">
+            </div>
+            <div class="field">
+                <label>CEP TELEFONU</label>
+                <input type="text" id="telNo" maxlength="10" placeholder="5xx xxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateApply();">
+            </div>
+            <button class="btn-apply" id="btnApply" onclick="basvuruYap()" disabled>BAŞVUR</button>
         </div>
-        <button class="btn-apply" id="btnApply" onclick="basvuruYap()" disabled>ŞİMDİ BAŞVUR</button>
     </div>
 
     <div id="sonucAlani" style="display:none;">
         <table>
-            <thead><tr><th>Taksit</th><th id="thNormalTaksit">Tutar</th><th>Anapara</th><th>Faiz</th><th>Vergi</th><th id="thSubCol">Sübv. Taksit</th><th>Kalan Borç</th></tr></thead>
+            <thead><tr><th>No</th><th id="thTutar">Tutar</th><th>Anapara</th><th>Faiz</th><th>Vergi</th><th id="thSub">Sübv. Taksit</th><th>Kalan</th></tr></thead>
             <tbody id="planBody"></tbody>
         </table>
     </div>
@@ -97,18 +114,29 @@
 
 <script>
     let currentType = 'traktor';
+    let isCalculated = false;
+
     function formatTutar(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); }
     
     function resetButtons() { 
+        isCalculated = false;
         document.getElementById('btnPdf').disabled = true; 
         document.getElementById('btnPrint').disabled = true; 
-        document.getElementById('btnApply').disabled = true;
         document.getElementById('sonucAlani').style.display = 'none'; 
+        validateApply();
+    }
+
+    function validateApply() {
+        const tc = document.getElementById('tcNo').value;
+        const tel = document.getElementById('telNo').value;
+        const btn = document.getElementById('btnApply');
+        // Hem TC (11), hem TEL (10) tam olmalı VE hesaplama yapılmış olmalı
+        btn.disabled = !(tc.length === 11 && tel.length === 10 && isCalculated);
     }
 
     function lockKKDF() { 
-        const k = document.getElementById('kkdfOran'); 
-        if(currentType === 'traktor') { k.value = 0; k.readOnly = true; } else { k.readOnly = false; }
+        window.bsmv = (currentType === 'tuketici') ? 0.15 : 0.05;
+        window.kkdf = (currentType === 'traktor') ? 0 : 0.15;
     }
 
     function vadeYukle() {
@@ -121,7 +149,8 @@
     function openTab(e, n) {
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         e.currentTarget.classList.add('active'); currentType = n;
-        document.getElementById('subOranWrapper').style.visibility = (n === 'traktor') ? 'visible' : 'hidden';
+        document.getElementById('subWrapper').style.visibility = (n === 'traktor') ? 'visible' : 'hidden';
+        document.getElementById('traktorOptions').style.display = (n === 'traktor') ? 'flex' : 'none';
         lockKKDF(); vadeYukle(); resetButtons();
     }
 
@@ -131,50 +160,48 @@
         const sub = (currentType === 'traktor') ? parseFloat(document.getElementById('subOran').value) / 100 : 0;
         const vade = parseInt(document.getElementById('vadeSecim').value);
         const per = parseInt(document.getElementById('periyot').value);
-        const bsmv = parseFloat(document.getElementById('bsmvOran').value) / 100;
-        const kkdf = parseFloat(document.getElementById('kkdfOran').value) / 100;
         const tip = document.getElementById('odemeTipi').value;
-
+        
+        lockKKDF();
         let toplamTaksit = (currentType === 'ticari' || currentType === 'zirai') ? Math.ceil(vade / (12 / per)) : vade * per;
         const dFaiz = yFaiz / per;
-        const i_v = dFaiz * (1 + bsmv + kkdf);
+        const i_v = dFaiz * (1 + window.bsmv + window.kkdf);
         
         let body = '', kalan = tutar;
-        const esitAnaparaTutari = tutar / toplamTaksit;
+        const esitAnapara = tutar / toplamTaksit;
 
         for(let j=1; j<=toplamTaksit; j++) {
             let f = kalan * dFaiz;
-            let v = f * (bsmv + kkdf);
+            let v = f * (window.bsmv + window.kkdf);
             let a, t;
             if(tip === 'esitTaksit') {
-                const taksitSabit = (tutar * i_v * Math.pow(1+i_v, toplamTaksit)) / (Math.pow(1+i_v, toplamTaksit)-1);
-                t = taksitSabit; a = t - (f + v);
+                const sabit = (tutar * i_v * Math.pow(1+i_v, toplamTaksit)) / (Math.pow(1+i_v, toplamTaksit)-1);
+                t = sabit; a = t - (f + v);
             } else {
-                a = esitAnaparaTutari; t = a + f + v;
+                a = esitAnapara; t = a + f + v;
             }
             if(j === toplamTaksit) a = kalan;
             let subT = t - ((f+v)*sub);
             kalan -= a;
             body += `<tr><td>${j}</td><td style="${currentType==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}₺</td><td>${Math.round(a).toLocaleString('tr-TR')}₺</td><td>${Math.round(f).toLocaleString('tr-TR')}₺</td><td>${Math.round(v).toLocaleString('tr-TR')}₺</td><td style="${currentType==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}₺</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}₺</td></tr>`;
         }
-        document.getElementById('thNormalTaksit').style.display = (currentType === 'traktor') ? 'none' : 'table-cell';
-        document.getElementById('thSubCol').style.display = (currentType === 'traktor') ? 'table-cell' : 'none';
+        document.getElementById('thTutar').style.display = (currentType === 'traktor') ? 'none' : 'table-cell';
+        document.getElementById('thSub').style.display = (currentType === 'traktor') ? 'table-cell' : 'none';
         document.getElementById('planBody').innerHTML = body;
         document.getElementById('sonucAlani').style.display = 'block';
+        
+        isCalculated = true;
         document.getElementById('btnPdf').disabled = false; 
         document.getElementById('btnPrint').disabled = false;
-        document.getElementById('btnApply').disabled = false;
+        validateApply();
     }
 
     function basvuruYap() {
-        const tc = document.getElementById('tcNo').value;
-        if(tc.length !== 11) { alert("Lütfen 11 haneli T.C. Kimlik numaranızı giriniz."); return; }
-        alert(tc + " numaralı kimlik için ön başvurunuz alınmıştır. En kısa sürede tarafınıza dönüş yapılacaktır.");
+        alert("Başvurunuz başarıyla iletildi. En kısa sürede iletişime geçilecektir.");
     }
 
     function yazdir() { window.print(); }
-    function indirPDF() { html2pdf().from(document.getElementById('printable-area')).set({ margin: 10, filename: 'odeme-plani.pdf', html2canvas: { scale: 3 } }).save(); }
-    function updateYerliMali() { document.getElementById('subOran').value = document.getElementById('yerliCheck')?.checked ? 50 : 25; }
+    function indirPDF() { html2pdf().from(document.getElementById('printable-area')).set({ margin: 10, filename: 'odeme_plani.pdf', html2canvas: { scale: 3 } }).save(); }
 </script>
 </body>
 </html>
