@@ -28,10 +28,33 @@
         label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 4px; display: block; }
         input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
 
-        /* Checkbox Tasarımı */
-        .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 10px; background: #fff; border-radius: 6px; border: 1px dashed #cbd5e1; }
-        .checkbox-row input { width: 20px; height: 20px; cursor: pointer; }
-        .status-text { font-weight: 700; font-size: 14px; color: var(--navy); }
+        .options-container { 
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .opt-box { 
+            background: #fff; 
+            padding: 12px; 
+            border-radius: 6px; 
+            border: 1px solid #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .checkbox-wrapper { display: flex; align-items: center; gap: 10px; }
+        .checkbox-wrapper input { width: 18px; height: 18px; cursor: pointer; }
+        
+        .status-line { 
+            font-weight: 800; 
+            font-size: 12px; 
+            text-transform: uppercase;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 4px;
+        }
 
         .btn-group { display: flex; gap: 8px; margin-bottom: 20px; }
         button { flex: 1; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; color: #fff; text-transform: uppercase; }
@@ -41,7 +64,7 @@
         button:disabled { opacity: 0.3; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #f8fafc; padding: 12px; text-align: center; border: 1px solid var(--border); color: var(--navy); font-size: 12px; }
+        th { background: #f8fafc; padding: 12px; text-align: center; border: 1px solid var(--border); color: var(--navy); font-size: 11px; }
         td { padding: 10px; text-align: center; border: 1px solid var(--border); font-size: 13px; }
 
         @media print {
@@ -58,11 +81,12 @@
             label { font-size: 8px !important; color: #000 !important; }
             th { background: #f0f0f0 !important; border: 1px solid #000 !important; color: #000 !important; }
             td { border: 1px solid #000 !important; color: #000 !important; }
+            .opt-box { border: 1px solid #000 !important; }
         }
         .print-header { display: none; }
     </style>
 </head>
-<body onload="vadeYukle(); updateBuyBackText();">
+<body onload="vadeYukle(); updateBuyBackText(); updateYerliMali();">
 
 <div class="container" id="printable-area">
     
@@ -81,38 +105,23 @@
     </div>
 
     <div class="input-grid">
-        <!-- Satır 1: Tutar ve Vade -->
         <div class="row">
             <div class="field" style="flex: 2;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
             <div class="field" style="flex: 1;"><label>Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
         </div>
 
-        <!-- Satır 2: Faiz ve BSMV -->
         <div class="row">
             <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
             <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" step="0.01" oninput="resetButtons();"></div>
         </div>
 
-        <!-- Satır 3: KKDF -->
         <div class="row">
-            <div class="field" style="visibility: hidden;"></div> 
             <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" step="0.01" oninput="resetButtons();"></div>
+            <div class="field" id="subOranWrapper"><label>Sübvansiyon Oranı %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
 
-        <!-- Satır 4: Sıklık ve Sübvansiyon -->
-        <div class="row" id="subContainer">
+        <div class="row">
             <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();">
-                <option value="1">Yılda 1</option>
-                <option value="2">6 Ayda 1</option>
-                <option value="4">3 Ayda 1</option>
-                <option value="12">Ayda 1</option>
-            </select></div>
-            <div class="field"><label>Sübvansiyon Oranı %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
-        </div>
-
-        <!-- Diğer Sekmeler İçin Sıklık -->
-        <div class="row" id="sıklıkRowNormal" style="display:none;">
-            <div class="field"><label>Ödeme Sıklığı</label><select id="periyotYedek" onchange="syncPeriyot(this); resetButtons();">
                 <option value="1">Yılda 1</option>
                 <option value="2">6 Ayda 1</option>
                 <option value="4">3 Ayda 1</option>
@@ -121,11 +130,25 @@
             <div class="field" style="visibility: hidden;"></div>
         </div>
 
-        <!-- Buy Back Checkbox Alanı -->
-        <div class="checkbox-row">
-            <input type="checkbox" id="buyBackCheck" checked onchange="updateBuyBackText()">
-            <label for="buyBackCheck" style="margin:0; cursor:pointer;">Buy Back Kapsamında mı?</label>
-            <span id="buyBackStatus" class="status-text"></span>
+        <!-- Seçenekler Paneli -->
+        <div class="options-container">
+            <!-- Yerli Malı Kontrolü -->
+            <div class="opt-box" id="yerliMaliBox">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="yerliCheck" checked onchange="updateYerliMali()">
+                    <label for="yerliCheck" style="margin:0; cursor:pointer;">Yerli Malı mı?</label>
+                </div>
+                <div id="yerliStatus" class="status-line">YERLİ ÜRETİM</div>
+            </div>
+
+            <!-- Buy Back Kontrolü -->
+            <div class="opt-box">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="buyBackCheck" checked onchange="updateBuyBackText()">
+                    <label for="buyBackCheck" style="margin:0; cursor:pointer;">Buy Back?</label>
+                </div>
+                <div id="buyBackStatus" class="status-line">SABİT FAİZ</div>
+            </div>
         </div>
     </div>
 
@@ -153,7 +176,8 @@
 
         <div class="masraf-container" style="margin-top: 20px; border: 1px solid var(--border); padding: 15px; border-radius: 8px;">
             <strong style="font-size: 12px; text-decoration: underline;">NOTLAR VE MASRAF DETAYLARI:</strong>
-            <p id="printBuyBackInfo" style="font-size: 13px; font-weight: bold; margin-top: 10px; color: var(--blue);"></p>
+            <p id="printYerliInfo" style="font-size: 13px; font-weight: bold; margin-top: 10px; color: var(--navy); margin-bottom: 5px;"></p>
+            <p id="printBuyBackInfo" style="font-size: 13px; font-weight: bold; color: var(--navy); margin: 0;"></p>
         </div>
     </div>
 </div>
@@ -161,20 +185,35 @@
 <script>
     let currentType = 'traktor';
 
+    function updateYerliMali() {
+        const isYerli = document.getElementById('yerliCheck').checked;
+        const statusDiv = document.getElementById('yerliStatus');
+        const subInput = document.getElementById('subOran');
+        const printInfo = document.getElementById('printYerliInfo');
+        
+        if(isYerli) {
+            subInput.value = 50;
+            statusDiv.innerText = "YERLİ ÜRETİM (%50)";
+            statusDiv.style.color = "#10b981";
+            printInfo.innerText = "• Yerli üretim kapsamında %50 sübvansiyon uygulanmıştır.";
+        } else {
+            subInput.value = 25;
+            statusDiv.innerText = "İTHAL ÜRETİM (%25)";
+            statusDiv.style.color = "#f59e0b";
+            printInfo.innerText = "• İthal üretim kapsamında %25 sübvansiyon uygulanmıştır.";
+        }
+        resetButtons();
+    }
+
     function updateBuyBackText() {
         const isChecked = document.getElementById('buyBackCheck').checked;
-        const statusSpan = document.getElementById('buyBackStatus');
+        const statusDiv = document.getElementById('buyBackStatus');
         const printInfo = document.getElementById('printBuyBackInfo');
         
         const text = isChecked ? "Kredi Sabit Faizlidir" : "Kredi Değişken Faizlidir";
-        statusSpan.innerText = "— " + text;
+        statusDiv.innerText = isChecked ? "SABİT FAİZ" : "DEĞİŞKEN FAİZ";
+        statusDiv.style.color = isChecked ? "#2563eb" : "#ef4444";
         printInfo.innerText = "• " + text;
-        
-        if(isChecked) {
-            statusSpan.style.color = "#10b981";
-        } else {
-            statusSpan.style.color = "#ef4444";
-        }
     }
 
     function formatTutar(i) {
@@ -185,10 +224,6 @@
     function resetButtons() {
         document.getElementById('btnPdf').disabled = true;
         document.getElementById('btnPrint').disabled = true;
-    }
-
-    function syncPeriyot(src) {
-        document.getElementById('periyot').value = src.value;
     }
 
     function vadeYukle() {
@@ -210,16 +245,9 @@
         evt.currentTarget.classList.add('active');
         currentType = tabName;
         
-        const subCont = document.getElementById('subContainer');
-        const normalRow = document.getElementById('sıklıkRowNormal');
-        
-        if (tabName === 'traktor') {
-            subCont.style.display = 'flex';
-            normalRow.style.display = 'none';
-        } else {
-            subCont.style.display = 'none';
-            normalRow.style.display = 'flex';
-        }
+        const isTraktor = (tabName === 'traktor');
+        document.getElementById('subOranWrapper').style.visibility = isTraktor ? 'visible' : 'hidden';
+        document.getElementById('yerliMaliBox').style.display = isTraktor ? 'flex' : 'none';
         
         vadeYukle(); resetButtons();
     }
