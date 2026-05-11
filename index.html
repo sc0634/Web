@@ -88,19 +88,16 @@
     </div>
 
     <div class="input-grid">
-        <!-- Satır 1: Tutar ve Vade -->
         <div class="row">
             <div class="field" style="flex: 2;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
             <div class="field" style="flex: 1;"><label>Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
         </div>
 
-        <!-- Satır 2: Faiz ve BSMV (Bsmv yukarı geldi) -->
         <div class="row">
             <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
             <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" step="0.01" oninput="resetButtons();"></div>
         </div>
 
-        <!-- Satır 3: Ödeme Sıklığı ve KKDF (Sıklık buraya geldi) -->
         <div class="row">
             <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();">
                 <option value="1">Yılda 1</option>
@@ -111,7 +108,6 @@
             <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" step="0.01" oninput="resetButtons();"></div>
         </div>
 
-        <!-- Satır 4: Boşluk ve Sübvansiyon (KKDF Hizasına göre ayarlandı) -->
         <div class="row" id="subContainer">
             <div class="field" style="visibility: hidden;"></div> 
             <div class="field"><label>Sübvansiyon Oranı %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
@@ -129,7 +125,7 @@
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>Taksit Tutarı</th>
+                    <th id="thNormalTaksit">Taksit Tutarı</th>
                     <th>Anapara</th>
                     <th>Faiz</th>
                     <th>Vergi</th>
@@ -208,15 +204,19 @@
             
             body += `<tr>
                 <td>${j}</td>
-                <td style="font-weight:bold">${Math.round(t).toLocaleString('tr-TR')}₺</td>
+                <td style="${currentType==='traktor'?'display:none':''}; font-weight:bold">${Math.round(t).toLocaleString('tr-TR')}₺</td>
                 <td>${Math.round(a).toLocaleString('tr-TR')}₺</td>
                 <td>${Math.round(f).toLocaleString('tr-TR')}₺</td>
                 <td>${Math.round(v).toLocaleString('tr-TR')}₺</td>
-                <td style="${currentType==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}₺</td>
+                <td style="${currentType==='traktor'?'':'display:none'}; font-weight:bold">${Math.round(subT).toLocaleString('tr-TR')}₺</td>
                 <td style="font-weight:bold">${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}₺</td>
             </tr>`;
         }
+        
+        // Başlıkları Yönet
+        document.getElementById('thNormalTaksit').style.display = (currentType === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('thSubCol').style.display = (currentType === 'traktor') ? 'table-cell' : 'none';
+        
         document.getElementById('planBody').innerHTML = body;
         document.getElementById('sonucAlani').style.display = 'block';
         document.getElementById('btnPdf').disabled = false;
