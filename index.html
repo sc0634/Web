@@ -3,154 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Modern Finansal Plan</title>
+    <title>Süleyman Coşkun - Profesyonel Ödeme Planı</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
-            --primary: #0f172a; --secondary: #3b82f6; --success: #10b981; 
-            --light: #f8fafc; --accent: #6366f1;
+            --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            font-family: 'Inter', -apple-system, sans-serif; 
-            background: #f1f5f9; margin: 0; padding: 0; color: #1e293b;
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f8fafc; margin: 0; padding: 0; color: #1e293b; }
         
         .container { 
-            width: 100%; max-width: 1000px; margin: 0 auto; 
-            background: #fff; padding: 20px; min-height: 100vh;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            width: 100%; max-width: 900px; margin: 0 auto; 
+            background: #fff; padding: 25px; min-height: 100vh;
         }
 
-        /* Başlık Alanı (Sadece Yazdırmada Şık Görünür) */
-        .print-header { display: none; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 20px; }
-        .print-header h1 { margin: 0; font-size: 20px; color: var(--primary); text-transform: uppercase; }
-        .print-header span { font-size: 12px; color: #64748b; }
+        .no-print-tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 15px; }
+        .tab-link { flex: 1; padding: 10px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 12px; cursor: pointer; }
+        .tab-link.active { background: var(--blue); color: #fff; }
 
-        .tabs { display: flex; background: var(--primary); border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 15px; }
-        .tab-link { flex: 1; padding: 12px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.3s; }
-        .tab-link.active { background: var(--secondary); color: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-
-        .input-grid { display: flex; flex-direction: column; gap: 10px; padding: 15px; background: var(--light); border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
-        .row { display: flex; gap: 10px; }
+        .input-grid { display: flex; flex-direction: column; gap: 10px; padding: 15px; background: #f1f5f9; border-radius: 8px; margin-bottom: 15px; }
+        .row { display: flex; gap: 10px; width: 100%; }
         .row .field { flex: 1; }
-        .field { display: flex; flex-direction: column; gap: 4px; }
-        label { font-size: 11px; font-weight: 700; color: #475569; }
-        input, select { padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 15px; transition: 0.2s; }
-        input:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .full-row { width: 100%; margin-top: 5px; }
+
+        label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 4px; display: block; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
 
         .btn-group { display: flex; gap: 8px; margin-bottom: 20px; }
-        button { flex: 1; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; color: #fff; font-size: 13px; transition: 0.2s; }
-        .btn-calc { background: var(--success); }
-        .btn-calc:hover { filter: brightness(1.1); }
-        .btn-clear { background: #64748b; }
-        .btn-pdf { background: var(--accent); }
-        .btn-print { background: var(--primary); }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        button { flex: 1; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; color: #fff; text-transform: uppercase; }
+        .btn-calc { background: #10b981; }
+        .btn-pdf { background: #6366f1; }
+        .btn-print { background: var(--navy); }
+        button:disabled { opacity: 0.3; }
 
-        .table-responsive { border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #f1f5f9; padding: 14px; text-align: center; color: #475569; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 12px; text-align: center; border-bottom: 1px solid #f1f5f9; }
-        tr:nth-child(even) { background-color: #fcfcfc; }
-        .bold-txt { font-weight: 700; color: var(--primary); }
-
-        .masraf-container { margin-top: 20px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
-        .masraf-header { font-size: 12px; font-weight: 800; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #f8fafc; padding: 12px; text-align: center; border: 1px solid var(--border); color: var(--navy); font-size: 12px; }
+        td { padding: 10px; text-align: center; border: 1px solid var(--border); font-size: 13px; }
 
         @media print {
-            @page { size: portrait; margin: 0.8cm; }
-            body { background: #fff; }
-            .container { box-shadow: none; padding: 0; width: 100%; }
+            @page { size: portrait; margin: 0.5cm; }
+            body { background: #fff; zoom: 98%; transform: scale(0.98); transform-origin: top center; }
             .no-print { display: none !important; }
-            .print-header { display: block; }
+            .container { width: 100%; padding: 0; }
             
-            /* Bilgi Kartları Görünümü */
-            .input-grid { 
-                display: grid !important; 
-                grid-template-columns: repeat(3, 1fr); 
-                background: #f8fafc !important; 
-                border: 1px solid #ddd !important;
-                -webkit-print-color-adjust: exact;
+            .print-header { 
+                display: flex !important; justify-content: space-between; align-items: center;
+                border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;
             }
-            .row { display: contents; }
-            input, select { border: none !important; font-weight: bold !important; padding: 2px !important; color: #000 !important; }
-            
-            table { font-size: 10px; border: 1px solid #eee; }
-            th { background: #0f172a !important; color: #fff !important; -webkit-print-color-adjust: exact; }
-            td { border-bottom: 1px solid #eee; }
-            .masraf-container { border: 1px solid #ccc; min-height: 120px; }
+            .print-header h1 { font-size: 18px; margin: 0; color: #000; }
+
+            .input-grid { 
+                background: #fff !important; border: 1px solid #000 !important; 
+                display: block !important;
+                padding: 10px !important; margin-bottom: 15px !important;
+            }
+            .row { display: flex !important; margin-bottom: 5px; }
+            .field { border: 0.5px solid #eee; padding: 5px; flex: 1; }
+            input, select { border: none !important; font-weight: bold !important; font-size: 12px !important; padding: 0 !important; height: auto; }
+            label { font-size: 8px !important; color: #000 !important; }
+
+            th { background: #f0f0f0 !important; border: 1px solid #000 !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+            td { border: 1px solid #000 !important; color: #000 !important; }
+            .masraf-container { margin-top: 20px; border: 1px solid #000 !important; min-height: 150px !important; padding: 10px; page-break-inside: avoid; }
         }
+
+        .print-header { display: none; }
     </style>
 </head>
 <body onload="vadeYukle();">
 
 <div class="container" id="printable-area">
     
-    <!-- Yazdırmada Çıkan Başlık -->
     <div class="print-header">
-        <h1>Kredi Ödeme Planı</h1>
-        <span id="print-date"></span>
-    </div>
-    
-    <div class="tabs no-print">
-        <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Traktör</button>
-        <button class="tab-link" onclick="openTab(event, 'ticari')">💼 Ticari</button>
-        <button class="tab-link" onclick="openTab(event, 'zirai')">👨‍🌾 Çiftçi</button>
-        <button class="tab-link" onclick="openTab(event, 'tuketici')">🛒 Tüketici</button>
+        <h1>KREDİ ÖDEME PLANI</h1>
+        <div style="text-align: right; font-size: 10px;">
+            <strong>Tarih:</strong> <span id="p-date"></span>
+        </div>
     </div>
 
-    <div class="input-grid" id="inputSection">
+    <div class="no-print-tabs no-print">
+        <button class="tab-link active" onclick="openTab(event, 'traktor')">TRAKTÖR</button>
+        <button class="tab-link" onclick="openTab(event, 'ticari')">TİCARİ</button>
+        <button class="tab-link" onclick="openTab(event, 'zirai')">ÇİFTÇİ</button>
+        <button class="tab-link" onclick="openTab(event, 'tuketici')">TÜKETİCİ</button>
+    </div>
+
+    <div class="input-grid">
+        <!-- Satır 1: Tutar ve Vade -->
         <div class="row">
-            <div class="field" style="flex: 2;"><label>Kredi Tutarı</label><input type="text" id="tutar" inputmode="numeric" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
-            <div class="field" style="flex: 1.2;"><label>Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
+            <div class="field" style="flex: 2;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this); resetButtons();"></div>
+            <div class="field" style="flex: 1;"><label>Vade</label><select id="vadeSecim" onchange="resetButtons();"></select></div>
         </div>
-        
+
+        <!-- Satır 2: Faiz ve Sıklık (Yerler Değişti) -->
         <div class="row">
-            <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();">
-                <option value="1" selected>Yılda 1 Ödemeli</option>
-                <option value="2">6 Ayda 1 Ödemeli</option>
-                <option value="4">3 Ayda 1 Ödemeli</option>
-                <option value="12">Ayda 1 Ödemeli</option>
-            </select></div>
             <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="resetButtons();"></div>
+            <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="resetButtons();">
+                <option value="1">Yılda 1</option>
+                <option value="2">6 Ayda 1</option>
+                <option value="4">3 Ayda 1</option>
+                <option value="12">Ayda 1</option>
+            </select></div>
         </div>
 
+        <!-- Satır 3: KKDF ve BSMV -->
         <div class="row">
             <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" step="0.01" oninput="resetButtons();"></div>
             <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" step="0.01" oninput="resetButtons();"></div>
-            <div class="field" id="subContainer"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
+        </div>
+
+        <!-- Satır 4: Sübvansiyon -->
+        <div class="full-row" id="subContainer">
+            <div class="field"><label>Sübvansiyon Oranı %</label><input type="number" id="subOran" value="50" oninput="resetButtons();"></div>
         </div>
     </div>
 
-    <div class="btn-group no-print" id="buttonGroup">
+    <div class="btn-group no-print">
         <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
-        <button class="btn-clear" onclick="location.reload()">Sıfırla</button>
-        <button class="btn-pdf" id="btnPdf" onclick="indirPDF()" disabled>PDF İNDİR</button>
+        <button class="btn-pdf" id="btnPdf" onclick="indirPDF()" disabled>PDF</button>
         <button class="btn-print" id="btnPrint" onclick="yazdir()" disabled>YAZDIR</button>
     </div>
 
     <div id="sonucAlani" style="display:none;">
-        <div class="table-responsive">
-            <table id="planTable">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Taksit Tutarı</th>
-                        <th>Anapara</th>
-                        <th>Faiz</th>
-                        <th>Vergi</th>
-                        <th id="thSub">Sübv. Taksit</th>
-                        <th>Kalan Borç</th>
-                    </tr>
-                </thead>
-                <tbody id="planBody"></tbody>
-            </table>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Taksit Tutarı</th>
+                    <th>Anapara</th>
+                    <th>Faiz</th>
+                    <th>Vergi</th>
+                    <th id="thSubCol">Sübv. Taksit</th>
+                    <th>Kalan Borç</th>
+                </tr>
+            </thead>
+            <tbody id="planBody"></tbody>
+        </table>
 
         <div class="masraf-container">
-            <div class="masraf-header">📌 Masraflar ve Önemli Notlar</div>
-            <div style="font-size: 12px; color: #64748b;">Buraya kalemle ek notlar alabilirsiniz...</div>
+            <strong style="font-size: 12px; text-decoration: underline;">NOTLAR VE MASRAF DETAYLARI:</strong>
         </div>
     </div>
 </div>
@@ -164,10 +155,8 @@
     }
 
     function resetButtons() {
-        ['btnPdf', 'btnPrint'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.disabled = true;
-        });
+        document.getElementById('btnPdf').disabled = true;
+        document.getElementById('btnPrint').disabled = true;
     }
 
     function vadeYukle() {
@@ -181,26 +170,20 @@
             if (i === limit) opt.selected = true;
             select.appendChild(opt);
         }
-        document.getElementById('print-date').innerText = new Date().toLocaleDateString('tr-TR') + " tarihinde oluşturuldu.";
+        document.getElementById('p-date').innerText = new Date().toLocaleDateString('tr-TR');
     }
 
     function openTab(evt, tabName) {
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         evt.currentTarget.classList.add('active');
         currentType = tabName;
-        const kkdfInput = document.getElementById('kkdfOran');
-        const bsmvInput = document.getElementById('bsmvOran');
-        if(tabName === 'tuketici' || tabName === 'zirai') { kkdfInput.value = 15; bsmvInput.value = 15; } 
-        else { kkdfInput.value = 0; bsmvInput.value = 5; }
-        document.getElementById('subContainer').style.visibility = (tabName === 'traktor') ? 'visible' : 'hidden';
+        document.getElementById('subContainer').style.display = (tabName === 'traktor') ? 'block' : 'none';
         vadeYukle(); resetButtons();
     }
 
     function hesapla() {
         const tVal = document.getElementById('tutar').value.replace(/\./g, "");
         const tutar = parseFloat(tVal);
-        if(isNaN(tutar)) return;
-
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeSecim').value);
@@ -214,7 +197,6 @@
         const taksitSabit = (tutar * i_vergi * Math.pow(1+i_vergi, toplamTaksit)) / (Math.pow(1+i_vergi, toplamTaksit)-1);
         
         let body = '', kalan = tutar;
-
         for(let j=1; j<=toplamTaksit; j++){
             let f = kalan * dFaiz;
             let v = f * (bsmv + kkdf);
@@ -226,34 +208,28 @@
             
             body += `<tr>
                 <td>${j}</td>
-                <td class="bold-txt">${Math.round(t).toLocaleString('tr-TR')}₺</td>
+                <td style="font-weight:bold">${Math.round(t).toLocaleString('tr-TR')}₺</td>
                 <td>${Math.round(a).toLocaleString('tr-TR')}₺</td>
                 <td>${Math.round(f).toLocaleString('tr-TR')}₺</td>
                 <td>${Math.round(v).toLocaleString('tr-TR')}₺</td>
                 <td style="${currentType==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}₺</td>
-                <td class="bold-txt">${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}₺</td>
+                <td style="font-weight:bold">${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}₺</td>
             </tr>`;
         }
-
+        document.getElementById('thSubCol').style.display = (currentType === 'traktor') ? 'table-cell' : 'none';
         document.getElementById('planBody').innerHTML = body;
         document.getElementById('sonucAlani').style.display = 'block';
-        ['btnPdf', 'btnPrint'].forEach(id => {
-            document.getElementById(id).disabled = false;
-        });
+        document.getElementById('btnPdf').disabled = false;
+        document.getElementById('btnPrint').disabled = false;
     }
 
     function yazdir() { window.print(); }
 
     function indirPDF() {
         const element = document.getElementById('printable-area');
-        const opt = {
-            margin: 10,
-            filename: 'Kredi_Odeme_Plani.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 3 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().from(element).set(opt).save();
+        html2pdf().from(element).set({
+            margin: 10, filename: 'odeme-plani.pdf', html2canvas: { scale: 2 }, jsPDF: { format: 'a4', orientation: 'portrait' }
+        }).save();
     }
 </script>
 </body>
