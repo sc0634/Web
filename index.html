@@ -19,50 +19,61 @@
             margin: 0; padding: 0; color: #333; min-height: 100vh;
         }
         .container { 
-            width: 100%; max-width: 1400px; margin: 20px auto; 
-            background: #fff; padding: 25px; border-radius: 12px;
+            width: 95%; max-width: 1400px; margin: 20px auto; 
+            background: #fff; padding: 20px; border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
         .tabs { display: flex; background: var(--primary); border-radius: 8px; padding: 5px; gap: 2px; overflow-x: auto; }
         .tab-link { 
             flex: 1; padding: 12px; color: #ecf0f1; border: none; background: transparent;
-            font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.3s;
+            font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.3s; white-space: nowrap;
         }
-        .tab-link.active { background: var(--secondary); box-shadow: 0 4px 12px rgba(52,152,219,0.4); }
+        .tab-link.active { background: var(--secondary); }
         
         .input-grid { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; 
             padding: 15px; background: #f9f9f9; border-radius: 8px; margin: 15px 0;
         }
-        .field { display: flex; align-items: center; gap: 8px; }
-        .field label { font-size: 12px; font-weight: 600; min-width: 120px; color: var(--primary); }
-        input, select { flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: 6px; }
+        .field { display: flex; flex-direction: column; gap: 4px; }
+        .field label { font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+        input, select { padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; }
         
-        .btn-group { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        button { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: #fff; transition: 0.3s; }
-        .btn-calc { background: var(--success); }
+        /* Buton Grubu - Tek Satır Düzeni */
+        .btn-group { 
+            display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;
+        }
+        button { 
+            flex: 1; min-width: 100px; padding: 12px 5px; border: none; border-radius: 6px; 
+            cursor: pointer; font-weight: 600; color: #fff; transition: 0.3s; font-size: 12px;
+            white-space: nowrap; text-transform: uppercase;
+        }
+        .btn-calc { background: var(--success); flex: 1.5; }
         .btn-clear { background: var(--danger); }
         .btn-pdf { background: var(--secondary); }
         .btn-excel { background: #16a085; }
         .btn-print { background: var(--warning); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
 
-        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
-        .summary-card { padding: 15px; border-radius: 8px; text-align: center; background: #f1f4f8; }
-        .summary-card.info { background: var(--primary); color: white; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .summary-card { padding: 15px; border-radius: 8px; text-align: center; background: #f1f4f8; border-bottom: 3px solid #ddd; }
+        .summary-card.info { background: var(--primary); color: white; border-bottom: 3px solid var(--secondary); }
         .summary-value { font-size: 18px; font-weight: bold; margin-top: 5px; }
-        .summary-label { font-size: 11px; text-transform: uppercase; opacity: 0.8; }
+        .summary-label { font-size: 10px; text-transform: uppercase; opacity: 0.8; letter-spacing: 1px; }
 
-        .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .chart-wrapper { background: #fff; padding: 10px; border: 1px solid #eee; border-radius: 8px; }
+        .chart-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin: 20px 0; }
+        .chart-wrapper { background: #fff; padding: 15px; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { background: var(--primary); color: white; padding: 10px; }
-        td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; }
+        .table-responsive { overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 600px; }
+        thead { background: var(--primary); color: white; }
+        th { padding: 12px; text-align: center; }
+        td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
+        tbody tr:nth-child(even) { background: #f9f9f9; }
         
-        @media (max-width: 768px) {
-            .input-grid, .summary-grid, .chart-container, .btn-group { grid-template-columns: 1fr; }
+        @media (max-width: 600px) {
+            .btn-group { flex-wrap: wrap; }
+            button { flex: 1 1 45%; }
+            .btn-calc { flex: 1 1 100%; }
         }
     </style>
 </head>
@@ -87,6 +98,7 @@
         <input type="hidden" id="bsmvOran" value="5">
     </div>
 
+    <!-- Tek Satır Buton Grubu -->
     <div class="btn-group no-print" id="buttonGroup">
         <button class="btn-calc" onclick="hesapla()">HESAPLA</button>
         <button class="btn-clear" onclick="location.reload()">SIFIRLA</button>
@@ -110,20 +122,22 @@
     </div>
 
     <div id="sonucAlani" style="display:none;">
-        <table id="planTable">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Taksit Tutarı</th>
-                    <th>Anapara</th>
-                    <th>Faiz</th>
-                    <th>Vergi</th>
-                    <th id="thSub">Sübvansiyonlu</th>
-                    <th>Kalan Anapara</th>
-                </tr>
-            </thead>
-            <tbody id="planBody"></tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="planTable">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Taksit Tutarı</th>
+                        <th>Anapara</th>
+                        <th>Faiz</th>
+                        <th>Vergi</th>
+                        <th id="thSub">Sübvansiyonlu</th>
+                        <th>Kalan Anapara</th>
+                    </tr>
+                </thead>
+                <tbody id="planBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -174,7 +188,10 @@
     }
 
     function hesapla() {
-        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const tInput = document.getElementById('tutar').value.replace(/\./g, "");
+        const tutar = parseFloat(tInput);
+        if(isNaN(tutar) || tutar <= 0) { alert("Geçerli bir tutar giriniz"); return; }
+
         const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
         const sub = parseFloat(document.getElementById('subOran').value) / 100;
         const vade = parseInt(document.getElementById('vadeSecim').value);
@@ -227,23 +244,26 @@
 
         charts.d = new Chart(document.getElementById('dagitimChart'), {
             type: 'doughnut',
-            data: { labels: ['Anapara', 'Faiz', 'Vergi'], datasets: [{ data: [ana, fz, vrg], backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'] }] }
+            data: { labels: ['Anapara', 'Faiz', 'Vergi'], datasets: [{ data: [ana, fz, vrg], backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'] }] },
+            options: { plugins: { title: { display: true, text: 'Ödeme Dağılımı' } } }
         });
 
         charts.k = new Chart(document.getElementById('kumulatifChart'), {
             type: 'line',
-            data: { labels: cData.labels, datasets: [{ label: 'Kalan Borç', data: cData.kalanlar, borderColor: '#3498db', fill: true }] }
+            data: { labels: cData.labels, datasets: [{ label: 'Kalan Borç', data: cData.kalanlar, borderColor: '#3498db', fill: true, backgroundColor: 'rgba(52, 152, 219, 0.1)' }] },
+            options: { plugins: { title: { display: true, text: 'Borç Azalma Seyri' } } }
         });
     }
 
     function indirPDF() {
-        const opt = { margin: 10, filename: 'kredi_plani.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-        html2pdf().set(opt).from(document.getElementById('pdf-area')).save();
+        const element = document.getElementById('pdf-area');
+        const opt = { margin: 5, filename: 'kredi_plani.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        html2pdf().set(opt).from(element).save();
     }
 
     function indirExcel() {
         let table = document.getElementById("planTable");
-        let wb = XLSX.utils.table_to_book(table, {sheet: "Kredi Planı"});
+        let wb = XLSX.utils.table_to_book(table, {sheet: "Amortisman Planı"});
         XLSX.writeFile(wb, "kredi_plani.xlsx");
     }
 </script>
