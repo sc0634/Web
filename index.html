@@ -2,109 +2,304 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Süleyman Coşkun - Kredi Hesaplama</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Süleyman Coşkun - Finansal Analiz & Kredi Hesaplama</title>
+    <!-- Gerekli Kütüphaneler -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: #f4f7f6; padding: 20px; }
-        .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 5px; }
-        .field { display: flex; flex-direction: column; }
-        label { font-size: 12px; font-weight: bold; margin-bottom: 5px; }
-        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-        th { background: #2c3e50; color: white; padding: 10px; }
-        td { border: 1px solid #ddd; padding: 8px; text-align: right; }
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 4px; background: #27ae60; color: white; font-weight: bold; }
-        #btnPdf { background: #3498db; }
-        #btnSifirla { background: #e74c3c; }
+        :root { 
+            --primary: #2c3e50; 
+            --secondary: #3498db; 
+            --success: #27ae60; 
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+        }
 
-        /* Masraf Bölümü */
-        .masraf-box { margin-top: 30px; border-top: 2px solid #2c3e50; padding-top: 15px; }
-        .masraf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .masraf-item { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 5px 10px; border: 1px solid #ddd; }
-        .masraf-item input { width: 120px; text-align: right; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0; padding: 20px; color: #333; min-height: 100vh;
+        }
+        
+        .container { 
+            width: 100%; max-width: 1200px; margin: 0 auto; 
+            background: #fff; padding: 30px; border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .header-main { text-align: center; border-bottom: 2px solid #eee; margin-bottom: 25px; padding-bottom: 15px; }
+        .header-main h1 { margin: 0; color: var(--primary); letter-spacing: 1px; }
+        .header-main p { margin: 5px 0; color: #7f8c8d; font-weight: 500; }
+
+        .tabs { display: flex; background: var(--primary); border-radius: 10px; padding: 6px; gap: 5px; margin-bottom: 25px; overflow-x: auto; }
+        .tab-link { flex: 1; padding: 12px; color: #fff; border: none; background: transparent; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.3s; white-space: nowrap; }
+        .tab-link.active { background: var(--secondary); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; padding: 25px; background: #fcfcfc; border-radius: 12px; border: 1px solid #eee; }
+        .field { display: flex; flex-direction: column; gap: 8px; }
+        .field label { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+        input, select { padding: 12px; border: 2px solid #dfe6e9; border-radius: 8px; outline: none; font-size: 14px; transition: 0.3s; }
+        input:focus { border-color: var(--secondary); background: #fff; }
+
+        .btn-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 25px 0; }
+        button { padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #fff; transition: 0.3s; text-transform: uppercase; font-size: 13px; }
+        .btn-calc { background: var(--success); grid-column: span 2; font-size: 15px; }
+        .btn-calc:hover { background: #219150; transform: translateY(-2px); }
+        .btn-pdf { background: var(--secondary); }
+        .btn-excel { background: #16a085; }
+        .btn-clear { background: var(--danger); }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 30px; }
+        .summary-card { padding: 20px; border-radius: 12px; text-align: center; background: #f8f9fa; border: 1px solid #eee; }
+        .summary-card label { font-size: 12px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; }
+        .summary-value { font-size: 22px; font-weight: 800; display: block; margin-top: 8px; color: var(--primary); }
+
+        .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 30px 0; }
+        .chart-wrapper { background: #fff; padding: 20px; border: 1px solid #f0f0f0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+        .table-responsive { overflow-x: auto; margin-top: 30px; border-radius: 10px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th { background: var(--primary); color: #fff; padding: 15px; font-size: 12px; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #f1f1f1; text-align: center; font-size: 14px; }
+        tr:nth-child(even) { background: #f9f9f9; }
+
+        @media (max-width: 768px) { .chart-container { grid-template-columns: 1fr; } .btn-calc { grid-column: span 1; } }
+        @media print { .no-print { display: none !important; } .container { box-shadow: none; border: none; } }
     </style>
 </head>
-<body>
+<body onload="vadeYukle(); yilliktanAyliga();">
 
 <div class="container" id="pdf-area">
-    <h2 style="text-align: center;">Kredi Ödeme Planı</h2>
-    
+    <div class="header-main">
+        <h1>SÜLEYMAN COŞKUN</h1>
+        <p>Profesyonel Finansal Analiz & Geri Ödeme Planlama Sistemi</p>
+    </div>
+
+    <div class="tabs no-print">
+        <button class="tab-link active" onclick="openTab(event, 'traktor')">🚜 Traktör Kredisi</button>
+        <button class="tab-link" onclick="openTab(event, 'ticari')">💼 Ticari Kredi</button>
+        <button class="tab-link" onclick="openTab(event, 'zirai')">👨‍🌾 Çiftçi/Zirai</button>
+        <button class="tab-link" onclick="openTab(event, 'tuketici')">🛒 Tüketici Kredisi</button>
+    </div>
+
     <div class="input-grid no-print">
         <div class="field"><label>Kredi Tutarı (₺)</label><input type="text" id="tutar" value="1.000.000" oninput="formatTutar(this)"></div>
-        <div class="field"><label>Yıllık Faiz (%)</label><input type="number" id="faiz" value="40.50" step="0.01"></div>
-        <div class="field"><label>Vade (Yıl)</label><input type="number" id="vade" value="5"></div>
-        <div class="field"><label>BSMV (%)</label><input type="number" id="bsmv" value="5"></div>
-        <div class="field"><label>KKDF (%)</label><input type="number" id="kkdf" value="0"></div>
+        <div class="field"><label id="vadeLabel">Vade</label><select id="vadeSecim"></select></div>
+        <div class="field"><label>Ödeme Sıklığı</label><select id="periyot" onchange="vadeYukle()"><option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12" selected>Ayda 1</option></select></div>
+        <div class="field"><label>Yıllık Faiz Oranı %</label><input type="number" id="faizYillik" value="40.50" step="0.01" oninput="yilliktanAyliga()"></div>
+        <div class="field"><label>Aylık Faiz Oranı %</label><input type="number" id="faizAylik" step="0.01" oninput="ayliktanYilliga()"></div>
+        <div class="field"><label>BSMV %</label><input type="number" id="bsmvOran" value="5" readonly></div>
+        <div class="field"><label>KKDF %</label><input type="number" id="kkdfOran" value="0" readonly></div>
+        <div id="subContainer" class="field"><label>Sübvansiyon İndirimi %</label><input type="number" id="subOran" value="50"></div>
     </div>
 
     <div class="btn-group no-print">
-        <button onclick="hesapla()">HESAPLA</button>
-        <button id="btnSifirla" onclick="location.reload()">SIFIRLA</button>
-        <button id="btnPdf" onclick="indirPDF()">PDF İNDİR</button>
+        <button class="btn-calc" onclick="hesapla()">HESAPLA VE ANALİZ ET</button>
+        <button class="btn-pdf" id="btnPdf" onclick="indirPDF()" disabled>PDF RAPOR AL</button>
+        <button class="btn-excel" id="btnExcel" onclick="indirExcel()" disabled>EXCEL'E AKTAR</button>
+        <button class="btn-clear" onclick="location.reload()">SAYFAYI SIFIRLA</button>
     </div>
 
-    <table id="planTablosu">
-        <thead>
-            <tr>
-                <th>Taksit No</th>
-                <th>Anapara</th>
-                <th>Faiz</th>
-                <th>BSMV+KKDF</th>
-                <th>Taksit Tutarı</th>
-                <th>Kalan Borç</th>
-            </tr>
-        </thead>
-        <tbody id="planBody"></tbody>
-    </table>
+    <div id="sonucAlani" style="display:none;">
+        <div class="summary-grid">
+            <div class="summary-card"><label>Toplam Geri Ödeme</label><span class="summary-value" id="toplamOdenecek">-</span></div>
+            <div class="summary-card"><label>Toplam Faiz Yükü</label><span class="summary-value" id="toplamFaiz">-</span></div>
+            <div class="summary-card"><label>Vergi Toplamı (BSMV+KKDF)</label><span class="summary-value" id="toplamVergiler">-</span></div>
+            <div class="summary-card"><label>Taksit Sayısı</label><span class="summary-value" id="toplamTaksit">-</span></div>
+        </div>
 
-    <div class="masraf-box">
-        <h4 style="margin-top: 0;">EK MASRAFLAR</h4>
-        <div class="masraf-grid">
-            <div class="masraf-item"><label>Ekspertiz / Dosya:</label><input type="text" oninput="formatTutar(this)"></div>
-            <div class="masraf-item"><label>Sigorta Giderleri:</label><input type="text" oninput="formatTutar(this)"></div>
-            <div class="masraf-item"><label>İpotek / Rehin:</label><input type="text" oninput="formatTutar(this)"></div>
-            <div class="masraf-item"><label>Diğer Masraflar:</label><input type="text" oninput="formatTutar(this)"></div>
+        <div class="chart-container">
+            <div class="chart-wrapper"><canvas id="dagitimChart"></canvas></div>
+            <div class="chart-wrapper"><canvas id="kalanChart"></canvas></div>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Taksit No</th>
+                        <th>Taksit Tutarı</th>
+                        <th>Anapara</th>
+                        <th>Faiz</th>
+                        <th>Vergi</th>
+                        <th id="thSub">Sübvansiyonlu</th>
+                        <th>Kalan Borç</th>
+                    </tr>
+                </thead>
+                <tbody id="planBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <script>
+    let currentType = 'traktor';
+    let charts = {};
+
     function formatTutar(i) {
         let v = i.value.replace(/\D/g, "");
-        i.value = v ? new Intl.NumberFormat('tr-TR').format(v) : "";
+        if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
+    }
+
+    function yilliktanAyliga() {
+        const y = parseFloat(document.getElementById('faizYillik').value);
+        document.getElementById('faizAylik').value = (y / 12).toFixed(2);
+    }
+
+    function ayliktanYilliga() {
+        const a = parseFloat(document.getElementById('faizAylik').value);
+        document.getElementById('faizYillik').value = (a * 12).toFixed(2);
+    }
+
+    function vadeYukle() {
+        const select = document.getElementById('vadeSecim');
+        const periyot = parseInt(document.getElementById('periyot').value);
+        select.innerHTML = '';
+        
+        let limit = (currentType === 'ticari' || currentType === 'zirai') ? 60 : 5;
+        let suffix = (currentType === 'ticari' || currentType === 'zirai') ? " Ay" : " Yıl";
+        
+        for (let i = 1; i <= limit; i++) {
+            let opt = document.createElement('option');
+            opt.value = i; opt.innerText = i + suffix;
+            if (i == limit) opt.selected = true;
+            select.appendChild(opt);
+        }
+    }
+
+    function openTab(evt, tabName) {
+        document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+        evt.currentTarget.classList.add('active');
+        currentType = tabName;
+        
+        document.getElementById('subContainer').style.display = (tabName === 'traktor') ? 'flex' : 'none';
+        const kkdf = document.getElementById('kkdfOran');
+        const bsmv = document.getElementById('bsmvOran');
+        
+        if (tabName === 'tuketici' || tabName === 'zirai') { 
+            kkdf.value = 15; bsmv.value = 15; 
+        } else { 
+            kkdf.value = 0; bsmv.value = 5; 
+        }
+        vadeYukle();
     }
 
     function hesapla() {
-        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
-        const yFaiz = parseFloat(document.getElementById('faiz').value) / 100;
-        const vade = parseInt(document.getElementById('vade').value);
-        const bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
-        const kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
+        const rawTutar = document.getElementById('tutar').value.replace(/\./g, "");
+        const tutar = parseFloat(rawTutar);
+        const yFaiz = parseFloat(document.getElementById('faizYillik').value) / 100;
+        const sub = parseFloat(document.getElementById('subOran').value) / 100;
+        const vadeVal = parseInt(document.getElementById('vadeSecim').value);
+        const per = parseInt(document.getElementById('periyot').value);
+        const bsmv_r = parseFloat(document.getElementById('bsmvOran').value) / 100;
+        const kkdf_r = parseFloat(document.getElementById('kkdfOran').value) / 100;
 
-        const brutFaiz = yFaiz * (1 + bsmv + kkdf);
-        const taksit = (tutar * brutFaiz) / (1 - Math.pow(1 + brutFaiz, -vade));
+        let tTaksit = (currentType === 'ticari' || currentType === 'zirai') ? Math.ceil(vadeVal / (12 / per)) : vadeVal * per;
+        if(tTaksit < 1) tTaksit = 1;
+
+        const dFaiz = yFaiz / per;
+        const i_vergi = dFaiz * (1 + bsmv_r + kkdf_r);
         
-        let body = "";
-        let bakiye = tutar;
+        let body = '', kalan = tutar;
+        let tFz = 0, tVergi = 0, taksitler = [], kalanlar = [];
 
-        for (let i = 1; i <= vade; i++) {
-            let fYukü = bakiye * yFaiz;
-            let vYükü = fYukü * (bsmv + kkdf);
-            let ana = taksit - (fYükü + vYükü);
-            if (i === vade) ana = bakiye;
-            bakiye -= ana;
-            body += `<tr><td>${i}</td><td>${ana.toLocaleString('tr-TR')} ₺</td><td>${fYükü.toLocaleString('tr-TR')} ₺</td><td>${vYükü.toLocaleString('tr-TR')} ₺</td><td>${taksit.toLocaleString('tr-TR')} ₺</td><td>${Math.abs(bakiye).toLocaleString('tr-TR')} ₺</td></tr>`;
+        document.getElementById('thSub').style.display = (currentType === 'traktor') ? '' : 'none';
+
+        for(let j=1; j<=tTaksit; j++){
+            let f = kalan * dFaiz;
+            let v = f * (bsmv_r + kkdf_r);
+            // Eşit taksit formülü (PMT)
+            let t = (tutar * i_vergi * Math.pow(1+i_vergi, tTaksit)) / (Math.pow(1+i_vergi, tTaksit)-1);
+            let a = t - (f + v);
+            
+            if(j === tTaksit) a = kalan; // Son taksit düzeltmesi
+            t = a + f + v;
+            let subT = t - ((f+v)*sub);
+            
+            tFz += f; tVergi += v;
+            kalan -= a;
+            taksitler.push(t); kalanlar.push(Math.max(0, Math.round(kalan)));
+            
+            body += `<tr>
+                <td><b>${j}</b></td>
+                <td>${Math.round(t).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(f).toLocaleString('tr-TR')} ₺</td>
+                <td>${Math.round(v).toLocaleString('tr-TR')} ₺</td>
+                <td style="${currentType === 'traktor' ? '' : 'display:none'}"><b>${Math.round(subT).toLocaleString('tr-TR')} ₺</b></td>
+                <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')} ₺</td>
+            </tr>`;
         }
+
+        document.getElementById('toplamOdenecek').innerText = Math.round(tutar + tFz + tVergi).toLocaleString('tr-TR') + " ₺";
+        document.getElementById('toplamFaiz').innerText = Math.round(tFz).toLocaleString('tr-TR') + " ₺";
+        document.getElementById('toplamVergiler').innerText = Math.round(tVergi).toLocaleString('tr-TR') + " ₺";
+        document.getElementById('toplamTaksit').innerText = tTaksit;
         document.getElementById('planBody').innerHTML = body;
+        document.getElementById('sonucAlani').style.display = 'block';
+        
+        document.getElementById('btnPdf').disabled = false;
+        document.getElementById('btnExcel').disabled = false;
+
+        updateCharts(tutar, tFz, tVergi, kalanlar);
+    }
+
+    function updateCharts(ana, fz, vrg, kalanlar) {
+        if(charts.dagitim) charts.dagitim.destroy();
+        if(charts.kalan) charts.kalan.destroy();
+
+        const ctx1 = document.getElementById('dagitimChart').getContext('2d');
+        charts.dagitim = new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: ['Anapara', 'Toplam Faiz', 'Toplam Vergi'],
+                datasets: [{
+                    data: [ana, fz, vrg],
+                    backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'],
+                    borderWidth: 0
+                }]
+            },
+            options: { plugins: { title: { display: true, text: 'Ödeme Kalemleri Dağılımı' } } }
+        });
+
+        const ctx2 = document.getElementById('kalanChart').getContext('2d');
+        charts.kalan = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: kalanlar.map((_, i) => (i + 1) + ". Dönem"),
+                datasets: [{
+                    label: 'Kalan Borç Dengesi',
+                    data: kalanlar,
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: { plugins: { title: { display: true, text: 'Anapara Azalma Grafiği' } } }
+        });
     }
 
     function indirPDF() {
         const element = document.getElementById('pdf-area');
-        html2pdf().from(element).save('kredi_plani.pdf');
+        const opt = { 
+            margin: 10, 
+            filename: 'Suleyman_Coskun_Finansal_Rapor.pdf', 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+
+    function indirExcel() {
+        let table = document.querySelector("table");
+        let wb = XLSX.utils.table_to_book(table, {sheet: "Geri Ödeme Planı"});
+        XLSX.writeFile(wb, "Suleyman_Coskun_Kredi_Analizi.xlsx");
     }
 </script>
-
 </body>
 </html>
