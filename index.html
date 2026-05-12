@@ -35,16 +35,18 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
+        /* Seçenekler ve Bilgi Notları */
         .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
-        .opt-row { display: flex; align-items: center; gap: 5px; }
-        .opt-row input { width: 14px; height: 14px; }
-        .opt-row label { font-size: 11px; font-weight: normal; }
+        .opt-row-wrapper { display: flex; flex-direction: row; gap: 10px; }
+        .opt-row { display: flex; align-items: center; gap: 5px; flex: 1; }
+        .opt-row input { width: 14px; height: 14px; margin: 0; }
+        .opt-row label { font-size: 10px; font-weight: bold; cursor: pointer; }
+        .info-text { font-size: 9px; color: #7f8c8d; line-height: 1.2; margin-top: 2px; display: none; }
 
-        /* Mobil Odaklı Tablo */
         .vade-header { background: var(--dark); color: white; padding: 6px; margin-top: 15px; border-radius: 4px 4px 0 0; font-weight: bold; text-align: center; font-size: 11px; }
         .table-res { overflow-x: hidden; width: 100%; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: #f8f9fa; padding: 4px 1px; font-size: 9px; border: 1px solid var(--border); overflow: hidden; }
+        th { background: #f8f9fa; padding: 4px 1px; font-size: 9px; border: 1px solid var(--border); }
         td { padding: 6px 1px; text-align: center; border: 1px solid var(--border); font-size: 10px; word-break: break-all; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-top: 12px; }
@@ -84,10 +86,23 @@
         <div class="field" id="tutar-input-box"><label>Kredi</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
         <div class="field"><label>Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
         <div class="field" id="sub-input-box"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
+        
         <div class="options-container" id="ziraiOpts">
-            <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
-            <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Buy Back</label></div>
+            <div class="opt-row-wrapper">
+                <div class="opt-row">
+                    <input type="checkbox" id="yerli" checked onchange="updateYerli()">
+                    <label for="yerli">Yerli Malı</label>
+                </div>
+                <div class="opt-row" id="bb-box">
+                    <input type="checkbox" id="buyback" checked onchange="updateYerli()">
+                    <label for="buyback">Buy Back</label>
+                </div>
+            </div>
+            <!-- Dinamik Bilgi Yazıları -->
+            <div id="yerli-info" class="info-text">✓ Yerli üretim desteği ile sübvansiyon oranı artırılmıştır.</div>
+            <div id="bb-info" class="info-text">✓ Geri alım garantisi kapsamında özel oran uygulanmaktadır.</div>
         </div>
+
         <div class="field" id="vade-box"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
         <div class="field" id="vergi-box">
             <div style="display: flex; gap: 5px;">
@@ -139,7 +154,15 @@
 
     function updateYerli() {
         const isY = document.getElementById('yerli').checked;
+        const isB = document.getElementById('buyback').checked;
+        
+        // Sübvansiyon Oran Mantığı
         document.getElementById('subOran').value = mode === 'traktor' ? (isY ? 50 : 25) : (isY ? 75 : 50);
+        
+        // Bilgi Yazılarını Göster/Gizle
+        document.getElementById('yerli-info').style.display = isY ? 'block' : 'none';
+        document.getElementById('bb-info').style.display = isB ? 'block' : 'none';
+        
         reset();
     }
 
