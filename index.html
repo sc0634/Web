@@ -40,6 +40,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
         th { background: var(--navy); color: #fff; padding: 8px 4px; font-size: 9px; }
         td { padding: 6px 3px; text-align: center; border-bottom: 1px solid var(--border); }
+        .total-row { background: #e2e8f0; font-weight: 800; color: var(--navy); }
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(3, 1fr); } .apply-panel { grid-template-columns: 2fr 2fr 1fr; } .btn-apply { grid-column: span 1; } }
     </style>
 </head>
@@ -84,7 +85,20 @@
     </div>
 
     <div id="result" style="display:none;">
-        <table id="table"><thead><tr><th>No</th><th id="hTutar">Taksit</th><th>Anapara</th><th>Faiz</th><th id="hSub">Sübv. Taksit</th><th>Kalan</th></tr></thead><tbody id="plan"></tbody></table>
+        <table id="table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th id="hTutar">Taksit</th>
+                    <th>Anapara</th>
+                    <th>Faiz</th>
+                    <th id="hSub">Sübv. Taksit</th>
+                    <th>Kalan</th>
+                </tr>
+            </thead>
+            <tbody id="plan"></tbody>
+            <tfoot id="tableFoot"></tfoot>
+        </table>
         <div class="apply-panel no-print">
             <div class="field"><label>T.C. KİMLİK NO</label><input type="text" id="tc" maxlength="11" placeholder="11 Hane" oninput="onlyNum(this); checkApply()"></div>
             <div class="field"><label>CEP TELEFONU</label><input type="text" id="tel" maxlength="10" placeholder="5xx xxxxxxx" oninput="onlyNum(this); checkApply()"></div>
@@ -139,17 +153,32 @@
         const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         let taksitSayisi = (mode === 'ticari' || mode === 'zirai') ? Math.ceil(vade / (12 / per)) : vade * per;
         const donemFaiz = yFaiz / per; const vergiOran = v_kkdf + v_bsmv; const bilesikFaiz = donemFaiz * (1 + vergiOran);
-        let html = '', kalan = anaPara; const sabitAnapara = anaPara / taksitSayisi;
+        
+        let html = '', kalan = anaPara; 
+        let tTaksit = 0, tAnapara = 0, tFaiz = 0, tSubTaksit = 0;
+        const sabitAnapara = anaPara / taksitSayisi;
+
         for(let i=1; i<=taksitSayisi; i++) {
             let f = kalan * donemFaiz; let v = f * vergiOran; let a, t;
             if(tip === 'esit') { t = (anaPara * bilesikFaiz * Math.pow(1+bilesikFaiz, taksitSayisi)) / (Math.pow(1+bilesikFaiz, taksitSayisi)-1); a = t - (f + v); }
             else { a = sabitAnapara; t = a + f + v; }
-            if(i === taksitSayisi) a = kalan; let subT = t - ((f+v) * sub); kalan -= a;
+            if(i === taksitSayisi) a = kalan; 
+            let subT = t - ((f+v) * sub); 
+            kalan -= a;
+
+            tTaksit += t; tAnapara += a; tFaiz += f; tSubTaksit += subT;
+
             html += `<tr><td>${i}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
         }
+
+        // Toplam Satırı
+        let footHtml = `<tr class="total-row"><td>TOPLAM</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td><td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td><td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(tSubTaksit).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
+        
         document.getElementById('hTutar').style.display = (mode === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('hSub').style.display = (mode === 'traktor') ? 'table-cell' : 'none';
-        document.getElementById('plan').innerHTML = html; document.getElementById('result').style.display = 'block';
+        document.getElementById('plan').innerHTML = html;
+        document.getElementById('tableFoot').innerHTML = footHtml;
+        document.getElementById('result').style.display = 'block';
         calculated = true; document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false; checkApply();
     }
     function send() {
