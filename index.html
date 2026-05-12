@@ -25,7 +25,8 @@
 
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; }
-        input:disabled, select:disabled { background-color: #e2e8f0; color: #64748b; cursor: not-allowed; }
+        /* Readonly ve Disabled alanlar için stil */
+        input[readonly], input:disabled, select:disabled { background-color: #e2e8f0; color: #64748b; cursor: not-allowed; border-color: #cbd5e1; }
         
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
         .opt { display: flex; align-items: center; gap: 2px; cursor: pointer; }
@@ -82,7 +83,7 @@
         <div class="grid no-print">
             <div id="proforma-container" class="field field-full">
                 <label>Proforma Fatura Tutarı</label>
-                <input type="text" id="proforma" value="1.500.000" oninput="fmtMoney(this)">
+                <input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)">
             </div>
 
             <div class="field-row">
@@ -92,12 +93,13 @@
             
             <div class="field-row">
                 <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="updateMonthly(); reset();"></div>
-                <div class="field"><label>Aylık Faiz %</label><input type="number" id="aylikFaiz" step="0.0001" readonly style="background: #f8fafc; color: var(--blue); font-weight: bold;"></div>
+                <div class="field"><label>Aylık Faiz %</label><input type="number" id="aylikFaiz" step="0.0001" readonly></div>
             </div>
 
             <div class="field-row">
-                <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
-                <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
+                <!-- BSMV ve KKDF artık readonly -->
+                <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
+                <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
             </div>
 
             <div id="row-dynamic" class="field">
@@ -154,10 +156,10 @@
                 </div>
                 <h3>Masraf Detayları</h3>
                 <div class="expense-grid">
-                    <div class="exp-item"><span>Kullandırım Komisyonu (%1+%5 BSMV)</span><span id="exp-komisyon">0 TL</span></div>
+                    <div class="exp-item"><span>Kullandırım Komisyonu</span><span id="exp-komisyon">0 TL</span></div>
                     <div class="exp-item"><span>Limit Tahsis Masrafı</span><span>1.500 TL</span></div>
-                    <div class="exp-item exp-traktor-only"><span>Tarsim Sigortası (%4)</span><span id="exp-tarsim">0 TL</span></div>
-                    <div class="exp-item exp-traktor-only"><span>Kasko Sigortası (%3)</span><span id="exp-kasko">0 TL</span></div>
+                    <div class="exp-item exp-traktor-only"><span>Tarsim Sigortası</span><span id="exp-tarsim">0 TL</span></div>
+                    <div class="exp-item exp-traktor-only"><span>Kasko Sigortası</span><span id="exp-kasko">0 TL</span></div>
                     <div class="exp-item exp-traktor-only"><span>Rehin Tesisi</span><span>1.250 TL</span></div>
                 </div>
             </div>
@@ -220,13 +222,11 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); 
         mode = m;
         const subBox = document.getElementById('subBox');
-        const periyotBox = document.getElementById('row-dynamic');
         const periyotSelect = document.getElementById('periyot');
         const tipBox = document.getElementById('tip-container');
         const traktorOpts = document.getElementById('traktorOpts');
         const proformaBox = document.getElementById('proforma-container');
 
-        // Varsayılan kilitleri aç
         periyotSelect.disabled = false;
 
         if(m === 'traktor') {
@@ -238,8 +238,8 @@
             traktorOpts.style.display = 'none'; 
             subBox.style.display = 'none';
             proformaBox.style.display = 'none';
-            periyotSelect.value = "1"; // Yılda 1 yap
-            periyotSelect.disabled = true; // Kilitle
+            periyotSelect.value = "1";
+            periyotSelect.disabled = true;
             tipBox.classList.add('half-width');
         } else {
             traktorOpts.style.display = 'none'; 
@@ -252,8 +252,10 @@
     
     function checkLocks() {
         const perSelect = document.getElementById('periyot');
+        // Seçilen moda göre BSMV ve KKDF değerlerini otomatik atıyoruz
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
+        
         if(mode === 'zirai') { 
             document.getElementById('faiz').value = "45.00"; 
             perSelect.value = "1"; 
@@ -271,6 +273,7 @@
 
     function hesapla() {
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const profTutar = parseFloat(document.getElementById('proforma').value.replace(/\./g, "")) || 0;
         const yFaiz = parseFloat(document.getElementById('faiz').value) / 100;
         const subOran = (mode === 'traktor') ? parseFloat(document.getElementById('subOran').value) / 100 : 0;
         const vade = parseInt(document.getElementById('vade').value);
@@ -309,7 +312,7 @@
 
         if(mode === 'traktor') {
             const tarsim = anaPara * 0.04;
-            const kasko = anaPara * 0.03;
+            const kasko = profTutar * 0.03; 
             const rehin = 1250;
             toplamMasraf += (tarsim + kasko + rehin);
             document.getElementById('exp-tarsim').innerText = Math.round(tarsim).toLocaleString('tr-TR') + " TL";
