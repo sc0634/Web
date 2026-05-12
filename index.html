@@ -140,32 +140,41 @@
     function initApp() { fmtMoney(document.getElementById('tutar')); fillVade(); checkLocks(); }
     function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
     function onlyNum(i) { i.value = i.value.replace(/[^0-9]/g,''); }
+    
     function fillVade() {
         const s = document.getElementById('vade'); s.innerHTML = '';
-        let max = (mode === 'ticari' || mode === 'zirai') ? 60 : 5;
-        let unit = (mode === 'ticari' || mode === 'zirai') ? ' Ay' : ' Yıl';
+        let isMonthly = (mode === 'ticari' || mode === 'zirai');
+        let max = isMonthly ? 60 : 5;
+        let unit = isMonthly ? ' Ay' : ' Yıl';
+        
+        // GÜNCELLEME: Varsayılan vadeyi 36 ay (veya 3 yıl) yap
+        let defaultVal = isMonthly ? 36 : 3;
+
         for(let i=1; i<=max; i++) {
             let o = document.createElement('option'); o.value = i; o.text = i + unit;
-            if(i === max) o.selected = true; s.appendChild(o);
+            if(i === defaultVal) o.selected = true; 
+            s.appendChild(o);
         }
     }
+
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); mode = m;
         document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
         document.getElementById('subBox').style.visibility = (m === 'traktor') ? 'visible' : 'hidden';
         checkLocks(); fillVade(); reset();
     }
+
     function checkLocks() {
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
         
-        // GÜNCELLEME: Ticari kredi seçildiğinde ödeme sıklığını 12 (Ayda 1) yap
         if(mode === 'ticari') {
             document.getElementById('periyot').value = "12";
         } else if(mode === 'traktor') {
-            document.getElementById('periyot').value = "1"; // Traktör için varsayılanı Yılda 1 yapabiliriz
+            document.getElementById('periyot').value = "1";
         }
     }
+
     function reset() { 
         calculated = false; document.getElementById('result').style.display = 'none';
         document.getElementById('pdfBtn').disabled = true; document.getElementById('printBtn').disabled = true; checkApply();
@@ -175,6 +184,7 @@
         const tel = document.getElementById('tel').value.length === 10;
         document.getElementById('applyBtn').disabled = !(tc && tel && calculated);
     }
+
     function hesapla() {
         const tutarVal = document.getElementById('tutar').value;
         const anaPara = parseFloat(tutarVal.replace(/\./g, ""));
@@ -188,6 +198,7 @@
         const tip = document.getElementById('tip').value;
         const v_kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
         const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
+        
         let taksitSayisi = (mode === 'ticari' || mode === 'zirai') ? Math.ceil(vade / (12 / per)) : vade * per;
         const donemFaiz = yFaiz / per; 
         const vergiOran = v_kkdf + v_bsmv; 
@@ -253,6 +264,7 @@
         document.getElementById('result').style.display = 'block';
         calculated = true; document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false; checkApply();
     }
+
     function send() {
         const btn = document.getElementById('applyBtn'); btn.innerText = "GÖNDERİLİYOR..."; btn.disabled = true;
         const params = {
