@@ -6,85 +6,48 @@
     <title>Süleyman Coşkun - Kredi Hesaplama</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; --red: #b91c1c; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: #f8fafc; margin: 0; padding: 10px; color: #1e293b; }
-        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f8fafc; margin: 0; padding: 10px; }
+        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
+        /* Sekmeler */
         .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 10px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 10px; cursor: pointer; text-transform: uppercase; }
+        .tab-btn { flex: 1; padding: 12px 5px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 10px; cursor: pointer; text-transform: uppercase; }
         .tab-btn.active { background: var(--blue); color: #fff; }
         
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
         
-        /* Proforma Satırı - Genişlik Sabitleme */
-        .proforma-wrapper { 
-            grid-column: span 2; 
-            display: flex; 
-            align-items: center; 
-            background: #fffbeb; 
-            padding: 8px 12px; 
-            border-radius: 10px; 
-            border: 1.2px dashed var(--accent); 
-            gap: 15px;
-        }
-        .proforma-input-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-        }
-        .proforma-input-group label { 
-            color: #b45309; 
-            font-weight: 800; 
-            font-size: 11px; 
-            text-transform: uppercase;
-            width: 80px; /* "PROFORMA:" yazısı için sabit alan */
-        }
-        .proforma-input-group input { 
-            width: 100%; /* Kredi tutarı ile aynı esneklikte */
-            max-width: 180px; /* Kredi tutarı hücresinin genişliğine sabitlendi */
-            padding: 8px 10px; 
-            border-radius: 8px; 
-            border: 1px solid #fcd34d; 
-            font-weight: 800; 
-            color: #92400e; 
-            font-size: 15px;
-            outline: none;
-        }
-        .proforma-info { 
-            font-size: 11px; 
-            color: var(--red); 
-            font-weight: 700; 
-            border-left: 2px solid #fcd34d; 
-            padding-left: 12px;
-            line-height: 1.2;
-        }
+        /* Proforma Özel Stil */
+        .proforma-field { grid-column: span 2; background: #fffbeb; padding: 12px; border-radius: 10px; border: 2px solid var(--accent); margin-bottom: 5px; display: flex; flex-direction: column; gap: 5px; }
+        .proforma-field label { color: #b45309; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+        .proforma-field input { border-color: var(--accent); background: #fff; font-weight: 800; font-size: 18px; color: var(--navy); text-align: center; padding: 10px; border-radius: 8px; border: 1px solid #fcd34d; outline: none; }
+
+        /* Kilitli Durum */
+        .locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); transition: all 0.3s ease; }
 
         .field { display: flex; flex-direction: column; gap: 4px; }
         .field-row { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
-        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; }
+        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; width: 100%; outline: none; }
         
-        .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .opt { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; }
-        
+        .options-row { grid-column: span 2; display: flex; gap: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
+        .opt { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; }
+
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 20px 0; }
         .btn { padding: 14px 5px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 12px; }
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #6366f1; }
         .btn-print { background: var(--navy); }
+        .btn:disabled { opacity: 0.3; }
 
-        #result { margin-top: 15px; overflow-x: auto; }
+        #result { margin-top: 20px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { background: var(--navy); color: #fff; padding: 8px; }
-        td { padding: 8px; border: 1px solid var(--border); text-align: center; }
+        th { background: var(--navy); color: #fff; padding: 10px; }
+        td { padding: 10px; text-align: center; border: 1px solid var(--border); }
+        tr:nth-child(even) { background: #f8fafc; }
 
-        @media (max-width: 600px) {
-            .proforma-wrapper { flex-wrap: wrap; gap: 5px; }
-            .proforma-info { border-left: none; padding-left: 0; width: 100%; border-top: 1px solid #fcd34d; padding-top: 5px; }
-            .grid { grid-template-columns: 1fr 1fr; }
-        }
-        @media (min-width: 601px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); } }
     </style>
 </head>
 <body onload="initApp()">
@@ -97,18 +60,13 @@
         <button class="tab-btn" onclick="switchTab(this, 'tuketici')">TÜKETİCİ</button>
     </div>
 
-    <div id="calc-panel">
-        <div class="grid no-print">
-            <div class="proforma-wrapper" id="proforma-container">
-                <div class="proforma-input-group">
-                    <label>PROFORMA:</label>
-                    <input type="text" id="proforma" value="3.000.000" oninput="fmtMoney(this)">
-                </div>
-                <div class="proforma-info">
-                    ⚠️ Fatura bedelinin max %75'i kadar kredi kullanılabilir.
-                </div>
-            </div>
+    <div class="grid no-print">
+        <div class="proforma-field" id="proforma-container">
+            <label>Proforma Fatura Bedeli (Zorunlu)</label>
+            <input type="text" id="proforma" value="0" oninput="fmtMoney(this); checkLock();">
+        </div>
 
+        <div id="lock-section" style="display: contents;">
             <div class="field-row">
                 <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
                 <div class="field"><label>Vade</label><select id="vade" onchange="resetRes()"></select></div>
@@ -132,58 +90,124 @@
 
             <div class="options-row" id="traktorOpts">
                 <div class="opt"><input type="checkbox" id="yerli" checked onchange="toggleYerli(this)"> Yerli Malı</div>
-                <div class="opt"><input type="checkbox" id="buyback" checked onchange="resetRes()"> Buy Back</div>
+                <div class="opt"><input type="checkbox" id="buyback" checked> Buy Back</div>
             </div>
         </div>
+    </div>
 
-        <div class="actions no-print">
-            <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
-            <button class="btn btn-pdf" id="pdfBtn" onclick="window.print()" disabled>PDF</button>
-            <button class="btn btn-print" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
-        </div>
+    <div class="actions no-print" id="btn-section">
+        <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
+        <button class="btn btn-pdf" id="pdfBtn" onclick="window.print()" disabled>PDF</button>
+        <button class="btn btn-print" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
+    </div>
 
-        <div id="result" style="display:none;">
-            <table id="resTable">
-                <thead>
-                    <tr><th>No</th><th>Anapara</th><th>Faiz</th><th>Taksit</th><th>Kalan</th></tr>
-                </thead>
-                <tbody id="planBody"></tbody>
-            </table>
-        </div>
+    <div id="result" style="display:none;">
+        <table id="resTable">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Anapara</th>
+                    <th>Faiz</th>
+                    <th>Taksit</th>
+                    <th>Kalan</th>
+                </tr>
+            </thead>
+            <tbody id="planBody"></tbody>
+        </table>
     </div>
 </div>
 
 <script>
     let mode = 'traktor';
-    function initApp() { fmtMoney(document.getElementById('proforma')); fmtMoney(document.getElementById('tutar')); switchTab(document.getElementById('btn-traktor'), 'traktor'); }
-    function switchTab(btn, m) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
-        mode = m;
-        document.getElementById('proforma-container').style.display = (m === 'traktor') ? 'flex' : 'none';
-        document.getElementById('subBox').style.display = (m === 'traktor') ? 'flex' : 'none';
-        document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
-        fillVade(); resetRes();
+
+    function initApp() {
+        switchTab(document.getElementById('btn-traktor'), 'traktor');
     }
-    function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if (v) i.value = new Intl.NumberFormat('tr-TR').format(v); resetRes(); }
+
+    // Kilit Mekanizması: Sadece Traktör modunda çalışır
+    function checkLock() {
+        const val = document.getElementById('proforma').value.replace(/\D/g, "");
+        const section = document.getElementById('lock-section');
+        const btns = document.getElementById('btn-section');
+        
+        if (mode === 'traktor') {
+            if (!val || val === "0") {
+                section.classList.add('locked');
+                btns.classList.add('locked');
+            } else {
+                section.classList.remove('locked');
+                btns.classList.remove('locked');
+            }
+        } else {
+            // Traktör değilse kilit her zaman açık
+            section.classList.remove('locked');
+            btns.classList.remove('locked');
+        }
+    }
+
+    function switchTab(btn, m) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mode = m;
+
+        const profContainer = document.getElementById('proforma-container');
+        const subBox = document.getElementById('subBox');
+        const traktorOpts = document.getElementById('traktorOpts');
+
+        if (m === 'traktor') {
+            profContainer.style.display = 'flex';
+            subBox.style.display = 'flex';
+            traktorOpts.style.display = 'flex';
+        } else {
+            profContainer.style.display = 'none';
+            subBox.style.display = 'none';
+            traktorOpts.style.display = 'none';
+        }
+
+        fillVade();
+        checkLock(); // Sekme değişiminde kilidi kontrol et
+        resetRes();
+    }
+
+    function fmtMoney(i) {
+        let v = i.value.replace(/\D/g, "");
+        if (v) i.value = new Intl.NumberFormat('tr-TR').format(v);
+        resetRes();
+    }
+
     function fillVade() {
         const s = document.getElementById('vade'); s.innerHTML = '';
         let isMonth = (mode !== 'traktor');
         let max = (mode === 'tuketici') ? 36 : (isMonth ? 60 : 5);
         for (let i = 1; i <= max; i++) {
-            let o = document.createElement('option'); o.value = i; o.text = i + (isMonth ? " Ay" : " Yıl");
+            let o = document.createElement('option');
+            o.value = i;
+            o.text = i + (isMonth ? " Ay" : " Yıl");
             if (i === (isMonth ? 36 : 5)) o.selected = true;
             s.appendChild(o);
         }
     }
-    function toggleYerli(cb) { document.getElementById('subOran').value = cb.checked ? 50 : 25; resetRes(); }
-    function resetRes() { document.getElementById('result').style.display = 'none'; document.getElementById('pdfBtn').disabled = true; document.getElementById('printBtn').disabled = true; }
+
+    function toggleYerli(cb) {
+        document.getElementById('subOran').value = cb.checked ? 50 : 25;
+    }
+
+    function resetRes() {
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('pdfBtn').disabled = true;
+        document.getElementById('printBtn').disabled = true;
+    }
+
     function hesapla() {
+        // Örnek basit hesaplama gösterimi
         document.getElementById('result').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false;
         document.getElementById('printBtn').disabled = false;
+        
         let tutar = document.getElementById('tutar').value;
         document.getElementById('planBody').innerHTML = `<tr><td>1</td><td>${tutar}</td><td>0</td><td>${tutar}</td><td>0</td></tr>`;
     }
 </script>
+
 </body>
 </html>
