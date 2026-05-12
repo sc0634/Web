@@ -32,6 +32,8 @@
         td { padding: 10px 4px; text-align: center; border: 1px solid var(--border); font-size: 12px; font-weight: 600; color: #000; }
         tr:nth-child(even) { background-color: #f8fafc; }
         
+        .total-row td { background: #f1f5f9 !important; font-weight: 800; border-top: 2px solid var(--navy); color: var(--navy); }
+
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 20px 0; }
         .btn { padding: 14px 5px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 12px; }
         .btn-calc { background: var(--success); }
@@ -45,7 +47,6 @@
         @media print { 
             .no-print, .btn-mini-print { display: none !important; } 
             .container { box-shadow: none; border: none; padding: 0; }
-            .print-only { display: block !important; }
         }
     </style>
 </head>
@@ -87,7 +88,7 @@
     <div class="actions no-print">
         <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
         <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF</button>
-        <button class="btn btn-print" id="printBtn" onclick="yazdirTüm()" disabled>TÜMÜNÜ YAZDIR</button>
+        <button class="btn btn-print" id="printBtn" onclick="yazdirTum()" disabled>TÜMÜNÜ YAZDIR</button>
     </div>
 
     <div id="result-area"></div>
@@ -172,7 +173,7 @@
             let label = isMonthly ? `${v} AY` : `${v} YIL`;
             let tableId = `table-group-${index}`;
 
-            let html = `<div id="${tableId}" class="print-section">
+            let html = `<div id="${tableId}" style="margin-bottom:30px;">
                         <div class="vade-header">
                             ${label} ÖDEME PLANI
                             <button class="btn-mini-print no-print" onclick="tekliYazdir('${tableId}')">YAZDIR</button>
@@ -181,6 +182,7 @@
                         <thead><tr><th>No</th><th>Anapara</th><th>Faiz</th><th>BSMV</th><th>${mode==='traktor'?'Sübv. Taksit':'Taksit'}</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara;
+            let tA = 0, tF = 0, tB = 0, tT = 0;
 
             for(let i=1; i<=totalTaksit; i++) {
                 let f = kalan * dFaiz;
@@ -192,6 +194,8 @@
                 let sTaksit = taksit - (f * sub); 
                 kalan -= a;
                 
+                tA += a; tF += f; tB += b; tT += sTaksit;
+
                 html += `<tr>
                     <td>${i}</td>
                     <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
@@ -199,6 +203,17 @@
                     <td>${Math.round(b).toLocaleString('tr-TR')} ₺</td>
                     <td style="background:#f0f9ff; font-weight:bold;">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
                     <td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')} ₺</td>
+                </tr>`;
+            }
+
+            if (v > 1) {
+                html += `<tr class="total-row">
+                    <td>TOPLAM</td>
+                    <td>${Math.round(tA).toLocaleString('tr-TR')} ₺</td>
+                    <td>${Math.round(tF).toLocaleString('tr-TR')} ₺</td>
+                    <td>${Math.round(tB).toLocaleString('tr-TR')} ₺</td>
+                    <td>${Math.round(tT).toLocaleString('tr-TR')} ₺</td>
+                    <td>-</td>
                 </tr>`;
             }
             
@@ -210,21 +225,30 @@
         document.getElementById('printBtn').disabled = false;
     }
 
+    // Yeni ve Garanti Yazdırma Fonksiyonu
     function tekliYazdir(id) {
-        const printContent = document.getElementById(id).innerHTML;
-        const originalContent = document.body.innerHTML;
+        const content = document.getElementById(id).cloneNode(true);
+        // Yazdırılacak içerikteki "YAZDIR" butonunu kaldır
+        const miniBtn = content.querySelector('.btn-mini-print');
+        if(miniBtn) miniBtn.remove();
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Kredi Ödeme Planı</title>');
+        // Mevcut CSS stillerini yeni pencereye aktar
+        printWindow.document.write('<style>' + document.head.querySelector('style').innerHTML + '</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write('<div class="container">' + content.innerHTML + '</div>');
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
         
-        // Sadece seçili olanın içeriğini yazdırılabilir bir yapıya sokar
-        document.body.innerHTML = `<div class="container">${printContent}</div>`;
-        window.print();
-        document.body.innerHTML = originalContent;
-        // Sayfayı yenilemeden state'i korumak için hesapla() fonksiyonu gibi init işlemlerini tetiklemiyoruz, 
-        // ancak body'yi bozmamak için genellikle window.print sonrası window.location.reload() önerilir.
-        // Daha temiz bir çözüm:
-        window.location.reload(); 
+        // İçeriğin yüklenmesi için kısa bir süre bekle ve yazdır
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
     }
 
-    function yazdirTüm() { window.print(); }
+    function yazdirTum() { window.print(); }
 
     function indir() { 
         const element = document.getElementById('pdf-area');
