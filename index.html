@@ -26,17 +26,22 @@
         label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; width: 100%; height: 34px; }
         
-        .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; }
-        .options-row { display: flex; gap: 15px; align-items: center; }
-        .opt { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 12px 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; }
+        .options-row { display: flex; gap: 20px; align-items: flex-start; }
+        .opt { display: flex; flex-direction: column; gap: 4px; }
+        .opt-check { display: flex; align-items: center; gap: 6px; cursor: pointer; }
         .opt input { width: 18px; height: 18px; margin: 0; cursor: pointer; }
         .opt label { font-size: 11px; color: var(--navy); cursor: pointer; font-weight: 700; }
+        
+        /* Checkbox Altındaki Metin Stili */
+        .sub-text { font-size: 9px; color: var(--blue); font-weight: 800; margin-left: 24px; }
 
         .vade-header { background: var(--blue); color: white; padding: 5px; margin-top: 8px; border-radius: 6px; font-size: 10px; font-weight: 900; text-align: center; position: relative; }
-        .faiz-bilgi { background: #f8fafc; padding: 4px; font-size: 10px; font-weight: 800; color: var(--navy); border: 1px solid var(--border); border-top: none; text-align: center; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; margin-bottom: 10px; }
+        .bilgi-kutusu { background: #f8fafc; padding: 6px; border: 1px solid var(--border); border-top: none; text-align: center; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; margin-bottom: 10px; }
+        .bilgi-notu { font-size: 10px; font-weight: 800; color: var(--navy); display: block; margin: 2px 0; }
 
         .table-res { overflow-x: auto; margin-top: 2px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 5px; background: white; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 0px; background: white; }
         th { background: #1e293b; color: #fff; padding: 4px 2px; font-size: 8px; border: 1px solid #334155; }
         td { padding: 4px 2px; text-align: center; border: 1px solid var(--border); font-size: 10px; font-weight: 600; color: #000; }
         tr:nth-child(even) { background-color: #f8fafc; }
@@ -98,12 +103,18 @@
         <div class="options-container" id="traktorOpts">
             <div class="options-row">
                 <div class="opt">
-                    <input type="checkbox" id="yerli" checked onchange="updateSub()">
-                    <label for="yerli">Yerli Malı Desteği</label>
+                    <div class="opt-check">
+                        <input type="checkbox" id="yerli" checked onchange="updateSub()">
+                        <label for="yerli">Yerli Malı</label>
+                    </div>
+                    <!-- İstediğiniz Metin Buraya Eklendi -->
+                    <div id="yerli-bilgi" class="sub-text">Faizin %25’ini devlet ödemektedir</div>
                 </div>
                 <div class="opt">
-                    <input type="checkbox" id="buyback" onchange="reset()">
-                    <label for="buyback">Buy Back Kapsamında</label>
+                    <div class="opt-check">
+                        <input type="checkbox" id="buyback" onchange="reset()">
+                        <label for="buyback">Buy Back Kapsamında</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -155,6 +166,8 @@
     function updateSub() {
         const isYerli = document.getElementById('yerli').checked;
         document.getElementById('subOran').value = isYerli ? 50 : 25;
+        // Checkbox altına metni göster/gizle
+        document.getElementById('yerli-bilgi').style.display = isYerli ? 'block' : 'none';
         reset();
     }
 
@@ -247,8 +260,13 @@
             if (v > 1) {
                 html += `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(tA).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tIF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tB).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tT).toLocaleString('tr-TR')} ₺</td><td>-</td></tr>`;
             }
+            
+            let bilgiNotlari = "";
+            if(isBuyBack) bilgiNotlari += `<span class="bilgi-notu">Kredi sabit faizlidir</span>`;
+            else bilgiNotlari += `<span class="bilgi-notu">Kredi değişken faizdir</span>`;
+
             html += `</tbody></table></div>
-                    <div class="faiz-bilgi">${isBuyBack ? 'Kredi sabit faizlidir' : 'Kredi değişken faizdir'}</div>
+                    <div class="bilgi-kutusu">${bilgiNotlari}</div>
                     </div>`;
             resultArea.innerHTML += html;
         });
