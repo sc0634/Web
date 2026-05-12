@@ -16,18 +16,15 @@
         .tab-btn { flex: 1; min-width: 80px; padding: 12px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 10px; cursor: pointer; line-height: 1.2; text-transform: uppercase; }
         .tab-btn.active { background: var(--blue); color: #fff; }
         
-        #about-content { display: none; padding: 40px 20px; text-align: center; animation: fadeIn 0.5s ease; }
-        .profile-card { max-width: 500px; margin: 0 auto; border: 1px solid var(--border); padding: 30px; border-radius: 20px; background: #fcfcfc; }
-        .profile-title { font-size: 24px; color: var(--navy); margin-bottom: 5px; font-weight: 800; }
-        .profile-sub { font-size: 16px; color: var(--blue); font-weight: 600; margin-bottom: 20px; }
-        .profile-text { color: var(--gray); line-height: 1.6; font-size: 14px; }
-        .profile-badge { display: inline-block; background: #e2e8f0; padding: 5px 15px; border-radius: 20px; font-size: 12px; margin: 5px; font-weight: bold; }
-
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
         .field { display: flex; flex-direction: column; gap: 4px; }
+        
+        /* Yan yana sabitleme yapısı */
         .field-row { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; }
+        
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
         .opt { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
         .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; line-height: 1.2; }
@@ -62,30 +59,36 @@
     <div class="tabs no-print">
         <button class="tab-btn active" onclick="switchTab(this, 'traktor')">ZİRAİ <br> TRAKTÖR</button>
         <button class="tab-btn" onclick="switchTab(this, 'ticari')">TİCARİ</button>
-        <button class="tab-btn" onclick="switchTab(this, 'zirai')">ÇİFTÇİ <br> TAKSİTLİ KREDİ</button>
+        <button class="tab-btn" onclick="switchTab(this, 'zirai')">ÇİFTÇİ <br> TAKSİTLİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'tuketici')">TÜKETİCİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'about')">HAKKIMDA</button>
     </div>
 
     <div id="calc-panel">
         <div class="grid no-print">
-            <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
-            <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
+            <div class="field-row">
+                <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
+                <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
+            </div>
             
             <div class="field-row">
                 <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="updateMonthly(); reset();"></div>
                 <div class="field"><label>Aylık Faiz %</label><input type="number" id="aylikFaiz" step="0.0001" readonly style="background: #f8fafc; color: var(--blue); font-weight: bold;"></div>
             </div>
 
-            <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
-            <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
+            <div class="field-row">
+                <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
+                <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
+            </div>
+
             <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
             <div class="field"><label>Ödeme Sıklığı</label>
                 <select id="periyot" onchange="reset()">
                     <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
                 </select>
             </div>
-            <div class="field"><label>Ödeme Tipi</label><select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select></div>
+            
+            <div class="field" style="grid-column: span 2;"><label>Ödeme Tipi</label><select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select></div>
 
             <div class="options-row" id="traktorOpts">
                 <div class="opt">
