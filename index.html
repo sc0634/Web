@@ -99,16 +99,16 @@
             </div>
         </div>
 
-        <div class="options-container" id="traktorOpts">
+        <div class="options-container" id="ziraiOpts">
             <div class="options-row">
-                <div class="opt">
+                <div class="opt" id="opt-yerli">
                     <div class="opt-check">
                         <input type="checkbox" id="yerli" checked onchange="updateYerli()">
                         <label for="yerli">Yerli Malı</label>
                     </div>
-                    <div id="yerli-bilgi" class="sub-text">Faizin %25’ini devlet ödemektedir</div>
+                    <div id="yerli-bilgi" class="sub-text">Sübvansiyon artırımı uygulanmıştır</div>
                 </div>
-                <div class="opt">
+                <div class="opt" id="opt-buyback">
                     <div class="opt-check">
                         <input type="checkbox" id="buyback" checked onchange="updateBuyBack()">
                         <label for="buyback">Buy Back Kapsamında</label>
@@ -165,8 +165,20 @@
 
     function updateYerli() {
         const isYerli = document.getElementById('yerli').checked;
-        document.getElementById('subOran').value = isYerli ? 50 : 25;
-        document.getElementById('yerli-bilgi').style.display = isYerli ? 'block' : 'none';
+        const subInput = document.getElementById('subOran');
+        const info = document.getElementById('yerli-bilgi');
+        
+        if (mode === 'traktor') {
+            subInput.value = isYerli ? 50 : 25;
+            info.innerText = "Faizin %25’ini devlet ödemektedir";
+        } else if (mode === 'ekipman') {
+            subInput.value = isYerli ? 75 : 50;
+            info.innerText = isYerli ? "Yerli malı teşviği (%75) uygulandı" : "Ham sübvansiyon (%50) uygulandı";
+        }
+        
+        info.style.display = isYerli ? 'block' : 'none';
+        if(mode === 'ekipman') info.style.display = 'block'; // Ekipmanda hep bilgi verelim
+        
         reset();
     }
 
@@ -202,15 +214,22 @@
         mode = m;
         
         const extraRow = document.getElementById('extra-row');
-        const traktorOpts = document.getElementById('traktorOpts');
+        const ziraiOpts = document.getElementById('ziraiOpts');
+        const optBuyback = document.getElementById('opt-buyback');
         
-        // Traktör ve Ekipman için seçenekler panelini göster/gizle
-        if (m === 'traktor' || m === 'ekipman') {
+        if (m === 'traktor') {
             extraRow.style.display = 'none';
-            traktorOpts.style.display = 'flex';
+            ziraiOpts.style.display = 'flex';
+            optBuyback.style.display = 'flex';
+            updateYerli();
+        } else if (m === 'ekipman') {
+            extraRow.style.display = 'none';
+            ziraiOpts.style.display = 'flex';
+            optBuyback.style.display = 'none';
+            updateYerli();
         } else {
             extraRow.style.display = 'grid';
-            traktorOpts.style.display = 'none';
+            ziraiOpts.style.display = 'none';
         }
 
         if(m === 'tuketici') { 
@@ -241,7 +260,6 @@
         const bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         const kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
 
-        // Traktör ve Ekipman 1-5 yıl arası tüm tabloları döker, diğerleri tek vade döker
         let vades = (mode === 'traktor' || mode === 'ekipman') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach((v) => {
