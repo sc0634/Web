@@ -15,7 +15,6 @@
         .tab-btn { flex: 1; padding: 8px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 10px; cursor: pointer; }
         .tab-btn.active { background: var(--blue); color: #fff; }
         
-        /* GRID AYARI: Kredi Tutarı ve Vade Yan Yana */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f1f5f9; padding: 12px; border-radius: 10px; }
         .field { display: flex; flex-direction: column; gap: 3px; }
         .full-width { grid-column: span 2; }
@@ -23,7 +22,6 @@
         label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #fff; width: 100%; }
 
-        /* CHECKBOX 2PX YAKLAŞTIRMA */
         .options-row { grid-column: span 2; display: flex; gap: 10px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
         .opt { flex: 1; display: flex; align-items: center; gap: 2px; padding: 4px 0; }
         .opt input[type="checkbox"] { margin: 0; padding: 0; width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
@@ -60,16 +58,18 @@
         <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
         
         <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
+        <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
+        
+        <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
+        <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
+        
         <div class="field"><label>Ödeme Sıklığı</label>
             <select id="periyot" onchange="checkLocks(); reset();">
                 <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
             </select>
         </div>
         
-        <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
-        <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
-        <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
-        <div class="field full-width"><label>Ödeme Tipi</label><select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select></div>
+        <div class="field"><label>Ödeme Tipi</label><select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select></div>
 
         <div class="options-row" id="traktorOpts">
             <div class="opt"><input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25; reset();"><label for="yerli">Yerli Malı Desteği (%50 Sübv.)</label></div>
