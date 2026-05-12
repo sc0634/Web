@@ -25,8 +25,9 @@
 
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
         .field { display: flex; flex-direction: column; gap: 4px; }
+        .field-row { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
-        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; }
+        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; }
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
         .opt { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
         .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; line-height: 1.2; }
@@ -103,7 +104,12 @@
         <div class="grid no-print">
             <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
             <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
-            <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
+            
+            <div class="field-row">
+                <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="updateMonthly(); reset();"></div>
+                <div class="field"><label>Aylık Faiz %</label><input type="number" id="aylikFaiz" step="0.0001" readonly style="background: #f8fafc; color: var(--blue); font-weight: bold;"></div>
+            </div>
+
             <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
             <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
             <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
@@ -178,10 +184,15 @@
     (function(){ emailjs.init("jDMRD7zxVCGxvmiRX"); })();
     let mode = 'traktor'; let calculated = false;
 
-    function initApp() { fmtMoney(document.getElementById('tutar')); checkLocks(); fillVade(); updateBuyBackText(); }
+    function initApp() { fmtMoney(document.getElementById('tutar')); checkLocks(); fillVade(); updateBuyBackText(); updateMonthly(); }
     function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
     function onlyNum(i) { i.value = i.value.replace(/[^0-9]/g,''); }
     
+    function updateMonthly() {
+        const yFaiz = parseFloat(document.getElementById('faiz').value) || 0;
+        document.getElementById('aylikFaiz').value = (yFaiz / 12).toFixed(4);
+    }
+
     function toggleYerli(cb) {
         document.getElementById('subOran').value = cb.checked ? 50 : 25;
         document.getElementById('hazine-note').style.display = cb.checked ? 'block' : 'none';
@@ -229,7 +240,7 @@
             aboutContent.style.display = 'none';
             document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
             document.getElementById('subBox').style.visibility = (m === 'traktor') ? 'visible' : 'hidden';
-            checkLocks(); fillVade(); reset();
+            checkLocks(); fillVade(); updateMonthly(); reset();
         }
     }
 
