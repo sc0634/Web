@@ -10,7 +10,7 @@
         :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #f8fafc; margin: 0; padding: 5px; color: #1e293b; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 12px; }
         .tab-btn { flex: 1; padding: 8px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 10px; cursor: pointer; }
         .tab-btn.active { background: var(--blue); color: #fff; }
@@ -29,10 +29,9 @@
         .btn-print { background: var(--navy); }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
         
-        /* Ultra Sıkıştırılmış Tablo */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 9px; table-layout: fixed; }
         th { background: var(--navy); color: #fff; padding: 6px 1px; font-size: 8px; border: 1px solid rgba(255,255,255,0.1); }
-        td { padding: 5px 1px; text-align: center; border: 1px solid var(--border); letter-spacing: -0.4px; white-space: nowrap; overflow: hidden; }
+        td { padding: 5px 1px; text-align: center; border: 1px solid var(--border); letter-spacing: -0.4px; white-space: nowrap; }
         .total-row { background: #e2e8f0; font-weight: 800; color: var(--navy); }
         
         .apply-panel { background: #f8fafc; border: 2px solid var(--blue); padding: 12px; border-radius: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
@@ -168,9 +167,11 @@
                 a = sabitAnapara; t = a + f + bsmvMiktar + kkdfMiktar; 
             }
             if(i === taksitSayisi) a = kalan; 
-            let subT = t - ((f + bsmvMiktar + kkdfMiktar) * subOran); 
+            
+            // FORMÜL: Anapara + İndirimli Faiz + BSMV
+            let subT = a + indF + bsmvMiktar; 
+            
             kalan -= a;
-
             tTaksit += t; tAnapara += a; tFaiz += f; tIndFaiz += indF; tBsmv += bsmvMiktar; tKkdf += kkdfMiktar; tSubTaksit += subT;
 
             html += `<tr>
