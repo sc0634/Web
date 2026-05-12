@@ -1,7 +1,3 @@
-import base64
-
-# CSS ve JS dahil tam HTML içeriği
-html_content = """
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -283,7 +279,6 @@ html_content = """
             html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td><td>${Math.round(bsmvM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
         }
 
-        // Komisyon Hesabı Güncellemesi: %1 + %5 BSMV
         const safKomisyon = anaPara * 0.01;
         const komisyonBsmv = safKomisyon * 0.05;
         const toplamKomisyonMaliyeti = safKomisyon + komisyonBsmv;
@@ -335,10 +330,3 @@ html_content = """
 </script>
 </body>
 </html>
-"""
-
-# Dosyayı kaydet
-with open("kredi_hesaplama_guncel.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
-
-print("Dosya başarıyla oluşturuldu.")
