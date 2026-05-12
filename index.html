@@ -166,8 +166,16 @@
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
         
-        if(mode === 'zirai') { document.getElementById('faiz').value = "45.00"; }
-        else { document.getElementById('faiz').value = "40.50"; }
+        // GÜNCEL FAİZ AYARLARI
+        if(mode === 'zirai') { 
+            document.getElementById('faiz').value = "45.00"; 
+        } else if(mode === 'ticari') { 
+            document.getElementById('faiz').value = "48.00"; 
+        } else if(mode === 'tuketici') { 
+            document.getElementById('faiz').value = "52.68"; 
+        } else { 
+            document.getElementById('faiz').value = "40.50"; 
+        }
 
         if(mode === 'ticari') { document.getElementById('periyot').value = "12"; }
         else if(mode === 'traktor') { document.getElementById('periyot').value = "1"; }
