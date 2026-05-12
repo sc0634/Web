@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Final Hassas Ayar</title>
+    <title>Süleyman Coşkun - Vergi Kontrollü Panel</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; }
@@ -22,29 +22,10 @@
         label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #fff; width: 100%; }
 
-        /* CHECKBOX VE METİN ARASI 2PX BOŞLUK AYARI */
         .options-row { grid-column: span 2; display: flex; gap: 8px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .opt { flex: 1; display: flex; align-items: flex-start; gap: 2px; padding: 4px 0; } /* gap: 2px yapıldı */
-        
-        .opt input[type="checkbox"] { 
-            margin: 0; 
-            position: relative; 
-            top: 4px; /* Hizalamayı metne göre 4px'e çektim, checkbox daha dengeli durur */
-            min-width: 16px; 
-            min-height: 16px;
-            cursor: pointer;
-        }
-        
-        .opt label { 
-            margin: 0; 
-            font-size: 10px; 
-            color: var(--navy); 
-            cursor: pointer; 
-            text-transform: none; 
-            line-height: 1.3;
-            user-select: none;
-            padding-left: 0; /* Gap zaten 2px sağlıyor */
-        }
+        .opt { flex: 1; display: flex; align-items: flex-start; gap: 2px; padding: 4px 0; }
+        .opt input[type="checkbox"] { margin: 0; position: relative; top: 4px; min-width: 16px; min-height: 16px; cursor: pointer; }
+        .opt label { margin: 0; font-size: 10px; color: var(--navy); cursor: pointer; text-transform: none; line-height: 1.3; user-select: none; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px; margin: 12px 0; }
         .btn { padding: 12px 5px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 11px; }
@@ -87,6 +68,10 @@
         </div>
         <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
         <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
+        
+        <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" step="1" oninput="reset()"></div>
+        <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" step="1" oninput="reset()"></div>
+
         <div class="field full-width"><label>Ödeme Tipi</label>
             <select id="tip" onchange="reset()">
                 <option value="esit">Eşit Taksit</option>
@@ -171,12 +156,15 @@
         mode = m;
         document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
         document.getElementById('subBox').style.visibility = (m === 'traktor') ? 'visible' : 'hidden';
-        fillVade(); checkLocks(); reset();
+        checkLocks();
+        fillVade(); 
+        reset();
     }
 
     function checkLocks() {
-        window.bsmv = (mode === 'tuketici') ? 0.15 : 0.05;
-        window.kkdf = (mode === 'traktor') ? 0 : 0.15;
+        // Otomatik vergi atamaları
+        document.getElementById('bsmv').value = (mode === 'tuketici') ? 15 : 5;
+        document.getElementById('kkdf').value = (mode === 'traktor') ? 0 : 15;
     }
 
     function reset() {
@@ -200,10 +188,14 @@
         const vade = parseInt(document.getElementById('vade').value);
         const per = parseInt(document.getElementById('periyot').value);
         const tip = document.getElementById('tip').value;
+        
+        // Kutulardan alınan vergiler
+        const v_kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
+        const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
 
         let taksitSayisi = (mode === 'ticari' || mode === 'zirai') ? Math.ceil(vade / (12 / per)) : vade * per;
         const donemFaiz = yFaiz / per;
-        const vergiOran = window.bsmv + window.kkdf;
+        const vergiOran = v_kkdf + v_bsmv;
         const bilesikFaiz = donemFaiz * (1 + vergiOran);
 
         let html = '', kalan = anaPara;
