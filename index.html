@@ -16,7 +16,6 @@
         .tab-btn { flex: 1; min-width: 80px; padding: 12px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 10px; cursor: pointer; line-height: 1.2; text-transform: uppercase; }
         .tab-btn.active { background: var(--blue); color: #fff; }
         
-        /* Hakkımda Sayfası Tasarımı */
         #about-content { display: none; padding: 40px 20px; text-align: center; animation: fadeIn 0.5s ease; }
         .profile-card { max-width: 500px; margin: 0 auto; border: 1px solid var(--border); padding: 30px; border-radius: 20px; background: #fcfcfc; }
         .profile-title { font-size: 24px; color: var(--navy); margin-bottom: 5px; font-weight: 800; }
@@ -29,8 +28,10 @@
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; }
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .opt { display: flex; align-items: center; gap: 6px; cursor: pointer; }
-        .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; }
+        .opt { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+        .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; line-height: 1.2; }
+        .sub-label { display: block; font-size: 9px; color: var(--blue); font-weight: 800; }
+        .status-label { display: block; font-size: 9px; color: var(--gray); font-weight: 700; margin-top: 2px; }
         
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 20px 0; }
         .btn { padding: 14px 5px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 12px; }
@@ -74,9 +75,9 @@
 
 <div class="container" id="pdf-area">
     <div class="tabs no-print">
-        <button class="tab-btn active" onclick="switchTab(this, 'traktor')">TRAKTÖR</button>
+        <button class="tab-btn active" onclick="switchTab(this, 'traktor')">ZİRAİ <br> TRAKTÖR</button>
         <button class="tab-btn" onclick="switchTab(this, 'ticari')">TİCARİ</button>
-        <button class="tab-btn" onclick="switchTab(this, 'zirai')">ÇİFTÇİ <br> TAKSİTLİ</button>
+        <button class="tab-btn" onclick="switchTab(this, 'zirai')">ÇİFTÇİ <br> TAKSİTLİ KREDİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'tuketici')">TÜKETİCİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'about')">HAKKIMDA</button>
     </div>
@@ -114,8 +115,14 @@
             <div class="field"><label>Ödeme Tipi</label><select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select></div>
 
             <div class="options-row" id="traktorOpts">
-                <div class="opt"><input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25; reset();"> <label for="yerli">Yerli Malı Desteği</label></div>
-                <div class="opt"><input type="checkbox" id="buyback" checked onchange="reset()"> <label for="buyback">Buy Back Kapsamında</label></div>
+                <div class="opt">
+                    <input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25; reset();"> 
+                    <label for="yerli">Yerli Malı Desteği <span class="sub-label">(%25 ek Sübv.)</span></label>
+                </div>
+                <div class="opt">
+                    <input type="checkbox" id="buyback" checked onchange="updateBuyBackText(); reset();"> 
+                    <label for="buyback">Buy Back Kapsamında <span id="bb-status" class="status-label">Kredi sabit faizlidir</span></label>
+                </div>
             </div>
         </div>
 
@@ -168,10 +175,22 @@
     (function(){ emailjs.init("jDMRD7zxVCGxvmiRX"); })();
     let mode = 'traktor'; let calculated = false;
 
-    function initApp() { fmtMoney(document.getElementById('tutar')); checkLocks(); fillVade(); }
+    function initApp() { fmtMoney(document.getElementById('tutar')); checkLocks(); fillVade(); updateBuyBackText(); }
     function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
     function onlyNum(i) { i.value = i.value.replace(/[^0-9]/g,''); }
     
+    function updateBuyBackText() {
+        const isChecked = document.getElementById('buyback').checked;
+        const statusSpan = document.getElementById('bb-status');
+        if(isChecked) {
+            statusSpan.innerText = "Kredi sabit faizlidir";
+            statusSpan.style.color = "var(--success)";
+        } else {
+            statusSpan.innerText = "Kredi değişken faizlidir";
+            statusSpan.style.color = "var(--accent)";
+        }
+    }
+
     function fillVade() {
         const s = document.getElementById('vade'); if(!s) return;
         s.innerHTML = '';
@@ -261,7 +280,7 @@
         document.getElementById('p_tutar').innerText = tutarVal + " TL";
         document.getElementById('p_vade').innerText = taksitSayisi + " Taksit (" + perText + ")";
         document.getElementById('p_faiz').innerText = "%" + yFaizVal;
-        document.getElementById('p_tur').innerText = (mode === 'zirai') ? "ÇİFTÇİ TAKSİTLİ" : mode.toUpperCase();
+        document.getElementById('p_tur').innerText = (mode === 'traktor') ? "ZİRAİ TRAKTÖR" : (mode === 'zirai' ? "ÇİFTÇİ TAKSİTLİ KREDİ" : mode.toUpperCase());
         
         let html = '', kalan = anaPara; 
         let tTaksit = 0, tAnapara = 0, tFaiz = 0, tIndFaiz = 0, tBsmv = 0, tKkdf = 0, tSubTaksit = 0;
