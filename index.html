@@ -23,9 +23,8 @@
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; }
         
-        /* CHECKBOX AYARLARI */
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .opt { display: flex; align-items: center; gap: 2px; cursor: pointer; } /* gap 2px yapıldı */
+        .opt { display: flex; align-items: center; gap: 2px; cursor: pointer; }
         .opt input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; }
         .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; line-height: 1.2; margin-bottom: 0; text-transform: none; }
         
@@ -39,12 +38,20 @@
         .btn-print { background: var(--navy); }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .table-res { overflow-x: auto; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .table-res { overflow-x: auto; margin-top: 10px; width: calc(100% + 6px); margin-left: -3px; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 100%; }
         th { background: #1e293b; color: #fff; padding: 10px 2px; font-size: 10px; border: 1px solid #334155; }
         td { padding: 10px 2px; text-align: center; border: 1px solid var(--border); font-weight: 400; color: #000; font-size: 13px; white-space: nowrap; }
         tr:nth-child(even) { background-color: #f8fafc; }
         .total-row td { background: #f1f5f9 !important; font-weight: 800 !important; color: var(--navy); border-top: 2px solid var(--navy); }
+
+        /* BAŞVURU FORMU STİLLERİ */
+        .apply-box { margin-top: 30px; padding: 20px; border: 2px solid var(--blue); border-radius: 12px; background: #f0f7ff; }
+        .apply-box h3 { margin-top: 0; color: var(--navy); font-size: 16px; text-align: center; text-transform: uppercase; }
+        .apply-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .apply-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+        .apply-full { grid-column: span 2; }
+        .btn-send { background: var(--blue); width: 100%; margin-top: 10px; padding: 15px; font-size: 14px; }
 
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); } }
         @media print { .no-print { display: none !important; } .container { box-shadow: none; width: 100%; padding: 0; } }
@@ -58,7 +65,6 @@
         <button class="tab-btn" onclick="switchTab(this, 'ticari')">TİCARİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'zirai')">ÇİFTÇİ <br> TAKSİTLİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'tuketici')">TÜKETİCİ</button>
-        <button class="tab-btn" onclick="switchTab(this, 'about')">HAKKIMDA</button>
     </div>
 
     <div id="calc-panel">
@@ -124,6 +130,16 @@
                     <tbody id="plan"></tbody>
                     <tfoot id="tableFoot"></tfoot>
                 </table>
+            </div>
+
+            <div class="apply-box no-print" id="apply-form">
+                <h3>Kredi Başvuru Formu</h3>
+                <div class="apply-grid">
+                    <div class="apply-field"><label>Adınız</label><input type="text" id="user_name" placeholder="Ad Soyad"></div>
+                    <div class="apply-field"><label>Telefon</label><input type="tel" id="user_phone" placeholder="05xx xxx xx xx"></div>
+                    <div class="apply-field apply-full"><label>E-posta</label><input type="email" id="user_email" placeholder="ornek@mail.com"></div>
+                </div>
+                <button class="btn btn-send" onclick="sendEmail()">BAŞVURUYU GÖNDER</button>
             </div>
         </div>
     </div>
@@ -211,17 +227,7 @@
 
             tTaksit += t; tAnapara += a; tFaiz += f; tIndFaiz += indF; tBsmv += bsmvM; tKkdf += kkdfM; tSubTaksit += subT;
 
-            html += `<tr>
-                <td>${i}</td>
-                <td>${Math.round(a).toLocaleString('tr-TR')}</td>
-                <td>${Math.round(f).toLocaleString('tr-TR')}</td>
-                <td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td>
-                <td>${Math.round(bsmvM).toLocaleString('tr-TR')}</td>
-                <td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfM).toLocaleString('tr-TR')}</td>
-                <td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td>
-                <td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td>
-                <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td>
-            </tr>`;
+            html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td><td>${Math.round(bsmvM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
         }
         document.getElementById('hTutar').style.display = (mode === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('hIndFaiz').style.display = (mode === 'traktor') ? 'table-cell' : 'none';
@@ -231,6 +237,22 @@
         document.getElementById('tableFoot').innerHTML = `<tr class="total-row"><td>TOP</td><td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td><td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(tIndFaiz).toLocaleString('tr-TR')}</td><td>${Math.round(tBsmv).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(tKkdf).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(tSubTaksit).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
         document.getElementById('result').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
+    }
+    function sendEmail() {
+        const name = document.getElementById('user_name').value;
+        const phone = document.getElementById('user_phone').value;
+        const email = document.getElementById('user_email').value;
+        const amount = document.getElementById('tutar').value;
+        
+        if(!name || !phone) { alert("Lütfen Ad ve Telefon alanlarını doldurun."); return; }
+
+        const params = { from_name: name, user_phone: phone, user_email: email, loan_amount: amount, loan_type: mode.toUpperCase() };
+
+        emailjs.send("service_default", "template_default", params).then(() => {
+            alert("Başvurunuz başarıyla gönderildi! Sizinle iletişime geçilecektir.");
+        }, (err) => {
+            alert("Hata oluştu: " + JSON.stringify(err));
+        });
     }
     function yazdir() { window.print(); }
     function indir() { html2pdf().from(document.getElementById('pdf-area')).set({ margin: 5, filename: 'Kredi_Plani.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save(); }
