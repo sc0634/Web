@@ -151,7 +151,8 @@
         const bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         const kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
 
-        let vades = (mode === 'traktor') ? [1, 2, 3, 4, 5] : [parseInt(document.getElementById('vade').value)];
+        // Traktör modunda 5'ten 1'e doğru azalan sıralama (Ters Sıralama)
+        let vades = (mode === 'traktor') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach(v => {
             let isMonthly = (mode === 'ticari' || mode === 'tuketici');
