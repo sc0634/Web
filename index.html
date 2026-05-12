@@ -35,6 +35,31 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
+        /* Yatay Scroll Vade Alanı */
+        .vade-scroll-container { 
+            grid-column: span 2; 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 8px; 
+            padding: 5px 0;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        .vade-scroll-container::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+        
+        .vade-chip { 
+            flex: 0 0 auto; 
+            padding: 8px 15px; 
+            background: #eee; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .vade-chip.selected { background: var(--dark); color: white; border-color: var(--dark); }
+
         .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row-wrapper { display: flex; flex-direction: row; gap: 10px; }
         .opt-row { display: flex; align-items: center; gap: 5px; flex: 1; }
@@ -103,7 +128,13 @@
             <div id="bb-info" class="info-text">✓ Geri alım garantisi kapsamında özel oran uygulanmaktadır.</div>
         </div>
 
-        <div class="field" id="vade-box"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
+        <div class="field full-width" id="vade-box">
+            <label id="vade-label">Vade (Ay)</label>
+            <div class="vade-scroll-container" id="vade-scroll">
+                </div>
+            <input type="hidden" id="selected-vade" value="12">
+        </div>
+
         <div class="field" id="vergi-box">
             <div style="display: flex; gap: 5px;">
                 <div style="flex:1"><label>BSMV</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
@@ -149,7 +180,32 @@
         document.getElementById('bsmv').value = (m === 'tuketici' ? 15 : 5);
         document.getElementById('kkdf').value = (m === 'tuketici' ? 15 : 0);
         document.getElementById('main-calc-btn').style.backgroundColor = { tarimsal: '#27ae60', ticari: '#e67e22', bireysel: '#3498db' }[segment];
-        if(isSub) updateYerli(); fillVade(); reset();
+        
+        if(isSub) updateYerli(); 
+        if(!isSub) fillVadeScroll(); 
+        reset();
+    }
+
+    function fillVadeScroll() {
+        const container = document.getElementById('vade-scroll');
+        container.innerHTML = '';
+        let max = (mode === 'tuketici') ? 36 : 60;
+        let defaultVade = (mode === 'tuketici' || mode === 'ticari') ? 12 : 1;
+        document.getElementById('vade-label').innerText = (mode === 'tuketici' || mode === 'ticari') ? "Vade (Ay)" : "Vade (Yıl)";
+        
+        for(let i=1; i<=max; i++) {
+            const chip = document.createElement('div');
+            chip.className = 'vade-chip' + (i === defaultVade ? ' selected' : '');
+            chip.innerText = i;
+            chip.onclick = function() {
+                document.querySelectorAll('.vade-chip').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('selected-vade').value = i;
+                reset();
+            };
+            container.appendChild(chip);
+        }
+        document.getElementById('selected-vade').value = defaultVade;
     }
 
     function updateYerli() {
@@ -159,17 +215,6 @@
         document.getElementById('yerli-info').style.display = isY ? 'block' : 'none';
         document.getElementById('bb-info').style.display = isB ? 'block' : 'none';
         reset();
-    }
-
-    function fillVade() {
-        const s = document.getElementById('vade'); s.innerHTML = '';
-        let isY = (segment === 'tarimsal');
-        let max = (mode === 'tuketici') ? 36 : (isY ? 5 : 60);
-        for(let i=1; i<=max; i++){
-            let o = document.createElement('option'); o.value = i; o.text = i + (mode === 'tuketici' || mode === 'ticari' ? " Ay" : " Yıl");
-            if(i === (mode === 'tuketici' || mode === 'ticari' ? 12 : max)) o.selected = true;
-            s.appendChild(o);
-        }
     }
 
     function fmtMoney(i) {
@@ -188,7 +233,7 @@
         
         const yF = faizVal / 100, subO = subVal / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         let isY = (segment === 'tarimsal');
-        let vades = isY ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
+        let vades = isY ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('selected-vade').value)];
 
         vades.forEach(v => {
             let dF = isY ? yF : (yF / 12), bF = dF * (1 + bsmv + kkdf);
@@ -201,9 +246,9 @@
                 tA += a; tF += f; tV += b; tT += sTaksit; tInd += indF; kalan -= a;
                 html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subVal>0?`<td style="color:red">-${Math.round(indF).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
             }
-            
-            // Toplam Satırı
-            html += `<tr class="total-row"><td>TOP</td><td>${Math.round(tA).toLocaleString('tr-TR')}</td><td>${Math.round(tF).toLocaleString('tr-TR')}</td>${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tV).toLocaleString('tr-TR')}</td><td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
+            if(v > 1) {
+                html += `<tr class="total-row"><td>TOP</td><td>${Math.round(tA).toLocaleString('tr-TR')}</td><td>${Math.round(tF).toLocaleString('tr-TR')}</td>${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tV).toLocaleString('tr-TR')}</td><td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
+            }
             res.innerHTML += html + `</tbody></table></div>`;
         });
         
