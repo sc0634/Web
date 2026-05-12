@@ -18,16 +18,17 @@
         
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
         .field { display: flex; flex-direction: column; gap: 4px; }
-        
-        /* Yan yana sabitleme yapısı */
         .field-row { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; }
         
+        /* CHECKBOX AYARLARI */
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .opt { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
-        .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; line-height: 1.2; }
+        .opt { display: flex; align-items: center; gap: 2px; cursor: pointer; } /* gap 2px yapıldı */
+        .opt input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; }
+        .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; line-height: 1.2; margin-bottom: 0; text-transform: none; }
+        
         .hazine-label { display: block; font-size: 8px; color: #1e40af; font-style: italic; font-weight: 600; margin-top: 2px; }
         .status-label { display: block; font-size: 9px; color: var(--gray); font-weight: 700; margin-top: 2px; }
         
@@ -46,11 +47,7 @@
         .total-row td { background: #f1f5f9 !important; font-weight: 800 !important; color: var(--navy); border-top: 2px solid var(--navy); }
 
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); } }
-
-        @media print {
-            .no-print { display: none !important; }
-            .container { box-shadow: none; width: 100%; max-width: 100%; padding: 0; }
-        }
+        @media print { .no-print { display: none !important; } .container { box-shadow: none; width: 100%; padding: 0; } }
     </style>
 </head>
 <body onload="initApp()">
