@@ -158,6 +158,13 @@
     function checkLocks() {
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
+        
+        // GÜNCELLEME: Ticari kredi seçildiğinde ödeme sıklığını 12 (Ayda 1) yap
+        if(mode === 'ticari') {
+            document.getElementById('periyot').value = "12";
+        } else if(mode === 'traktor') {
+            document.getElementById('periyot').value = "1"; // Traktör için varsayılanı Yılda 1 yapabiliriz
+        }
     }
     function reset() { 
         calculated = false; document.getElementById('result').style.display = 'none';
