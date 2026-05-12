@@ -45,7 +45,6 @@
         tr:nth-child(even) { background-color: #f8fafc; }
         .total-row td { background: #f1f5f9 !important; font-weight: 800 !important; color: var(--navy); border-top: 2px solid var(--navy); }
 
-        /* MASRAFLAR CONTAINER */
         .expense-box { margin-top: 20px; padding: 15px; border-radius: 10px; background: #fff5f5; border: 1px solid #fecaca; }
         .expense-box h3 { margin: 0 0 10px 0; font-size: 13px; color: var(--red); text-transform: uppercase; border-bottom: 1px solid #fecaca; padding-bottom: 5px; }
         .expense-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -53,12 +52,11 @@
         .exp-item span:first-child { font-size: 11px; font-weight: 700; color: var(--gray); }
         .exp-item span:last-child { font-size: 12px; font-weight: 800; color: var(--navy); }
 
-        /* BAŞVURU FORMU */
+        /* GÜNCELLENMİŞ BAŞVURU FORMU */
         .apply-box { margin-top: 20px; padding: 20px; border: 2px solid var(--blue); border-radius: 12px; background: #f0f7ff; }
         .apply-box h3 { margin-top: 0; color: var(--navy); font-size: 14px; text-align: center; text-transform: uppercase; }
         .apply-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .apply-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
-        .apply-full { grid-column: span 2; }
         .btn-send { background: var(--blue); width: 100%; margin-top: 10px; padding: 15px; font-size: 14px; }
 
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); } }
@@ -153,9 +151,8 @@
             <div class="apply-box no-print" id="apply-form">
                 <h3>Kredi Başvuru Formu</h3>
                 <div class="apply-grid">
-                    <div class="apply-field"><label>Adınız</label><input type="text" id="user_name" placeholder="Ad Soyad"></div>
+                    <div class="apply-field"><label>T.C. Kimlik No</label><input type="number" id="user_tckn" placeholder="11 Haneli"></div>
                     <div class="apply-field"><label>Telefon</label><input type="tel" id="user_phone" placeholder="05xx xxx xx xx"></div>
-                    <div class="apply-field apply-full"><label>E-posta</label><input type="email" id="user_email" placeholder="ornek@mail.com"></div>
                 </div>
                 <button class="btn btn-send" onclick="sendEmail()">BAŞVURUYU GÖNDER</button>
             </div>
@@ -246,7 +243,6 @@
             html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td><td>${Math.round(bsmvM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
         }
 
-        // Masraf Hesaplama
         const tahsis = anaPara * 0.005;
         const ekspertiz = 7500;
         const rehin = 1250;
@@ -265,12 +261,11 @@
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
     function sendEmail() {
-        const name = document.getElementById('user_name').value;
+        const tckn = document.getElementById('user_tckn').value;
         const phone = document.getElementById('user_phone').value;
-        const email = document.getElementById('user_email').value;
         const amount = document.getElementById('tutar').value;
-        if(!name || !phone) { alert("Lütfen Ad ve Telefon alanlarını doldurun."); return; }
-        const params = { from_name: name, user_phone: phone, user_email: email, loan_amount: amount, loan_type: mode.toUpperCase() };
+        if(tckn.length !== 11 || !phone) { alert("Lütfen geçerli bir TC No (11 hane) ve Telefon girin."); return; }
+        const params = { user_tckn: tckn, user_phone: phone, loan_amount: amount, loan_type: mode.toUpperCase() };
         emailjs.send("service_default", "template_default", params).then(() => {
             alert("Başvurunuz başarıyla gönderildi! Sizinle iletişime geçilecektir.");
         }, (err) => {
