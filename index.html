@@ -31,6 +31,7 @@
         .opt { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
         .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; line-height: 1.2; }
         .sub-label { display: block; font-size: 9px; color: var(--blue); font-weight: 800; }
+        .hazine-label { display: block; font-size: 8px; color: #1e40af; font-style: italic; font-weight: 600; margin-top: 1px; }
         .status-label { display: block; font-size: 9px; color: var(--gray); font-weight: 700; margin-top: 2px; }
         
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 20px 0; }
@@ -116,8 +117,11 @@
 
             <div class="options-row" id="traktorOpts">
                 <div class="opt">
-                    <input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25; reset();"> 
-                    <label for="yerli">Yerli Malı Desteği <span class="sub-label">(%25 ek Sübv.)</span></label>
+                    <input type="checkbox" id="yerli" checked onchange="toggleYerli(this)"> 
+                    <label for="yerli">
+                        Yerli Malı Desteği <span class="sub-label">(%25 ek Sübv.)</span>
+                        <span id="hazine-note" class="hazine-label">Faizin %25'ini hazine ödemektedir</span>
+                    </label>
                 </div>
                 <div class="opt">
                     <input type="checkbox" id="buyback" checked onchange="updateBuyBackText(); reset();"> 
@@ -179,6 +183,12 @@
     function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
     function onlyNum(i) { i.value = i.value.replace(/[^0-9]/g,''); }
     
+    function toggleYerli(cb) {
+        document.getElementById('subOran').value = cb.checked ? 50 : 25;
+        document.getElementById('hazine-note').style.display = cb.checked ? 'block' : 'none';
+        reset();
+    }
+
     function updateBuyBackText() {
         const isChecked = document.getElementById('buyback').checked;
         const statusSpan = document.getElementById('bb-status');
