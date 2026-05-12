@@ -22,18 +22,24 @@
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f1f5f9; padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
         .field { display: flex; flex-direction: column; gap: 2px; }
         .field-row { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .field-triple { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
         
         label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; white-space: nowrap; }
         input, select { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; width: 100%; height: 34px; }
-        input:disabled { background-color: #e2e8f0; color: #475569; font-weight: 800; cursor: not-allowed; }
         
+        /* Seçenekler Bölümü */
+        .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 2px; }
+        .options-title { font-size: 9px; font-weight: 800; color: var(--blue); text-transform: uppercase; margin-bottom: 2px; }
+        .options-row { display: flex; gap: 15px; align-items: center; }
+        .opt { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .opt input { width: 18px; height: 18px; margin: 0; cursor: pointer; }
+        .opt label { font-size: 11px; text-transform: none; color: var(--navy); cursor: pointer; margin: 0; font-weight: 700; }
+
         .vade-header { background: var(--blue); color: white; padding: 5px; margin-top: 8px; border-radius: 6px; font-size: 10px; font-weight: 900; text-align: center; position: relative; }
         .btn-mini-print { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: var(--blue); border: none; padding: 2px 6px; border-radius: 4px; font-size: 8px; cursor: pointer; font-weight: 800; }
 
         .table-res { overflow-x: auto; margin-top: 2px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 5px; background: white; }
-        th { background: #1e293b; color: #fff; padding: 4px 2px; font-size: 9px; border: 1px solid #334155; }
+        th { background: #1e293b; color: #fff; padding: 4px 2px; font-size: 8px; border: 1px solid #334155; }
         td { padding: 4px 2px; text-align: center; border: 1px solid var(--border); font-size: 10px; font-weight: 600; color: #000; }
         tr:nth-child(even) { background-color: #f8fafc; }
         .total-row td { background: #f1f5f9 !important; font-weight: 800; border-top: 2px solid var(--navy); }
@@ -43,11 +49,6 @@
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #6366f1; }
         .btn-print { background: var(--navy); }
-
-        .options-row { grid-column: span 2; display: flex; justify-content: flex-start; gap: 15px; margin-top: 2px; padding-top: 5px; border-top: 1px solid #e2e8f0; }
-        .opt { display: flex; align-items: center; gap: 4px; }
-        .opt input { width: 16px; height: 16px; cursor: pointer; }
-        .opt label { font-size: 10px; text-transform: none; color: var(--navy); cursor: pointer; margin: 0; font-weight: 700; }
 
         @media print { 
             .no-print { display: none !important; } 
@@ -74,7 +75,7 @@
     </div>
 
     <div class="grid no-print">
-        <!-- SATIR 1: Proforma ve Kredi -->
+        <!-- Grup 1: Tutarlar -->
         <div class="field-row">
             <div class="field">
                 <label>Proforma Fatura Tutarı</label>
@@ -86,23 +87,34 @@
             </div>
         </div>
 
-        <!-- SATIR 2: Faiz, İndirimli Faiz ve Sübv. Oranı -->
-        <div class="field-triple">
+        <!-- Grup 2: Oranlar -->
+        <div class="field-row">
             <div class="field">
                 <label>Yıllık Faiz %</label>
-                <input type="number" id="faiz" value="40.50" step="0.01" oninput="updateNetFaiz()">
+                <input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()">
             </div>
             <div class="field">
-                <label>İndirimli Faiz %</label>
-                <input type="text" id="netFaiz" disabled value="0">
-            </div>
-            <div class="field">
-                <label>Sübvansiyon %</label>
-                <input type="number" id="subOran" value="50" oninput="updateNetFaiz()">
+                <label>Sübvansiyon Oranı %</label>
+                <input type="number" id="subOran" value="50" oninput="reset()">
             </div>
         </div>
 
-        <!-- SATIR 3: Vade ve Vergiler -->
+        <!-- Grup 3: Sabitlenen Destek Seçenekleri (Sadece Traktörde Görünür) -->
+        <div class="options-container" id="traktorOpts">
+            <div class="options-title">Zirai Destek Tanımları</div>
+            <div class="options-row">
+                <div class="opt">
+                    <input type="checkbox" id="yerli" checked onchange="updateSub()">
+                    <label for="yerli">Yerli Malı Desteği</label>
+                </div>
+                <div class="opt">
+                    <input type="checkbox" id="buyback" onchange="updateSub()">
+                    <label for="buyback">Buy Back Kapsamında</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grup 4: Vade ve Vergiler -->
         <div class="field-row">
             <div class="field" id="vade-box">
                 <label>Vade</label>
@@ -113,17 +125,6 @@
                     <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
                     <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
                 </div>
-            </div>
-        </div>
-
-        <div class="options-row" id="traktorOpts">
-            <div class="opt">
-                <input type="checkbox" id="yerli" checked onchange="updateSub()">
-                <label for="yerli">Yerli Malı Desteği</label>
-            </div>
-            <div class="opt">
-                <input type="checkbox" id="buyback" onchange="updateSub()">
-                <label for="buyback">Buy Back Kapsamında</label>
             </div>
         </div>
     </div>
@@ -144,7 +145,6 @@
         fmtMoney(document.getElementById('proforma'));
         fmtMoney(document.getElementById('tutar'));
         switchTab(document.querySelector('.tab-btn'), 'traktor');
-        updateNetFaiz();
     }
 
     function fmtMoney(i) {
@@ -159,14 +159,6 @@
         document.getElementById('printBtn').disabled = true;
     }
 
-    function updateNetFaiz() {
-        const faiz = parseFloat(document.getElementById('faiz').value) || 0;
-        const sub = parseFloat(document.getElementById('subOran').value) || 0;
-        const net = faiz * (1 - (sub / 100));
-        document.getElementById('netFaiz').value = net.toFixed(2);
-        reset();
-    }
-
     function updateSub() {
         const isYerli = document.getElementById('yerli').checked;
         const isBuyBack = document.getElementById('buyback').checked;
@@ -174,7 +166,7 @@
         if(isYerli) base += 25;
         if(isBuyBack) base += 25;
         document.getElementById('subOran').value = base;
-        updateNetFaiz();
+        reset();
     }
 
     function fillVade() {
@@ -213,7 +205,7 @@
         document.getElementById('sum-faiz').innerText = '%' + faizVal + ' / %' + subVal;
 
         const yFaiz = faizVal / 100;
-        const sub = (mode === 'traktor') ? subVal / 100 : 0;
+        const subOran = subVal / 100;
         const bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         const kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
 
@@ -230,21 +222,32 @@
                         <div class="vade-header">${isMonthly ? v+' AY' : v+' YIL'} ÖDEME PLANI
                         <button class="btn-mini-print no-print" onclick="tekliYazdir('${tableId}')">YAZDIR</button></div>
                         <div class="table-res"><table>
-                        <thead><tr><th>No</th><th>Anapara</th><th>Faiz</th><th>BSMV</th><th>${mode==='traktor'?'Sübv. Taksit':'Taksit'}</th><th>Kalan</th></tr></thead><tbody>`;
+                        <thead><tr><th>No</th><th>Anapara</th><th>Faiz</th><th>İnd. Faiz</th><th>BSMV</th><th>${mode==='traktor'?'Sübv. Taksit':'Taksit'}</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara;
-            let tA = 0, tF = 0, tB = 0, tT = 0;
+            let tA = 0, tF = 0, tIF = 0, tB = 0, tT = 0;
             for(let i=1; i<=v; i++) {
                 let f = kalan * dFaiz;
                 let b = f * bsmv;
+                let indFaiz = f * (1 - subOran);
                 let a = (i === v) ? kalan : taksit - (f + b + (f * kkdf));
-                let sTaksit = taksit - (f * sub);
+                let sTaksit = taksit - (f * subOran);
+                
                 kalan -= a;
-                tA += a; tF += f; tB += b; tT += sTaksit;
-                html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')} ₺</td><td>${Math.round(f).toLocaleString('tr-TR')} ₺</td><td>${Math.round(b).toLocaleString('tr-TR')} ₺</td><td style="background:#f0f9ff;font-weight:bold;">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td><td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')} ₺</td></tr>`;
+                tA += a; tF += f; tIF += indFaiz; tB += b; tT += sTaksit;
+                
+                html += `<tr>
+                    <td>${i}</td>
+                    <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
+                    <td>${Math.round(f).toLocaleString('tr-TR')} ₺</td>
+                    <td style="color:var(--blue);">${Math.round(indFaiz).toLocaleString('tr-TR')} ₺</td>
+                    <td>${Math.round(b).toLocaleString('tr-TR')} ₺</td>
+                    <td style="background:#f0f9ff;font-weight:bold;">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
+                    <td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')} ₺</td>
+                </tr>`;
             }
             if (v > 1) {
-                html += `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(tA).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tB).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tT).toLocaleString('tr-TR')} ₺</td><td>-</td></tr>`;
+                html += `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(tA).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tIF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tB).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tT).toLocaleString('tr-TR')} ₺</td><td>-</td></tr>`;
             }
             html += `</tbody></table></div></div>`;
             resultArea.innerHTML += html;
