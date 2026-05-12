@@ -165,26 +165,21 @@
     function checkLocks() {
         const perSelect = document.getElementById('periyot');
         
-        // Vergi ve Faiz Ayarları
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
         
         if(mode === 'zirai') { 
             document.getElementById('faiz').value = "45.00"; 
-            perSelect.value = "1"; // Yılda 1
-            perSelect.disabled = false;
+            perSelect.value = "1"; perSelect.disabled = false;
         } else if(mode === 'ticari') { 
             document.getElementById('faiz').value = "48.00"; 
-            perSelect.value = "12"; // Ayda 1
-            perSelect.disabled = false;
+            perSelect.value = "12"; perSelect.disabled = false;
         } else if(mode === 'tuketici') { 
             document.getElementById('faiz').value = "52.68"; 
-            perSelect.value = "12"; // Ayda 1 Kilitli
-            perSelect.disabled = true;
+            perSelect.value = "12"; perSelect.disabled = false; // Tüketici için kilit açıldı
         } else { 
             document.getElementById('faiz').value = "40.50"; 
-            perSelect.value = "1"; // Yılda 1
-            perSelect.disabled = false;
+            perSelect.value = "1"; perSelect.disabled = false;
         }
     }
 
@@ -212,10 +207,9 @@
         const v_kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
         const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         
-        // Önemli: Ay bazlı sekmelerde vade / (12/per) hesaplaması
         let taksitSayisi;
         if(mode === 'ticari' || mode === 'zirai' || mode === 'tuketici') {
-            taksitSayisi = Math.ceil(vade / (12 / per));
+            taksitSayisi = Math.max(1, Math.ceil(vade / (12 / per)));
         } else {
             taksitSayisi = vade * per;
         }
