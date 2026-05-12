@@ -136,12 +136,11 @@
             <div class="expense-box" id="expense-container">
                 <h3>Kredi Masrafları & Kesintiler</h3>
                 <div class="expense-grid">
-                    <div class="exp-item"><span>Kredi Tahsis Ücreti (%0.5)</span><span id="exp-tahsis">0 TL</span></div>
                     <div class="exp-item"><span>Limit Tahsis Masrafı</span><span>1.500 TL</span></div>
                     <div class="exp-item"><span>Kullandırım Komisyonu (%1)</span><span id="exp-komisyon">0 TL</span></div>
                     <div class="exp-item exp-traktor-only"><span>Tarsim Sigortası (%4)</span><span id="exp-tarsim">0 TL</span></div>
+                    <div class="exp-item exp-traktor-only"><span>Kasko Sigortası (%3)</span><span id="exp-kasko">0 TL</span></div>
                     <div class="exp-item exp-traktor-only"><span>Rehin Tesisi</span><span>1.250 TL</span></div>
-                    <div class="exp-item exp-traktor-only"><span>Kasko Sigortası</span><span>12.500 TL</span></div>
                 </div>
             </div>
 
@@ -235,14 +234,14 @@
             html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td><td>${Math.round(bsmvM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
         }
 
-        // Masraf Güncellemeleri
-        const tahsis = anaPara * 0.005;
+        // Masraflar
         const komisyon = anaPara * 0.01;
-        const tarsim = anaPara * 0.04; // Traktöre özel %4 Tarsim
+        const tarsim = anaPara * 0.04; 
+        const kasko = anaPara * 0.03; // Yeni: %3 Kasko
 
-        document.getElementById('exp-tahsis').innerText = Math.round(tahsis).toLocaleString('tr-TR') + " TL";
         document.getElementById('exp-komisyon').innerText = Math.round(komisyon).toLocaleString('tr-TR') + " TL";
         document.getElementById('exp-tarsim').innerText = Math.round(tarsim).toLocaleString('tr-TR') + " TL";
+        document.getElementById('exp-kasko').innerText = Math.round(kasko).toLocaleString('tr-TR') + " TL";
 
         document.querySelectorAll('.exp-traktor-only').forEach(el => {
             el.style.display = (mode === 'traktor') ? 'flex' : 'none';
