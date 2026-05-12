@@ -42,8 +42,15 @@
         tr:nth-child(even) { background-color: #f8fafc; }
         .total-row td { background: #f1f5f9 !important; font-weight: 800 !important; color: var(--navy); border-top: 2px solid var(--navy); }
 
+        /* MASRAFLAR */
         .expense-box { margin-top: 20px; padding: 15px; border-radius: 10px; background: #fff5f5; border: 1px solid #fecaca; }
         .expense-box h3 { margin: 0 0 10px 0; font-size: 13px; color: var(--red); text-transform: uppercase; border-bottom: 1px solid #fecaca; padding-bottom: 5px; }
+        
+        /* TOPLAM MASRAF KUTUSU (ÖZEL) */
+        .total-expense-highlight { background: #fee2e2; border: 2px solid var(--red); padding: 12px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .total-expense-highlight span:first-child { font-size: 14px; font-weight: 900; color: var(--red); }
+        .total-expense-highlight span:last-child { font-size: 20px; font-weight: 900; color: var(--navy); }
+
         .expense-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .exp-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #fee2e2; }
         .exp-item span:first-child { font-size: 11px; font-weight: 700; color: var(--gray); }
@@ -134,10 +141,15 @@
             </div>
 
             <div class="expense-box" id="expense-container">
-                <h3>Kredi Masrafları & Kesintiler</h3>
+                <div class="total-expense-highlight">
+                    <span>TOPLAM MASRAFLAR</span>
+                    <span id="exp-total-all">0 TL</span>
+                </div>
+
+                <h3>Masraf Detayları</h3>
                 <div class="expense-grid">
-                    <div class="exp-item"><span>Limit Tahsis Masrafı</span><span>1.500 TL</span></div>
                     <div class="exp-item"><span>Kullandırım Komisyonu (%1)</span><span id="exp-komisyon">0 TL</span></div>
+                    <div class="exp-item"><span>Limit Tahsis Masrafı</span><span>1.500 TL</span></div>
                     <div class="exp-item exp-traktor-only"><span>Tarsim Sigortası (%4)</span><span id="exp-tarsim">0 TL</span></div>
                     <div class="exp-item exp-traktor-only"><span>Kasko Sigortası (%3)</span><span id="exp-kasko">0 TL</span></div>
                     <div class="exp-item exp-traktor-only"><span>Rehin Tesisi</span><span>1.250 TL</span></div>
@@ -234,14 +246,25 @@
             html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td><td>${Math.round(bsmvM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
         }
 
-        // Masraflar
+        // MASRAFLARIN HESAPLANMASI
         const komisyon = anaPara * 0.01;
-        const tarsim = anaPara * 0.04; 
-        const kasko = anaPara * 0.03; // Yeni: %3 Kasko
+        const limitTahsis = 1500;
+        let toplamMasraf = komisyon + limitTahsis;
 
         document.getElementById('exp-komisyon').innerText = Math.round(komisyon).toLocaleString('tr-TR') + " TL";
-        document.getElementById('exp-tarsim').innerText = Math.round(tarsim).toLocaleString('tr-TR') + " TL";
-        document.getElementById('exp-kasko').innerText = Math.round(kasko).toLocaleString('tr-TR') + " TL";
+
+        if(mode === 'traktor') {
+            const tarsim = anaPara * 0.04;
+            const kasko = anaPara * 0.03;
+            const rehin = 1250;
+            toplamMasraf += (tarsim + kasko + rehin);
+            
+            document.getElementById('exp-tarsim').innerText = Math.round(tarsim).toLocaleString('tr-TR') + " TL";
+            document.getElementById('exp-kasko').innerText = Math.round(kasko).toLocaleString('tr-TR') + " TL";
+        }
+
+        // Toplam Masraf Kutusunu Güncelle
+        document.getElementById('exp-total-all').innerText = Math.round(toplamMasraf).toLocaleString('tr-TR') + " TL";
 
         document.querySelectorAll('.exp-traktor-only').forEach(el => {
             el.style.display = (mode === 'traktor') ? 'flex' : 'none';
