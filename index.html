@@ -6,7 +6,7 @@
     <title>Süleyman Coşkun - Kredi Hesaplama</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; }
+        :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background: #f8fafc; margin: 0; padding: 5px; color: #1e293b; }
         .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
@@ -16,26 +16,24 @@
         .summary-item span { display: block; color: var(--gray); font-size: 9px; text-transform: uppercase; }
 
         .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 10px; flex-wrap: wrap; }
-        .tab-btn { flex: 1; min-width: 70px; padding: 8px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 9px; cursor: pointer; line-height: 1.1; text-transform: uppercase; }
+        .tab-btn { flex: 1; min-width: 70px; padding: 8px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 9px; cursor: pointer; text-transform: uppercase; }
         .tab-btn.active { background: var(--blue); color: #fff; }
         
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f1f5f9; padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
         .field { display: flex; flex-direction: column; gap: 2px; }
         .field-row { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
-        label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; white-space: nowrap; }
+        label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; width: 100%; height: 34px; }
         
-        /* Seçenekler Bölümü */
-        .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 2px; }
-        .options-title { font-size: 9px; font-weight: 800; color: var(--blue); text-transform: uppercase; margin-bottom: 2px; }
+        .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; }
         .options-row { display: flex; gap: 15px; align-items: center; }
         .opt { display: flex; align-items: center; gap: 6px; cursor: pointer; }
         .opt input { width: 18px; height: 18px; margin: 0; cursor: pointer; }
-        .opt label { font-size: 11px; text-transform: none; color: var(--navy); cursor: pointer; margin: 0; font-weight: 700; }
+        .opt label { font-size: 11px; color: var(--navy); cursor: pointer; font-weight: 700; }
 
         .vade-header { background: var(--blue); color: white; padding: 5px; margin-top: 8px; border-radius: 6px; font-size: 10px; font-weight: 900; text-align: center; position: relative; }
-        .btn-mini-print { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #fff; color: var(--blue); border: none; padding: 2px 6px; border-radius: 4px; font-size: 8px; cursor: pointer; font-weight: 800; }
+        .faiz-bilgi { background: #f8fafc; padding: 4px; font-size: 10px; font-weight: 800; color: var(--navy); border: 1px solid var(--border); border-top: none; text-align: center; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; margin-bottom: 10px; }
 
         .table-res { overflow-x: auto; margin-top: 2px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 5px; background: white; }
@@ -75,7 +73,6 @@
     </div>
 
     <div class="grid no-print">
-        <!-- Grup 1: Tutarlar -->
         <div class="field-row">
             <div class="field">
                 <label>Proforma Fatura Tutarı</label>
@@ -87,7 +84,6 @@
             </div>
         </div>
 
-        <!-- Grup 2: Oranlar -->
         <div class="field-row">
             <div class="field">
                 <label>Yıllık Faiz %</label>
@@ -99,29 +95,26 @@
             </div>
         </div>
 
-        <!-- Grup 3: Sabitlenen Destek Seçenekleri (Sadece Traktörde Görünür) -->
         <div class="options-container" id="traktorOpts">
-            <div class="options-title">Zirai Destek Tanımları</div>
             <div class="options-row">
                 <div class="opt">
                     <input type="checkbox" id="yerli" checked onchange="updateSub()">
                     <label for="yerli">Yerli Malı Desteği</label>
                 </div>
                 <div class="opt">
-                    <input type="checkbox" id="buyback" onchange="updateSub()">
+                    <input type="checkbox" id="buyback" onchange="reset()">
                     <label for="buyback">Buy Back Kapsamında</label>
                 </div>
             </div>
         </div>
 
-        <!-- Grup 4: Vade ve Vergiler -->
-        <div class="field-row">
+        <div class="field-row" id="extra-row" style="display: none;">
             <div class="field" id="vade-box">
                 <label>Vade</label>
                 <select id="vade" onchange="reset()"></select>
             </div>
-            <div class="field">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; display: none;" id="tax-row">
+            <div class="field" id="tax-row">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
                     <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
                 </div>
@@ -161,11 +154,7 @@
 
     function updateSub() {
         const isYerli = document.getElementById('yerli').checked;
-        const isBuyBack = document.getElementById('buyback').checked;
-        let base = 25;
-        if(isYerli) base += 25;
-        if(isBuyBack) base += 25;
-        document.getElementById('subOran').value = base;
+        document.getElementById('subOran').value = isYerli ? 50 : 25;
         reset();
     }
 
@@ -184,11 +173,21 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         mode = m;
-        document.getElementById('vade-box').style.visibility = (m === 'traktor') ? 'hidden' : 'visible';
-        document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
-        document.getElementById('tax-row').style.display = (m === 'traktor') ? 'none' : 'grid';
+        
+        const extraRow = document.getElementById('extra-row');
+        const traktorOpts = document.getElementById('traktorOpts');
+        
+        if (m === 'traktor') {
+            extraRow.style.display = 'none';
+            traktorOpts.style.display = 'flex';
+        } else {
+            extraRow.style.display = 'grid';
+            traktorOpts.style.display = 'none';
+        }
+
         if(m === 'tuketici') { document.getElementById('bsmv').value = 15; document.getElementById('kkdf').value = 15; } 
         else { document.getElementById('bsmv').value = 5; document.getElementById('kkdf').value = 0; }
+        
         fillVade(); reset();
     }
 
@@ -199,6 +198,7 @@
         const prof = document.getElementById('proforma').value;
         const faizVal = document.getElementById('faiz').value;
         const subVal = document.getElementById('subOran').value;
+        const isBuyBack = document.getElementById('buyback').checked;
 
         document.getElementById('sum-prof').innerText = prof + ' ₺';
         document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value + ' ₺';
@@ -216,13 +216,11 @@
             let dFaiz = isMonthly ? (yFaiz / 12) : yFaiz;
             let bFaiz = dFaiz * (1 + bsmv + kkdf);
             let taksit = (anaPara * bFaiz * Math.pow(1+bFaiz, v)) / (Math.pow(1+bFaiz, v)-1);
-            let tableId = `table-group-${index}`;
-
-            let html = `<div id="${tableId}">
-                        <div class="vade-header">${isMonthly ? v+' AY' : v+' YIL'} ÖDEME PLANI
-                        <button class="btn-mini-print no-print" onclick="tekliYazdir('${tableId}')">YAZDIR</button></div>
+            
+            let html = `<div>
+                        <div class="vade-header">${isMonthly ? v+' AY' : v+' YIL'} ÖDEME PLANI</div>
                         <div class="table-res"><table>
-                        <thead><tr><th>No</th><th>Anapara</th><th>Faiz</th><th>İnd. Faiz</th><th>BSMV</th><th>${mode==='traktor'?'Sübv. Taksit':'Taksit'}</th><th>Kalan</th></tr></thead><tbody>`;
+                        <thead><tr><th>No</th><th>Anapara</th><th>Faiz</th><th>İnd. Faiz</th><th>BSMV</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara;
             let tA = 0, tF = 0, tIF = 0, tB = 0, tT = 0;
@@ -249,22 +247,13 @@
             if (v > 1) {
                 html += `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(tA).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tIF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tB).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tT).toLocaleString('tr-TR')} ₺</td><td>-</td></tr>`;
             }
-            html += `</tbody></table></div></div>`;
+            html += `</tbody></table></div>
+                    <div class="faiz-bilgi">${isBuyBack ? 'Kredi sabit faizlidir' : 'Kredi değişken faizdir'}</div>
+                    </div>`;
             resultArea.innerHTML += html;
         });
         document.getElementById('pdfBtn').disabled = false;
         document.getElementById('printBtn').disabled = false;
-    }
-
-    function tekliYazdir(id) {
-        const content = document.getElementById(id).cloneNode(true);
-        const summary = document.getElementById('print-summary').cloneNode(true);
-        if(content.querySelector('.btn-mini-print')) content.querySelector('.btn-mini-print').remove();
-        const pWin = window.open('', '_blank');
-        pWin.document.write('<html><head><style>' + document.head.querySelector('style').innerHTML + ' #print-summary{display:grid !important;}</style></head><body>');
-        pWin.document.write('<div class="container">' + summary.outerHTML + content.innerHTML + '</div></body></html>');
-        pWin.document.close();
-        setTimeout(() => { pWin.print(); pWin.close(); }, 500);
     }
 
     function yazdirTum() { window.print(); }
