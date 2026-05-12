@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Kredi Hesaplama</title>
+    <title>Süleyman Coşkun - Kredi Hesaplama ve Başvuru</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
@@ -148,15 +148,42 @@
         calculated = true; document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false; checkApply();
     }
     function send() {
-        const btn = document.getElementById('applyBtn'); btn.innerText = "GÖNDERİLİYOR..."; btn.disabled = true;
+        const btn = document.getElementById('applyBtn');
+        const tcField = document.getElementById('tc');
+        const telField = document.getElementById('tel');
+
+        btn.innerText = "GÖNDERİLİYOR...";
+        btn.disabled = true;
+
         const params = {
-            tc: document.getElementById('tc').value, tel: document.getElementById('tel').value,
+            tc: tcField.value, tel: telField.value,
             tutar: document.getElementById('tutar').value, vade: document.getElementById('vade').value,
-            faiz: document.getElementById('faiz').value, mod: mode.toUpperCase()
+            faiz: document.getElementById('faiz').value, mod: mode.toUpperCase(),
+            tarih: new Date().toLocaleString('tr-TR')
         };
+
         emailjs.send('service_5w8gyxb', 'template_ege1n6p', params).then(function() {
-            alert("Başvuru maili başarıyla gönderildi!"); btn.innerText = "BAŞVURU TAMAMLANDI"; btn.style.background = "#10b981";
-        }, function(error) { alert("Hata: " + JSON.stringify(error)); btn.innerText = "TEKRAR DENE"; btn.disabled = false; });
+            alert("Başvuru maili başarıyla gönderildi!");
+            
+            // Verileri Temizle
+            tcField.value = "";
+            telField.value = "";
+            
+            btn.innerText = "BAŞVURU TAMAMLANDI";
+            btn.style.background = "#10b981";
+            
+            // 3 saniye sonra butonu sıfırla
+            setTimeout(() => {
+                btn.innerText = "BAŞVURUYU TAMAMLA";
+                btn.style.background = "";
+                checkApply();
+            }, 3000);
+
+        }, function(error) { 
+            alert("Hata: " + JSON.stringify(error)); 
+            btn.innerText = "TEKRAR DENE"; 
+            btn.disabled = false; 
+        });
     }
     function yazdir() { window.print(); }
     function indir() {
