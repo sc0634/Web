@@ -22,6 +22,7 @@
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f1f5f9; padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
         .field { display: flex; flex-direction: column; gap: 2px; }
         .field-row { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .full-width { grid-column: span 2; }
         
         label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; width: 100%; height: 34px; }
@@ -63,9 +64,9 @@
 
 <div class="container" id="pdf-area">
     <div id="print-summary">
-        <div class="summary-item"><span>Proforma Tutarı</span><div id="sum-prof">0 ₺</div></div>
+        <div class="summary-item" id="sum-prof-box"><span>Proforma Tutarı</span><div id="sum-prof">0 ₺</div></div>
         <div class="summary-item"><span>Kredi Tutarı</span><div id="sum-kredi">0 ₺</div></div>
-        <div class="summary-item"><span>Faiz / Sübv. Oranı</span><div id="sum-faiz">0 / 0</div></div>
+        <div class="summary-item" id="sum-rate-box"><span>Faiz / Sübv. Oranı</span><div id="sum-faiz">0 / 0</div></div>
     </div>
 
     <div class="tabs no-print">
@@ -78,22 +79,22 @@
 
     <div class="grid no-print">
         <div class="field-row">
-            <div class="field">
+            <div class="field" id="prof-input-box">
                 <label>Proforma Fatura Tutarı</label>
                 <input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)">
             </div>
-            <div class="field">
+            <div class="field" id="tutar-input-box">
                 <label>Kredi Tutarı</label>
                 <input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)">
             </div>
         </div>
 
         <div class="field-row">
-            <div class="field">
+            <div class="field" id="faiz-input-box">
                 <label>Yıllık Faiz %</label>
                 <input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()">
             </div>
-            <div class="field">
+            <div class="field" id="sub-input-box">
                 <label>Sübvansiyon Oranı %</label>
                 <input type="number" id="subOran" value="50" oninput="reset()">
             </div>
@@ -177,8 +178,7 @@
         }
         
         info.style.display = isYerli ? 'block' : 'none';
-        if(mode === 'ekipman') info.style.display = 'block'; // Ekipmanda hep bilgi verelim
-        
+        if(mode === 'ekipman') info.style.display = 'block';
         reset();
     }
 
@@ -186,13 +186,8 @@
         const isBB = document.getElementById('buyback').checked;
         const bbText = document.getElementById('bb-bilgi');
         if(bbText) {
-            if(isBB) {
-                bbText.innerText = "Kredi Sabit Faizlidir";
-                bbText.classList.remove('red');
-            } else {
-                bbText.innerText = "Kredi Değişken Faizlidir";
-                bbText.classList.add('red');
-            }
+            bbText.innerText = isBB ? "Kredi Sabit Faizlidir" : "Kredi Değişken Faizlidir";
+            isBB ? bbText.classList.remove('red') : bbText.classList.add('red');
         }
         reset();
     }
@@ -216,22 +211,36 @@
         const extraRow = document.getElementById('extra-row');
         const ziraiOpts = document.getElementById('ziraiOpts');
         const optBuyback = document.getElementById('opt-buyback');
+        const profBox = document.getElementById('prof-input-box');
+        const tutarBox = document.getElementById('tutar-input-box');
+        const subBox = document.getElementById('sub-input-box');
+        const faizBox = document.getElementById('faiz-input-box');
         
-        if (m === 'traktor') {
+        // Ticari Sekme Kontrolü
+        if (m === 'ticari') {
+            profBox.style.display = 'none';
+            subBox.style.display = 'none';
+            tutarBox.classList.add('full-width');
+            faizBox.classList.add('full-width');
+        } else {
+            profBox.style.display = 'flex';
+            subBox.style.display = 'flex';
+            tutarBox.classList.remove('full-width');
+            faizBox.classList.remove('full-width');
+        }
+
+        // Zirai Seçenekler Görünürlüğü
+        if (m === 'traktor' || m === 'ekipman') {
             extraRow.style.display = 'none';
             ziraiOpts.style.display = 'flex';
-            optBuyback.style.display = 'flex';
-            updateYerli();
-        } else if (m === 'ekipman') {
-            extraRow.style.display = 'none';
-            ziraiOpts.style.display = 'flex';
-            optBuyback.style.display = 'none';
+            optBuyback.style.display = (m === 'traktor') ? 'flex' : 'none';
             updateYerli();
         } else {
             extraRow.style.display = 'grid';
             ziraiOpts.style.display = 'none';
         }
 
+        // BSMV/KKDF Ayarları
         if(m === 'tuketici') { 
             document.getElementById('bsmv').value = 15; 
             document.getElementById('kkdf').value = 15; 
@@ -249,11 +258,24 @@
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const prof = document.getElementById('proforma').value;
         const faizVal = document.getElementById('faiz').value;
-        const subVal = document.getElementById('subOran').value;
+        const subVal = (mode === 'ticari') ? 0 : document.getElementById('subOran').value;
 
-        document.getElementById('sum-prof').innerText = prof + ' ₺';
+        // Özet Alanı Güncelleme
+        const sumProfBox = document.getElementById('sum-prof-box');
+        const sumRateLabel = document.querySelector('#sum-rate-box span');
+        
+        if (mode === 'ticari') {
+            sumProfBox.style.display = 'none';
+            sumRateLabel.innerText = "Yıllık Faiz Oranı";
+            document.getElementById('sum-faiz').innerText = '%' + faizVal;
+        } else {
+            sumProfBox.style.display = 'block';
+            sumRateLabel.innerText = "Faiz / Sübv. Oranı";
+            document.getElementById('sum-prof').innerText = prof + ' ₺';
+            document.getElementById('sum-faiz').innerText = '%' + faizVal + ' / %' + subVal;
+        }
+        
         document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value + ' ₺';
-        document.getElementById('sum-faiz').innerText = '%' + faizVal + ' / %' + subVal;
 
         const yFaiz = faizVal / 100;
         const subOran = subVal / 100;
@@ -263,7 +285,7 @@
         let vades = (mode === 'traktor' || mode === 'ekipman') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach((v) => {
-            let isMonthly = (mode === 'ticari' || mode === 'tuketici');
+            let isMonthly = (mode === 'ticari' || mode === 'tuketici' || mode === 'zirai');
             let dFaiz = isMonthly ? (yFaiz / 12) : yFaiz;
             let bFaiz = dFaiz * (1 + bsmv + kkdf);
             let taksit = (anaPara * bFaiz * Math.pow(1+bFaiz, v)) / (Math.pow(1+bFaiz, v)-1);
@@ -271,7 +293,7 @@
             let html = `<div>
                         <div class="vade-header">${isMonthly ? v+' AY' : v+' YIL'} ÖDEME PLANI</div>
                         <div class="table-res"><table>
-                        <thead><tr><th>No</th><th>Anapara</th><th>Faiz</th><th>İnd. Faiz</th><th>BSMV</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
+                        <thead><tr><th>No</th><th>Anapara</th><th>Faiz</th>${mode !== 'ticari' ? '<th>İnd. Faiz</th>' : ''}<th>BSMV</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara;
             let tA = 0, tF = 0, tIF = 0, tB = 0, tT = 0;
@@ -289,14 +311,14 @@
                     <td>${i}</td>
                     <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
                     <td>${Math.round(f).toLocaleString('tr-TR')} ₺</td>
-                    <td style="color:var(--blue);">${Math.round(indFaiz).toLocaleString('tr-TR')} ₺</td>
+                    ${mode !== 'ticari' ? `<td style="color:var(--blue);">${Math.round(indFaiz).toLocaleString('tr-TR')} ₺</td>` : ''}
                     <td>${Math.round(b).toLocaleString('tr-TR')} ₺</td>
                     <td style="background:#f0f9ff;font-weight:bold;">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
                     <td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')} ₺</td>
                 </tr>`;
             }
             if (v > 1) {
-                html += `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(tA).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tIF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tB).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tT).toLocaleString('tr-TR')} ₺</td><td>-</td></tr>`;
+                html += `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(tA).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tF).toLocaleString('tr-TR')} ₺</td>${mode !== 'ticari' ? `<td>${Math.round(tIF).toLocaleString('tr-TR')} ₺</td>` : ''}<td>${Math.round(tB).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tT).toLocaleString('tr-TR')} ₺</td><td>-</td></tr>`;
             }
             
             html += `</tbody></table></div></div>`;
