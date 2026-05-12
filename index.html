@@ -25,7 +25,6 @@
 
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; }
-        /* Readonly ve Disabled alanlar için stil */
         input[readonly], input:disabled, select:disabled { background-color: #e2e8f0; color: #64748b; cursor: not-allowed; border-color: #cbd5e1; }
         
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
@@ -88,7 +87,7 @@
 
             <div class="field-row">
                 <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
-                <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
+                <div class="field" id="vade-box"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
             </div>
             
             <div class="field-row">
@@ -97,7 +96,6 @@
             </div>
 
             <div class="field-row">
-                <!-- BSMV ve KKDF artık readonly -->
                 <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
                 <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
             </div>
@@ -118,7 +116,7 @@
 
             <div class="options-row" id="traktorOpts">
                 <div class="opt"><input type="checkbox" id="yerli" checked onchange="toggleYerli(this)"><label for="yerli">Yerli Malı Desteği</label></div>
-                <div class="opt"><input type="checkbox" id="buyback" checked onchange="updateBuyBackText(); reset();"><label for="buyback">Buy Back Kapsamında</label></div>
+                <div class="opt"><input type="checkbox" id="buyback" checked onchange="reset();"><label for="buyback">Buy Back Kapsamında</label></div>
             </div>
         </div>
 
@@ -204,8 +202,6 @@
         reset(); 
     }
     
-    function updateBuyBackText() { reset(); }
-    
     function fillVade() {
         const s = document.getElementById('vade'); s.innerHTML = '';
         let isMonthly = (mode !== 'traktor' && mode !== 'zirai');
@@ -226,6 +222,7 @@
         const tipBox = document.getElementById('tip-container');
         const traktorOpts = document.getElementById('traktorOpts');
         const proformaBox = document.getElementById('proforma-container');
+        const vadeBox = document.getElementById('vade-box');
 
         periyotSelect.disabled = false;
 
@@ -233,11 +230,13 @@
             traktorOpts.style.display = 'flex'; 
             subBox.style.display = 'flex';
             proformaBox.style.display = 'flex';
+            vadeBox.style.display = 'none';
             tipBox.classList.add('half-width');
         } else if(m === 'zirai') {
             traktorOpts.style.display = 'none'; 
             subBox.style.display = 'none';
             proformaBox.style.display = 'none';
+            vadeBox.style.display = 'flex';
             periyotSelect.value = "1";
             periyotSelect.disabled = true;
             tipBox.classList.add('half-width');
@@ -245,6 +244,7 @@
             traktorOpts.style.display = 'none'; 
             subBox.style.display = 'none';
             proformaBox.style.display = 'none';
+            vadeBox.style.display = 'flex';
             tipBox.classList.add('half-width');
         }
         checkLocks(); fillVade(); updateMonthly(); reset();
@@ -252,7 +252,6 @@
     
     function checkLocks() {
         const perSelect = document.getElementById('periyot');
-        // Seçilen moda göre BSMV ve KKDF değerlerini otomatik atıyoruz
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
         
@@ -276,36 +275,44 @@
         const profTutar = parseFloat(document.getElementById('proforma').value.replace(/\./g, "")) || 0;
         const yFaiz = parseFloat(document.getElementById('faiz').value) / 100;
         const subOran = (mode === 'traktor') ? parseFloat(document.getElementById('subOran').value) / 100 : 0;
-        const vade = parseInt(document.getElementById('vade').value);
+        
+        let vade = (mode === 'traktor') ? 5 : parseInt(document.getElementById('vade').value);
         const per = parseInt(document.getElementById('periyot').value);
         const tip = document.getElementById('tip').value;
         const v_kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
         const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         
-        let taksitSayisi = (mode !== 'traktor' && mode !== 'zirai') ? Math.max(1, Math.ceil(vade / (12 / per))) : vade * per;
+        let toplamTaksitSayisi = (mode !== 'traktor' && mode !== 'zirai') ? Math.max(1, Math.ceil(vade / (12 / per))) : vade * per;
+        
+        // Sadece tablo gösterimi için 1 yıllık taksit sayısı (Traktör için periyot kadar, diğerleri için vade kadar)
+        let tabloTaksitSayisi = (mode === 'traktor') ? per : toplamTaksitSayisi;
+
         const donemFaiz = yFaiz / per; 
         const bilesikFaiz = donemFaiz * (1 + v_kkdf + v_bsmv);
 
         let html = '', kalan = anaPara; 
         let tTaksit = 0, tAnapara = 0, tFaiz = 0, tIndFaiz = 0, tBsmv = 0, tKkdf = 0, tSubTaksit = 0;
 
-        for(let i=1; i<=taksitSayisi; i++) {
+        for(let i=1; i<=toplamTaksitSayisi; i++) {
             let f = kalan * donemFaiz; let indF = f * (1 - subOran); let bsmvM = f * v_bsmv; let kkdfM = f * v_kkdf;
             let a, t;
             if(tip === 'esit') { 
-                t = (anaPara * bilesikFaiz * Math.pow(1+bilesikFaiz, taksitSayisi)) / (Math.pow(1+bilesikFaiz, taksitSayisi)-1); 
+                t = (anaPara * bilesikFaiz * Math.pow(1+bilesikFaiz, toplamTaksitSayisi)) / (Math.pow(1+bilesikFaiz, toplamTaksitSayisi)-1); 
                 a = t - (f + bsmvM + kkdfM); 
-            } else { a = anaPara / taksitSayisi; t = a + f + bsmvM + kkdfM; }
-            if(i === taksitSayisi) a = kalan; 
+            } else { a = anaPara / toplamTaksitSayisi; t = a + f + bsmvM + kkdfM; }
+            if(i === toplamTaksitSayisi) a = kalan; 
             let subT = a + indF + bsmvM; kalan -= a;
-            tTaksit += t; tAnapara += a; tFaiz += f; tIndFaiz += indF; tBsmv += bsmvM; tKkdf += kkdfM; tSubTaksit += subT;
-            html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td><td>${Math.round(bsmvM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
+
+            // Sadece tablodaki satırlar için toplama yap ve html oluştur
+            if(i <= tabloTaksitSayisi) {
+                tTaksit += t; tAnapara += a; tFaiz += f; tIndFaiz += indF; tBsmv += bsmvM; tKkdf += kkdfM; tSubTaksit += subT;
+                html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td><td>${Math.round(bsmvM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
+            }
         }
 
         const safKomisyon = anaPara * 0.01;
         const komisyonBsmv = safKomisyon * 0.05;
         const toplamKomisyonMaliyeti = safKomisyon + komisyonBsmv;
-        
         const limitTahsis = 1500;
         let toplamMasraf = toplamKomisyonMaliyeti + limitTahsis;
         document.getElementById('exp-komisyon').innerText = Math.round(toplamKomisyonMaliyeti).toLocaleString('tr-TR') + " TL";
@@ -326,7 +333,10 @@
         document.getElementById('hKkdf').style.display = (mode === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('hSub').style.display = (mode === 'traktor') ? 'table-cell' : 'none';
         document.getElementById('plan').innerHTML = html;
+        
+        // Toplam satırı (Sadece tabloda görünen dönemin toplamını gösterir)
         document.getElementById('tableFoot').innerHTML = `<tr class="total-row"><td>TOP</td><td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td><td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(tIndFaiz).toLocaleString('tr-TR')}</td><td>${Math.round(tBsmv).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(tKkdf).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(tSubTaksit).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
+        
         document.getElementById('result').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
