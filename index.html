@@ -11,7 +11,6 @@
         body { background: #f8fafc; margin: 0; padding: 10px; color: #1e293b; }
         .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         
-        /* Yazdırma Özeti Stili */
         #print-summary { display: none; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; padding: 15px; border: 2px solid var(--navy); border-radius: 8px; }
         .summary-item { font-size: 12px; font-weight: bold; }
         .summary-item span { display: block; color: var(--gray); font-size: 10px; text-transform: uppercase; }
@@ -44,9 +43,11 @@
         .btn-pdf { background: #6366f1; }
         .btn-print { background: var(--navy); }
 
-        .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .opt { display: flex; align-items: center; }
-        .opt label { font-size: 11px; text-transform: none; color: var(--navy); cursor: pointer; margin-left: 3px; }
+        /* YERLİ MALI HİZALAMA GÜNCELLEMESİ */
+        .options-row { grid-column: span 2; display: flex; justify-content: flex-start; gap: 5px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
+        .opt { display: flex; align-items: center; gap: 4px; }
+        .opt input { width: auto; cursor: pointer; }
+        .opt label { font-size: 11px; text-transform: none; color: var(--navy); cursor: pointer; margin: 0; }
 
         @media print { 
             .no-print { display: none !important; } 
@@ -62,7 +63,6 @@
 <body onload="initApp()">
 
 <div class="container" id="pdf-area">
-    <!-- Yazdırma Özeti (Normalde Gizli) -->
     <div id="print-summary">
         <div class="summary-item"><span id="sum-label-prof">Proforma Tutarı</span><div id="sum-prof">0 ₺</div></div>
         <div class="summary-item"><span>Kredi Tutarı</span><div id="sum-kredi">0 ₺</div></div>
@@ -167,7 +167,6 @@
         const faizVal = document.getElementById('faiz').value;
         const subVal = document.getElementById('subOran').value;
 
-        // Yazdırma Özetini Güncelle
         document.getElementById('sum-prof').innerText = prof + ' ₺';
         document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value + ' ₺';
         document.getElementById('sum-faiz').innerText = '%' + faizVal + ' / %' + subVal;
