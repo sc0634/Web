@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Süleyman Coşkun - Kredi Hesaplama</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; --red: #ef4444; }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -32,8 +31,6 @@
         td { padding: 10px 4px; text-align: center; border: 1px solid var(--border); font-size: 12px; font-weight: 600; color: #000; }
         tr:nth-child(even) { background-color: #f8fafc; }
         
-        .total-row td { background: #f1f5f9 !important; font-weight: 800; border-top: 2px solid var(--navy); color: var(--navy); }
-
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 20px 0; }
         .btn { padding: 14px 5px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 12px; }
         .btn-calc { background: var(--success); }
@@ -70,7 +67,6 @@
             <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
             <div class="field"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         </div>
-        <!-- Vergi Satırı: Dinamik olarak gösterilecek/gizlenecek -->
         <div class="field-row" id="tax-row">
             <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
             <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
@@ -121,7 +117,7 @@
         let max = (mode === 'tuketici') ? 36 : (isM ? 60 : 5);
         for(let i=1; i<=max; i++) {
             let o = document.createElement('option'); o.value = i; o.text = i + (isM ? " Ay" : " Yıl");
-            if(i === max) o.selected = true;
+            if(i === (isM ? 12 : max)) o.selected = true;
             s.appendChild(o);
         }
     }
@@ -131,20 +127,13 @@
         btn.classList.add('active');
         mode = m;
         
-        // Element Kontrolleri
         document.getElementById('vade-box').style.display = (m === 'traktor') ? 'none' : 'block';
         document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
-        
-        // Sadece Traktörde BSMV/KKDF Satırını Gizle
         document.getElementById('tax-row').style.display = (m === 'traktor') ? 'none' : 'grid';
         
-        // Mod bazlı varsayılan vergi değerleri
         if(m === 'tuketici') {
             document.getElementById('bsmv').value = 15;
             document.getElementById('kkdf').value = 15;
-        } else if(m === 'ticari') {
-            document.getElementById('bsmv').value = 5;
-            document.getElementById('kkdf').value = 0;
         } else {
             document.getElementById('bsmv').value = 5;
             document.getElementById('kkdf').value = 0;
@@ -165,19 +154,19 @@
         let vades = (mode === 'traktor') ? [1, 2, 3, 4, 5] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach(v => {
-            let per = (mode === 'ticari' || mode === 'tuketici') ? 12 : 1; 
-            let totalTaksit = (mode === 'ticari' || mode === 'tuketici') ? v : v * per;
-            let dFaiz = yFaiz / per;
+            let isMonthly = (mode === 'ticari' || mode === 'tuketici');
+            let totalTaksit = v;
+            let dFaiz = isMonthly ? (yFaiz / 12) : yFaiz;
             let bFaiz = dFaiz * (1 + bsmv + kkdf);
             
             let taksit = (anaPara * bFaiz * Math.pow(1+bFaiz, totalTaksit)) / (Math.pow(1+bFaiz, totalTaksit)-1);
             
-            let html = `<div class="vade-header">${v} YILLIK ÖDEME PLANI</div>
+            let label = isMonthly ? `${v} AY` : `${v} YIL`;
+            let html = `<div class="vade-header">${label} ÖDEME PLANI</div>
                         <div class="table-res"><table>
                         <thead><tr><th>No</th><th>Anapara</th><th>Faiz</th><th>BSMV</th><th>${mode==='traktor'?'Sübv. Taksit':'Taksit'}</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara;
-            let tA = 0, tF = 0, tB = 0, tT = 0;
 
             for(let i=1; i<=totalTaksit; i++) {
                 let f = kalan * dFaiz;
@@ -189,12 +178,17 @@
                 let sTaksit = taksit - (f * sub); 
                 kalan -= a;
                 
-                tA += a; tF += f; tB += b; tT += sTaksit;
-
-                html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
+                html += `<tr>
+                    <td>${i}</td>
+                    <td>${Math.round(a).toLocaleString('tr-TR')} ₺</td>
+                    <td>${Math.round(f).toLocaleString('tr-TR')} ₺</td>
+                    <td>${Math.round(b).toLocaleString('tr-TR')} ₺</td>
+                    <td style="background:#f0f9ff; font-weight:bold;">${Math.round(sTaksit).toLocaleString('tr-TR')} ₺</td>
+                    <td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')} ₺</td>
+                </tr>`;
             }
             
-            html += `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(tA).toLocaleString('tr-TR')}</td><td>${Math.round(tF).toLocaleString('tr-TR')}</td><td>${Math.round(tB).toLocaleString('tr-TR')}</td><td>${Math.round(tT).toLocaleString('tr-TR')}</td><td>-</td></tr></tbody></table></div>`;
+            html += `</tbody></table></div>`;
             resultArea.innerHTML += html;
         });
 
@@ -205,10 +199,14 @@
     function yazdir() { window.print(); }
     function indir() { 
         const element = document.getElementById('pdf-area');
-        html2pdf().from(element).set({
-            margin: 5, filename: 'Kredi_Plani.pdf', image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).save(); 
+        const opt = {
+            margin: 5,
+            filename: 'Kredi_Odeme_Plani.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().from(element).set(opt).save(); 
     }
 </script>
 </body>
