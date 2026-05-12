@@ -28,6 +28,12 @@
         .btn-print { background: var(--navy); }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
+        /* Yazdırma Bilgi Paneli (Normalde gizli, sadece yazdırınca/sonuçta görünür) */
+        .print-info-header { display: none; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; padding: 10px; border: 1px solid var(--navy); border-radius: 8px; background: #fff; }
+        .print-info-item { display: flex; flex-direction: column; }
+        .print-info-label { font-size: 9px; color: var(--gray); font-weight: bold; }
+        .print-info-value { font-size: 13px; font-weight: 800; color: #000; }
+
         /* Modern Büyük Tablo */
         .table-res { overflow-x: auto; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -41,6 +47,7 @@
             @page { size: A4 portrait; margin: 0.5cm; }
             body { background: white; padding: 0; }
             .no-print { display: none !important; }
+            .print-info-header { display: grid !important; } /* Yazdırma esnasında bilgileri göster */
             .container { box-shadow: none; width: 100%; max-width: 100%; padding: 0; }
             table { width: 100% !important; table-layout: fixed !important; }
             th { font-size: 8pt !important; padding: 3px !important; color: black !important; background: #eee !important; border: 0.5pt solid #666 !important; }
@@ -91,6 +98,14 @@
 
     <div id="result" style="display:none;">
         <h2 style="font-size: 18px; border-bottom: 2px solid var(--navy); padding-bottom: 8px; color: var(--navy);">Kredi Ödeme Planı</h2>
+        
+        <div class="print-info-header">
+            <div class="print-info-item"><span class="print-info-label">KREDİ TUTARI</span><span id="p_tutar" class="print-info-value">-</span></div>
+            <div class="print-info-item"><span class="print-info-label">VADE / SIKLIK</span><span id="p_vade" class="print-info-value">-</span></div>
+            <div class="print-info-item"><span class="print-info-label">FAİZ ORANI</span><span id="p_faiz" class="print-info-value">-</span></div>
+            <div class="print-info-item"><span class="print-info-label">KREDİ TÜRÜ</span><span id="p_tur" class="print-info-value">-</span></div>
+        </div>
+
         <div class="table-res">
             <table id="table">
                 <thead>
@@ -155,11 +170,15 @@
         document.getElementById('applyBtn').disabled = !(tc && tel && calculated);
     }
     function hesapla() {
-        const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
-        const yFaiz = parseFloat(document.getElementById('faiz').value) / 100;
+        const tutarVal = document.getElementById('tutar').value;
+        const anaPara = parseFloat(tutarVal.replace(/\./g, ""));
+        const yFaizVal = document.getElementById('faiz').value;
+        const yFaiz = parseFloat(yFaizVal) / 100;
         const subOran = (mode === 'traktor') ? parseFloat(document.getElementById('subOran').value) / 100 : 0;
         const vade = parseInt(document.getElementById('vade').value);
-        const per = parseInt(document.getElementById('periyot').value);
+        const perSelect = document.getElementById('periyot');
+        const perText = perSelect.options[perSelect.selectedIndex].text;
+        const per = parseInt(perSelect.value);
         const tip = document.getElementById('tip').value;
         const v_kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
         const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
@@ -167,6 +186,12 @@
         const donemFaiz = yFaiz / per; 
         const vergiOran = v_kkdf + v_bsmv; 
         const bilesikFaiz = donemFaiz * (1 + vergiOran);
+
+        // Özet Bilgileri Yazdırma Paneline Aktar
+        document.getElementById('p_tutar').innerText = tutarVal + " TL";
+        document.getElementById('p_vade').innerText = taksitSayisi + " Taksit (" + perText + ")";
+        document.getElementById('p_faiz').innerText = "%" + yFaizVal;
+        document.getElementById('p_tur').innerText = mode.toUpperCase();
         
         let html = '', kalan = anaPara; 
         let tTaksit = 0, tAnapara = 0, tFaiz = 0, tIndFaiz = 0, tBsmv = 0, tKkdf = 0, tSubTaksit = 0;
@@ -183,8 +208,6 @@
                 a = t - (f + bsmvMiktar + kkdfMiktar); 
             } else { a = sabitAnapara; t = a + f + bsmvMiktar + kkdfMiktar; }
             if(i === taksitSayisi) a = kalan; 
-            
-            // FORMÜL: Anapara + İndirimli Faiz + BSMV
             let subT = a + indF + bsmvMiktar; 
             kalan -= a;
 
