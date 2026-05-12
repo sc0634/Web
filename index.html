@@ -14,32 +14,26 @@
         .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 12px; }
         .tab-btn { flex: 1; padding: 8px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 10px; cursor: pointer; }
         .tab-btn.active { background: var(--blue); color: #fff; }
-        
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f1f5f9; padding: 12px; border-radius: 10px; }
         .field { display: flex; flex-direction: column; gap: 3px; }
         .full-width { grid-column: span 2; }
-        
         label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #fff; width: 100%; }
-
         .options-row { grid-column: span 2; display: flex; gap: 10px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
         .opt { flex: 1; display: flex; align-items: center; gap: 2px; padding: 4px 0; }
         .opt input[type="checkbox"] { margin: 0; padding: 0; width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
         .opt label { margin: 0; padding-left: 2px; font-size: 10px; color: var(--navy); cursor: pointer; text-transform: none; line-height: 1.2; user-select: none; }
-
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px; margin: 12px 0; }
         .btn { padding: 12px 5px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 11px; }
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #6366f1; }
         .btn-print { background: var(--navy); }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
         .apply-panel { background: #f8fafc; border: 2px solid var(--blue); padding: 12px; border-radius: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
         .btn-apply { background: var(--accent); grid-column: span 2; height: 40px; margin-top: 5px; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
-        th { background: var(--navy); color: #fff; padding: 8px 4px; font-size: 9px; }
-        td { padding: 6px 3px; text-align: center; border-bottom: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10px; }
+        th { background: var(--navy); color: #fff; padding: 8px 2px; font-size: 9px; }
+        td { padding: 6px 2px; text-align: center; border-bottom: 1px solid var(--border); }
         .total-row { background: #e2e8f0; font-weight: 800; color: var(--navy); }
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(3, 1fr); } .apply-panel { grid-template-columns: 2fr 2fr 1fr; } .btn-apply { grid-column: span 1; } }
     </style>
@@ -61,15 +55,14 @@
         <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
         <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
         
-        <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
+        <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         
         <div class="field"><label>Ödeme Sıklığı</label>
             <select id="periyot" onchange="checkLocks(); reset();">
                 <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
             </select>
         </div>
-        
         <div class="field"><label>Ödeme Tipi</label><select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select></div>
 
         <div class="options-row" id="traktorOpts">
@@ -168,11 +161,24 @@
 
             tTaksit += t; tAnapara += a; tFaiz += f; tSubTaksit += subT;
 
-            html += `<tr><td>${i}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
+            html += `<tr>
+                <td>${i}</td>
+                <td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td>
+                <td>${Math.round(a).toLocaleString('tr-TR')}</td>
+                <td>${Math.round(f).toLocaleString('tr-TR')}</td>
+                <td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td>
+                <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td>
+            </tr>`;
         }
 
-        // Toplam Satırı
-        let footHtml = `<tr class="total-row"><td>TOPLAM</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td><td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td><td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(tSubTaksit).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
+        let footHtml = `<tr class="total-row">
+            <td>TOPLAM</td>
+            <td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td>
+            <td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td>
+            <td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td>
+            <td style="${mode==='traktor'?'':'display:none'}">${Math.round(tSubTaksit).toLocaleString('tr-TR')}</td>
+            <td>-</td>
+        </tr>`;
         
         document.getElementById('hTutar').style.display = (mode === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('hSub').style.display = (mode === 'traktor') ? 'table-cell' : 'none';
