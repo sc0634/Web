@@ -25,6 +25,7 @@
 
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; }
+        input:disabled, select:disabled { background-color: #e2e8f0; color: #64748b; cursor: not-allowed; }
         
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
         .opt { display: flex; align-items: center; gap: 2px; cursor: pointer; }
@@ -79,7 +80,6 @@
 
     <div id="calc-panel">
         <div class="grid no-print">
-            <!-- Proforma Sadece Traktörde Görünecek -->
             <div id="proforma-container" class="field field-full">
                 <label>Proforma Fatura Tutarı</label>
                 <input type="text" id="proforma" value="1.500.000" oninput="fmtMoney(this)">
@@ -206,7 +206,7 @@
     
     function fillVade() {
         const s = document.getElementById('vade'); s.innerHTML = '';
-        let isMonthly = (mode !== 'traktor');
+        let isMonthly = (mode !== 'traktor' && mode !== 'zirai');
         let max = (mode === 'tuketici') ? 36 : (isMonthly ? 60 : 5);
         let unit = isMonthly ? ' Ay' : ' Yıl';
         for(let i=1; i<=max; i++) {
@@ -221,19 +221,30 @@
         mode = m;
         const subBox = document.getElementById('subBox');
         const periyotBox = document.getElementById('row-dynamic');
+        const periyotSelect = document.getElementById('periyot');
         const tipBox = document.getElementById('tip-container');
         const traktorOpts = document.getElementById('traktorOpts');
         const proformaBox = document.getElementById('proforma-container');
 
+        // Varsayılan kilitleri aç
+        periyotSelect.disabled = false;
+
         if(m === 'traktor') {
             traktorOpts.style.display = 'flex'; 
             subBox.style.display = 'flex';
-            proformaBox.style.display = 'flex'; // Traktörde göster
+            proformaBox.style.display = 'flex';
+            tipBox.classList.add('half-width');
+        } else if(m === 'zirai') {
+            traktorOpts.style.display = 'none'; 
+            subBox.style.display = 'none';
+            proformaBox.style.display = 'none';
+            periyotSelect.value = "1"; // Yılda 1 yap
+            periyotSelect.disabled = true; // Kilitle
             tipBox.classList.add('half-width');
         } else {
             traktorOpts.style.display = 'none'; 
             subBox.style.display = 'none';
-            proformaBox.style.display = 'none'; // Diğerlerinde gizle
+            proformaBox.style.display = 'none';
             tipBox.classList.add('half-width');
         }
         checkLocks(); fillVade(); updateMonthly(); reset();
@@ -243,7 +254,10 @@
         const perSelect = document.getElementById('periyot');
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
-        if(mode === 'zirai') { document.getElementById('faiz').value = "45.00"; perSelect.value = "1"; }
+        if(mode === 'zirai') { 
+            document.getElementById('faiz').value = "45.00"; 
+            perSelect.value = "1"; 
+        }
         else if(mode === 'ticari') { document.getElementById('faiz').value = "48.00"; perSelect.value = "12"; }
         else if(mode === 'tuketici') { document.getElementById('faiz').value = "52.68"; perSelect.value = "12"; }
         else { document.getElementById('faiz').value = "40.50"; perSelect.value = "1"; }
@@ -265,7 +279,7 @@
         const v_kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
         const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         
-        let taksitSayisi = (mode !== 'traktor') ? Math.max(1, Math.ceil(vade / (12 / per))) : vade * per;
+        let taksitSayisi = (mode !== 'traktor' && mode !== 'zirai') ? Math.max(1, Math.ceil(vade / (12 / per))) : vade * per;
         const donemFaiz = yFaiz / per; 
         const bilesikFaiz = donemFaiz * (1 + v_kkdf + v_bsmv);
 
