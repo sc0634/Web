@@ -143,10 +143,10 @@
     
     function fillVade() {
         const s = document.getElementById('vade'); s.innerHTML = '';
-        let isMonthly = (mode === 'ticari' || mode === 'zirai');
-        let max = isMonthly ? 60 : 5;
+        let isMonthly = (mode === 'ticari' || mode === 'zirai' || mode === 'tuketici');
+        let max = (mode === 'tuketici') ? 36 : (isMonthly ? 60 : 5);
         let unit = isMonthly ? ' Ay' : ' Yıl';
-        let defaultVal = (mode === 'ticari') ? 36 : max;
+        let defaultVal = (mode === 'ticari' || mode === 'tuketici') ? 36 : max;
 
         for(let i=1; i<=max; i++) {
             let o = document.createElement('option'); o.value = i; o.text = i + unit;
@@ -166,19 +166,10 @@
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
         
-        // GÜNCEL FAİZ AYARLARI
-        if(mode === 'zirai') { 
-            document.getElementById('faiz').value = "45.00"; 
-        } else if(mode === 'ticari') { 
-            document.getElementById('faiz').value = "48.00"; 
-        } else if(mode === 'tuketici') { 
-            document.getElementById('faiz').value = "52.68"; 
-        } else { 
-            document.getElementById('faiz').value = "40.50"; 
-        }
-
-        if(mode === 'ticari') { document.getElementById('periyot').value = "12"; }
-        else if(mode === 'traktor') { document.getElementById('periyot').value = "1"; }
+        if(mode === 'zirai') { document.getElementById('faiz').value = "45.00"; document.getElementById('periyot').value = "1"; }
+        else if(mode === 'ticari') { document.getElementById('faiz').value = "48.00"; document.getElementById('periyot').value = "12"; }
+        else if(mode === 'tuketici') { document.getElementById('faiz').value = "52.68"; document.getElementById('periyot').value = "12"; }
+        else { document.getElementById('faiz').value = "40.50"; document.getElementById('periyot').value = "1"; }
     }
 
     function reset() { 
@@ -205,7 +196,7 @@
         const v_kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
         const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         
-        let taksitSayisi = (mode === 'ticari' || mode === 'zirai') ? Math.ceil(vade / (12 / per)) : vade * per;
+        let taksitSayisi = (mode === 'ticari' || mode === 'zirai' || mode === 'tuketici') ? Math.ceil(vade / (12 / per)) : vade * per;
         const donemFaiz = yFaiz / per; 
         const vergiOran = v_kkdf + v_bsmv; 
         const bilesikFaiz = donemFaiz * (1 + vergiOran);
