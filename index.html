@@ -8,37 +8,59 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root { --navy: #0f172a; --blue: #2563eb; --gray: #64748b; --border: #e2e8f0; --success: #10b981; --accent: #f59e0b; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f8fafc; margin: 0; padding: 5px; color: #1e293b; }
-        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 12px; }
-        .tab-btn { flex: 1; padding: 10px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 600; border-radius: 6px; font-size: 11px; cursor: pointer; }
-        .tab-btn.active { background: var(--blue); color: #fff; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f1f5f9; padding: 10px; border-radius: 10px; }
-        .field { display: flex; flex-direction: column; gap: 3px; }
-        label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
-        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; background: #fff; width: 100%; }
-        .options-row { grid-column: span 2; display: flex; gap: 10px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .opt { flex: 1; display: flex; align-items: center; gap: 4px; padding: 4px 0; }
-        .opt input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
-        .opt label { font-size: 11px; color: var(--navy); text-transform: none; }
-        .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px; margin: 12px 0; }
-        .btn { padding: 14px 5px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 12px; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f8fafc; margin: 0; padding: 10px; color: #1e293b; }
+        
+        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        
+        /* Modern UI Bileşenleri */
+        .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 12px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { background: var(--blue); color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
+        .field { display: flex; flex-direction: column; gap: 4px; }
+        label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--blue); ring: 2px var(--blue); }
+        
+        .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
+        .opt { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .opt input { width: 18px; height: 18px; accent-color: var(--blue); }
+        .opt label { font-size: 11px; color: var(--navy); text-transform: none; font-weight: 600; }
+
+        .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 20px 0; }
+        .btn { padding: 14px 5px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 12px; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #6366f1; }
         .btn-print { background: var(--navy); }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        
-        /* Büyütülmüş Tablo Düzeni */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11.5px; table-layout: fixed; }
-        th { background: var(--navy); color: #fff; padding: 10px 2px; font-size: 9px; border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; }
-        td { padding: 8px 2px; text-align: center; border: 1px solid var(--border); font-weight: 600; color: #000; }
-        .total-row { background: #e2e8f0; font-weight: 800; color: var(--navy); font-size: 12px; }
-        .total-row td { border-top: 2px solid var(--navy); }
-        
-        .apply-panel { background: #f8fafc; border: 2px solid var(--blue); padding: 15px; border-radius: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
-        .btn-apply { background: var(--accent); grid-column: span 2; height: 45px; font-size: 13px; }
-        
+
+        /* Modern Tablo Stili */
+        .table-res { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 800px; }
+        th { background: #1e293b; color: #fff; padding: 12px 4px; font-size: 10px; border: 1px solid #334155; text-transform: uppercase; }
+        td { padding: 10px 4px; text-align: center; border: 1px solid var(--border); font-weight: 600; color: #334155; font-size: 12px; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        .total-row { background: #f1f5f9 !important; color: var(--navy); }
+        .total-row td { border-top: 2px solid var(--navy); font-size: 13px; color: var(--navy); }
+
+        /* Yazdırma Tasarımı - Print CSS */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; padding: 0; }
+            .no-print { display: none !important; }
+            table { font-size: 10pt; table-layout: auto; border: 1px solid #000; }
+            th { background: #f1f5f9 !important; color: black !important; border: 1px solid #ccc !important; }
+            td { border: 1px solid #ccc !important; color: black !important; }
+            .total-row { background: #eee !important; font-weight: bold; }
+            @page { margin: 1.5cm; }
+        }
+
+        .apply-panel { background: #f0f9ff; border: 2px solid var(--blue); padding: 15px; border-radius: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
+        .btn-apply { background: var(--accent); grid-column: span 2; height: 48px; font-size: 14px; }
+
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); } .apply-panel { grid-template-columns: 2fr 2fr 1fr; } .btn-apply { grid-column: span 1; } }
     </style>
 </head>
@@ -68,7 +90,7 @@
 
         <div class="options-row" id="traktorOpts">
             <div class="opt"><input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25; reset();"><label for="yerli">Yerli Malı Desteği (%50 Sübv.)</label></div>
-            <div class="opt"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Geri Alım (Buy Back) Uygula</label></div>
+            <div class="opt"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Geri Alım Uygula</label></div>
         </div>
     </div>
 
@@ -79,23 +101,27 @@
     </div>
 
     <div id="result" style="display:none;">
-        <table id="table">
-            <thead>
-                <tr>
-                    <th style="width: 35px;">No</th>
-                    <th id="hTutar">Taksit</th>
-                    <th>Anapara</th>
-                    <th>Faiz</th>
-                    <th id="hIndFaiz">İnd. Faiz</th>
-                    <th>BSMV</th>
-                    <th>KKDF</th>
-                    <th id="hSub">Sübv. Taksit</th>
-                    <th>Kalan</th>
-                </tr>
-            </thead>
-            <tbody id="plan"></tbody>
-            <tfoot id="tableFoot"></tfoot>
-        </table>
+        <h2 style="font-size: 16px; border-bottom: 2px solid var(--navy); padding-bottom: 8px; margin-bottom: 10px; color: var(--navy);">Ödeme Planı</h2>
+        <div class="table-res">
+            <table id="table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">No</th>
+                        <th id="hTutar">Taksit</th>
+                        <th>Anapara</th>
+                        <th>Faiz</th>
+                        <th id="hIndFaiz">İnd. Faiz</th>
+                        <th>BSMV</th>
+                        <th>KKDF</th>
+                        <th id="hSub">Sübv. Taksit</th>
+                        <th>Kalan</th>
+                    </tr>
+                </thead>
+                <tbody id="plan"></tbody>
+                <tfoot id="tableFoot"></tfoot>
+            </table>
+        </div>
+        
         <div class="apply-panel no-print">
             <div class="field"><label>T.C. KİMLİK NO</label><input type="text" id="tc" maxlength="11" placeholder="11 Hane" oninput="onlyNum(this); checkApply()"></div>
             <div class="field"><label>CEP TELEFONU</label><input type="text" id="tel" maxlength="10" placeholder="5xx xxxxxxx" oninput="onlyNum(this); checkApply()"></div>
@@ -170,11 +196,9 @@
                 a = sabitAnapara; t = a + f + bsmvMiktar + kkdfMiktar; 
             }
             if(i === taksitSayisi) a = kalan; 
-            
-            // FORMÜL: Anapara + İndirimli Faiz + BSMV
             let subT = a + indF + bsmvMiktar; 
-            
             kalan -= a;
+
             tTaksit += t; tAnapara += a; tFaiz += f; tIndFaiz += indF; tBsmv += bsmvMiktar; tKkdf += kkdfMiktar; tSubTaksit += subT;
 
             html += `<tr>
@@ -191,7 +215,7 @@
         }
 
         let footHtml = `<tr class="total-row">
-            <td>TOP</td>
+            <td>TOPLAM</td>
             <td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td>
             <td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td>
             <td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td>
@@ -229,7 +253,7 @@
     function yazdir() { window.print(); }
     function indir() {
         const element = document.getElementById('pdf-area');
-        html2pdf().from(element).set({ margin: 5, filename: 'Kredi_Plani.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save();
+        html2pdf().from(element).set({ margin: 10, filename: 'Kredi_Plani.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save();
     }
 </script>
 </body>
