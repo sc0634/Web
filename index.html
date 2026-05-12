@@ -16,7 +16,7 @@
         .summary-item span { display: block; color: var(--gray); font-size: 9px; text-transform: uppercase; }
 
         .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 10px; flex-wrap: wrap; }
-        .tab-btn { flex: 1; min-width: 70px; padding: 8px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 9px; cursor: pointer; text-transform: uppercase; }
+        .tab-btn { flex: 1; min-width: 70px; padding: 8px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 8px; cursor: pointer; text-transform: uppercase; line-height: 1.2; }
         .tab-btn.active { background: var(--blue); color: #fff; }
         
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f1f5f9; padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
@@ -36,7 +36,7 @@
         .sub-text { font-size: 9px; color: var(--blue); font-weight: 800; margin-left: 24px; min-height: 12px; }
         .sub-text.red { color: #e11d48; }
 
-        .vade-header { background: var(--blue); color: white; padding: 5px; margin-top: 8px; border-radius: 6px; font-size: 10px; font-weight: 900; text-align: center; position: relative; }
+        .vade-header { background: var(--blue); color: white; padding: 5px; margin-top: 8px; border-radius: 6px; font-size: 10px; font-weight: 900; text-align: center; }
 
         .table-res { overflow-x: auto; margin-top: 2px; margin-bottom: 15px; }
         table { width: 100%; border-collapse: collapse; background: white; }
@@ -70,6 +70,7 @@
 
     <div class="tabs no-print">
         <button class="tab-btn active" onclick="switchTab(this, 'traktor')">ZİRAİ <br> TRAKTÖR</button>
+        <button class="tab-btn" onclick="switchTab(this, 'ekipman')">MEKANİZASYON <br> EKİPMAN</button>
         <button class="tab-btn" onclick="switchTab(this, 'ticari')">TİCARİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'zirai')">ÇİFTÇİ <br> TAKSİTLİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'tuketici')">TÜKETİCİ</button>
@@ -147,7 +148,7 @@
         fmtMoney(document.getElementById('proforma'));
         fmtMoney(document.getElementById('tutar'));
         switchTab(document.querySelector('.tab-btn'), 'traktor');
-        updateBuyBack(); // Başlangıç metnini ayarla
+        updateBuyBack();
     }
 
     function fmtMoney(i) {
@@ -172,12 +173,14 @@
     function updateBuyBack() {
         const isBB = document.getElementById('buyback').checked;
         const bbText = document.getElementById('bb-bilgi');
-        if(isBB) {
-            bbText.innerText = "Kredi Sabit Faizlidir";
-            bbText.classList.remove('red');
-        } else {
-            bbText.innerText = "Kredi Değişken Faizlidir";
-            bbText.classList.add('red');
+        if(bbText) {
+            if(isBB) {
+                bbText.innerText = "Kredi Sabit Faizlidir";
+                bbText.classList.remove('red');
+            } else {
+                bbText.innerText = "Kredi Değişken Faizlidir";
+                bbText.classList.add('red');
+            }
         }
         reset();
     }
@@ -201,7 +204,8 @@
         const extraRow = document.getElementById('extra-row');
         const traktorOpts = document.getElementById('traktorOpts');
         
-        if (m === 'traktor') {
+        // Traktör ve Ekipman için seçenekler panelini göster/gizle
+        if (m === 'traktor' || m === 'ekipman') {
             extraRow.style.display = 'none';
             traktorOpts.style.display = 'flex';
         } else {
@@ -209,8 +213,13 @@
             traktorOpts.style.display = 'none';
         }
 
-        if(m === 'tuketici') { document.getElementById('bsmv').value = 15; document.getElementById('kkdf').value = 15; } 
-        else { document.getElementById('bsmv').value = 5; document.getElementById('kkdf').value = 0; }
+        if(m === 'tuketici') { 
+            document.getElementById('bsmv').value = 15; 
+            document.getElementById('kkdf').value = 15; 
+        } else { 
+            document.getElementById('bsmv').value = 5; 
+            document.getElementById('kkdf').value = 0; 
+        }
         
         fillVade(); reset();
     }
@@ -232,9 +241,10 @@
         const bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         const kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
 
-        let vades = (mode === 'traktor') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
+        // Traktör ve Ekipman 1-5 yıl arası tüm tabloları döker, diğerleri tek vade döker
+        let vades = (mode === 'traktor' || mode === 'ekipman') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
-        vades.forEach((v, index) => {
+        vades.forEach((v) => {
             let isMonthly = (mode === 'ticari' || mode === 'tuketici');
             let dFaiz = isMonthly ? (yFaiz / 12) : yFaiz;
             let bFaiz = dFaiz * (1 + bsmv + kkdf);
