@@ -35,7 +35,6 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
-        /* Seçenekler ve Bilgi Notları */
         .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row-wrapper { display: flex; flex-direction: row; gap: 10px; }
         .opt-row { display: flex; align-items: center; gap: 5px; flex: 1; }
@@ -48,6 +47,8 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background: #f8f9fa; padding: 4px 1px; font-size: 9px; border: 1px solid var(--border); }
         td { padding: 6px 1px; text-align: center; border: 1px solid var(--border); font-size: 10px; word-break: break-all; }
+        .total-row { background: #f1f2f6; font-weight: bold; }
+        .total-row td { border-top: 2px solid var(--dark); }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-top: 12px; }
         .btn { padding: 8px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 11px; }
@@ -98,7 +99,6 @@
                     <label for="buyback">Buy Back</label>
                 </div>
             </div>
-            <!-- Dinamik Bilgi Yazıları -->
             <div id="yerli-info" class="info-text">✓ Yerli üretim desteği ile sübvansiyon oranı artırılmıştır.</div>
             <div id="bb-info" class="info-text">✓ Geri alım garantisi kapsamında özel oran uygulanmaktadır.</div>
         </div>
@@ -132,7 +132,6 @@
         document.getElementById(`tabs-${seg}`).style.display = 'flex';
         const firstTab = document.getElementById(`tabs-${seg}`).querySelector('.tab-btn');
         switchTab(firstTab, firstTab.onclick.toString().match(/'(.*?)'/)[1]);
-        document.getElementById('main-calc-btn').style.backgroundColor = { tarimsal: '#27ae60', ticari: '#e67e22', bireysel: '#3498db' }[seg];
     }
 
     function switchTab(btn, m) {
@@ -149,20 +148,16 @@
         else document.getElementById('tutar-input-box').classList.remove('full-width');
         document.getElementById('bsmv').value = (m === 'tuketici' ? 15 : 5);
         document.getElementById('kkdf').value = (m === 'tuketici' ? 15 : 0);
+        document.getElementById('main-calc-btn').style.backgroundColor = { tarimsal: '#27ae60', ticari: '#e67e22', bireysel: '#3498db' }[segment];
         if(isSub) updateYerli(); fillVade(); reset();
     }
 
     function updateYerli() {
         const isY = document.getElementById('yerli').checked;
         const isB = document.getElementById('buyback').checked;
-        
-        // Sübvansiyon Oran Mantığı
         document.getElementById('subOran').value = mode === 'traktor' ? (isY ? 50 : 25) : (isY ? 75 : 50);
-        
-        // Bilgi Yazılarını Göster/Gizle
         document.getElementById('yerli-info').style.display = isY ? 'block' : 'none';
         document.getElementById('bb-info').style.display = isB ? 'block' : 'none';
-        
         reset();
     }
 
@@ -190,11 +185,7 @@
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const faizVal = document.getElementById('faiz').value;
         const subVal = (mode === 'traktor' || mode === 'ekipman') ? document.getElementById('subOran').value : 0;
-        if (mode === 'tuketici' || mode === 'ticari') document.getElementById('sum-prof-box').style.display = 'none';
-        else { document.getElementById('sum-prof-box').style.display = 'block'; document.getElementById('sum-prof').innerText = document.getElementById('proforma').value; }
-        document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value;
-        document.getElementById('sum-faiz').innerText = `%${faizVal}`;
-
+        
         const yF = faizVal / 100, subO = subVal / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         let isY = (segment === 'tarimsal');
         let vades = isY ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
@@ -203,13 +194,21 @@
             let dF = isY ? yF : (yF / 12), bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, v)) / (Math.pow(1+bF, v)-1);
             let html = `<div class="vade-header">${v} ${isY ? 'Yıl' : 'Ay'}</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana P.</th><th>Faiz</th>${subVal>0?'<th>İnd.</th>':''}<th>Vergi</th><th>Tutar</th><th>Kalan</th></tr></thead><tbody>`;
-            let kalan = anaPara;
+            
+            let kalan = anaPara, tA = 0, tF = 0, tV = 0, tT = 0, tInd = 0;
             for(let i=1; i<=v; i++){
-                let f = kalan * dF, b = f * (bsmv + kkdf), indF = f * subO, a = (i===v) ? kalan : taksit - (f + b), sTaksit = taksit - indF; kalan -= a;
+                let f = kalan * dF, b = f * (bsmv + kkdf), indF = f * subO, a = (i===v) ? kalan : taksit - (f + b), sTaksit = taksit - indF;
+                tA += a; tF += f; tV += b; tT += sTaksit; tInd += indF; kalan -= a;
                 html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subVal>0?`<td style="color:red">-${Math.round(indF).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
             }
+            
+            // Toplam Satırı
+            html += `<tr class="total-row"><td>TOP</td><td>${Math.round(tA).toLocaleString('tr-TR')}</td><td>${Math.round(tF).toLocaleString('tr-TR')}</td>${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tV).toLocaleString('tr-TR')}</td><td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
             res.innerHTML += html + `</tbody></table></div>`;
         });
+        
+        document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value;
+        document.getElementById('sum-faiz').innerText = `%${faizVal}`;
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
 
