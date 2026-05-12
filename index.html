@@ -28,9 +28,6 @@
         .opt input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; }
         .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; line-height: 1.2; margin-bottom: 0; text-transform: none; }
         
-        .hazine-label { display: block; font-size: 8px; color: #1e40af; font-style: italic; font-weight: 600; margin-top: 2px; }
-        .status-label { display: block; font-size: 9px; color: var(--gray); font-weight: 700; margin-top: 2px; }
-        
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 20px 0; }
         .btn { padding: 14px 5px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 12px; }
         .btn-calc { background: var(--success); }
@@ -52,7 +49,6 @@
         .exp-item span:first-child { font-size: 11px; font-weight: 700; color: var(--gray); }
         .exp-item span:last-child { font-size: 12px; font-weight: 800; color: var(--navy); }
 
-        /* GÜNCELLENMİŞ BAŞVURU FORMU */
         .apply-box { margin-top: 20px; padding: 20px; border: 2px solid var(--blue); border-radius: 12px; background: #f0f7ff; }
         .apply-box h3 { margin-top: 0; color: var(--navy); font-size: 14px; text-align: center; text-transform: uppercase; }
         .apply-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -91,23 +87,22 @@
             </div>
 
             <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
-            <div class="field"><label>Ödeme Sıklığı</label>
+            
+            <div id="row-dynamic" class="field">
+                <label>Ödeme Sıklığı</label>
                 <select id="periyot" onchange="reset()">
                     <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
                 </select>
             </div>
             
-            <div class="field" style="grid-column: span 2;"><label>Ödeme Tipi</label><select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select></div>
+            <div id="tip-container" class="field" style="grid-column: span 2;">
+                <label>Ödeme Tipi</label>
+                <select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select>
+            </div>
 
             <div class="options-row" id="traktorOpts">
-                <div class="opt">
-                    <input type="checkbox" id="yerli" checked onchange="toggleYerli(this)"> 
-                    <label for="yerli">Yerli Malı Desteği<span id="hazine-note" class="hazine-label">Faizin %25'ini hazine ödemektedir</span></label>
-                </div>
-                <div class="opt">
-                    <input type="checkbox" id="buyback" checked onchange="updateBuyBackText(); reset();"> 
-                    <label for="buyback">Buy Back Kapsamında <span id="bb-status" class="status-label">Kredi sabit faizlidir</span></label>
-                </div>
+                <div class="opt"><input type="checkbox" id="yerli" checked onchange="toggleYerli(this)"><label for="yerli">Yerli Malı Desteği</label></div>
+                <div class="opt"><input type="checkbox" id="buyback" checked onchange="updateBuyBackText(); reset();"><label for="buyback">Buy Back Kapsamında</label></div>
             </div>
         </div>
 
@@ -142,9 +137,11 @@
                 <h3>Kredi Masrafları & Kesintiler</h3>
                 <div class="expense-grid">
                     <div class="exp-item"><span>Kredi Tahsis Ücreti (%0.5)</span><span id="exp-tahsis">0 TL</span></div>
-                    <div class="exp-item"><span>Ekspertiz Ücreti</span><span>7.500 TL</span></div>
-                    <div class="exp-item"><span>Rehin Tesisi</span><span>1.250 TL</span></div>
-                    <div class="exp-item"><span>Hesaba Geçecek Net Tutar</span><span id="exp-net" style="color:var(--success)">0 TL</span></div>
+                    <div class="exp-item"><span>Limit Tahsis Masrafı</span><span>1.500 TL</span></div>
+                    <div class="exp-item"><span>Kullandırım Komisyonu (%1)</span><span id="exp-komisyon">0 TL</span></div>
+                    <div class="exp-item exp-traktor-only"><span>Tarsim Sigortası (%4)</span><span id="exp-tarsim">0 TL</span></div>
+                    <div class="exp-item exp-traktor-only"><span>Rehin Tesisi</span><span>1.250 TL</span></div>
+                    <div class="exp-item exp-traktor-only"><span>Kasko Sigortası</span><span>12.500 TL</span></div>
                 </div>
             </div>
 
@@ -166,24 +163,11 @@
 
     function initApp() { fmtMoney(document.getElementById('tutar')); checkLocks(); fillVade(); updateBuyBackText(); updateMonthly(); }
     function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
-    function updateMonthly() {
-        const yFaiz = parseFloat(document.getElementById('faiz').value) || 0;
-        document.getElementById('aylikFaiz').value = (yFaiz / 12).toFixed(4);
-    }
-    function toggleYerli(cb) {
-        document.getElementById('subOran').value = cb.checked ? 50 : 25;
-        document.getElementById('hazine-note').style.display = cb.checked ? 'block' : 'none';
-        reset();
-    }
-    function updateBuyBackText() {
-        const isChecked = document.getElementById('buyback').checked;
-        const statusSpan = document.getElementById('bb-status');
-        statusSpan.innerText = isChecked ? "Kredi sabit faizlidir" : "Kredi değişken faizlidir";
-        statusSpan.style.color = isChecked ? "var(--success)" : "var(--accent)";
-    }
+    function updateMonthly() { const yFaiz = parseFloat(document.getElementById('faiz').value) || 0; document.getElementById('aylikFaiz').value = (yFaiz / 12).toFixed(4); }
+    function toggleYerli(cb) { document.getElementById('subOran').value = cb.checked ? 50 : 25; reset(); }
+    function updateBuyBackText() { reset(); }
     function fillVade() {
-        const s = document.getElementById('vade');
-        s.innerHTML = '';
+        const s = document.getElementById('vade'); s.innerHTML = '';
         let isMonthly = (mode !== 'traktor');
         let max = (mode === 'tuketici') ? 36 : (isMonthly ? 60 : 5);
         let unit = isMonthly ? ' Ay' : ' Yıl';
@@ -196,8 +180,18 @@
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); 
         mode = m;
-        document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
-        document.getElementById('subBox').style.visibility = (m === 'traktor') ? 'visible' : 'hidden';
+        const subBox = document.getElementById('subBox');
+        const periyotBox = document.getElementById('row-dynamic');
+        const tipBox = document.getElementById('tip-container');
+        const traktorOpts = document.getElementById('traktorOpts');
+
+        if(m === 'traktor') {
+            traktorOpts.style.display = 'flex'; subBox.style.display = 'flex';
+            periyotBox.style.gridColumn = 'auto'; tipBox.style.gridColumn = 'span 2';
+        } else {
+            traktorOpts.style.display = 'none'; subBox.style.display = 'none';
+            periyotBox.style.gridColumn = 'span 1'; tipBox.style.gridColumn = 'span 1';
+        }
         checkLocks(); fillVade(); updateMonthly(); reset();
     }
     function checkLocks() {
@@ -209,10 +203,8 @@
         else if(mode === 'tuketici') { document.getElementById('faiz').value = "52.68"; perSelect.value = "12"; }
         else { document.getElementById('faiz').value = "40.50"; perSelect.value = "1"; }
     }
-    function reset() { 
-        document.getElementById('result').style.display = 'none';
-        document.getElementById('pdfBtn').disabled = true; document.getElementById('printBtn').disabled = true; 
-    }
+    function reset() { document.getElementById('result').style.display = 'none'; document.getElementById('pdfBtn').disabled = true; document.getElementById('printBtn').disabled = true; }
+
     function hesapla() {
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const yFaiz = parseFloat(document.getElementById('faiz').value) / 100;
@@ -243,13 +235,18 @@
             html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td><td>${Math.round(bsmvM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfM).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td><td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
         }
 
+        // Masraf Güncellemeleri
         const tahsis = anaPara * 0.005;
-        const ekspertiz = 7500;
-        const rehin = 1250;
-        const net = anaPara - (tahsis + ekspertiz + rehin);
+        const komisyon = anaPara * 0.01;
+        const tarsim = anaPara * 0.04; // Traktöre özel %4 Tarsim
 
         document.getElementById('exp-tahsis').innerText = Math.round(tahsis).toLocaleString('tr-TR') + " TL";
-        document.getElementById('exp-net').innerText = Math.round(net).toLocaleString('tr-TR') + " TL";
+        document.getElementById('exp-komisyon').innerText = Math.round(komisyon).toLocaleString('tr-TR') + " TL";
+        document.getElementById('exp-tarsim').innerText = Math.round(tarsim).toLocaleString('tr-TR') + " TL";
+
+        document.querySelectorAll('.exp-traktor-only').forEach(el => {
+            el.style.display = (mode === 'traktor') ? 'flex' : 'none';
+        });
 
         document.getElementById('hTutar').style.display = (mode === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('hIndFaiz').style.display = (mode === 'traktor') ? 'table-cell' : 'none';
@@ -260,17 +257,13 @@
         document.getElementById('result').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
+
     function sendEmail() {
         const tckn = document.getElementById('user_tckn').value;
         const phone = document.getElementById('user_phone').value;
-        const amount = document.getElementById('tutar').value;
-        if(tckn.length !== 11 || !phone) { alert("Lütfen geçerli bir TC No (11 hane) ve Telefon girin."); return; }
-        const params = { user_tckn: tckn, user_phone: phone, loan_amount: amount, loan_type: mode.toUpperCase() };
-        emailjs.send("service_default", "template_default", params).then(() => {
-            alert("Başvurunuz başarıyla gönderildi! Sizinle iletişime geçilecektir.");
-        }, (err) => {
-            alert("Hata oluştu: " + JSON.stringify(err));
-        });
+        if(tckn.length !== 11 || !phone) { alert("Lütfen geçerli bilgiler girin."); return; }
+        const params = { user_tckn: tckn, user_phone: phone, loan_amount: document.getElementById('tutar').value, loan_type: mode.toUpperCase() };
+        emailjs.send("service_default", "template_default", params).then(() => alert("Başvuru gönderildi!"), (err) => alert("Hata!"));
     }
     function yazdir() { window.print(); }
     function indir() { html2pdf().from(document.getElementById('pdf-area')).set({ margin: 5, filename: 'Kredi_Plani.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save(); }
