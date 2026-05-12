@@ -23,7 +23,8 @@
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; }
         
-        .vade-header { background: var(--blue); color: white; padding: 10px; margin-top: 25px; border-radius: 8px; font-size: 13px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+        .vade-header { background: var(--blue); color: white; padding: 10px; margin-top: 25px; border-radius: 8px; font-size: 13px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1px; position: relative; }
+        .btn-mini-print { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #fff; color: var(--blue); border: none; padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: 800; }
 
         .table-res { overflow-x: auto; margin-top: 8px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; background: white; }
@@ -38,10 +39,14 @@
         .btn-print { background: var(--navy); }
 
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .opt { display: flex; align-items: center; gap: 4px; }
-        .opt label { font-size: 11px; text-transform: none; color: var(--navy); cursor: pointer; }
+        .opt { display: flex; align-items: center; }
+        .opt label { font-size: 11px; text-transform: none; color: var(--navy); cursor: pointer; margin-left: 3px; }
 
-        @media print { .no-print { display: none !important; } .container { box-shadow: none; border: none; } }
+        @media print { 
+            .no-print, .btn-mini-print { display: none !important; } 
+            .container { box-shadow: none; border: none; padding: 0; }
+            .print-only { display: block !important; }
+        }
     </style>
 </head>
 <body onload="initApp()">
@@ -72,14 +77,17 @@
             <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
         </div>
         <div class="options-row" id="traktorOpts">
-            <div class="opt"><input type="checkbox" id="yerli" checked onchange="toggleYerli(this)"><label for="yerli">Yerli Malı Desteği</label></div>
+            <div class="opt">
+                <input type="checkbox" id="yerli" checked onchange="toggleYerli(this)">
+                <label for="yerli">Yerli Malı Desteği</label>
+            </div>
         </div>
     </div>
 
     <div class="actions no-print">
         <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
         <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF</button>
-        <button class="btn btn-print" id="printBtn" onclick="yazdir()" disabled>YAZDIR</button>
+        <button class="btn btn-print" id="printBtn" onclick="yazdirTüm()" disabled>TÜMÜNÜ YAZDIR</button>
     </div>
 
     <div id="result-area"></div>
@@ -151,10 +159,9 @@
         const bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         const kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
 
-        // Traktör modunda 5'ten 1'e doğru azalan sıralama (Ters Sıralama)
         let vades = (mode === 'traktor') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
-        vades.forEach(v => {
+        vades.forEach((v, index) => {
             let isMonthly = (mode === 'ticari' || mode === 'tuketici');
             let totalTaksit = v;
             let dFaiz = isMonthly ? (yFaiz / 12) : yFaiz;
@@ -163,7 +170,13 @@
             let taksit = (anaPara * bFaiz * Math.pow(1+bFaiz, totalTaksit)) / (Math.pow(1+bFaiz, totalTaksit)-1);
             
             let label = isMonthly ? `${v} AY` : `${v} YIL`;
-            let html = `<div class="vade-header">${label} ÖDEME PLANI</div>
+            let tableId = `table-group-${index}`;
+
+            let html = `<div id="${tableId}" class="print-section">
+                        <div class="vade-header">
+                            ${label} ÖDEME PLANI
+                            <button class="btn-mini-print no-print" onclick="tekliYazdir('${tableId}')">YAZDIR</button>
+                        </div>
                         <div class="table-res"><table>
                         <thead><tr><th>No</th><th>Anapara</th><th>Faiz</th><th>BSMV</th><th>${mode==='traktor'?'Sübv. Taksit':'Taksit'}</th><th>Kalan</th></tr></thead><tbody>`;
             
@@ -189,7 +202,7 @@
                 </tr>`;
             }
             
-            html += `</tbody></table></div>`;
+            html += `</tbody></table></div></div>`;
             resultArea.innerHTML += html;
         });
 
@@ -197,7 +210,22 @@
         document.getElementById('printBtn').disabled = false;
     }
 
-    function yazdir() { window.print(); }
+    function tekliYazdir(id) {
+        const printContent = document.getElementById(id).innerHTML;
+        const originalContent = document.body.innerHTML;
+        
+        // Sadece seçili olanın içeriğini yazdırılabilir bir yapıya sokar
+        document.body.innerHTML = `<div class="container">${printContent}</div>`;
+        window.print();
+        document.body.innerHTML = originalContent;
+        // Sayfayı yenilemeden state'i korumak için hesapla() fonksiyonu gibi init işlemlerini tetiklemiyoruz, 
+        // ancak body'yi bozmamak için genellikle window.print sonrası window.location.reload() önerilir.
+        // Daha temiz bir çözüm:
+        window.location.reload(); 
+    }
+
+    function yazdirTüm() { window.print(); }
+
     function indir() { 
         const element = document.getElementById('pdf-area');
         const opt = {
