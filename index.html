@@ -79,7 +79,8 @@
 
     <div id="calc-panel">
         <div class="grid no-print">
-            <div class="field field-full">
+            <!-- Proforma Sadece Traktörde Görünecek -->
+            <div id="proforma-container" class="field field-full">
                 <label>Proforma Fatura Tutarı</label>
                 <input type="text" id="proforma" value="1.500.000" oninput="fmtMoney(this)">
             </div>
@@ -222,12 +223,17 @@
         const periyotBox = document.getElementById('row-dynamic');
         const tipBox = document.getElementById('tip-container');
         const traktorOpts = document.getElementById('traktorOpts');
+        const proformaBox = document.getElementById('proforma-container');
 
         if(m === 'traktor') {
-            traktorOpts.style.display = 'flex'; subBox.style.display = 'flex';
+            traktorOpts.style.display = 'flex'; 
+            subBox.style.display = 'flex';
+            proformaBox.style.display = 'flex'; // Traktörde göster
             tipBox.classList.add('half-width');
         } else {
-            traktorOpts.style.display = 'none'; subBox.style.display = 'none';
+            traktorOpts.style.display = 'none'; 
+            subBox.style.display = 'none';
+            proformaBox.style.display = 'none'; // Diğerlerinde gizle
             tipBox.classList.add('half-width');
         }
         checkLocks(); fillVade(); updateMonthly(); reset();
