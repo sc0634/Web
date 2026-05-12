@@ -57,6 +57,8 @@
         .apply-panel { background: #f0f9ff; border: 2px solid var(--blue); padding: 15px; border-radius: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
         .btn-apply { background: var(--accent); grid-column: span 2; height: 48px; }
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); } .apply-panel { grid-template-columns: 2fr 2fr 1fr; } .btn-apply { grid-column: span 1; } }
+        
+        #about-content { display: none; padding: 40px 20px; text-align: center; color: var(--gray); min-height: 300px; }
     </style>
 </head>
 <body onload="initApp()">
@@ -67,68 +69,74 @@
         <button class="tab-btn" onclick="switchTab(this, 'ticari')">TİCARİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'zirai')">ÇİFTÇİ <br> TAKSİTLİ <br> KREDİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'tuketici')">TÜKETİCİ</button>
+        <button class="tab-btn" onclick="switchTab(this, 'about')">HAKKIMDA</button>
     </div>
 
-    <div class="grid no-print">
-        <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
-        <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
-        <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
-        <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
-        <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
-        <div class="field"><label>Ödeme Sıklığı</label>
-            <select id="periyot" onchange="reset()">
-                <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
-            </select>
-        </div>
-        <div class="field"><label>Ödeme Tipi</label><select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select></div>
-
-        <div class="options-row" id="traktorOpts">
-            <div class="opt"><input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25; reset();"> <label for="yerli">Yerli Malı Desteği</label></div>
-            <div class="opt"><input type="checkbox" id="buyback" checked onchange="reset()"> <label for="buyback">Buy Back Kapsamında</label></div>
-        </div>
-    </div>
-
-    <div class="actions no-print">
-        <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
-        <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF</button>
-        <button class="btn btn-print" id="printBtn" onclick="yazdir()" disabled>YAZDIR</button>
-    </div>
-
-    <div id="result" style="display:none;">
-        <h2 style="font-size: 18px; border-bottom: 2px solid var(--navy); padding-bottom: 8px; color: var(--navy);">Kredi Ödeme Planı</h2>
-        
-        <div class="print-info-header">
-            <div class="print-info-item"><span class="print-info-label">KREDİ TUTARI</span><span id="p_tutar" class="print-info-value">-</span></div>
-            <div class="print-info-item"><span class="print-info-label">VADE / SIKLIK</span><span id="p_vade" class="print-info-value">-</span></div>
-            <div class="print-info-item"><span class="print-info-label">FAİZ ORANI</span><span id="p_faiz" class="print-info-value">-</span></div>
-            <div class="print-info-item"><span class="print-info-label">KREDİ TÜRÜ</span><span id="p_tur" class="print-info-value">-</span></div>
+    <div id="about-content">
         </div>
 
-        <div class="table-res">
-            <table id="table">
-                <thead>
-                    <tr>
-                        <th style="width: 35px;">No</th>
-                        <th>Anapara</th>
-                        <th>Faiz</th>
-                        <th id="hIndFaiz">İnd. Faiz</th>
-                        <th>BSMV</th>
-                        <th id="hKkdf">KKDF</th>
-                        <th id="hTutar">Taksit</th>
-                        <th id="hSub">Sübv. Taksit</th>
-                        <th>Kalan</th>
-                    </tr>
-                </thead>
-                <tbody id="plan"></tbody>
-                <tfoot id="tableFoot"></tfoot>
-            </table>
+    <div id="calc-panel">
+        <div class="grid no-print">
+            <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
+            <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
+            <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
+            <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
+            <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
+            <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
+            <div class="field"><label>Ödeme Sıklığı</label>
+                <select id="periyot" onchange="reset()">
+                    <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
+                </select>
+            </div>
+            <div class="field"><label>Ödeme Tipi</label><select id="tip" onchange="reset()"><option value="esit">Eşit Taksit</option><option value="anapara">Anapara Eşit</option></select></div>
+
+            <div class="options-row" id="traktorOpts">
+                <div class="opt"><input type="checkbox" id="yerli" checked onchange="document.getElementById('subOran').value=this.checked?50:25; reset();"> <label for="yerli">Yerli Malı Desteği</label></div>
+                <div class="opt"><input type="checkbox" id="buyback" checked onchange="reset()"> <label for="buyback">Buy Back Kapsamında</label></div>
+            </div>
         </div>
-        
-        <div class="apply-panel no-print">
-            <div class="field"><label>T.C. KİMLİK NO</label><input type="text" id="tc" maxlength="11" oninput="onlyNum(this); checkApply()"></div>
-            <div class="field"><label>CEP TELEFONU</label><input type="text" id="tel" maxlength="10" placeholder="5xx xxxxxxx" oninput="onlyNum(this); checkApply()"></div>
-            <button class="btn btn-apply" id="applyBtn" onclick="send()" disabled>BAŞVURUYU TAMAMLA</button>
+
+        <div class="actions no-print">
+            <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
+            <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF</button>
+            <button class="btn btn-print" id="printBtn" onclick="yazdir()" disabled>YAZDIR</button>
+        </div>
+
+        <div id="result" style="display:none;">
+            <h2 style="font-size: 18px; border-bottom: 2px solid var(--navy); padding-bottom: 8px; color: var(--navy);">Kredi Ödeme Planı</h2>
+            
+            <div class="print-info-header">
+                <div class="print-info-item"><span class="print-info-label">KREDİ TUTARI</span><span id="p_tutar" class="print-info-value">-</span></div>
+                <div class="print-info-item"><span class="print-info-label">VADE / SIKLIK</span><span id="p_vade" class="print-info-value">-</span></div>
+                <div class="print-info-item"><span class="print-info-label">FAİZ ORANI</span><span id="p_faiz" class="print-info-value">-</span></div>
+                <div class="print-info-item"><span class="print-info-label">KREDİ TÜRÜ</span><span id="p_tur" class="print-info-value">-</span></div>
+            </div>
+
+            <div class="table-res">
+                <table id="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35px;">No</th>
+                            <th>Anapara</th>
+                            <th>Faiz</th>
+                            <th id="hIndFaiz">İnd. Faiz</th>
+                            <th>BSMV</th>
+                            <th id="hKkdf">KKDF</th>
+                            <th id="hTutar">Taksit</th>
+                            <th id="hSub">Sübv. Taksit</th>
+                            <th>Kalan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plan"></tbody>
+                    <tfoot id="tableFoot"></tfoot>
+                </table>
+            </div>
+            
+            <div class="apply-panel no-print">
+                <div class="field"><label>T.C. KİMLİK NO</label><input type="text" id="tc" maxlength="11" oninput="onlyNum(this); checkApply()"></div>
+                <div class="field"><label>CEP TELEFONU</label><input type="text" id="tel" maxlength="10" placeholder="5xx xxxxxxx" oninput="onlyNum(this); checkApply()"></div>
+                <button class="btn btn-apply" id="applyBtn" onclick="send()" disabled>BAŞVURUYU TAMAMLA</button>
+            </div>
         </div>
     </div>
 </div>
@@ -142,7 +150,8 @@
     function onlyNum(i) { i.value = i.value.replace(/[^0-9]/g,''); }
     
     function fillVade() {
-        const s = document.getElementById('vade'); s.innerHTML = '';
+        const s = document.getElementById('vade'); if(!s) return;
+        s.innerHTML = '';
         let isMonthly = (mode === 'ticari' || mode === 'zirai' || mode === 'tuketici');
         let max = (mode === 'tuketici') ? 36 : (isMonthly ? 60 : 5);
         let unit = isMonthly ? ' Ay' : ' Yıl';
@@ -156,14 +165,27 @@
     }
 
     function switchTab(btn, m) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); mode = m;
-        document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
-        document.getElementById('subBox').style.visibility = (m === 'traktor') ? 'visible' : 'hidden';
-        checkLocks(); fillVade(); reset();
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); 
+        mode = m;
+        
+        const calcPanel = document.getElementById('calc-panel');
+        const aboutContent = document.getElementById('about-content');
+
+        if(m === 'about') {
+            calcPanel.style.display = 'none';
+            aboutContent.style.display = 'block';
+        } else {
+            calcPanel.style.display = 'block';
+            aboutContent.style.display = 'none';
+            document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
+            document.getElementById('subBox').style.visibility = (m === 'traktor') ? 'visible' : 'hidden';
+            checkLocks(); fillVade(); reset();
+        }
     }
 
     function checkLocks() {
         const perSelect = document.getElementById('periyot');
+        if(!perSelect) return;
         
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
@@ -176,7 +198,7 @@
             perSelect.value = "12"; perSelect.disabled = false;
         } else if(mode === 'tuketici') { 
             document.getElementById('faiz').value = "52.68"; 
-            perSelect.value = "12"; perSelect.disabled = false; // Tüketici için kilit açıldı
+            perSelect.value = "12"; perSelect.disabled = false;
         } else { 
             document.getElementById('faiz').value = "40.50"; 
             perSelect.value = "1"; perSelect.disabled = false;
@@ -184,12 +206,18 @@
     }
 
     function reset() { 
-        calculated = false; document.getElementById('result').style.display = 'none';
-        document.getElementById('pdfBtn').disabled = true; document.getElementById('printBtn').disabled = true; checkApply();
+        calculated = false; if(document.getElementById('result')) document.getElementById('result').style.display = 'none';
+        if(document.getElementById('pdfBtn')) document.getElementById('pdfBtn').disabled = true; 
+        if(document.getElementById('printBtn')) document.getElementById('printBtn').disabled = true; 
+        checkApply();
     }
+
     function checkApply() {
-        const tc = document.getElementById('tc').value.length === 11;
-        const tel = document.getElementById('tel').value.length === 10;
+        const tcInput = document.getElementById('tc');
+        const telInput = document.getElementById('tel');
+        if(!tcInput || !telInput) return;
+        const tc = tcInput.value.length === 11;
+        const tel = telInput.value.length === 10;
         document.getElementById('applyBtn').disabled = !(tc && tel && calculated);
     }
 
