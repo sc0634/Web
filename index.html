@@ -147,8 +147,8 @@
         let max = isMonthly ? 60 : 5;
         let unit = isMonthly ? ' Ay' : ' Yıl';
         
-        // GÜNCELLEME: Varsayılan vadeyi 36 ay (veya 3 yıl) yap
-        let defaultVal = isMonthly ? 36 : 3;
+        // Sadece TİCARİ sekmesinde varsayılan 36 Ay olsun, diğerlerinde son değer kalsın
+        let defaultVal = (mode === 'ticari') ? 36 : max;
 
         for(let i=1; i<=max; i++) {
             let o = document.createElement('option'); o.value = i; o.text = i + unit;
