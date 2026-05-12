@@ -110,12 +110,12 @@
                 <thead>
                     <tr>
                         <th style="width: 35px;">No</th>
-                        <th id="hTutar">Taksit</th>
                         <th>Anapara</th>
                         <th>Faiz</th>
                         <th id="hIndFaiz">İnd. Faiz</th>
                         <th>BSMV</th>
                         <th id="hKkdf">KKDF</th>
+                        <th id="hTutar">Taksit</th>
                         <th id="hSub">Sübv. Taksit</th>
                         <th>Kalan</th>
                     </tr>
@@ -146,8 +146,6 @@
         let isMonthly = (mode === 'ticari' || mode === 'zirai');
         let max = isMonthly ? 60 : 5;
         let unit = isMonthly ? ' Ay' : ' Yıl';
-        
-        // Sadece TİCARİ sekmesinde varsayılan 36 Ay olsun, diğerlerinde son değer kalsın
         let defaultVal = (mode === 'ticari') ? 36 : max;
 
         for(let i=1; i<=max; i++) {
@@ -168,11 +166,11 @@
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
         
-        if(mode === 'ticari') {
-            document.getElementById('periyot').value = "12";
-        } else if(mode === 'traktor') {
-            document.getElementById('periyot').value = "1";
-        }
+        if(mode === 'zirai') { document.getElementById('faiz').value = "45.00"; }
+        else { document.getElementById('faiz').value = "40.50"; }
+
+        if(mode === 'ticari') { document.getElementById('periyot').value = "12"; }
+        else if(mode === 'traktor') { document.getElementById('periyot').value = "1"; }
     }
 
     function reset() { 
@@ -231,12 +229,12 @@
 
             html += `<tr>
                 <td>${i}</td>
-                <td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td>
                 <td>${Math.round(a).toLocaleString('tr-TR')}</td>
                 <td>${Math.round(f).toLocaleString('tr-TR')}</td>
                 <td style="${mode==='traktor'?'':'display:none'}">${Math.round(indF).toLocaleString('tr-TR')}</td>
                 <td>${(bsmvMiktar).toLocaleString('tr-TR', {maximumFractionDigits: 0})}</td>
                 <td style="${mode==='traktor'?'display:none':''}">${Math.round(kkdfMiktar).toLocaleString('tr-TR')}</td>
+                <td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td>
                 <td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td>
                 <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td>
             </tr>`;
@@ -244,12 +242,12 @@
 
         let footHtml = `<tr class="total-row">
             <td>TOP</td>
-            <td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td>
             <td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td>
             <td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td>
             <td style="${mode==='traktor'?'':'display:none'}">${Math.round(tIndFaiz).toLocaleString('tr-TR')}</td>
             <td>${Math.round(tBsmv).toLocaleString('tr-TR')}</td>
             <td style="${mode==='traktor'?'display:none':''}">${Math.round(tKkdf).toLocaleString('tr-TR')}</td>
+            <td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td>
             <td style="${mode==='traktor'?'':'display:none'}">${Math.round(tSubTaksit).toLocaleString('tr-TR')}</td>
             <td>-</td>
         </tr>`;
