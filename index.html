@@ -16,7 +16,6 @@
         .tab-btn.active { background: var(--blue); color: #fff; }
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f1f5f9; padding: 12px; border-radius: 10px; }
         .field { display: flex; flex-direction: column; gap: 3px; }
-        .full-width { grid-column: span 2; }
         label { font-size: 9px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
         input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #fff; width: 100%; }
         .options-row { grid-column: span 2; display: flex; gap: 10px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
@@ -31,8 +30,8 @@
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .apply-panel { background: #f8fafc; border: 2px solid var(--blue); padding: 12px; border-radius: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
         .btn-apply { background: var(--accent); grid-column: span 2; height: 40px; margin-top: 5px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10px; }
-        th { background: var(--navy); color: #fff; padding: 8px 2px; font-size: 9px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 9.5px; }
+        th { background: var(--navy); color: #fff; padding: 8px 2px; font-size: 8px; }
         td { padding: 6px 2px; text-align: center; border-bottom: 1px solid var(--border); }
         .total-row { background: #e2e8f0; font-weight: 800; color: var(--navy); }
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(3, 1fr); } .apply-panel { grid-template-columns: 2fr 2fr 1fr; } .btn-apply { grid-column: span 1; } }
@@ -51,13 +50,10 @@
     <div class="grid no-print">
         <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
         <div class="field"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
-        
         <div class="field"><label>Yıllık Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
         <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
-        
         <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
         <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
-        
         <div class="field"><label>Ödeme Sıklığı</label>
             <select id="periyot" onchange="checkLocks(); reset();">
                 <option value="1">Yılda 1</option><option value="2">6 Ayda 1</option><option value="4">3 Ayda 1</option><option value="12">Ayda 1</option>
@@ -85,6 +81,8 @@
                     <th id="hTutar">Taksit</th>
                     <th>Anapara</th>
                     <th>Faiz</th>
+                    <th>BSMV</th>
+                    <th>KKDF</th>
                     <th id="hSub">Sübv. Taksit</th>
                     <th>Kalan</th>
                 </tr>
@@ -138,34 +136,48 @@
     function hesapla() {
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const yFaiz = parseFloat(document.getElementById('faiz').value) / 100;
-        const sub = (mode === 'traktor') ? parseFloat(document.getElementById('subOran').value) / 100 : 0;
+        const subOran = (mode === 'traktor') ? parseFloat(document.getElementById('subOran').value) / 100 : 0;
         const vade = parseInt(document.getElementById('vade').value);
         const per = parseInt(document.getElementById('periyot').value);
         const tip = document.getElementById('tip').value;
         const v_kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
         const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         let taksitSayisi = (mode === 'ticari' || mode === 'zirai') ? Math.ceil(vade / (12 / per)) : vade * per;
-        const donemFaiz = yFaiz / per; const vergiOran = v_kkdf + v_bsmv; const bilesikFaiz = donemFaiz * (1 + vergiOran);
+        const donemFaiz = yFaiz / per; 
+        const vergiOran = v_kkdf + v_bsmv; 
+        const bilesikFaiz = donemFaiz * (1 + vergiOran);
         
         let html = '', kalan = anaPara; 
-        let tTaksit = 0, tAnapara = 0, tFaiz = 0, tSubTaksit = 0;
+        let tTaksit = 0, tAnapara = 0, tFaiz = 0, tBsmv = 0, tKkdf = 0, tSubTaksit = 0;
         const sabitAnapara = anaPara / taksitSayisi;
 
         for(let i=1; i<=taksitSayisi; i++) {
-            let f = kalan * donemFaiz; let v = f * vergiOran; let a, t;
-            if(tip === 'esit') { t = (anaPara * bilesikFaiz * Math.pow(1+bilesikFaiz, taksitSayisi)) / (Math.pow(1+bilesikFaiz, taksitSayisi)-1); a = t - (f + v); }
-            else { a = sabitAnapara; t = a + f + v; }
+            let f = kalan * donemFaiz; 
+            let bsmvMiktar = f * v_bsmv;
+            let kkdfMiktar = f * v_kkdf;
+            let a, t;
+            
+            if(tip === 'esit') { 
+                t = (anaPara * bilesikFaiz * Math.pow(1+bilesikFaiz, taksitSayisi)) / (Math.pow(1+bilesikFaiz, taksitSayisi)-1); 
+                a = t - (f + bsmvMiktar + kkdfMiktar); 
+            } else { 
+                a = sabitAnapara; 
+                t = a + f + bsmvMiktar + kkdfMiktar; 
+            }
+            
             if(i === taksitSayisi) a = kalan; 
-            let subT = t - ((f+v) * sub); 
+            let subT = t - ((f + bsmvMiktar + kkdfMiktar) * subOran); 
             kalan -= a;
 
-            tTaksit += t; tAnapara += a; tFaiz += f; tSubTaksit += subT;
+            tTaksit += t; tAnapara += a; tFaiz += f; tBsmv += bsmvMiktar; tKkdf += kkdfMiktar; tSubTaksit += subT;
 
             html += `<tr>
                 <td>${i}</td>
                 <td style="${mode==='traktor'?'display:none':''}">${Math.round(t).toLocaleString('tr-TR')}</td>
                 <td>${Math.round(a).toLocaleString('tr-TR')}</td>
                 <td>${Math.round(f).toLocaleString('tr-TR')}</td>
+                <td>${Math.round(bsmvMiktar).toLocaleString('tr-TR')}</td>
+                <td>${Math.round(kkdfMiktar).toLocaleString('tr-TR')}</td>
                 <td style="${mode==='traktor'?'':'display:none'}">${Math.round(subT).toLocaleString('tr-TR')}</td>
                 <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td>
             </tr>`;
@@ -176,6 +188,8 @@
             <td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td>
             <td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td>
             <td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td>
+            <td>${Math.round(tBsmv).toLocaleString('tr-TR')}</td>
+            <td>${Math.round(tKkdf).toLocaleString('tr-TR')}</td>
             <td style="${mode==='traktor'?'':'display:none'}">${Math.round(tSubTaksit).toLocaleString('tr-TR')}</td>
             <td>-</td>
         </tr>`;
@@ -189,23 +203,17 @@
     }
     function send() {
         const btn = document.getElementById('applyBtn');
-        const tcField = document.getElementById('tc');
-        const telField = document.getElementById('tel');
         btn.innerText = "GÖNDERİLİYOR..."; btn.disabled = true;
         const params = {
-            tc: tcField.value, tel: telField.value,
+            tc: document.getElementById('tc').value, tel: document.getElementById('tel').value,
             tutar: document.getElementById('tutar').value, vade: document.getElementById('vade').value,
             faiz: document.getElementById('faiz').value, mod: mode.toUpperCase(),
             tarih: new Date().toLocaleString('tr-TR')
         };
         emailjs.send('service_5w8gyxb', 'template_ege1n6p', params).then(function() {
             alert("Başvuru maili başarıyla gönderildi!");
-            tcField.value = ""; telField.value = "";
-            btn.innerText = "BAŞVURU TAMAMLANDI"; btn.style.background = "#10b981";
-            setTimeout(() => {
-                btn.innerText = "BAŞVURUYU TAMAMLA"; btn.style.background = "";
-                checkApply();
-            }, 3000);
+            document.getElementById('tc').value = ""; document.getElementById('tel').value = "";
+            btn.innerText = "BAŞVURUYU TAMAMLA"; checkApply();
         }, function(error) { 
             alert("Hata: " + JSON.stringify(error)); btn.innerText = "TEKRAR DENE"; btn.disabled = false; 
         });
