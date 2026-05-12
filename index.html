@@ -28,20 +28,18 @@
         
         .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 12px 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; }
         .options-row { display: flex; gap: 20px; align-items: flex-start; }
-        .opt { display: flex; flex-direction: column; gap: 4px; }
+        .opt { display: flex; flex-direction: column; gap: 4px; min-width: 140px; }
         .opt-check { display: flex; align-items: center; gap: 6px; cursor: pointer; }
         .opt input { width: 18px; height: 18px; margin: 0; cursor: pointer; }
         .opt label { font-size: 11px; color: var(--navy); cursor: pointer; font-weight: 700; }
         
-        /* Checkbox Altındaki Metin Stili */
-        .sub-text { font-size: 9px; color: var(--blue); font-weight: 800; margin-left: 24px; }
+        .sub-text { font-size: 9px; color: var(--blue); font-weight: 800; margin-left: 24px; min-height: 12px; }
+        .sub-text.red { color: #e11d48; }
 
         .vade-header { background: var(--blue); color: white; padding: 5px; margin-top: 8px; border-radius: 6px; font-size: 10px; font-weight: 900; text-align: center; position: relative; }
-        .bilgi-kutusu { background: #f8fafc; padding: 6px; border: 1px solid var(--border); border-top: none; text-align: center; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; margin-bottom: 10px; }
-        .bilgi-notu { font-size: 10px; font-weight: 800; color: var(--navy); display: block; margin: 2px 0; }
 
-        .table-res { overflow-x: auto; margin-top: 2px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 0px; background: white; }
+        .table-res { overflow-x: auto; margin-top: 2px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; background: white; }
         th { background: #1e293b; color: #fff; padding: 4px 2px; font-size: 8px; border: 1px solid #334155; }
         td { padding: 4px 2px; text-align: center; border: 1px solid var(--border); font-size: 10px; font-weight: 600; color: #000; }
         tr:nth-child(even) { background-color: #f8fafc; }
@@ -104,17 +102,17 @@
             <div class="options-row">
                 <div class="opt">
                     <div class="opt-check">
-                        <input type="checkbox" id="yerli" checked onchange="updateSub()">
+                        <input type="checkbox" id="yerli" checked onchange="updateYerli()">
                         <label for="yerli">Yerli Malı</label>
                     </div>
-                    <!-- İstediğiniz Metin Buraya Eklendi -->
                     <div id="yerli-bilgi" class="sub-text">Faizin %25’ini devlet ödemektedir</div>
                 </div>
                 <div class="opt">
                     <div class="opt-check">
-                        <input type="checkbox" id="buyback" onchange="reset()">
+                        <input type="checkbox" id="buyback" checked onchange="updateBuyBack()">
                         <label for="buyback">Buy Back Kapsamında</label>
                     </div>
+                    <div id="bb-bilgi" class="sub-text">Kredi Sabit Faizlidir</div>
                 </div>
             </div>
         </div>
@@ -149,6 +147,7 @@
         fmtMoney(document.getElementById('proforma'));
         fmtMoney(document.getElementById('tutar'));
         switchTab(document.querySelector('.tab-btn'), 'traktor');
+        updateBuyBack(); // Başlangıç metnini ayarla
     }
 
     function fmtMoney(i) {
@@ -163,11 +162,23 @@
         document.getElementById('printBtn').disabled = true;
     }
 
-    function updateSub() {
+    function updateYerli() {
         const isYerli = document.getElementById('yerli').checked;
         document.getElementById('subOran').value = isYerli ? 50 : 25;
-        // Checkbox altına metni göster/gizle
         document.getElementById('yerli-bilgi').style.display = isYerli ? 'block' : 'none';
+        reset();
+    }
+
+    function updateBuyBack() {
+        const isBB = document.getElementById('buyback').checked;
+        const bbText = document.getElementById('bb-bilgi');
+        if(isBB) {
+            bbText.innerText = "Kredi Sabit Faizlidir";
+            bbText.classList.remove('red');
+        } else {
+            bbText.innerText = "Kredi Değişken Faizlidir";
+            bbText.classList.add('red');
+        }
         reset();
     }
 
@@ -211,7 +222,6 @@
         const prof = document.getElementById('proforma').value;
         const faizVal = document.getElementById('faiz').value;
         const subVal = document.getElementById('subOran').value;
-        const isBuyBack = document.getElementById('buyback').checked;
 
         document.getElementById('sum-prof').innerText = prof + ' ₺';
         document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value + ' ₺';
@@ -261,13 +271,7 @@
                 html += `<tr class="total-row"><td>TOPLAM</td><td>${Math.round(tA).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tIF).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tB).toLocaleString('tr-TR')} ₺</td><td>${Math.round(tT).toLocaleString('tr-TR')} ₺</td><td>-</td></tr>`;
             }
             
-            let bilgiNotlari = "";
-            if(isBuyBack) bilgiNotlari += `<span class="bilgi-notu">Kredi sabit faizlidir</span>`;
-            else bilgiNotlari += `<span class="bilgi-notu">Kredi değişken faizdir</span>`;
-
-            html += `</tbody></table></div>
-                    <div class="bilgi-kutusu">${bilgiNotlari}</div>
-                    </div>`;
+            html += `</tbody></table></div></div>`;
             resultArea.innerHTML += html;
         });
         document.getElementById('pdfBtn').disabled = false;
