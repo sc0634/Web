@@ -30,8 +30,7 @@
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
         .opt { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
         .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; line-height: 1.2; }
-        .sub-label { display: block; font-size: 9px; color: var(--blue); font-weight: 800; }
-        .hazine-label { display: block; font-size: 8px; color: #1e40af; font-style: italic; font-weight: 600; margin-top: 1px; }
+        .hazine-label { display: block; font-size: 8px; color: #1e40af; font-style: italic; font-weight: 600; margin-top: 2px; }
         .status-label { display: block; font-size: 9px; color: var(--gray); font-weight: 700; margin-top: 2px; }
         
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 20px 0; }
@@ -119,7 +118,7 @@
                 <div class="opt">
                     <input type="checkbox" id="yerli" checked onchange="toggleYerli(this)"> 
                     <label for="yerli">
-                        Yerli Malı Desteği <span class="sub-label">(%25 ek Sübv.)</span>
+                        Yerli Malı Desteği
                         <span id="hazine-note" class="hazine-label">Faizin %25'ini hazine ödemektedir</span>
                     </label>
                 </div>
