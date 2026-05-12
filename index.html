@@ -75,7 +75,7 @@
     </div>
 
     <div class="grid no-print">
-        <!-- SATIR 1: Proforma ve Kredi Tutarı -->
+        <!-- SATIR 1: Proforma (Sol) ve Kredi (Sağ) -->
         <div class="field-row">
             <div class="field">
                 <label>Proforma Fatura Tutarı</label>
@@ -87,31 +87,26 @@
             </div>
         </div>
 
-        <!-- SATIR 2: Faiz & Sübv (Yan Yana) ve Vade (Sağda Sabit) -->
+        <!-- SATIR 2: Faiz (Proforma Altı) ve Sübv (Kredi Altı) -->
         <div class="field-row">
-            <!-- Sol Sütun: Faiz ve Sübv Yan Yana -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="field">
-                    <label>Yıllık Faiz %</label>
-                    <input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()">
-                </div>
-                <div class="field">
-                    <label>Sübvansiyon %</label>
-                    <input type="number" id="subOran" value="50" oninput="reset()">
-                </div>
+            <div class="field">
+                <label>Yıllık Faiz %</label>
+                <input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()">
             </div>
-            <!-- Sağ Sütun: Vade -->
+            <div class="field">
+                <label>Sübvansiyon %</label>
+                <input type="number" id="subOran" value="50" oninput="reset()">
+            </div>
+        </div>
+
+        <!-- SATIR 3: Vade ve Vergiler -->
+        <div class="field-row">
             <div class="field" id="vade-box">
                 <label>Vade</label>
                 <select id="vade" onchange="reset()"></select>
             </div>
-        </div>
-
-        <!-- SATIR 3: Vergiler (Sadece ticari/tüketici modunda görünür) -->
-        <div class="field-row" id="tax-row-outer">
-            <div class="field"></div> <!-- Boş yer tutucu -->
             <div class="field">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" id="tax-row">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; display: none;" id="tax-row">
                     <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
                     <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
                 </div>
@@ -177,8 +172,11 @@
         btn.classList.add('active');
         mode = m;
         
+        // Vade kutusunun görünürlüğü
         document.getElementById('vade-box').style.visibility = (m === 'traktor') ? 'hidden' : 'visible';
+        // Yerli malı checkbox görünürlüğü
         document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
+        // Vergi satırı görünürlüğü
         document.getElementById('tax-row').style.display = (m === 'traktor') ? 'none' : 'grid';
         
         if(m === 'tuketici') { document.getElementById('bsmv').value = 15; document.getElementById('kkdf').value = 15; } 
