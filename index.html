@@ -156,7 +156,8 @@
         checkLocks(); fillVade(); reset();
     }
     function checkLocks() {
-        document.getElementById('bsmv').value = (mode === 'tuketici') ? 15 : 5;
+        // GÜNCELLEME: Çiftçi (zirai) ve Tüketicide BSMV 15, Diğerlerinde 5
+        document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         // GÜNCELLEME: Çiftçi (zirai) ve Tüketicide KKDF 15, Traktör ve Ticaride 0
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
     }
