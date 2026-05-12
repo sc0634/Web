@@ -12,9 +12,18 @@
         body { background: #f8fafc; margin: 0; padding: 10px; color: #1e293b; }
         .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         
-        .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 12px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 11px; cursor: pointer; line-height: 1.2; }
+        .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab-btn { flex: 1; min-width: 80px; padding: 12px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 10px; cursor: pointer; line-height: 1.2; text-transform: uppercase; }
         .tab-btn.active { background: var(--blue); color: #fff; }
+        
+        /* Hakkımda Sayfası Tasarımı */
+        #about-content { display: none; padding: 40px 20px; text-align: center; animation: fadeIn 0.5s ease; }
+        .profile-card { max-width: 500px; margin: 0 auto; border: 1px solid var(--border); padding: 30px; border-radius: 20px; background: #fcfcfc; }
+        .profile-title { font-size: 24px; color: var(--navy); margin-bottom: 5px; font-weight: 800; }
+        .profile-sub { font-size: 16px; color: var(--blue); font-weight: 600; margin-bottom: 20px; }
+        .profile-text { color: var(--gray); line-height: 1.6; font-size: 14px; }
+        .profile-badge { display: inline-block; background: #e2e8f0; padding: 5px 15px; border-radius: 20px; font-size: 12px; margin: 5px; font-weight: bold; }
+
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
         .field { display: flex; flex-direction: column; gap: 4px; }
         label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
@@ -22,6 +31,7 @@
         .options-row { grid-column: span 2; display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
         .opt { display: flex; align-items: center; gap: 6px; cursor: pointer; }
         .opt label { font-size: 11px; color: var(--navy); font-weight: 600; cursor: pointer; }
+        
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 20px 0; }
         .btn { padding: 14px 5px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 12px; }
         .btn-calc { background: var(--success); }
@@ -39,8 +49,9 @@
         th { background: #1e293b; color: #fff; padding: 10px 2px; font-size: 10px; border: 1px solid #334155; }
         td { padding: 10px 2px; text-align: center; border: 1px solid var(--border); font-weight: 400; color: #000; font-size: 13px; white-space: nowrap; }
         tr:nth-child(even) { background-color: #f8fafc; }
-        
         .total-row td { background: #f1f5f9 !important; font-weight: 800 !important; color: var(--navy); border-top: 2px solid var(--navy); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         @media print {
             @page { size: A4 portrait; margin: 0.5cm; }
@@ -57,8 +68,6 @@
         .apply-panel { background: #f0f9ff; border: 2px solid var(--blue); padding: 15px; border-radius: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
         .btn-apply { background: var(--accent); grid-column: span 2; height: 48px; }
         @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); } .apply-panel { grid-template-columns: 2fr 2fr 1fr; } .btn-apply { grid-column: span 1; } }
-        
-        #about-content { display: none; padding: 40px 20px; text-align: center; color: var(--gray); min-height: 300px; }
     </style>
 </head>
 <body onload="initApp()">
@@ -67,13 +76,27 @@
     <div class="tabs no-print">
         <button class="tab-btn active" onclick="switchTab(this, 'traktor')">TRAKTÖR</button>
         <button class="tab-btn" onclick="switchTab(this, 'ticari')">TİCARİ</button>
-        <button class="tab-btn" onclick="switchTab(this, 'zirai')">ÇİFTÇİ <br> TAKSİTLİ <br> KREDİ</button>
+        <button class="tab-btn" onclick="switchTab(this, 'zirai')">ÇİFTÇİ <br> TAKSİTLİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'tuketici')">TÜKETİCİ</button>
         <button class="tab-btn" onclick="switchTab(this, 'about')">HAKKIMDA</button>
     </div>
 
     <div id="about-content">
+        <div class="profile-card">
+            <div class="profile-title">Süleyman Coşkun</div>
+            <div class="profile-sub">Bankacı & Finansal Analist</div>
+            <div class="profile-text">
+                Bankacılık sektöründeki uzmanlığımla, finansal analiz ve kredi planlama süreçlerinde çözüm odaklı yaklaşımlar sunmaktayım. 
+                Tarım, ticari ve bireysel kredilerde doğru maliyet analizi yaparak finansal kararlarınıza değer katıyorum.
+            </div>
+            <div style="margin-top: 20px;">
+                <span class="profile-badge">Finansal Danışmanlık</span>
+                <span class="profile-badge">Kredi Analizi</span>
+                <span class="profile-badge">Risk Yönetimi</span>
+                <span class="profile-badge">Tarım Finansmanı</span>
+            </div>
         </div>
+    </div>
 
     <div id="calc-panel">
         <div class="grid no-print">
@@ -167,7 +190,6 @@
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); 
         mode = m;
-        
         const calcPanel = document.getElementById('calc-panel');
         const aboutContent = document.getElementById('about-content');
 
@@ -186,7 +208,6 @@
     function checkLocks() {
         const perSelect = document.getElementById('periyot');
         if(!perSelect) return;
-        
         document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 5;
         document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'tuketici') ? 15 : 0;
         
@@ -213,8 +234,7 @@
     }
 
     function checkApply() {
-        const tcInput = document.getElementById('tc');
-        const telInput = document.getElementById('tel');
+        const tcInput = document.getElementById('tc'); const telInput = document.getElementById('tel');
         if(!tcInput || !telInput) return;
         const tc = tcInput.value.length === 11;
         const tel = telInput.value.length === 10;
@@ -235,16 +255,8 @@
         const v_kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
         const v_bsmv = parseFloat(document.getElementById('bsmv').value) / 100;
         
-        let taksitSayisi;
-        if(mode === 'ticari' || mode === 'zirai' || mode === 'tuketici') {
-            taksitSayisi = Math.max(1, Math.ceil(vade / (12 / per)));
-        } else {
-            taksitSayisi = vade * per;
-        }
-        
-        const donemFaiz = yFaiz / per; 
-        const vergiOran = v_kkdf + v_bsmv; 
-        const bilesikFaiz = donemFaiz * (1 + vergiOran);
+        let taksitSayisi = (mode === 'ticari' || mode === 'zirai' || mode === 'tuketici') ? Math.max(1, Math.ceil(vade / (12 / per))) : vade * per;
+        const donemFaiz = yFaiz / per; const vergiOran = v_kkdf + v_bsmv; const bilesikFaiz = donemFaiz * (1 + vergiOran);
 
         document.getElementById('p_tutar').innerText = tutarVal + " TL";
         document.getElementById('p_vade').innerText = taksitSayisi + " Taksit (" + perText + ")";
@@ -256,18 +268,14 @@
         const sabitAnapara = anaPara / taksitSayisi;
 
         for(let i=1; i<=taksitSayisi; i++) {
-            let f = kalan * donemFaiz; 
-            let indF = f * (1 - subOran);
-            let bsmvMiktar = f * v_bsmv;
-            let kkdfMiktar = f * v_kkdf;
+            let f = kalan * donemFaiz; let indF = f * (1 - subOran); let bsmvMiktar = f * v_bsmv; let kkdfMiktar = f * v_kkdf;
             let a, t;
             if(tip === 'esit') { 
                 t = (anaPara * bilesikFaiz * Math.pow(1+bilesikFaiz, taksitSayisi)) / (Math.pow(1+bilesikFaiz, taksitSayisi)-1); 
                 a = t - (f + bsmvMiktar + kkdfMiktar); 
             } else { a = sabitAnapara; t = a + f + bsmvMiktar + kkdfMiktar; }
             if(i === taksitSayisi) a = kalan; 
-            let subT = a + indF + bsmvMiktar; 
-            kalan -= a;
+            let subT = a + indF + bsmvMiktar; kalan -= a;
 
             tTaksit += t; tAnapara += a; tFaiz += f; tIndFaiz += indF; tBsmv += bsmvMiktar; tKkdf += kkdfMiktar; tSubTaksit += subT;
 
@@ -283,48 +291,25 @@
                 <td>${Math.max(0, Math.round(kalan)).toLocaleString('tr-TR')}</td>
             </tr>`;
         }
-
-        let footHtml = `<tr class="total-row">
-            <td>TOP</td>
-            <td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td>
-            <td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td>
-            <td style="${mode==='traktor'?'':'display:none'}">${Math.round(tIndFaiz).toLocaleString('tr-TR')}</td>
-            <td>${Math.round(tBsmv).toLocaleString('tr-TR')}</td>
-            <td style="${mode==='traktor'?'display:none':''}">${Math.round(tKkdf).toLocaleString('tr-TR')}</td>
-            <td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td>
-            <td style="${mode==='traktor'?'':'display:none'}">${Math.round(tSubTaksit).toLocaleString('tr-TR')}</td>
-            <td>-</td>
-        </tr>`;
-        
         document.getElementById('hTutar').style.display = (mode === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('hIndFaiz').style.display = (mode === 'traktor') ? 'table-cell' : 'none';
         document.getElementById('hKkdf').style.display = (mode === 'traktor') ? 'none' : 'table-cell';
         document.getElementById('hSub').style.display = (mode === 'traktor') ? 'table-cell' : 'none';
-        
         document.getElementById('plan').innerHTML = html;
-        document.getElementById('tableFoot').innerHTML = footHtml;
+        document.getElementById('tableFoot').innerHTML = `<tr class="total-row"><td>TOP</td><td>${Math.round(tAnapara).toLocaleString('tr-TR')}</td><td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(tIndFaiz).toLocaleString('tr-TR')}</td><td>${Math.round(tBsmv).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(tKkdf).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'display:none':''}">${Math.round(tTaksit).toLocaleString('tr-TR')}</td><td style="${mode==='traktor'?'':'display:none'}">${Math.round(tSubTaksit).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
         document.getElementById('result').style.display = 'block';
         calculated = true; document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false; checkApply();
     }
 
     function send() {
         const btn = document.getElementById('applyBtn'); btn.innerText = "GÖNDERİLİYOR..."; btn.disabled = true;
-        const params = {
-            tc: document.getElementById('tc').value, tel: document.getElementById('tel').value,
-            tutar: document.getElementById('tutar').value, vade: document.getElementById('vade').value,
-            faiz: document.getElementById('faiz').value, mod: mode.toUpperCase(), tarih: new Date().toLocaleString('tr-TR')
-        };
+        const params = { tc: document.getElementById('tc').value, tel: document.getElementById('tel').value, tutar: document.getElementById('tutar').value, vade: document.getElementById('vade').value, faiz: document.getElementById('faiz').value, mod: mode.toUpperCase(), tarih: new Date().toLocaleString('tr-TR') };
         emailjs.send('service_5w8gyxb', 'template_ege1n6p', params).then(function() {
-            alert("Başvuru başarıyla gönderildi!");
-            document.getElementById('tc').value = ""; document.getElementById('tel').value = "";
-            btn.innerText = "BAŞVURUYU TAMAMLA"; checkApply();
+            alert("Başvuru başarıyla gönderildi!"); document.getElementById('tc').value = ""; document.getElementById('tel').value = ""; btn.innerText = "BAŞVURUYU TAMAMLA"; checkApply();
         }, function(error) { alert("Hata!"); btn.innerText = "TEKRAR DENE"; btn.disabled = false; });
     }
     function yazdir() { window.print(); }
-    function indir() {
-        const element = document.getElementById('pdf-area');
-        html2pdf().from(element).set({ margin: 10, filename: 'Plan.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save();
-    }
+    function indir() { html2pdf().from(document.getElementById('pdf-area')).set({ margin: 10, filename: 'Suleyman_Coskun_Plan.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save(); }
 </script>
 </body>
 </html>
