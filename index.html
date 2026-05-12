@@ -12,18 +12,52 @@
         .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         
         .tabs { display: flex; background: var(--navy); border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 12px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 10px; cursor: pointer; text-transform: uppercase; line-height: 1.2; }
+        .tab-btn { flex: 1; padding: 10px 2px; color: #cbd5e1; border: none; background: transparent; font-weight: 700; border-radius: 6px; font-size: 10px; cursor: pointer; text-transform: uppercase; }
         .tab-btn.active { background: var(--blue); color: #fff; }
         
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
         
-        /* Proforma Alanı ve Sağ Taraf Açıklaması */
-        .proforma-wrapper { grid-column: span 2; display: flex; align-items: center; gap: 15px; background: #fffbeb; padding: 12px; border-radius: 10px; border: 1.5px dashed var(--accent); }
-        .proforma-input-group { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        .proforma-info { flex: 1; font-size: 12px; color: var(--red); line-height: 1.5; border-left: 3px solid var(--accent); padding-left: 12px; font-weight: 600; }
-        
-        .proforma-input-group label { color: #b45309; font-weight: 800; font-size: 10px; text-transform: uppercase; }
-        .proforma-input-group input { border-color: #fcd34d; background: #fff; font-weight: 800; color: #92400e; font-size: 18px; outline: none; padding: 10px; border-radius: 8px; border: 1px solid #fcd34d; }
+        /* Tek Satır Proforma Düzeni */
+        .proforma-wrapper { 
+            grid-column: span 2; 
+            display: flex; 
+            align-items: center; 
+            background: #fffbeb; 
+            padding: 8px 12px; 
+            border-radius: 10px; 
+            border: 1.2px dashed var(--accent); 
+            gap: 15px;
+        }
+        .proforma-input-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            white-space: nowrap;
+        }
+        .proforma-input-group label { 
+            color: #b45309; 
+            font-weight: 800; 
+            font-size: 11px; 
+            text-transform: uppercase; 
+        }
+        .proforma-input-group input { 
+            width: 150px; 
+            padding: 6px 10px; 
+            border-radius: 6px; 
+            border: 1px solid #fcd34d; 
+            font-weight: 800; 
+            color: #92400e; 
+            font-size: 15px;
+            outline: none;
+        }
+        .proforma-info { 
+            font-size: 11px; 
+            color: var(--red); 
+            font-weight: 600; 
+            border-left: 2px solid #fcd34d; 
+            padding-left: 12px;
+            line-height: 1.2;
+        }
 
         .field { display: flex; flex-direction: column; gap: 4px; }
         .field-row { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -39,15 +73,14 @@
         .btn-pdf { background: #6366f1; }
         .btn-print { background: var(--navy); }
 
-        #result { margin-top: 20px; overflow-x: auto; }
+        #result { margin-top: 15px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { background: var(--navy); color: #fff; padding: 10px; text-align: center; }
-        td { padding: 10px; border: 1px solid var(--border); text-align: center; }
-        tr:nth-child(even) { background: #f8fafc; }
+        th { background: var(--navy); color: #fff; padding: 8px; }
+        td { padding: 8px; border: 1px solid var(--border); text-align: center; }
 
         @media (max-width: 600px) {
-            .proforma-wrapper { flex-direction: column; align-items: flex-start; }
-            .proforma-info { border-left: none; border-top: 1px solid #fcd34d; padding-left: 0; padding-top: 8px; width: 100%; }
+            .proforma-wrapper { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+            .proforma-info { border-left: none; padding-left: 0; font-size: 10px; width: 100%; border-top: 1px solid #fcd34d; padding-top: 5px; }
             .grid { grid-template-columns: 1fr 1fr; }
         }
         @media (min-width: 601px) { .grid { grid-template-columns: repeat(4, 1fr); } }
@@ -65,15 +98,13 @@
 
     <div id="calc-panel">
         <div class="grid no-print">
-            <!-- Proforma Alanı ve Açıklama -->
             <div class="proforma-wrapper" id="proforma-container">
                 <div class="proforma-input-group">
-                    <label>Proforma Fatura Bedeli</label>
+                    <label>PROFORMA:</label>
                     <input type="text" id="proforma" value="3.000.000" oninput="fmtMoney(this)">
                 </div>
                 <div class="proforma-info">
-                    ⚠️ AÇIKLAMA:<br>
-                    Fatura bedelinin max %75'i kadar kredi kullanılabilir.
+                    ⚠️ Fatura bedelinin max %75'i kadar kredi kullanılabilir.
                 </div>
             </div>
 
@@ -99,7 +130,7 @@
             <div class="field" id="subBox"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetRes()"></div>
 
             <div class="options-row" id="traktorOpts">
-                <div class="opt"><input type="checkbox" id="yerli" checked onchange="toggleYerli(this)"> Yerli Malı Desteği</div>
+                <div class="opt"><input type="checkbox" id="yerli" checked onchange="toggleYerli(this)"> Yerli Malı</div>
                 <div class="opt"><input type="checkbox" id="buyback" checked onchange="resetRes()"> Buy Back</div>
             </div>
         </div>
@@ -113,9 +144,7 @@
         <div id="result" style="display:none;">
             <table id="resTable">
                 <thead>
-                    <tr>
-                        <th>No</th><th>Anapara</th><th>Faiz</th><th>Taksit</th><th>Kalan</th>
-                    </tr>
+                    <tr><th>No</th><th>Anapara</th><th>Faiz</th><th>Taksit</th><th>Kalan</th></tr>
                 </thead>
                 <tbody id="planBody"></tbody>
             </table>
@@ -125,57 +154,28 @@
 
 <script>
     let mode = 'traktor';
-
-    function initApp() {
-        fmtMoney(document.getElementById('proforma'));
-        fmtMoney(document.getElementById('tutar'));
-        switchTab(document.getElementById('btn-traktor'), 'traktor');
-    }
-
+    function initApp() { fmtMoney(document.getElementById('proforma')); fmtMoney(document.getElementById('tutar')); switchTab(document.getElementById('btn-traktor'), 'traktor'); }
     function switchTab(btn, m) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
         mode = m;
-
-        // Proforma sadece traktör modunda görünsün
         document.getElementById('proforma-container').style.display = (m === 'traktor') ? 'flex' : 'none';
         document.getElementById('subBox').style.display = (m === 'traktor') ? 'flex' : 'none';
         document.getElementById('traktorOpts').style.display = (m === 'traktor') ? 'flex' : 'none';
-
-        fillVade();
-        resetRes();
+        fillVade(); resetRes();
     }
-
-    function fmtMoney(i) {
-        let v = i.value.replace(/\D/g, "");
-        if (v) i.value = new Intl.NumberFormat('tr-TR').format(v);
-        resetRes();
-    }
-
+    function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if (v) i.value = new Intl.NumberFormat('tr-TR').format(v); resetRes(); }
     function fillVade() {
         const s = document.getElementById('vade'); s.innerHTML = '';
         let isMonth = (mode !== 'traktor');
         let max = (mode === 'tuketici') ? 36 : (isMonth ? 60 : 5);
         for (let i = 1; i <= max; i++) {
-            let o = document.createElement('option');
-            o.value = i;
-            o.text = i + (isMonth ? " Ay" : " Yıl");
+            let o = document.createElement('option'); o.value = i; o.text = i + (isMonth ? " Ay" : " Yıl");
             if (i === (isMonth ? 36 : 5)) o.selected = true;
             s.appendChild(o);
         }
     }
-
-    function toggleYerli(cb) {
-        document.getElementById('subOran').value = cb.checked ? 50 : 25;
-        resetRes();
-    }
-
-    function resetRes() {
-        document.getElementById('result').style.display = 'none';
-        document.getElementById('pdfBtn').disabled = true;
-        document.getElementById('printBtn').disabled = true;
-    }
-
+    function toggleYerli(cb) { document.getElementById('subOran').value = cb.checked ? 50 : 25; resetRes(); }
+    function resetRes() { document.getElementById('result').style.display = 'none'; document.getElementById('pdfBtn').disabled = true; document.getElementById('printBtn').disabled = true; }
     function hesapla() {
         document.getElementById('result').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false;
