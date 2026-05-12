@@ -23,7 +23,7 @@
         .field { display: flex; flex-direction: column; gap: 4px; }
         .field-row { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
-        label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; }
+        label { font-size: 10px; font-weight: 800; color: var(--gray); text-transform: uppercase; white-space: nowrap; }
         input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; width: 100%; height: 42px; }
         
         .vade-header { background: var(--blue); color: white; padding: 8px; margin-top: 15px; border-radius: 6px; font-size: 11px; font-weight: 900; text-align: center; position: relative; }
@@ -87,25 +87,30 @@
             </div>
         </div>
 
-        <!-- SATIR 2: Faiz (Proforma Altı) ve Vade (Kredi Altı) -->
+        <!-- SATIR 2: Faiz & Sübv (Yan Yana) ve Vade (Sağda Sabit) -->
         <div class="field-row">
-            <div class="field">
-                <label>Yıllık Faiz %</label>
-                <input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()">
+            <!-- Sol Sütun: Faiz ve Sübv Yan Yana -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="field">
+                    <label>Yıllık Faiz %</label>
+                    <input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()">
+                </div>
+                <div class="field">
+                    <label>Sübvansiyon %</label>
+                    <input type="number" id="subOran" value="50" oninput="reset()">
+                </div>
             </div>
+            <!-- Sağ Sütun: Vade -->
             <div class="field" id="vade-box">
                 <label>Vade</label>
                 <select id="vade" onchange="reset()"></select>
             </div>
         </div>
 
-        <!-- SATIR 3: Sübvansiyon ve Vergiler -->
-        <div class="field-row">
+        <!-- SATIR 3: Vergiler (Sadece ticari/tüketici modunda görünür) -->
+        <div class="field-row" id="tax-row-outer">
+            <div class="field"></div> <!-- Boş yer tutucu -->
             <div class="field">
-                <label>Sübvansiyon %</label>
-                <input type="number" id="subOran" value="50" oninput="reset()">
-            </div>
-            <div class="field" id="tax-row-container">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" id="tax-row">
                     <div class="field"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
                     <div class="field"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
