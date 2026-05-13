@@ -35,7 +35,6 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
-        /* Readonly Alanlar İçin Stil */
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; border: 1px solid #dcdde1; }
 
         .compact-row { grid-column: span 2; display: flex; gap: 4px; padding: 0; justify-content: flex-start; }
@@ -97,7 +96,6 @@
         <div class="compact-row">
             <div class="small-field"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
             <div class="small-field"><label>Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
-            <!-- READONLY ALANLAR -->
             <div class="small-field" id="bsmv-box"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly tabindex="-1"></div>
             <div class="small-field" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly tabindex="-1"></div>
             <div class="small-field" id="sub-input-box"><label>Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
@@ -169,12 +167,13 @@
         btn.classList.add('active'); mode = m;
         const isSub = (m === 'traktor' || m === 'ekipman');
         
-        // Alanların Görünürlüğü
         document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
-        document.getElementById('periyot-box').style.display = (segment === 'ticari' || segment === 'bireysel') ? 'flex' : 'none';
+        
+        // Ödeme Periyodu: Çiftçi Taksitli (zirai), Ticari ve Bireysel sekmelerinde görünür
+        document.getElementById('periyot-box').style.display = (m === 'zirai' || segment === 'ticari' || segment === 'bireysel') ? 'flex' : 'none';
         
         const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
         document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
@@ -182,7 +181,11 @@
         if(isProformaHidden) document.getElementById('tutar-input-box').classList.add('full-width');
         else document.getElementById('tutar-input-box').classList.remove('full-width');
         
-        // VERGİ OTOMASYONU (Readonly olsa bile kod değiştirebilir)
+        if (m === 'ticari' || m === 'zirai') {
+            document.getElementById('faiz').value = 46.00;
+            syncFaiz('yillik');
+        }
+
         if (m === 'tuketici') {
             document.getElementById('bsmv').value = 15;
             document.getElementById('kkdf').value = 15;
@@ -238,19 +241,20 @@
         const periyot = parseInt(document.getElementById('periyot').value);
         
         const yF = faizVal / 100, subO = subVal / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
-        let isTarim = (segment === 'tarimsal');
+        let isTarimSub = (mode === 'traktor' || mode === 'ekipman');
         
-        let vades = isTarim ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
+        let vades = (mode === 'traktor' || mode === 'ekipman') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach(v => {
-            let taksitSayisi = isTarim ? v : Math.ceil(v / periyot);
-            let dF = isTarim ? yF : (yF / 12) * periyot;
+            // Eğer traktör/ekipman değilse periyoda göre taksit sayısını ayarla
+            let taksitSayisi = isTarimSub ? v : Math.ceil(v / periyot);
+            let dF = isTarimSub ? yF : (yF / 12) * periyot;
             let bF = dF * (1 + bsmv + kkdf);
             
             let taksit = (anaPara * bF * Math.pow(1+bF, taksitSayisi)) / (Math.pow(1+bF, taksitSayisi)-1);
             
             const subCol = subVal > 0 ? '<th style="width:12%">İnd.</th>' : '';
-            let html = `<div class="vade-header">${v} ${isTarim ? 'Yıllık' : 'Aylık'} Toplam Süre (${taksitSayisi} Taksit)</div><div class="table-res"><table><thead><tr>
+            let html = `<div class="vade-header">${v} ${isTarimSub ? 'Yıllık' : 'Aylık'} Toplam Süre (${taksitSayisi} Taksit)</div><div class="table-res"><table><thead><tr>
                 <th style="width:7%">Tks</th>
                 <th style="width:18%">Ana P.</th>
                 <th style="width:15%">Faiz</th>
@@ -280,7 +284,7 @@
         });
         
         document.getElementById('result-main-container').style.display = 'block';
-        document.getElementById('result-title').innerText = isTarim ? "Yıllık Ödemeli Planlar" : "Eşit Taksitli Ödeme Planı";
+        document.getElementById('result-title').innerText = isTarimSub ? "Yıllık Ödemeli Planlar" : "Eşit Taksitli Ödeme Planı";
         document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value;
         document.getElementById('sum-faiz').innerText = `%${faizVal}`;
         document.getElementById('sum-prof').innerText = document.getElementById('proforma').value;
