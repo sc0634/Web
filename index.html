@@ -35,8 +35,8 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
-        /* Tüm oranların toplandığı kompakt satır */
-        .compact-row { grid-column: span 2; display: flex; gap: 6px; padding: 0; justify-content: flex-start; flex-wrap: nowrap; }
+        /* Oranların dip dibe (yaslanmış) durduğu satır */
+        .compact-row { grid-column: span 2; display: flex; gap: 4px; padding: 0; justify-content: flex-start; }
         .small-field { width: 19%; display: flex; flex-direction: column; gap: 2px; flex: none; }
 
         .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
@@ -92,7 +92,6 @@
         <div class="field" id="prof-input-box"><label>Proforma</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
         <div class="field" id="tutar-input-box"><label>Kredi</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
         
-        <!-- Tüm Oranların Yan Yana Olduğu Satır -->
         <div class="compact-row">
             <div class="small-field">
                 <label>Yıllık %</label>
@@ -102,10 +101,6 @@
                 <label>Aylık %</label>
                 <input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')">
             </div>
-            <div class="small-field" id="sub-input-box">
-                <label>Sübv. %</label>
-                <input type="number" id="subOran" value="50" oninput="reset()">
-            </div>
             <div class="small-field" id="bsmv-box">
                 <label>BSMV %</label>
                 <input type="number" id="bsmv" value="5" oninput="reset()">
@@ -113,6 +108,10 @@
             <div class="small-field" id="kkdf-box">
                 <label>KKDF %</label>
                 <input type="number" id="kkdf" value="0" oninput="reset()">
+            </div>
+            <div class="small-field" id="sub-input-box">
+                <label>Sübv. %</label>
+                <input type="number" id="subOran" value="50" oninput="reset()">
             </div>
         </div>
 
@@ -181,7 +180,7 @@
         btn.classList.add('active'); mode = m;
         const isSub = (m === 'traktor' || m === 'ekipman');
         
-        // Alan görünürlük kontrolleri
+        // BSMV ve KKDF genellikle ticari ve bireyselde görünür, sübvansiyon tarımsalda görünür.
         document.getElementById('sub-input-box').style.visibility = isSub ? 'visible' : 'hidden';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
@@ -193,10 +192,8 @@
         if(isProformaHidden) document.getElementById('tutar-input-box').classList.add('full-width');
         else document.getElementById('tutar-input-box').classList.remove('full-width');
         
-        // Vergi değerleri ataması
         document.getElementById('bsmv').value = (m === 'tuketici' ? 15 : 5);
         document.getElementById('kkdf').value = (m === 'tuketici' ? 15 : 0);
-        
         document.getElementById('main-calc-btn').style.backgroundColor = { tarimsal: '#27ae60', ticari: '#e67e22', bireysel: '#3498db' }[segment];
         
         if(isSub) updateYerli(); fillVade(); reset();
