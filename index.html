@@ -57,9 +57,10 @@
 
         label { 
             font-weight: bold; font-size: 9px; color: #57606f; 
-            text-transform: uppercase; height: 25px; display: flex; 
-            align-items: flex-end; margin-bottom: 2px; line-height: 1; 
+            text-transform: uppercase; height: 32px; display: flex; 
+            align-items: flex-end; margin-bottom: 2px; line-height: 1.1; 
             white-space: pre-line;
+            overflow: hidden;
         }
         
         .compact-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
@@ -82,25 +83,14 @@
 
         .vade-header { background: #f1f2f6; padding: 8px; font-weight: bold; text-align: center; border-bottom: 1px solid var(--border); font-size: 11px; }
 
-        /* --- TEK SAYFAYA SIĞDIRMA KURALLARI --- */
         @media print {
             @page { size: auto; margin: 5mm; }
             body { background: white; padding: 0; }
             .no-print { display: none !important; }
-            .container { 
-                width: 100% !important; 
-                max-width: none !important; 
-                margin: 0 !important; 
-                padding: 0 !important; 
-                box-shadow: none !important; 
-                border: none !important;
-            }
+            .container { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
             .result-main-container { display: block !important; margin-top: 0; border-width: 1px; }
-            table { font-size: 9px !important; } /* Fontu küçülterek sığmayı kolaylaştırır */
-            .vade-header { padding: 4px; font-size: 10px; }
+            table { font-size: 9px !important; }
             th, td { padding: 4px 1px !important; }
-            .table-res { overflow: visible !important; }
-            /* Sayfa kırılmasını önle */
             tr, .vade-header { page-break-inside: avoid; }
         }
     </style>
@@ -123,16 +113,16 @@
     <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
 
     <div class="grid no-print">
-        <div class="field" id="prof-input-box"><label>Proforma</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field" id="tutar-input-box"><label>Kredi Tut.</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
+        <div class="field" id="prof-input-box"><label>Proforma&#10;Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
+        <div class="field" id="tutar-input-box"><label>Kredi&#10;Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
         
         <div class="compact-row">
-            <div class="field px-faiz"><label>Yıllık&#10;%</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
-            <div class="field px-faiz"><label>Aylık&#10;%</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
-            <div class="field px-vergi" id="bsmv-box"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
-            <div class="field px-vergi" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
-            <div class="field px-vade-sync" id="vade-box"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
-            <div class="field px-vergi" id="sub-input-box"><label>Sübv %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
+            <div class="field px-faiz"><label>Yıllık&#10;Oran %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
+            <div class="field px-faiz"><label>Aylık&#10;Oran %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
+            <div class="field px-vergi" id="bsmv-box"><label>BSMV&#10;%</label><input type="number" id="bsmv" value="5" readonly></div>
+            <div class="field px-vergi" id="kkdf-box"><label>KKDF&#10;%</label><input type="number" id="kkdf" value="0" readonly></div>
+            <div class="field px-vade-sync" id="vade-box"><label>Vade&#10;Süresi</label><select id="vade" onchange="reset()"></select></div>
+            <div class="field px-vergi" id="sub-input-box"><label>Sübv.&#10;%</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         </div>
 
         <div class="field px-periyot" id="periyot-box"><label>Ödeme Periyodu</label>
