@@ -30,8 +30,8 @@
         .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); }
         .bg-bir { background: var(--bireysel); } .bg-hak { background: var(--hakkimda); }
 
-        .tabs { display: none; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 8px; }
-        .tab-btn { padding: 6px 10px; border: none; background: #eee; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; }
+        .tabs { display: none; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 8px; overflow-x: auto; white-space: nowrap; }
+        .tab-btn { padding: 6px 12px; border: none; background: #eee; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; flex-shrink: 0; }
         .tab-btn.active { background: var(--dark); color: white; }
         
         .grid { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
@@ -49,10 +49,9 @@
         .px-vade-sync { width: 85px; }
         .px-periyot { width: 130px; }
         
-        /* Checkbox ve Label Sabitleme */
         .options-container { 
             display: flex; 
-            flex-direction: row; /* Yan yana olması için row yapıldı */
+            flex-direction: row; 
             flex-wrap: wrap;
             gap: 15px; 
             align-items: center;
@@ -109,11 +108,12 @@
             <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
             <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
             <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
-            <button class="tab-btn" onclick="switchTab(this, 'hayvancilik')">Hayvancılık</button>
+            <button class="tab-btn" onclick="switchTab(this, 'hayvancilik')">Bitkisel/Hayvancılık İşletme Kredileri</button>
         </div>
         <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme</button></div>
         <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
 
+        <!-- Özel Girişler -->
         <div id="hayvan-konteynirlar" style="display:none; margin-bottom: 20px;">
             <div class="animal-container">
                 <div class="animal-title">KÜÇÜKBAŞ</div>
@@ -131,6 +131,7 @@
             </div>
         </div>
 
+        <!-- Standart Giriş Paneli -->
         <div id="main-inputs-container">
             <div class="grid no-print" id="main-inputs">
                 <div class="field" id="prof-input-box"><label class="field-label">Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
@@ -247,8 +248,6 @@
         
         if(!isHayvan) {
             const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
-            
-            // Traktörde Buyback var, Ekipmanda yok
             document.getElementById('bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
             
             if(isSub) document.getElementById('faiz').value = "40.50";
