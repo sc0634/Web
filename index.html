@@ -35,8 +35,9 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
-        /* Çiftli Faiz Girişi */
-        .faiz-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: span 2; }
+        /* Yan yana ve %50 Daraltılmış Faiz Alanı */
+        .faiz-wrapper { grid-column: span 2; display: flex; gap: 10px; }
+        .faiz-half { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 
         .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row-wrapper { display: flex; flex-direction: row; gap: 10px; }
@@ -89,12 +90,12 @@
         <div class="field" id="prof-input-box"><label>Proforma</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
         <div class="field" id="tutar-input-box"><label>Kredi</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
         
-        <div class="faiz-group">
-            <div class="field">
+        <div class="faiz-wrapper">
+            <div class="faiz-half">
                 <label>Yıllık Faiz %</label>
                 <input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')">
             </div>
-            <div class="field">
+            <div class="faiz-half">
                 <label>Aylık Faiz %</label>
                 <input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')">
             </div>
