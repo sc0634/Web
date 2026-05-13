@@ -32,11 +32,14 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .field { display: flex; flex-direction: column; gap: 2px; }
         
-        /* Kredi Tutarı Genişlik Ayarı */
-        #tutar-input-box { width: calc(100% - 10px); }
-        .full-width { grid-column: span 2 !important; width: calc(100% - 10px) !important; }
+        /* Kredi Tutarı Genişliği 35px Olarak Sabitlendi */
+        #tutar-input-box { width: 35px !important; flex: none; }
+        #tutar-input-box input { width: 35px !important; padding: 6px 2px; text-align: center; }
         
-        label { font-weight: bold; font-size: 10px; color: #57606f; }
+        /* Proforma ve diğer alanların düzeni bozulmaması için */
+        .full-width { grid-column: span 2 !important; width: 100% !important; }
+        
+        label { font-weight: bold; font-size: 10px; color: #57606f; white-space: nowrap; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; border: 1px solid #dcdde1; }
@@ -181,8 +184,12 @@
         const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
         document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
         
-        if(isProformaHidden) document.getElementById('tutar-input-box').classList.add('full-width');
-        else document.getElementById('tutar-input-box').classList.remove('full-width');
+        // Kredi Tutarı 35px olduğu için full-width durumunda diğer alanları bozmaması için ayarlandı
+        if(isProformaHidden) {
+            document.getElementById('tutar-input-box').style.width = '100%';
+        } else {
+            document.getElementById('tutar-input-box').style.width = '35px';
+        }
         
         if (m === 'ticari' || m === 'zirai') {
             document.getElementById('faiz').value = 46.00;
