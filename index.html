@@ -35,8 +35,8 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
-        /* Aylık Faiz Bilgi Alanı */
-        .aylik-info { font-size: 10px; font-weight: bold; color: #2980b9; margin-top: 1px; }
+        /* Çiftli Faiz Girişi */
+        .faiz-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; grid-column: span 2; }
 
         .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row-wrapper { display: flex; flex-direction: row; gap: 10px; }
@@ -74,7 +74,7 @@
     <div id="print-summary">
         <div class="summary-item" id="sum-prof-box"><b>PROFORMA</b><div id="sum-prof">0</div></div>
         <div class="summary-item"><b>KREDİ</b><div id="sum-kredi">0</div></div>
-        <div class="summary-item"><b>ORAN</b><div id="sum-faiz">0</div></div>
+        <div class="summary-item"><b>ORAN (Yıllık)</b><div id="sum-faiz">0</div></div>
     </div>
 
     <div class="tabs no-print" id="tabs-tarimsal" style="display: flex;">
@@ -88,11 +88,18 @@
     <div class="grid no-print">
         <div class="field" id="prof-input-box"><label>Proforma</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
         <div class="field" id="tutar-input-box"><label>Kredi</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field">
-            <label>Faiz % (Yıllık)</label>
-            <input type="number" id="faiz" value="40.50" step="0.01" oninput="updateAylikGosterge()">
-            <div id="aylik-gosterge" class="aylik-info">Aylık: %3.38</div>
+        
+        <div class="faiz-group">
+            <div class="field">
+                <label>Yıllık Faiz %</label>
+                <input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')">
+            </div>
+            <div class="field">
+                <label>Aylık Faiz %</label>
+                <input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')">
+            </div>
         </div>
+
         <div class="field" id="sub-input-box"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         
         <div class="options-container" id="ziraiOpts">
@@ -129,17 +136,21 @@
 
 <script>
     let mode = 'traktor'; let segment = 'tarimsal';
+    
     function initApp() { 
         fmtMoney(document.getElementById('proforma')); 
         fmtMoney(document.getElementById('tutar')); 
-        updateAylikGosterge();
         switchSegment('tarimsal'); 
     }
 
-    function updateAylikGosterge() {
-        const yF = parseFloat(document.getElementById('faiz').value) || 0;
-        const aF = (yF / 12).toFixed(2);
-        document.getElementById('aylik-gosterge').innerText = `Aylık: %${aF}`;
+    function syncFaiz(source) {
+        const yInput = document.getElementById('faiz');
+        const aInput = document.getElementById('faizAylik');
+        if (source === 'yillik') {
+            aInput.value = (parseFloat(yInput.value) / 12).toFixed(2);
+        } else {
+            yInput.value = (parseFloat(aInput.value) * 12).toFixed(2);
+        }
         reset();
     }
 
@@ -161,7 +172,6 @@
         document.getElementById('sub-input-box').style.visibility = isSub ? 'visible' : 'hidden';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
-
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
         document.getElementById('vergi-box').style.display = isSub ? 'none' : 'flex';
         
@@ -246,17 +256,15 @@
                 </tr>`;
             }
             
-            if(v >= 1) { 
-                html += `<tr class="total-row">
-                    <td>TOP</td>
-                    <td>${Math.round(tA).toLocaleString('tr-TR')}</td>
-                    <td>${Math.round(tF).toLocaleString('tr-TR')}</td>
-                    ${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}
-                    <td>${Math.round(tV).toLocaleString('tr-TR')}</td>
-                    <td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td>
-                    <td>-</td>
-                </tr>`;
-            }
+            html += `<tr class="total-row">
+                <td>TOP</td>
+                <td>${Math.round(tA).toLocaleString('tr-TR')}</td>
+                <td>${Math.round(tF).toLocaleString('tr-TR')}</td>
+                ${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}
+                <td>${Math.round(tV).toLocaleString('tr-TR')}</td>
+                <td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td>
+                <td>-</td>
+            </tr>`;
             
             res.innerHTML += html + `</tbody></table></div>`;
         });
