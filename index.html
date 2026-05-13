@@ -11,8 +11,17 @@
             --success: #27ae60; --dark: #2c3e50; --light: #ecf0f1; --border: #dcdde1;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f5f6fa; margin: 0; padding: 8px; color: var(--dark); font-size: 13px; }
-        .container { max-width: 100%; margin: 0 auto; background: #fff; padding: 12px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        body { background: #f5f6fa; margin: 0; padding: 10px; color: var(--dark); font-size: 13px; }
+        
+        /* PC Görüntüsünü Sabitleyen ve Ortaya Alan Bölüm */
+        .container { 
+            max-width: 500px; 
+            margin: 10px auto; 
+            background: #fff; 
+            padding: 12px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
+        }
         
         .segment-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 12px; }
         .seg-btn { border: none; padding: 8px 2px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; font-size: 10px; opacity: 0.6; }
@@ -32,12 +41,9 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .field { display: flex; flex-direction: column; gap: 2px; }
         
-        /* Kredi Tutarı Genişliği 35px Olarak Sabitlendi */
-        #tutar-input-box { width: 35px !important; flex: none; }
-        #tutar-input-box input { width: 35px !important; padding: 6px 2px; text-align: center; }
-        
-        /* Proforma ve diğer alanların düzeni bozulmaması için */
-        .full-width { grid-column: span 2 !important; width: 100% !important; }
+        /* Kredi Tutarı 75px Sabitlendi ve Genişlemesi Engellendi */
+        #tutar-input-box { width: 75px !important; flex: none !important; grid-column: auto !important; }
+        #tutar-input-box input { width: 75px !important; padding: 6px 4px; text-align: center; }
         
         label { font-weight: bold; font-size: 10px; color: #57606f; white-space: nowrap; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
@@ -70,7 +76,7 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        @media print { .no-print { display: none !important; } #print-summary { display: grid !important; } }
+        @media print { .no-print { display: none !important; } #print-summary { display: grid !important; } .container { max-width: 100%; margin: 0; box-shadow: none; } }
     </style>
 </head>
 <body onload="initApp()">
@@ -178,18 +184,10 @@
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
-        
         document.getElementById('periyot-box').style.display = (m === 'zirai' || segment === 'ticari' || segment === 'bireysel') ? 'flex' : 'none';
         
         const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
         document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
-        
-        // Kredi Tutarı 35px olduğu için full-width durumunda diğer alanları bozmaması için ayarlandı
-        if(isProformaHidden) {
-            document.getElementById('tutar-input-box').style.width = '100%';
-        } else {
-            document.getElementById('tutar-input-box').style.width = '35px';
-        }
         
         if (m === 'ticari' || m === 'zirai') {
             document.getElementById('faiz').value = 46.00;
