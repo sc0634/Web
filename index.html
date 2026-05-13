@@ -56,8 +56,6 @@
         #prof-input-box, #tutar-input-box { width: 140px; }
         .px-faiz { width: 95px; }
         .px-vergi { width: 65px; }
-        
-        /* İstediğin düzenleme: Vade ve KKDF genişlikleri eşitlendi (65px) */
         .px-vade-sync { width: 65px; }
         .px-periyot { width: 150px; }
 
@@ -79,32 +77,9 @@
         .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; font-size: 14px; text-transform: uppercase; }
         
-        .vade-header { 
-            background: #f1f2f6; 
-            color: var(--dark); 
-            padding: 10px; 
-            border-top: 1px solid var(--border); 
-            border-bottom: 1px solid var(--border); 
-            font-weight: bold; 
-            text-align: center; 
-            font-size: 12px; 
-            position: relative;
-        }
+        .vade-header { background: #f1f2f6; color: var(--dark); padding: 10px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-weight: bold; text-align: center; font-size: 12px; position: relative; }
 
-        .btn-mini-print {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--dark);
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 3px;
-            font-size: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        .btn-mini-print { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: var(--dark); color: white; border: none; padding: 5px 12px; border-radius: 3px; font-size: 10px; cursor: pointer; font-weight: bold; }
 
         .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
@@ -151,23 +126,23 @@
 
     <div class="grid no-print">
         <div class="field" id="prof-input-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
-        <!-- Kredi Tutarı 100.000 olarak set edildi -->
         <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="100.000" oninput="fmtMoney(this)"></div>
         
         <div class="compact-row">
             <div class="field px-faiz"><label>Yıllık Oran %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
             <div class="field px-faiz"><label>Aylık Oran %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
             <div class="field px-vergi" id="bsmv-box"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly tabindex="-1"></div>
-            <div class="field px-vergi px-vade-sync" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly tabindex="-1"></div>
-            <!-- Vade süresi genişliği KKDF ile aynı (65px) yapıldı ve yanına taşındı -->
+            <div class="field px-vade-sync" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly tabindex="-1"></div>
+            <!-- Bireysel seçildiğinde bu kutucuk (vade-box) gizlenecek -->
             <div class="field px-vade-sync" id="vade-box"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
             <div class="field px-vergi" id="sub-input-box"><label>Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         </div>
 
+        <!-- Bireysel özel slider -->
         <div class="slider-container" id="bir-slider-box">
             <div class="slider-label">
                 <span>Vade Seçimi</span>
-                <span id="slider-val" style="color:var(--bireysel)">12 Ay</span>
+                <b id="slider-val" style="color:var(--bireysel); font-size: 14px;">12 Ay</b>
             </div>
             <input type="range" id="vadeSlider" min="1" max="36" value="12" oninput="syncSlider(this.value)">
         </div>
@@ -240,42 +215,38 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
         const isSub = (m === 'traktor' || m === 'ekipman');
+        const isBireysel = (m === 'tuketici');
         
         document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
-        document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
-        document.getElementById('periyot-box').style.display = (m === 'zirai' || segment === 'ticari' || segment === 'bireysel') ? 'flex' : 'none';
         
-        // Bireysel/Tüketici özel kısıtlamalar
-        if (m === 'tuketici') {
-            document.getElementById('bir-slider-box').style.display = 'flex';
-            document.getElementById('opt-6ay').style.display = 'none'; // 6 aylık periyodu kaldır
+        // Bireysel ise üstteki Vade kutusunu gizle, sadece Slider göster
+        document.getElementById('vade-box').style.display = (isSub || isBireysel) ? 'none' : 'flex';
+        document.getElementById('bir-slider-box').style.display = isBireysel ? 'flex' : 'none';
+
+        document.getElementById('periyot-box').style.display = (m === 'zirai' || segment === 'ticari' || isBireysel) ? 'flex' : 'none';
+        
+        if (isBireysel) {
+            document.getElementById('opt-6ay').style.display = 'none';
             if(document.getElementById('periyot').value === "6") document.getElementById('periyot').value = "1";
-        } else {
-            document.getElementById('bir-slider-box').style.display = 'none';
-            document.getElementById('opt-6ay').style.display = 'block';
-        }
-
-        const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
-        document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
-        
-        if (m === 'ticari' || m === 'zirai') {
-            document.getElementById('faiz').value = 46.00;
-            syncFaiz('yillik');
-        } else if (m === 'tuketici') {
-            document.getElementById('faizAylik').value = 4.39;
-            syncFaiz('aylik');
-        }
-
-        if (m === 'tuketici') {
             document.getElementById('bsmv').value = 15;
             document.getElementById('kkdf').value = 15;
+            document.getElementById('faizAylik').value = 4.39;
+            syncFaiz('aylik');
         } else {
+            document.getElementById('opt-6ay').style.display = 'block';
             document.getElementById('bsmv').value = 5;
             document.getElementById('kkdf').value = 0;
+            if (m === 'ticari' || m === 'zirai') {
+                document.getElementById('faiz').value = 46.00;
+                syncFaiz('yillik');
+            }
         }
 
+        const isProformaHidden = (m === 'ticari' || isBireysel || m === 'zirai');
+        document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
+        
         document.getElementById('main-calc-btn').style.backgroundColor = { tarimsal: '#27ae60', ticari: '#e67e22', bireysel: '#3498db' }[segment];
         
         if(isSub) updateYerli(); fillVade(); reset();
@@ -292,7 +263,7 @@
         let isY = (segment === 'tarimsal');
         let max = (mode === 'tuketici') ? 36 : (isY ? 5 : 60);
         for(let i=1; i<=max; i++){
-            let o = document.createElement('option'); o.value = i; o.text = i + (segment !== 'tarimsal' ? "" : "");
+            let o = document.createElement('option'); o.value = i; o.text = i;
             if(i === (segment !== 'tarimsal' ? 12 : max)) o.selected = true;
             s.appendChild(o);
         }
@@ -324,48 +295,27 @@
         const faizVal = document.getElementById('faiz').value;
         const subVal = (mode === 'traktor' || mode === 'ekipman') ? document.getElementById('subOran').value : 0;
         const periyot = parseInt(document.getElementById('periyot').value);
-        
         const yF = faizVal / 100, subO = subVal / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         let isTarimSub = (mode === 'traktor' || mode === 'ekipman');
-        
-        let vades = (mode === 'traktor' || mode === 'ekipman') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
+        let vades = isTarimSub ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach(v => {
             let taksitSayisi = isTarimSub ? v : Math.ceil(v / periyot);
             let dF = isTarimSub ? yF : (yF / 12) * periyot;
             let bF = dF * (1 + bsmv + kkdf);
-            
             let taksit = (anaPara * bF * Math.pow(1+bF, taksitSayisi)) / (Math.pow(1+bF, taksitSayisi)-1);
             
             const subCol = subVal > 0 ? '<th>İnd. Faiz</th>' : '';
-            let html = `<div class="vade-header">
-                ${v} ${isTarimSub ? 'Yıllık' : 'Aylık'} Ödeme Planı (${taksitSayisi} Taksit)
+            let html = `<div class="vade-header">${v} ${isTarimSub ? 'Yıllık' : 'Aylık'} Ödeme Planı (${taksitSayisi} Taksit)
                 <button class="btn-mini-print no-print" onclick="window.print()">YAZDIR</button>
-            </div><div class="table-res"><table><thead><tr>
-                <th>Tks</th>
-                <th>Ana Para</th>
-                <th>Faiz</th>
-                ${subCol}
-                <th>Vergi</th>
-                <th>Taksit</th>
-                <th>Kalan</th>
-                </tr></thead><tbody>`;
+            </div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subCol}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara, tA = 0, tF = 0, tV = 0, tT = 0, tInd = 0;
             for(let i=1; i<=taksitSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), indF = f * subO, a = (i===taksitSayisi) ? kalan : taksit - (f + b), sTaksit = taksit - indF;
                 tA += a; tF += f; tV += b; tT += sTaksit; tInd += indF; kalan -= a;
-                html += `<tr>
-                    <td>${i}</td>
-                    <td>${Math.round(a).toLocaleString('tr-TR')}</td>
-                    <td>${Math.round(f).toLocaleString('tr-TR')}</td>
-                    ${subVal>0?`<td style="color:red">-${Math.round(indF).toLocaleString('tr-TR')}</td>`:''}
-                    <td>${Math.round(b).toLocaleString('tr-TR')}</td>
-                    <td style="font-weight:bold">${Math.round(sTaksit).toLocaleString('tr-TR')}</td>
-                    <td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td>
-                </tr>`;
+                html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subVal>0?`<td style="color:red">-${Math.round(indF).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
             }
-            
             html += `<tr class="total-row"><td>TOP</td><td>${Math.round(tA).toLocaleString('tr-TR')}</td><td>${Math.round(tF).toLocaleString('tr-TR')}</td>${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tV).toLocaleString('tr-TR')}</td><td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td><td>-</td></tr></tbody></table></div>`;
             res.innerHTML += html;
         });
