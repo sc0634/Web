@@ -13,82 +13,45 @@
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #f5f6fa; margin: 0; padding: 10px; color: var(--dark); font-size: 13px; }
-        
-        .container { 
-            max-width: 1000px; margin: 10px auto; background: #fff; padding: 20px; 
-            border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
-            position: relative; min-height: 400px;
-        }
-        
-        .segment-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; }
-        .seg-btn { 
-            flex: 1 0 auto; min-width: 95px; border: 2px solid transparent; 
-            height: 40px; border-radius: 6px; color: white; font-weight: bold; 
-            cursor: pointer; font-size: 11px; opacity: 0.5; transition: 0.3s; padding: 0 15px;
-        }
+        .container { max-width: 1000px; margin: 10px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); min-height: 400px; }
+        .segment-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 8px; }
+        .seg-btn { flex: 1 0 auto; min-width: 95px; border: 2px solid transparent; height: 40px; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; font-size: 11px; opacity: 0.5; transition: 0.3s; padding: 0 15px; }
         .seg-btn.active { opacity: 1; border-color: #fff; outline: 2px solid var(--dark); }
         .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); }
         .bg-bir { background: var(--bireysel); } .bg-hak { background: var(--hakkimda); }
-
-        .tabs { display: none; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 8px; overflow-x: auto; white-space: nowrap; }
+        .tabs { display: none; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 8px; overflow-x: auto; }
         .tab-btn { padding: 6px 12px; border: none; background: #eee; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; flex-shrink: 0; }
         .tab-btn.active { background: var(--dark); color: white; }
-        
         .grid { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
         .field { display: flex; flex-direction: column; gap: 4px; }
-        
-        input, select { 
-            height: var(--input-height) !important; padding: 0 8px; 
-            border: 1px solid var(--border); border-radius: 5px; 
-            font-size: 12px; outline: none; background: white; width: 100%;
-        }
+        input, select { height: var(--input-height) !important; padding: 0 8px; border: 1px solid var(--border); border-radius: 5px; font-size: 12px; outline: none; background: white; width: 100%; }
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; }
-
         .px-faiz, .px-vergi { width: 65px; }
         .px-vade-sync { width: 85px; }
         .px-periyot { width: 130px; }
-        
-        /* Checkbox ve Seçenek Alanı Düzenlemesi - Kompakt */
-        .options-container { 
-            display: flex; flex-direction: row; gap: 12px; align-items: center;
-            padding: 0 10px; background: #fdfdfd; border: 1px solid var(--border); 
-            border-radius: 5px; height: var(--input-height); width: auto; min-width: 190px;
-        }
+        .options-container { display: flex; flex-direction: row; gap: 12px; align-items: center; padding: 0 10px; background: #fdfdfd; border: 1px solid var(--border); border-radius: 5px; height: var(--input-height); width: auto; min-width: 190px; }
         .opt-row { display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .opt-row input[type="checkbox"] { width: 15px !important; height: 15px !important; margin: 0; cursor: pointer; accent-color: var(--tarimsal); }
         .opt-row label { font-size: 11px; color: var(--dark); font-weight: 600; cursor: pointer; white-space: nowrap; margin: 0; }
-
         .animal-container { width: 100%; padding: 15px; border: 1px solid var(--border); border-radius: 6px; margin-top: 10px; background: #fafafa; }
         .animal-title { font-weight: bold; color: var(--tarimsal); margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; text-transform: uppercase; }
-
-        /* Bitkisel Sola Yaslı Düzen */
         .bitki-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; justify-content: flex-start; }
         .bitki-row label { font-weight: 600; font-size: 11px; width: 80px; text-align: left; }
         .bitki-row input { width: 110px !important; }
-
-        /* Hayvancılık Alt Alta Düzen */
         .hayvan-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
         .hayvan-sub-row { display: flex; gap: 10px; align-items: flex-end; }
         .hayvan-sub-row .field { flex: 1; max-width: 140px; }
-
         label.field-label { font-weight: bold; font-size: 9px; color: #57606f; text-transform: uppercase; margin-bottom: 2px; }
-        
         .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; }
         .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
-        .row-total { background: #f1f2f6; font-weight: bold; }
-
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
-
-        @media (max-width: 600px) {
-            .actions { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body onload="initApp()">
@@ -116,8 +79,6 @@
                 <div class="animal-title">BİTKİSEL ÜRETİM</div>
                 <div class="bitki-row"><label>BUĞDAY</label><input type="number" id="bugday-sayi" placeholder="Dönüm"><input type="text" id="bugday-fiyat" oninput="fmtMoney(this)" placeholder="Limit/Dönüm"></div>
                 <div class="bitki-row"><label>ARPA</label><input type="number" id="arpa-sayi" placeholder="Dönüm"><input type="text" id="arpa-fiyat" oninput="fmtMoney(this)" placeholder="Limit/Dönüm"></div>
-                <div class="bitki-row"><label>MERCİMEK</label><input type="number" id="mercimek-sayi" placeholder="Dönüm"><input type="text" id="mercimek-fiyat" oninput="fmtMoney(this)" placeholder="Limit/Dönüm"></div>
-                <div class="bitki-row"><label>NOHUT</label><input type="number" id="nohut-sayi" placeholder="Dönüm"><input type="text" id="nohut-fiyat" oninput="fmtMoney(this)" placeholder="Limit/Dönüm"></div>
                 <div class="bitki-row"><label>PAMUK</label><input type="number" id="pamuk-sayi" placeholder="Dönüm"><input type="text" id="pamuk-fiyat" oninput="fmtMoney(this)" placeholder="Limit/Dönüm"></div>
             </div>
             <div class="animal-container">
@@ -141,8 +102,8 @@
                 <div class="field" style="width:140px;" id="tutar-input-box"><label class="field-label">Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
                 <div class="field px-faiz"><label class="field-label">Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
                 <div class="field px-faiz" id="aylik-faiz-box"><label class="field-label">Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
-                <div class="field px-vergi" id="bsmv-box"><label class="field-label">BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
-                <div class="field px-vergi" id="kkdf-box"><label class="field-label">KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
+                <div class="field px-vergi"><label class="field-label">BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
+                <div class="field px-vergi"><label class="field-label">KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
                 <div class="field px-vade-sync" id="vade-box-select"><label class="field-label">Vade</label><select id="vade-select" onchange="reset()"></select></div>
                 <div class="field px-vergi" id="sub-input-box"><label class="field-label">Sübv. %</label><input type="number" id="subOran" value="50"></div>
                 <div class="field px-periyot" id="periyot-box"><label class="field-label">Ödeme Periyodu</label><select id="periyot" onchange="reset()"></select></div>
@@ -164,7 +125,6 @@
             <div id="result-area"></div>
         </div>
     </div>
-    <div id="about-box" style="display:none; padding:20px; text-align:center;"><h2>Süleyman Coşkun</h2><p>Bankacılık ve Finans Uzmanı</p></div>
 </div>
 
 <script>
@@ -178,32 +138,43 @@
         reset();
     }
 
-    function updatePeriyotOptions() {
-        const pSelect = document.getElementById('periyot');
-        pSelect.innerHTML = '';
-        const options = [{v: "1", t: "Aylık"}, {v: "3", t: "3 Ayda Bir"}, {v: "6", t: "6 Ayda Bir"}, {v: "12", t: "Yıllık"}];
-        options.forEach(opt => {
-            let o = document.createElement('option'); o.value = opt.v; o.text = opt.t;
-            pSelect.appendChild(o);
-        });
-        pSelect.value = (segment === 'tarimsal') ? "12" : "1";
-    }
-
     function switchSegment(seg) {
         segment = seg;
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('seg-' + seg.substring(0,3)).classList.add('active');
-        updatePeriyotOptions();
-        if (seg === 'hakkimda') {
-            document.getElementById('calculator-ui').style.display = 'none';
-            document.getElementById('about-box').style.display = 'block';
+        
+        const pSelect = document.getElementById('periyot');
+        pSelect.innerHTML = '';
+        const options = [{v: "1", t: "Aylık"}, {v: "3", t: "3 Ayda Bir"}, {v: "6", t: "6 Ayda Bir"}, {v: "12", t: "Yıllık"}];
+        options.forEach(opt => { let o = document.createElement('option'); o.value = opt.v; o.text = opt.t; pSelect.appendChild(o); });
+        pSelect.value = (seg === 'tarimsal') ? "12" : "1";
+
+        document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
+        document.getElementById(`tabs-${seg}`).style.display = 'flex';
+        document.getElementById(`tabs-${seg}`).querySelector('.tab-btn').click();
+    }
+
+    function updateKrediAyarlari() {
+        const bsmv = document.getElementById('bsmv');
+        const kkdf = document.getElementById('kkdf');
+        const faiz = document.getElementById('faiz');
+        
+        // Vergi Oranları Güncelleme
+        if(segment === 'bireysel' || mode === 'zirai' || mode === 'hayvancilik') {
+            bsmv.value = 15;
+            kkdf.value = 15;
         } else {
-            document.getElementById('calculator-ui').style.display = 'block';
-            document.getElementById('about-box').style.display = 'none';
-            document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
-            document.getElementById(`tabs-${seg}`).style.display = 'flex';
-            document.getElementById(`tabs-${seg}`).querySelector('.tab-btn').click();
+            bsmv.value = 5;
+            kkdf.value = 0;
         }
+
+        // Faiz Oranı Güncelleme (%46 Talebi)
+        if (segment === 'ticari' || mode === 'zirai' || mode === 'hayvancilik') {
+            faiz.value = 46.00;
+        } else if (segment === 'tarimsal' && (mode === 'traktor' || mode === 'ekipman')) {
+            faiz.value = 40.50; // Sübvansiyonlu varsayılan
+        }
+        syncFaiz('yillik');
     }
 
     function switchTab(btn, m) {
@@ -211,29 +182,25 @@
         btn.classList.add('active'); mode = m;
         const isHayvan = (mode === 'hayvancilik'), isSub = (mode === 'traktor' || mode === 'ekipman');
         
+        updateKrediAyarlari(); // Vergiler ve Faizi güncelle
+
         document.getElementById('main-inputs-container').style.display = isHayvan ? 'none' : 'block';
         document.getElementById('hayvan-konteynirlar').style.display = isHayvan ? 'block' : 'none';
         
-        // Vade Kutusu: Sadece Tarımsal DEĞİLSE göster
         document.getElementById('vade-box-select').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
-        // Zirai Seçenekler: Sadece Tarımsal ve Traktör/Ekipman ise göster
         document.getElementById('ziraiOpts').style.display = (segment === 'tarimsal' && isSub) ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
         document.getElementById('sub-input-box').style.display = (segment === 'tarimsal' && isSub) ? 'flex' : 'none';
         document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
         document.getElementById('prof-input-box').style.display = (segment !== 'tarimsal' || mode === 'zirai' || isHayvan) ? 'none' : 'flex';
         
-        fillVades(); reset();
-    }
-
-    function fillVades() {
         const s = document.getElementById('vade-select'); s.innerHTML = '';
         let max = (segment === 'ticari') ? 60 : (segment === 'tarimsal' ? 5 : 36);
         for(let i=1; i<=max; i++){
             let o = document.createElement('option'); o.value = i; o.text = i + (segment === 'tarimsal' ? " Yıl" : " Ay");
-            if(i === max) o.selected = true;
-            s.appendChild(o);
+            if(i === max) o.selected = true; s.appendChild(o);
         }
+        reset();
     }
 
     function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
@@ -243,24 +210,20 @@
     function hesapla() {
         const resArea = document.getElementById('result-area'); resArea.innerHTML = ''; let anaPara = 0;
         if(mode === 'hayvancilik') {
-            anaPara += (parseFloat(document.getElementById('bugday-sayi').value)||0) * getVal('bugday-fiyat');
-            anaPara += (parseFloat(document.getElementById('arpa-sayi').value)||0) * getVal('arpa-fiyat');
-            anaPara += (parseFloat(document.getElementById('mercimek-sayi').value)||0) * getVal('mercimek-fiyat');
-            anaPara += (parseFloat(document.getElementById('nohut-sayi').value)||0) * getVal('nohut-fiyat');
-            anaPara += (parseFloat(document.getElementById('pamuk-sayi').value)||0) * getVal('pamuk-fiyat');
-            anaPara += (parseFloat(document.getElementById('kb-sayi').value)||0) * getVal('kb-fiyat');
-            anaPara += (parseFloat(document.getElementById('bb-sayi').value)||0) * getVal('bb-fiyat');
+            anaPara += (getVal('bugday-sayi') * getVal('bugday-fiyat')) + (getVal('arpa-sayi') * getVal('arpa-fiyat')) + (getVal('pamuk-sayi') * getVal('pamuk-fiyat')) + (getVal('kb-sayi') * getVal('kb-fiyat')) + (getVal('bb-sayi') * getVal('bb-fiyat'));
         } else { anaPara = getVal('tutar'); }
-        if(anaPara <= 0) { alert("Lütfen miktar/tutar giriniz."); return; }
+        
+        if(anaPara <= 0) return;
         const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         const subO = (segment === 'tarimsal' && (mode === 'traktor' || mode === 'ekipman')) ? document.getElementById('subOran').value / 100 : 0;
         const periyot = (segment === 'tarimsal' ? 12 : parseInt(document.getElementById('periyot').value));
         let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade-select').value)];
+
         vades.forEach(v => {
             let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / periyot);
             let dF = (yF / 12) * periyot, bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
-            let html = `<div style="margin-bottom:15px"><div style="background:#f8f9fa;padding:8px;text-align:center;font-weight:bold;border:1px solid #ddd; border-bottom:none;">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Vade'} (Kredi: ${Math.round(anaPara).toLocaleString('tr-TR')} TL)</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
+            let html = `<div style="margin-bottom:15px"><div style="background:#f8f9fa;padding:8px;text-align:center;font-weight:bold;border:1px solid #ddd;">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Vade'} (${Math.round(anaPara).toLocaleString('tr-TR')} TL)</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             let kalan = anaPara;
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), ind = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b);
@@ -272,6 +235,7 @@
         document.getElementById('result-main-container').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
+
     function updateYerli() { 
         if(mode === 'traktor') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 50 : 25;
         else if(mode === 'ekipman') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 75 : 50;
