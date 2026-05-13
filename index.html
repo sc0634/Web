@@ -138,8 +138,13 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
         const isSub = (m === 'traktor' || m === 'ekipman');
+        
         document.getElementById('sub-input-box').style.visibility = isSub ? 'visible' : 'hidden';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
+        
+        // Ekipmanda Buy Back kutusunu gizle
+        document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
+
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
         document.getElementById('vergi-box').style.display = isSub ? 'none' : 'flex';
         const isProformaHidden = (m === 'ticari' || m === 'tuketici');
@@ -157,7 +162,7 @@
         const isB = document.getElementById('buyback').checked;
         document.getElementById('subOran').value = mode === 'traktor' ? (isY ? 50 : 25) : (isY ? 75 : 50);
         document.getElementById('yerli-info').style.display = isY ? 'block' : 'none';
-        document.getElementById('bb-info').style.display = isB ? 'block' : 'none';
+        document.getElementById('bb-info').style.display = (isB && mode !== 'ekipman') ? 'block' : 'none';
         reset();
     }
 
@@ -202,7 +207,6 @@
                 html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subVal>0?`<td style="color:red">-${Math.round(indF).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
             }
             
-            // Sadece vade 1'den büyükse toplam satırını ekle
             if(v > 1) {
                 html += `<tr class="total-row"><td>TOP</td><td>${Math.round(tA).toLocaleString('tr-TR')}</td><td>${Math.round(tF).toLocaleString('tr-TR')}</td>${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tV).toLocaleString('tr-TR')}</td><td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
             }
@@ -212,6 +216,7 @@
         
         document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value;
         document.getElementById('sum-faiz').innerText = `%${faizVal}`;
+        document.getElementById('sum-prof').innerText = document.getElementById('proforma').value;
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
 
