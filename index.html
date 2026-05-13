@@ -48,6 +48,8 @@
             font-size: 12px; outline: none; background: white;
         }
 
+        input[readonly] { background-color: #f1f2f6; cursor: not-allowed; color: #7f8c8d; }
+
         #prof-input-box, #tutar-input-box { width: 100px !important; }
         #prof-input-box input, #tutar-input-box input { width: 100px !important; }
         .px-faiz, .px-vergi { width: 50px !important; }
@@ -77,6 +79,7 @@
         .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; position: relative; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
+        tfoot { background: #f8f9fa; font-weight: bold; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
@@ -215,6 +218,10 @@
         const bsmvInp = document.getElementById('bsmv');
         const kkdfInp = document.getElementById('kkdf');
         
+        // Tüm modlarda readonly yap
+        bsmvInp.readOnly = true; 
+        kkdfInp.readOnly = true;
+
         document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
         document.getElementById('vade-box-select').style.display = (segment === 'tarimsal') ? 'none' : (isBir ? 'none' : 'flex');
 
@@ -229,12 +236,10 @@
                 fInp.value = "46.00";
                 bsmvInp.value = 15;
                 kkdfInp.value = 15;
-                bsmvInp.readOnly = true; kkdfInp.readOnly = true;
             } else {
                 fInp.value = "40.50";
                 bsmvInp.value = 5;
                 kkdfInp.value = 0;
-                bsmvInp.readOnly = true; kkdfInp.readOnly = true;
             }
         } else if (isTic) {
             document.getElementById('periyot-box').style.display = 'flex';
@@ -244,7 +249,6 @@
             fInp.value = "46.00";
             bsmvInp.value = 5;
             kkdfInp.value = 0;
-            bsmvInp.readOnly = true; kkdfInp.readOnly = true;
             fillVadeSelect();
         } else {
             document.getElementById('periyot-box').style.display = 'flex';
@@ -254,7 +258,6 @@
             fInp.value = "40.50";
             bsmvInp.value = 15;
             kkdfInp.value = 15;
-            bsmvInp.readOnly = true; kkdfInp.readOnly = true;
             fillVadeSelect();
         }
 
@@ -291,13 +294,13 @@
         document.body.innerHTML = `<div class="container">${printContents}</div>`;
         window.print();
         document.body.innerHTML = originalContents;
-        window.location.reload(); // Sayfayı yenileyerek state'i koru
+        window.location.reload(); 
     }
 
     function hesapla() {
         const res = document.getElementById('result-area'); res.innerHTML = '';
-        const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
-        if(isNaN(anaPara)) return;
+        const anaParaVal = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        if(isNaN(anaParaVal)) return;
         
         const yF = document.getElementById('faiz').value / 100;
         const bsmv = document.getElementById('bsmv').value / 100;
@@ -315,7 +318,7 @@
             let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / (periyot === 12 ? 1 : periyot));
             let dF = (yF / 12) * periyot;
             let bF = dF * (1 + bsmv + kkdf);
-            let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
+            let taksit = (anaParaVal * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
             
             let labelVade = (segment === 'tarimsal') ? 'Yıl' : (periyot === 1 ? 'Ay' : 'Dönem');
             let divId = `plan-${index}`;
@@ -332,13 +335,19 @@
                         </thead>
                         <tbody>`;
             
-            let kalan = anaPara;
+            let kalan = anaParaVal;
+            let totA = 0, totF = 0, totV = 0, totT = 0;
+
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), indF = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b), sTaksit = taksit - indF;
+                
+                totA += a; totF += f; totV += b; totT += sTaksit;
                 kalan -= a;
+
                 html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subO>0?`<td style="color:red">-${Math.round(indF).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
             }
-            html += `</tbody></table></div></div>`;
+
+            html += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(totA).toLocaleString('tr-TR')}</td><td>${Math.round(totF).toLocaleString('tr-TR')}</td>${subO>0?'<td></td>':''}<td>${Math.round(totV).toLocaleString('tr-TR')}</td><td>${Math.round(totT).toLocaleString('tr-TR')}</td><td>-</td></tr></tfoot></table></div></div>`;
             res.innerHTML += html;
         });
         
