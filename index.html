@@ -25,11 +25,33 @@
             min-height: 400px;
         }
         
-        .segment-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        /* MOBİLDE TEK SATIR VE KAYDIRILABİLİR SEKME AYARI */
+        .segment-nav { 
+            display: flex; 
+            gap: 8px; 
+            margin-bottom: 20px; 
+            overflow-x: auto; 
+            white-space: nowrap; 
+            padding-bottom: 8px;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .segment-nav::-webkit-scrollbar { display: none; }
+
         .seg-btn { 
-            border: 2px solid transparent; height: 40px; border-radius: 6px; color: white; 
-            font-weight: bold; cursor: pointer; font-size: 11px; opacity: 0.5; 
+            flex: 1 0 auto;
+            min-width: 90px;
+            border: 2px solid transparent; 
+            height: 40px; 
+            border-radius: 6px; 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 11px; 
+            opacity: 0.5; 
             transition: all 0.3s ease;
+            padding: 0 15px;
         }
         .seg-btn.active { opacity: 1; border-color: #fff; outline: 2px solid var(--dark); }
 
@@ -109,40 +131,16 @@
             border-radius: 4px; font-size: 10px; cursor: pointer;
         }
 
-        /* Ziyaretçi Sayacı Stili */
-        .visitor-counter {
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-        }
-        .v-grid {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 5px;
-        }
-        .v-item {
-            font-size: 10px;
-            color: #7f8c8d;
-            font-weight: bold;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .visitor-count {
-            background: var(--dark);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
+        /* Ziyaretçi Sayacı */
+        .visitor-counter { margin-top: 30px; padding-top: 15px; border-top: 1px solid var(--border); text-align: center; }
+        .v-grid { display: flex; justify-content: center; gap: 15px; margin-top: 5px; }
+        .v-item { font-size: 10px; color: #7f8c8d; font-weight: bold; display: flex; flex-direction: column; gap: 2px; }
+        .visitor-count { background: var(--dark); color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
 
         @media (max-width: 600px) {
             .px-vade-slider { width: 100% !important; }
             .compact-row { gap: 5px; }
             .field { flex-grow: 1; }
-            .segment-nav { grid-template-columns: repeat(2, 1fr); }
             .v-grid { gap: 8px; }
         }
 
@@ -229,12 +227,10 @@
     <div id="about-box">
         <div class="about-title">Süleyman Coşkun</div>
         <p class="about-text">
-            Bankacılık ve Finans alanında uzmanlaşmış, tarımsal, ticari ve bireysel kredi süreçlerinde doğru analizi ve pratik çözümleri hedefleyen bir bankacıyım. <br><br>
-            Bu araç, en güncel faiz oranları ve yasal vergiler ışığında hızlı ve şeffaf ödeme planları oluşturmanız için tasarlanmıştır.
+            Bankacılık ve Finans alanında uzmanlaşmış, tarımsal, ticari ve bireysel kredi süreçlerinde doğru analizi ve pratik çözümleri hedefleyen bir bankacıyım.
         </p>
     </div>
 
-    <!-- Gelişmiş Ziyaretçi Sayacı -->
     <div class="visitor-counter no-print">
         <div class="v-grid">
             <div class="v-item">BUGÜN <span id="v-today" class="visitor-count">0</span></div>
@@ -254,19 +250,15 @@
         switchSegment('tarimsal'); 
     }
 
-    // Gelişmiş Sayaç Fonksiyonu
     function updateVisitorStats() {
         const now = new Date();
         const todayStr = now.toLocaleDateString();
-        
-        // Hafta numarasını bul (ISO 8601)
         const getWeekNumber = (d) => {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
             d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
             var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
             return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
         };
-        
         const weekStr = now.getFullYear() + "-W" + getWeekNumber(now);
         const monthStr = now.getFullYear() + "-" + (now.getMonth() + 1);
 
@@ -276,17 +268,11 @@
             month: { key: monthStr, count: 0 }
         };
 
-        // Günlük Kontrol
-        if (stats.today.key !== todayStr) { stats.today = { key: todayStr, count: 1 }; } else { stats.today.count++; }
-        
-        // Haftalık Kontrol
-        if (stats.week.key !== weekStr) { stats.week = { key: weekStr, count: 1 }; } else { stats.week.count++; }
-        
-        // Aylık Kontrol
-        if (stats.month.key !== monthStr) { stats.month = { key: monthStr, count: 1 }; } else { stats.month.count++; }
+        if (stats.today.key !== todayStr) stats.today = { key: todayStr, count: 1 }; else stats.today.count++;
+        if (stats.week.key !== weekStr) stats.week = { key: weekStr, count: 1 }; else stats.week.count++;
+        if (stats.month.key !== monthStr) stats.month = { key: monthStr, count: 1 }; else stats.month.count++;
 
         localStorage.setItem('krediVisitorStats', JSON.stringify(stats));
-        
         document.getElementById('v-today').innerText = stats.today.count;
         document.getElementById('v-week').innerText = stats.week.count;
         document.getElementById('v-month').innerText = stats.month.count;
@@ -305,16 +291,11 @@
         segment = seg;
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('seg-' + seg.substring(0,3)).classList.add('active');
-
         const calcUI = document.getElementById('calculator-ui');
         const aboutUI = document.getElementById('about-box');
-
-        if (seg === 'hakkimda') {
-            calcUI.style.display = 'none';
-            aboutUI.style.display = 'block';
-        } else {
-            calcUI.style.display = 'block';
-            aboutUI.style.display = 'none';
+        if (seg === 'hakkimda') { calcUI.style.display = 'none'; aboutUI.style.display = 'block'; } 
+        else {
+            calcUI.style.display = 'block'; aboutUI.style.display = 'none';
             document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
             document.getElementById(`tabs-${seg}`).style.display = 'flex';
             const firstTab = document.getElementById(`tabs-${seg}`).querySelector('.tab-btn');
@@ -325,31 +306,23 @@
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
-        
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
         const pSel = document.getElementById('periyot'), fInp = document.getElementById('faiz');
         const bsmvInp = document.getElementById('bsmv'), kkdfInp = document.getElementById('kkdf');
-        
-        bsmvInp.readOnly = true; kkdfInp.readOnly = true;
         document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
-        document.getElementById('vade-box-select').style.display = (segment === 'tarimsal') ? 'none' : (isBir ? 'none' : 'flex');
-
+        document.getElementById('vade-box-select').style.display = (segment === 'tarimsal' || isBir) ? 'none' : 'flex';
         if (segment === 'tarimsal') {
-            document.getElementById('periyot-box').style.display = 'none';
-            pSel.value = "12";
+            document.getElementById('periyot-box').style.display = 'none'; pSel.value = "12";
             document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
-            document.getElementById('bb-box').style.display = (mode === 'ekipman') ? 'none' : 'flex';
             document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
             if(mode === 'zirai') { fInp.value = "46.00"; bsmvInp.value = 15; kkdfInp.value = 15; } 
             else { fInp.value = "40.50"; bsmvInp.value = 5; kkdfInp.value = 0; }
-        } else if (isTic) {
-            document.getElementById('periyot-box').style.display = 'flex'; pSel.value = "1";
-            document.getElementById('ziraiOpts').style.display = 'none'; document.getElementById('sub-input-box').style.display = 'none';
-            fInp.value = "46.00"; bsmvInp.value = 5; kkdfInp.value = 0; fillVadeSelect();
         } else {
             document.getElementById('periyot-box').style.display = 'flex'; pSel.value = "1";
             document.getElementById('ziraiOpts').style.display = 'none'; document.getElementById('sub-input-box').style.display = 'none';
-            fInp.value = "40.50"; bsmvInp.value = 15; kkdfInp.value = 15; fillVadeSelect();
+            if (isTic) { fInp.value = "46.00"; bsmvInp.value = 5; kkdfInp.value = 0; } 
+            else { fInp.value = "40.50"; bsmvInp.value = 15; kkdfInp.value = 15; }
+            fillVadeSelect();
         }
         syncFaiz('yillik');
         document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
@@ -391,16 +364,10 @@
         const res = document.getElementById('result-area'); res.innerHTML = '';
         const anaParaVal = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         if(isNaN(anaParaVal)) return;
-        
         const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         const periyot = parseInt(document.getElementById('periyot').value);
         const subO = (mode === 'traktor' || mode === 'ekipman') ? document.getElementById('subOran').value / 100 : 0;
-        
-        let vadeDegeri;
-        if (segment === 'bireysel') vadeDegeri = parseInt(document.getElementById('vade-slider').value);
-        else if (segment === 'ticari') vadeDegeri = parseInt(document.getElementById('vade-select').value);
-
-        let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [vadeDegeri];
+        let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [(segment === 'bireysel' ? parseInt(document.getElementById('vade-slider').value) : parseInt(document.getElementById('vade-select').value))];
 
         vades.forEach((v, index) => {
             let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / (periyot === 12 ? 1 : periyot));
@@ -408,14 +375,8 @@
             let bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaParaVal * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
             let divId = `plan-${index}`;
-            
-            let html = `<div id="${divId}" class="vade-group">
-                <div class="vade-header">${v} ${(segment === 'tarimsal') ? 'Yıl' : (periyot === 1 ? 'Ay' : 'Dönem')} Planı
-                <button class="single-print-btn no-print" onclick="printDiv('${divId}')">Yazdır</button></div>
-                <div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
-            
+            let html = `<div id="${divId}" class="vade-group"><div class="vade-header">${v} ${(segment === 'tarimsal') ? 'Yıl' : (periyot === 1 ? 'Ay' : 'Dönem')} Planı<button class="single-print-btn no-print" onclick="printDiv('${divId}')">Yazdır</button></div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             let kalan = anaParaVal; let totA = 0, totF = 0, totV = 0, totT = 0;
-
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), indF = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b), sTaksit = taksit - indF;
                 totA += a; totF += f; totV += b; totT += sTaksit; kalan -= a;
