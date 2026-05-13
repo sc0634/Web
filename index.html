@@ -35,7 +35,6 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
-        /* Oranların dip dibe (yaslanmış) durduğu satır */
         .compact-row { grid-column: span 2; display: flex; gap: 4px; padding: 0; justify-content: flex-start; }
         .small-field { width: 19%; display: flex; flex-direction: column; gap: 2px; flex: none; }
 
@@ -93,44 +92,30 @@
         <div class="field" id="tutar-input-box"><label>Kredi</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
         
         <div class="compact-row">
-            <div class="small-field">
-                <label>Yıllık %</label>
-                <input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')">
-            </div>
-            <div class="small-field">
-                <label>Aylık %</label>
-                <input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')">
-            </div>
-            <div class="small-field" id="bsmv-box">
-                <label>BSMV %</label>
-                <input type="number" id="bsmv" value="5" oninput="reset()">
-            </div>
-            <div class="small-field" id="kkdf-box">
-                <label>KKDF %</label>
-                <input type="number" id="kkdf" value="0" oninput="reset()">
-            </div>
-            <div class="small-field" id="sub-input-box">
-                <label>Sübv. %</label>
-                <input type="number" id="subOran" value="50" oninput="reset()">
-            </div>
+            <div class="small-field"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
+            <div class="small-field"><label>Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
+            <div class="small-field" id="bsmv-box"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
+            <div class="small-field" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
+            <div class="small-field" id="sub-input-box"><label>Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         </div>
 
         <div class="options-container" id="ziraiOpts">
             <div class="opt-row-wrapper">
-                <div class="opt-row">
-                    <input type="checkbox" id="yerli" checked onchange="updateYerli()">
-                    <label for="yerli">Yerli Malı</label>
-                </div>
-                <div class="opt-row" id="bb-box">
-                    <input type="checkbox" id="buyback" checked onchange="updateYerli()">
-                    <label for="buyback">Buy Back</label>
-                </div>
+                <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
+                <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="updateYerli()"><label for="buyback">Buy Back</label></div>
             </div>
             <div id="yerli-info" class="info-text">✓ Yerli üretim desteği ile sübvansiyon oranı artırılmıştır.</div>
             <div id="bb-info" class="info-text">✓ Geri alım garantisi kapsamında özel oran uygulanmaktadır.</div>
         </div>
 
         <div class="field" id="vade-box"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
+        <div class="field" id="periyot-box"><label>Ödeme Periyodu</label>
+            <select id="periyot" onchange="reset()">
+                <option value="1">Aylık</option>
+                <option value="3">3 Ayda Bir</option>
+                <option value="6">6 Ayda Bir</option>
+            </select>
+        </div>
     </div>
 
     <div class="actions no-print">
@@ -140,7 +125,7 @@
     </div>
 
     <div id="result-main-container" class="result-main-container">
-        <div class="result-main-title">Yılda Bir Ödemeli Ödeme Planları</div>
+        <div class="result-main-title" id="result-title">Ödeme Planı</div>
         <div id="result-area"></div>
     </div>
 </div>
@@ -180,11 +165,13 @@
         btn.classList.add('active'); mode = m;
         const isSub = (m === 'traktor' || m === 'ekipman');
         
-        // BSMV ve KKDF genellikle ticari ve bireyselde görünür, sübvansiyon tarımsalda görünür.
         document.getElementById('sub-input-box').style.visibility = isSub ? 'visible' : 'hidden';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
+        
+        // Periyot sadece Ticari ve Bireysel'de görünür
+        document.getElementById('periyot-box').style.display = (segment === 'ticari' || segment === 'bireysel') ? 'flex' : 'none';
         
         const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
         document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
@@ -213,8 +200,8 @@
         let isY = (segment === 'tarimsal');
         let max = (mode === 'tuketici') ? 36 : (isY ? 5 : 60);
         for(let i=1; i<=max; i++){
-            let o = document.createElement('option'); o.value = i; o.text = i + (mode === 'tuketici' || mode === 'ticari' ? " Ay" : " Yıl");
-            if(i === (mode === 'tuketici' || mode === 'ticari' ? 12 : max)) o.selected = true;
+            let o = document.createElement('option'); o.value = i; o.text = i + (segment !== 'tarimsal' ? " Ay" : " Yıl");
+            if(i === (segment !== 'tarimsal' ? 12 : max)) o.selected = true;
             s.appendChild(o);
         }
     }
@@ -237,17 +224,23 @@
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const faizVal = document.getElementById('faiz').value;
         const subVal = (mode === 'traktor' || mode === 'ekipman') ? document.getElementById('subOran').value : 0;
+        const periyot = parseInt(document.getElementById('periyot').value);
         
         const yF = faizVal / 100, subO = subVal / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
-        let isY = (segment === 'tarimsal');
-        let vades = isY ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
+        let isTarim = (segment === 'tarimsal');
+        
+        // Vade ve taksit sayısı belirleme
+        let vades = isTarim ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach(v => {
-            let dF = isY ? yF : (yF / 12), bF = dF * (1 + bsmv + kkdf);
-            let taksit = (anaPara * bF * Math.pow(1+bF, v)) / (Math.pow(1+bF, v)-1);
+            let taksitSayisi = isTarim ? v : Math.ceil(v / periyot);
+            let dF = isTarim ? yF : (yF / 12) * periyot; // Periyodik faiz
+            let bF = dF * (1 + bsmv + kkdf);
+            
+            let taksit = (anaPara * bF * Math.pow(1+bF, taksitSayisi)) / (Math.pow(1+bF, taksitSayisi)-1);
             
             const subCol = subVal > 0 ? '<th style="width:12%">İnd.</th>' : '';
-            let html = `<div class="vade-header">${v} ${isY ? 'Yıllık' : 'Aylık'} Ödeme Planı</div><div class="table-res"><table><thead><tr>
+            let html = `<div class="vade-header">${v} ${isTarim ? 'Yıllık' : 'Aylık'} Toplam Süre (${taksitSayisi} Taksit)</div><div class="table-res"><table><thead><tr>
                 <th style="width:7%">Tks</th>
                 <th style="width:18%">Ana P.</th>
                 <th style="width:15%">Faiz</th>
@@ -258,8 +251,8 @@
                 </tr></thead><tbody>`;
             
             let kalan = anaPara, tA = 0, tF = 0, tV = 0, tT = 0, tInd = 0;
-            for(let i=1; i<=v; i++){
-                let f = kalan * dF, b = f * (bsmv + kkdf), indF = f * subO, a = (i===v) ? kalan : taksit - (f + b), sTaksit = taksit - indF;
+            for(let i=1; i<=taksitSayisi; i++){
+                let f = kalan * dF, b = f * (bsmv + kkdf), indF = f * subO, a = (i===taksitSayisi) ? kalan : taksit - (f + b), sTaksit = taksit - indF;
                 tA += a; tF += f; tV += b; tT += sTaksit; tInd += indF; kalan -= a;
                 html += `<tr>
                     <td>${i}</td>
@@ -272,20 +265,12 @@
                 </tr>`;
             }
             
-            html += `<tr class="total-row">
-                <td>TOP</td>
-                <td>${Math.round(tA).toLocaleString('tr-TR')}</td>
-                <td>${Math.round(tF).toLocaleString('tr-TR')}</td>
-                ${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}
-                <td>${Math.round(tV).toLocaleString('tr-TR')}</td>
-                <td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td>
-                <td>-</td>
-            </tr>`;
-            
-            res.innerHTML += html + `</tbody></table></div>`;
+            html += `<tr class="total-row"><td>TOP</td><td>${Math.round(tA).toLocaleString('tr-TR')}</td><td>${Math.round(tF).toLocaleString('tr-TR')}</td>${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tV).toLocaleString('tr-TR')}</td><td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td><td>-</td></tr></tbody></table></div>`;
+            res.innerHTML += html;
         });
         
         document.getElementById('result-main-container').style.display = 'block';
+        document.getElementById('result-title').innerText = isTarim ? "Yıllık Ödemeli Planlar" : "Eşit Taksitli Ödeme Planı";
         document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value;
         document.getElementById('sum-faiz').innerText = `%${faizVal}`;
         document.getElementById('sum-prof').innerText = document.getElementById('proforma').value;
