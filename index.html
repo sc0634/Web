@@ -165,8 +165,9 @@
             <div class="field" id="tutar-input-box"><label>Kredi&#10;Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
             
             <div class="compact-row">
-                <div class="field px-faiz"><label>Yıllık&#10;Oran %</label><input type="number" id="faiz" value="46.00" step="0.01" oninput="syncFaiz('yillik')"></div>
-                <div class="field px-faiz"><label>Aylık&#10;Oran %</label><input type="number" id="faizAylik" value="3.83" step="0.01" oninput="syncFaiz('aylik')"></div>
+                <!-- VARSAYILAN %40.50 OLARAK BAŞLATILDI -->
+                <div class="field px-faiz"><label>Yıllık&#10;Oran %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
+                <div class="field px-faiz"><label>Aylık&#10;Oran %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
                 <div class="field px-vergi" id="bsmv-box"><label>BSMV&#10;%</label><input type="number" id="bsmv" value="5" readonly></div>
                 <div class="field px-vergi" id="kkdf-box"><label>KKDF&#10;%</label><input type="number" id="kkdf" value="0" readonly></div>
                 
@@ -187,7 +188,7 @@
                     <option value="1">Aylık</option>
                     <option value="3">3 Ayda Bir</option>
                     <option value="6">6 Ayda Bir</option>
-                    <option value="12">Yıllık</option>
+                    <option value="12" selected>Yıllık</option>
                 </select>
             </div>
 
@@ -295,6 +296,17 @@
         btn.classList.add('active'); mode = m;
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
         const pSel = document.getElementById('periyot'), bsmvInp = document.getElementById('bsmv'), kkdfInp = document.getElementById('kkdf');
+        const faizInp = document.getElementById('faiz');
+        const faizAylikInp = document.getElementById('faizAylik');
+
+        // ÖZEL FAİZ SETLEMESİ
+        if (mode === 'traktor' || mode === 'ekipman') {
+            faizInp.value = "40.50";
+            faizAylikInp.value = "3.38";
+        } else if (mode === 'zirai' || segment === 'ticari') {
+            faizInp.value = "46.00";
+            faizAylikInp.value = "3.83";
+        }
         
         document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
         document.getElementById('vade-box-select').style.display = (segment === 'tarimsal' || isBir) ? 'none' : 'flex';
@@ -313,7 +325,6 @@
             fillVadeSelect();
         }
         document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
-        // OTOMATİK FAİZ DEĞİŞİMİ SİLİNDİ - ARTIK "KENDİ KENDİNE" DEĞİŞMEZ
         reset();
     }
 
