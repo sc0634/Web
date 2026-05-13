@@ -11,63 +11,87 @@
             --success: #27ae60; --dark: #2c3e50; --light: #ecf0f1; --border: #dcdde1;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f5f6fa; margin: 0; padding: 0; color: var(--dark); font-size: 13px; padding-bottom: 140px; }
+        body { background: #f5f6fa; margin: 0; padding: 0; color: var(--dark); font-size: 13px; }
         
-        .container { max-width: 1000px; margin: 10px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
+        .container { max-width: 1000px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         
-        .segment-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding: 5px; }
-        .seg-btn { flex: 1; min-width: 100px; height: 45px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; border: none; opacity: 0.6; transition: 0.3s; }
-        .seg-btn.active { opacity: 1; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        /* Navigasyon */
+        .segment-nav { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding: 5px; }
+        .seg-btn { flex: 1; min-width: 110px; height: 48px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; border: none; opacity: 0.6; transition: 0.3s; }
+        .seg-btn.active { opacity: 1; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         
         .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); }
         .bg-bir { background: var(--bireysel); } .bg-hak { background: var(--hakkimda); }
 
-        .tabs { display: none; gap: 5px; margin-bottom: 15px; border-bottom: 1px solid var(--light); padding-bottom: 10px; }
-        .tab-btn { padding: 8px 15px; border: none; background: #eee; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 11px; }
+        .tabs { display: none; gap: 6px; margin-bottom: 20px; border-bottom: 2px solid var(--light); padding-bottom: 12px; }
+        .tab-btn { padding: 10px 18px; border: none; background: #f1f2f6; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; transition: 0.2s; }
         .tab-btn.active { background: var(--dark); color: white; }
 
-        .grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 15px; }
-        .field { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 10px; font-weight: bold; color: #7f8c8d; text-transform: uppercase; }
-        input, select { height: 40px; padding: 0 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; outline: none; width: 100%; }
-        input[readonly] { background: #f9f9f9; }
+        /* Form Alanları */
+        .grid { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; margin-bottom: 20px; }
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 11px; font-weight: bold; color: #57606f; text-transform: uppercase; }
+        input, select { height: 42px; padding: 0 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; width: 100%; transition: 0.2s; }
+        input:focus { border-color: var(--bireysel); }
+        input[readonly] { background: #f8f9fa; cursor: not-allowed; }
 
-        .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin: 20px 0; }
-        .btn { height: 45px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; }
+        /* Butonlar */
+        .actions { display: grid; grid-template-columns: 2.5fr 1fr 1fr; gap: 12px; margin: 25px 0; }
+        .btn { height: 48px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; font-size: 14px; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        .result-main-container { margin-top: 20px; border: 2px solid var(--dark); border-radius: 8px; overflow: hidden; display: none; }
-        .result-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; }
+        /* Sonuç Tablosu */
+        .result-main-container { margin-top: 30px; border: 1.5px solid var(--dark); border-radius: 10px; overflow: hidden; display: none; }
+        .result-title { background: var(--dark); color: white; padding: 12px; text-align: center; font-weight: bold; font-size: 15px; }
         .table-res { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th, td { padding: 8px 4px; border: 1px solid var(--border); text-align: center; }
-        .row-total { background: #f1f2f6; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { background: #f8f9fa; font-weight: bold; color: #2c3e50; }
+        th, td { padding: 12px 8px; border: 1px solid var(--border); text-align: center; }
+        .row-total { background: #f1f2f6; font-weight: 800; font-size: 13px; }
 
-        /* SABİT BAŞVURU BARI */
-        .fixed-apply-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: #fff;
-            border-top: 3px solid var(--bireysel); box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
-            padding: 15px 20px; z-index: 9999; display: flex; justify-content: center;
+        /* KAYDIRILABİLİR BAŞVURU BÖLÜMÜ (SAYFA SONU) */
+        .apply-section {
+            margin-top: 50px;
+            padding: 30px;
+            background: #ffffff;
+            border: 2px dashed var(--bireysel);
+            border-radius: 12px;
         }
-        .apply-content {
-            max-width: 1100px; width: 100%; display: grid;
-            grid-template-columns: 1fr 1.5fr 1.5fr 1.2fr 1.2fr; gap: 12px; align-items: center;
+        .apply-header { text-align: center; margin-bottom: 25px; }
+        .apply-header h3 { margin: 0; color: var(--bireysel); font-size: 20px; }
+        .apply-header p { margin: 5px 0 0; color: #7f8c8d; }
+        
+        .apply-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 0.8fr 1fr;
+            gap: 15px;
+            align-items: flex-end;
         }
-        .apply-text { font-weight: bold; color: var(--dark); font-size: 13px; }
-        .captcha-box { display: flex; align-items: center; gap: 5px; background: #f8f9fa; padding: 5px; border-radius: 6px; border: 1px solid var(--border); }
-        .btn-apply { background: var(--bireysel); color: white; height: 40px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .captcha-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 0 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            height: 42px;
+        }
+        .btn-submit { background: var(--bireysel); font-size: 15px; }
 
         @media (max-width: 850px) {
-            .apply-content { grid-template-columns: 1fr; }
-            body { padding-bottom: 300px; }
+            .apply-grid { grid-template-columns: 1fr; }
+            .actions { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body onload="initApp()">
 
 <div class="container" id="pdf-area">
+    <!-- Üst Navigasyon -->
     <div class="segment-nav no-print">
         <button id="seg-tar" class="seg-btn bg-tar" onclick="switchSegment('tarimsal')">TARIMSAL</button>
         <button id="seg-tic" class="seg-btn bg-tic" onclick="switchSegment('ticari')">TİCARİ</button>
@@ -75,47 +99,64 @@
         <button id="seg-hak" class="seg-btn bg-hak" onclick="switchSegment('hakkimda')">HAKKIMDA</button>
     </div>
 
+    <!-- Alt Sekmeler -->
     <div class="tabs no-print" id="tabs-tarimsal">
         <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
         <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
         <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
     </div>
-    <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme</button></div>
-    <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
+    <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme Kredisi</button></div>
+    <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç Kredisi</button></div>
 
+    <!-- Giriş Formu -->
     <div class="grid">
-        <div class="field" id="box-proforma" style="width:140px;"><label>Proforma</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field" style="width:70px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="syncFaiz('yillik')"></div>
-        <div class="field" style="width:70px;"><label>Aylık %</label><input type="number" id="faizAylik" step="0.01" oninput="syncFaiz('aylik')"></div>
-        <div class="field" style="width:50px;"><label>BSMV</label><input type="number" id="bsmv" readonly></div>
-        <div class="field" style="width:50px;"><label>KKDF</label><input type="number" id="kkdf" readonly></div>
-        <div class="field" id="box-vade" style="width:90px;"><label>Vade</label><select id="vade-select" onchange="reset()"></select></div>
-        <div class="field" id="box-periyot" style="width:110px;"><label>Ödeme Sıklığı</label><select id="periyot" onchange="reset()"></select></div>
+        <div class="field" id="box-proforma" style="width:160px;"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
+        <div class="field" style="width:160px;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
+        <div class="field" style="width:85px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="syncFaiz('yillik')"></div>
+        <div class="field" style="width:85px;"><label>Aylık %</label><input type="number" id="faizAylik" step="0.01" oninput="syncFaiz('aylik')"></div>
+        <div class="field" style="width:60px;"><label>BSMV</label><input type="number" id="bsmv" readonly></div>
+        <div class="field" style="width:60px;"><label>KKDF</label><input type="number" id="kkdf" readonly></div>
+        <div class="field" id="box-vade" style="width:110px;"><label>Vade</label><select id="vade-select" onchange="reset()"></select></div>
+        <div class="field" id="box-periyot" style="width:130px;"><label>Ödeme Sıklığı</label><select id="periyot" onchange="reset()"></select></div>
     </div>
 
+    <!-- Hesapla Butonları -->
     <div class="actions no-print">
-        <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
-        <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF</button>
+        <button class="btn btn-calc" onclick="hesapla()">HESAPLAMAYI BAŞLAT</button>
+        <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF AL</button>
         <button class="btn btn-print" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
     </div>
 
+    <!-- Hesaplama Sonucu -->
     <div id="result-main-container" class="result-main-container">
-        <div class="result-title">Kredi Geri Ödeme Planı</div>
+        <div class="result-title">Kredi Geri Ödeme Tablosu</div>
         <div class="table-res" id="result-area"></div>
     </div>
-</div>
 
-<div class="fixed-apply-bar no-print">
-    <div class="apply-content">
-        <div class="apply-text">HIZLI BAŞVURU</div>
-        <input type="text" id="app-tckn" placeholder="TC Kimlik No" maxlength="11" oninput="this.value=this.value.replace(/[^\d]/,'')">
-        <input type="tel" id="app-tel" placeholder="Cep Telefonu (5XX...)" maxlength="10" oninput="this.value=this.value.replace(/[^\d]/,'')">
-        <div class="captcha-box">
-            <span id="cap-ques" style="font-weight:bold; color:var(--bireysel);"></span>
-            <input type="text" id="cap-ans" placeholder="?" style="width:35px; height:25px; text-align:center;">
+    <!-- SAYFA SONUNDAKİ BAŞVURU BÖLÜMÜ -->
+    <div class="apply-section no-print">
+        <div class="apply-header">
+            <h3>Kredi Başvuru Formu</h3>
+            <p>Hemen başvurunuzu iletin, biz sizi arayalım.</p>
         </div>
-        <button class="btn-apply" onclick="completeApp()">GÖNDER</button>
+        <div class="apply-grid">
+            <div class="field">
+                <label>T.C. Kimlik No</label>
+                <input type="text" id="app-tckn" placeholder="11 Haneli TCKN" maxlength="11" oninput="this.value=this.value.replace(/[^\d]/,'')">
+            </div>
+            <div class="field">
+                <label>Cep Telefonu</label>
+                <input type="tel" id="app-tel" placeholder="05XX XXX XX XX" maxlength="10" oninput="this.value=this.value.replace(/[^\d]/,'')">
+            </div>
+            <div class="field">
+                <label>Güvenlik</label>
+                <div class="captcha-container">
+                    <span id="cap-ques" style="font-weight:bold; color:var(--bireysel);"></span>
+                    <input type="text" id="cap-ans" placeholder="?" style="width:45px; border:none; background:transparent; text-align:center; font-weight:bold;">
+                </div>
+            </div>
+            <button class="btn btn-submit" onclick="completeApp()">BAŞVURUYU GÖNDER</button>
+        </div>
     </div>
 </div>
 
@@ -129,10 +170,11 @@
         genCap();
     }
 
+    // Güvenlik Sorusu Üretici
     function genCap() {
         const n1 = Math.floor(Math.random() * 9) + 1, n2 = Math.floor(Math.random() * 9) + 1;
         capRes = n1 + n2;
-        document.getElementById('cap-ques').innerText = `${n1}+${n2}=`;
+        document.getElementById('cap-ques').innerText = `${n1} + ${n2} =`;
         document.getElementById('cap-ans').value = '';
     }
 
@@ -156,13 +198,18 @@
         btn.classList.add('active');
         
         const bsmv = document.getElementById('bsmv'), kkdf = document.getElementById('kkdf'), fA = document.getElementById('faizAylik');
-        if(segment === 'bireysel' || mode === 'zirai') { bsmv.value = 15; kkdf.value = 15; } else { bsmv.value = 5; kkdf.value = 0; }
         
+        // Vergi Mantığı
+        if(segment === 'bireysel' || mode === 'zirai') { bsmv.value = 15; kkdf.value = 15; } 
+        else { bsmv.value = 5; kkdf.value = 0; }
+        
+        // Faiz Mantığı
         if(segment === 'bireysel') { fA.value = 4.39; } 
         else if(segment === 'ticari' || mode === 'zirai') { fA.value = (46/12).toFixed(2); }
         else { fA.value = (40.5/12).toFixed(2); }
         syncFaiz('aylik');
 
+        // Vade Listesi
         const vs = document.getElementById('vade-select'); vs.innerHTML = '';
         let max = (segment === 'tarimsal') ? 5 : (segment === 'ticari' ? 60 : 36);
         for(let i=1; i<=max; i++) { 
@@ -192,7 +239,7 @@
         let dF = (yF / 12) * per, bF = dF * (1 + bsmv + kkdf);
         let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
 
-        let html = `<table><thead><tr><th>Taksit</th><th>Ana Para</th><th>Faiz</th><th>Vergi</th><th>Taksit Tutarı</th><th>Kalan</th></tr></thead><tbody>`;
+        let html = `<table><thead><tr><th>Taksit No</th><th>Ana Para</th><th>Faiz</th><th>Vergi</th><th>Taksit Tutarı</th><th>Kalan Borç</th></tr></thead><tbody>`;
         let kal = anaPara, tA=0, tF=0, tV=0, tT=0;
 
         for(let i=1; i<=tSayisi; i++) {
@@ -205,18 +252,24 @@
         document.getElementById('result-area').innerHTML = html;
         document.getElementById('result-main-container').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
+        
+        // Hesaplama sonrası başvuruya odaklanmak için hafif kaydır
+        window.scrollBy({ top: 150, behavior: 'smooth' });
     }
 
     function completeApp() {
         const tckn = document.getElementById('app-tckn').value, tel = document.getElementById('app-tel').value, ans = document.getElementById('cap-ans').value;
-        if(tckn.length !== 11 || tel.length < 10) { alert("TCKN ve Telefon eksik!"); return; }
-        if(parseInt(ans) !== capRes) { alert("Güvenlik sorusu hatalı!"); genCap(); return; }
+        if(tckn.length !== 11 || tel.length < 10) { alert("Lütfen TCKN (11 hane) ve Telefon bilgilerinizi tam giriniz!"); return; }
+        if(parseInt(ans) !== capRes) { alert("Güvenlik sorusu hatalı cevaplandı!"); genCap(); return; }
         
-        if(confirm(`${tckn} TCKN ile başvuruyu onaylıyor musunuz? Plan e-posta ile gönderilecektir.`)) {
-            alert("Başvurunuz başarıyla iletildi!"); genCap();
+        if(confirm(`${tckn} TCKN ile kredi başvurunuzu onaylıyor musunuz? Bilgileriniz danışmanımıza iletilecektir.`)) {
+            alert("TEBRİKLER!\nKredi başvurunuz başarıyla alınmıştır. En kısa sürede sizinle iletişime geçeceğiz."); 
+            document.getElementById('app-tckn').value = '';
+            document.getElementById('app-tel').value = '';
+            genCap();
         }
     }
-    function indir() { html2pdf().from(document.getElementById('pdf-area')).set({ margin: 10, filename: 'Plan.pdf' }).save(); }
+    function indir() { html2pdf().from(document.getElementById('pdf-area')).set({ margin: 10, filename: 'Kredi_Odeme_Plani.pdf' }).save(); }
 </script>
 </body>
 </html>
