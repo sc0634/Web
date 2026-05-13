@@ -146,7 +146,8 @@
             <select id="periyot" onchange="reset()">
                 <option value="1">Aylık</option>
                 <option value="3">3 Ayda Bir</option>
-                <option id="opt-6ay" value="6">6 Ayda Bir</option>
+                <option value="6">6 Ayda Bir</option>
+                <option id="opt-12ay" value="12">Yılda 1 (Yıllık)</option>
             </select>
         </div>
 
@@ -215,26 +216,30 @@
         document.getElementById('bir-slider-box').style.display = isBir ? 'flex' : 'none';
         document.getElementById('periyot-box').style.display = (isZirai || segment === 'ticari' || isBir) ? 'flex' : 'none';
         
+        // Periyot Reset ve Opt Ayarları
+        const periyotSelect = document.getElementById('periyot');
+        const opt12 = document.getElementById('opt-12ay');
+
         if (isBir) {
-            document.getElementById('opt-6ay').style.display = 'none';
-            if(document.getElementById('periyot').value === "6") document.getElementById('periyot').value = "1";
+            opt12.style.display = 'none';
+            if(periyotSelect.value === "12") periyotSelect.value = "1";
             document.getElementById('bsmv').value = 15; 
             document.getElementById('kkdf').value = 15;
             document.getElementById('faizAylik').value = 4.39; syncFaiz('aylik');
         } else if (isZirai) {
-            document.getElementById('opt-6ay').style.display = 'block';
+            // ÇİFTÇİ TAKSİTLİ AYARLARI
+            opt12.style.display = 'block';
+            periyotSelect.value = "12"; // ÖDEME PERİYODU YILDA 1 (12 AY)
             document.getElementById('bsmv').value = 15; 
             document.getElementById('kkdf').value = 15;
             document.getElementById('faiz').value = 46.00; syncFaiz('yillik');
         } else if (isSub) {
-            // TRAKTÖR VE EKİPMAN İÇİN SABİT 40.50 AYARI
-            document.getElementById('opt-6ay').style.display = 'block';
+            opt12.style.display = 'block';
             document.getElementById('bsmv').value = 5; 
             document.getElementById('kkdf').value = 0;
-            document.getElementById('faiz').value = 40.50; 
-            syncFaiz('yillik');
+            document.getElementById('faiz').value = 40.50; syncFaiz('yillik');
         } else {
-            document.getElementById('opt-6ay').style.display = 'block';
+            opt12.style.display = 'none';
             document.getElementById('bsmv').value = 5; 
             document.getElementById('kkdf').value = 0;
             if (segment === 'ticari') { document.getElementById('faiz').value = 46.00; syncFaiz('yillik'); }
@@ -288,13 +293,14 @@
         let vades = multiYear ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach(v => {
-            let isAnnual = multiYear; 
-            let taksitSayisi = isAnnual ? v : Math.ceil(v / periyot);
-            let dF = isAnnual ? yF : (yF / 12) * periyot;
+            let isAnnual = (multiYear && periyot >= 12); 
+            let taksitSayisi = isAnnual ? v : Math.ceil((v * (multiYear ? 12 : 1)) / periyot);
+            let dF = (yF / 12) * periyot;
             let bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, taksitSayisi)) / (Math.pow(1+bF, taksitSayisi)-1);
             
-            let html = `<div class="vade-header">${v} ${isAnnual ? 'Yıllık' : 'Aylık'} Ödeme Planı (${taksitSayisi} Taksit)
+            let label = isAnnual ? 'Yıllık' : (periyot === 1 ? 'Aylık' : periyot + ' Aylık');
+            let html = `<div class="vade-header">${v} Yıl / ${taksitSayisi} Taksit (${label} Ödemeli Plan)
                 <button class="btn-mini-print no-print" onclick="window.print()">YAZDIR</button>
             </div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>İnd. Faiz</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             
@@ -309,7 +315,7 @@
         });
         
         document.getElementById('result-main-container').style.display = 'block';
-        document.getElementById('result-title').innerText = multiYear ? "Yıllık Ödemeli Planlar" : "Eşit Taksitli Ödeme Planı";
+        document.getElementById('result-title').innerText = multiYear ? "Zirai / Taksitli Ödeme Planları" : "Eşit Taksitli Ödeme Planı";
         document.getElementById('sum-kredi').innerText = document.getElementById('tutar').value + " TL";
         document.getElementById('sum-faiz').innerText = `%${faizVal}`;
         document.getElementById('sum-prof').innerText = (document.getElementById('proforma').value || "0") + " TL";
