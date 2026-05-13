@@ -23,7 +23,6 @@
             box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
         }
         
-        /* ÜST SEKME VURGULAMA */
         .segment-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; align-items: center; }
         .seg-btn { 
             border: 2px solid transparent; height: 40px; border-radius: 6px; color: white; 
@@ -212,7 +211,6 @@
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
         
-        // Vade kutusunu Subvasiyonlu ürünler ve Zirai sekmesinde gizle
         document.getElementById('vade-box').style.display = (isSub || isBir || isZirai) ? 'none' : 'flex';
         document.getElementById('bir-slider-box').style.display = isBir ? 'flex' : 'none';
         document.getElementById('periyot-box').style.display = (isZirai || segment === 'ticari' || isBir) ? 'flex' : 'none';
@@ -220,12 +218,26 @@
         if (isBir) {
             document.getElementById('opt-6ay').style.display = 'none';
             if(document.getElementById('periyot').value === "6") document.getElementById('periyot').value = "1";
-            document.getElementById('bsmv').value = 15; document.getElementById('kkdf').value = 15;
+            document.getElementById('bsmv').value = 15; 
+            document.getElementById('kkdf').value = 15;
             document.getElementById('faizAylik').value = 4.39; syncFaiz('aylik');
+        } else if (isZirai) {
+            document.getElementById('opt-6ay').style.display = 'block';
+            document.getElementById('bsmv').value = 15; 
+            document.getElementById('kkdf').value = 15;
+            document.getElementById('faiz').value = 46.00; syncFaiz('yillik');
+        } else if (isSub) {
+            // TRAKTÖR VE EKİPMAN İÇİN SABİT 40.50 AYARI
+            document.getElementById('opt-6ay').style.display = 'block';
+            document.getElementById('bsmv').value = 5; 
+            document.getElementById('kkdf').value = 0;
+            document.getElementById('faiz').value = 40.50; 
+            syncFaiz('yillik');
         } else {
             document.getElementById('opt-6ay').style.display = 'block';
-            document.getElementById('bsmv').value = 5; document.getElementById('kkdf').value = 0;
-            if (segment === 'ticari' || isZirai) { document.getElementById('faiz').value = 46.00; syncFaiz('yillik'); }
+            document.getElementById('bsmv').value = 5; 
+            document.getElementById('kkdf').value = 0;
+            if (segment === 'ticari') { document.getElementById('faiz').value = 46.00; syncFaiz('yillik'); }
         }
 
         document.getElementById('prof-input-box').style.display = (segment === 'ticari' || isBir || isZirai) ? 'none' : 'flex';
@@ -272,13 +284,11 @@
         const yF = faizVal / 100, subO = (mode === 'traktor' || mode === 'ekipman') ? document.getElementById('subOran').value / 100 : 0;
         const bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100, periyot = parseInt(document.getElementById('periyot').value);
         
-        // --- OTOMATİK 5 YIL HESAPLAMA MANTIĞI ---
-        // Eğer Traktör, Ekipman VEYA Çiftçi Taksitli seçiliyse 5-4-3-2-1 yıl otomatik hesapla
         let multiYear = (mode === 'traktor' || mode === 'ekipman' || mode === 'zirai');
         let vades = multiYear ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach(v => {
-            let isAnnual = multiYear; // Tarımsal modlarda taksitler yıllık kabul edilir
+            let isAnnual = multiYear; 
             let taksitSayisi = isAnnual ? v : Math.ceil(v / periyot);
             let dF = isAnnual ? yF : (yF / 12) * periyot;
             let bF = dF * (1 + bsmv + kkdf);
