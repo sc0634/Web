@@ -57,10 +57,35 @@
         .px-periyot { width: 130px; }
 
         .px-vade-sync { width: 60px !important; }
-        .px-vade-slider { width: 150px !important; display: none; }
-        .slider-container { display: flex; align-items: center; gap: 8px; height: 40px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 8px; }
-        input[type="range"] { flex: 1; height: 4px !important; cursor: pointer; padding: 0 !important; }
-        #vade-val { font-weight: bold; color: var(--dark); min-width: 20px; text-align: center; font-size: 14px; }
+        
+        /* Bireysel Vade Slider - Sağa sola yaslama */
+        .px-vade-slider { width: 180px !important; display: none; }
+        .slider-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 10px; 
+            height: 40px; 
+            background: #f8f9fa; 
+            border: 1px solid var(--border); 
+            border-radius: 5px; 
+            padding: 0 10px; 
+            width: 100%;
+        }
+        input[type="range"] { 
+            flex: 1; 
+            height: 6px !important; 
+            cursor: pointer; 
+            padding: 0 !important; 
+            margin: 0;
+        }
+        #vade-val { 
+            font-weight: bold; 
+            color: var(--dark); 
+            min-width: 25px; 
+            text-align: right; 
+            font-size: 14px; 
+        }
 
         label { 
             font-weight: bold; font-size: 9px; color: #57606f; 
@@ -69,7 +94,7 @@
             white-space: pre-line;
         }
         
-        .compact-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+        .compact-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; width: 100%; }
         .options-container { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row { display: flex; align-items: center; gap: 6px; }
 
@@ -96,6 +121,12 @@
             position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
             padding: 4px 8px; background: var(--dark); color: white; border: none;
             border-radius: 4px; font-size: 10px; cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .px-vade-slider { width: 100% !important; }
+            .compact-row { gap: 5px; }
+            .field { flex-grow: 1; }
         }
 
         @media print {
@@ -218,7 +249,6 @@
         const bsmvInp = document.getElementById('bsmv');
         const kkdfInp = document.getElementById('kkdf');
         
-        // Tüm modlarda readonly yap
         bsmvInp.readOnly = true; 
         kkdfInp.readOnly = true;
 
