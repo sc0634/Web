@@ -15,10 +15,10 @@
         body { background: #f5f6fa; margin: 0; padding: 10px; color: var(--dark); font-size: 13px; }
         
         .container { 
-            max-width: 500px; 
+            max-width: 1000px; 
             margin: 10px auto; 
             background: #fff; 
-            padding: 15px; 
+            padding: 20px; 
             border-radius: 8px; 
             box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
         }
@@ -53,66 +53,77 @@
             display: block;
         }
 
-        #prof-input-box, #tutar-input-box { width: 130px; }
-        .px-faiz { width: 85px; }
-        .px-vergi { width: 55px; }
-        .px-vade { width: 135px; }
+        #prof-input-box, #tutar-input-box { width: 140px; }
+        .px-faiz { width: 95px; }
+        .px-vergi { width: 65px; }
+        .px-vade { width: 150px; }
+
+        /* Slider Stil */
+        .slider-container { width: 100%; display: none; flex-direction: column; gap: 8px; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; border: 1px solid var(--border); }
+        .slider-label { display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--bireysel); }
 
         label { font-weight: bold; font-size: 10px; color: #57606f; white-space: nowrap; text-transform: uppercase; }
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; }
 
-        .compact-row { width: 100%; display: flex; gap: 8px; padding: 0; justify-content: flex-start; flex-wrap: wrap; }
+        .compact-row { width: 100%; display: flex; gap: 12px; padding: 0; justify-content: flex-start; flex-wrap: wrap; }
 
         .options-container { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
-        .opt-row-wrapper { display: flex; flex-direction: row; gap: 15px; }
+        .opt-row-wrapper { display: flex; flex-direction: row; gap: 20px; }
         .opt-row { display: flex; align-items: center; gap: 6px; }
         .opt-row input { width: 18px !important; height: 18px !important; margin: 0; cursor: pointer; }
         .opt-row label { font-size: 11px; font-weight: bold; cursor: pointer; color: var(--dark); }
 
         .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
-        .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; font-size: 12px; text-transform: uppercase; }
+        .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; font-size: 14px; text-transform: uppercase; }
         
         .vade-header { 
             background: #f1f2f6; 
             color: var(--dark); 
-            padding: 8px; 
+            padding: 10px; 
             border-top: 1px solid var(--border); 
             border-bottom: 1px solid var(--border); 
             font-weight: bold; 
             text-align: center; 
-            font-size: 11px; 
+            font-size: 12px; 
             position: relative;
         }
 
         .btn-mini-print {
             position: absolute;
-            right: 5px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
             background: var(--dark);
             color: white;
             border: none;
-            padding: 4px 8px;
+            padding: 5px 12px;
             border-radius: 3px;
-            font-size: 9px;
+            font-size: 10px;
             cursor: pointer;
             font-weight: bold;
         }
 
-        .table-res { overflow-x: hidden; width: 100%; background: white; padding: 5px; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 5px; }
-        th { background: #f8f9fa; padding: 5px 2px; font-size: 9px; border: 1px solid var(--border); }
-        td { padding: 8px 2px; text-align: center; border: 1px solid var(--border); font-size: 10px; }
+        .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
+        th { background: #f8f9fa; padding: 10px 5px; font-size: 11px; border: 1px solid var(--border); }
+        td { padding: 10px 5px; text-align: center; border: 1px solid var(--border); font-size: 11px; }
         .total-row { background: #f9f9f9; font-weight: bold; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn { height: 40px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; font-size: 12px; }
+        .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; font-size: 13px; }
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
+        @media screen and (max-width: 600px) {
+            .container { padding: 10px; }
+            #prof-input-box, #tutar-input-box { width: 100px; }
+            .px-vade { width: 135px; }
+        }
+
         @media print { 
-            .no-print, .btn-mini-print { display: none !important; } 
+            .no-print, .btn-mini-print, .slider-container { display: none !important; } 
             #print-summary { display: grid !important; } 
             .container { max-width: 100%; margin: 0; box-shadow: none; border: none; } 
             .result-main-container { border: none; }
@@ -154,20 +165,30 @@
             <div class="field px-vergi" id="sub-input-box"><label>Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         </div>
 
-        <div class="options-container" id="ziraiOpts">
-            <div class="opt-row-wrapper">
-                <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
-                <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="updateYerli()"><label for="buyback">Buy Back</label></div>
+        <div class="field px-vade" id="vade-box"><label>Vade Süresi</label><select id="vade" onchange="reset()"></select></div>
+        
+        <!-- Sadece Bireyselde Görünecek Slider -->
+        <div class="slider-container" id="bir-slider-box">
+            <div class="slider-label">
+                <span>Vade Seçimi</span>
+                <span id="slider-val" style="color:var(--bireysel)">12 Ay</span>
             </div>
+            <input type="range" id="vadeSlider" min="1" max="36" value="12" oninput="syncSlider(this.value)">
         </div>
 
-        <div class="field px-vade" id="vade-box"><label>Vade Süresi</label><select id="vade" onchange="reset()"></select></div>
         <div class="field px-vade" id="periyot-box"><label>Ödeme Periyodu</label>
             <select id="periyot" onchange="reset()">
                 <option value="1">Aylık</option>
                 <option value="3">3 Ayda Bir</option>
                 <option value="6">6 Ayda Bir</option>
             </select>
+        </div>
+
+        <div class="options-container" id="ziraiOpts">
+            <div class="opt-row-wrapper">
+                <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
+                <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="updateYerli()"><label for="buyback">Buy Back</label></div>
+            </div>
         </div>
     </div>
 
@@ -190,6 +211,12 @@
         fmtMoney(document.getElementById('proforma')); 
         fmtMoney(document.getElementById('tutar')); 
         switchSegment('tarimsal'); 
+    }
+
+    function syncSlider(val) {
+        document.getElementById('slider-val').innerText = val + " Ay";
+        document.getElementById('vade').value = val;
+        reset();
     }
 
     function syncFaiz(source) {
@@ -224,6 +251,9 @@
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
         document.getElementById('periyot-box').style.display = (m === 'zirai' || segment === 'ticari' || segment === 'bireysel') ? 'flex' : 'none';
         
+        // Slider sadece Bireysel/Tüketici kısmında aktif
+        document.getElementById('bir-slider-box').style.display = (m === 'tuketici') ? 'flex' : 'none';
+
         const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
         document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
         
@@ -263,6 +293,10 @@
             if(i === (segment !== 'tarimsal' ? 12 : max)) o.selected = true;
             s.appendChild(o);
         }
+        if(mode === 'tuketici') {
+            document.getElementById('vadeSlider').value = s.value;
+            document.getElementById('slider-val').innerText = s.value + " Ay";
+        }
     }
 
     function fmtMoney(i) {
@@ -300,18 +334,18 @@
             
             let taksit = (anaPara * bF * Math.pow(1+bF, taksitSayisi)) / (Math.pow(1+bF, taksitSayisi)-1);
             
-            const subCol = subVal > 0 ? '<th style="width:12%">İnd. Faiz</th>' : '';
+            const subCol = subVal > 0 ? '<th>İnd. Faiz</th>' : '';
             let html = `<div class="vade-header">
                 ${v} ${isTarimSub ? 'Yıllık' : 'Aylık'} Ödeme Planı (${taksitSayisi} Taksit)
                 <button class="btn-mini-print no-print" onclick="window.print()">YAZDIR</button>
             </div><div class="table-res"><table><thead><tr>
-                <th style="width:7%">Tks</th>
-                <th style="width:18%">Ana Para</th>
-                <th style="width:15%">Faiz</th>
+                <th>Tks</th>
+                <th>Ana Para</th>
+                <th>Faiz</th>
                 ${subCol}
-                <th style="width:12%">Vergi</th>
-                <th style="width:18%">Taksit</th>
-                <th style="width:18%">Kalan</th>
+                <th>Vergi</th>
+                <th>Taksit</th>
+                <th>Kalan</th>
                 </tr></thead><tbody>`;
             
             let kalan = anaPara, tA = 0, tF = 0, tV = 0, tT = 0, tInd = 0;
