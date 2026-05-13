@@ -35,9 +35,9 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
-        /* Faiz Alanlarını 5px Daha Daraltan Düzenleme */
-        .faiz-wrapper { grid-column: span 2; display: flex; gap: 30px; padding: 0 20px; justify-content: center; }
-        .faiz-half { flex: 1; display: flex; flex-direction: column; gap: 2px; max-width: 38%; }
+        /* Daraltılmış ve Sola Yaslanmış Faiz ve Sübvansiyon Alanları */
+        .faiz-wrapper { grid-column: span 2; display: flex; gap: 10px; padding: 0; justify-content: flex-start; }
+        .small-field { width: 32%; display: flex; flex-direction: column; gap: 2px; flex: none; }
 
         .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row-wrapper { display: flex; flex-direction: row; gap: 10px; }
@@ -91,18 +91,21 @@
         <div class="field" id="tutar-input-box"><label>Kredi</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
         
         <div class="faiz-wrapper">
-            <div class="faiz-half">
-                <label>Yıllık Faiz %</label>
+            <div class="small-field">
+                <label>Yıllık %</label>
                 <input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')">
             </div>
-            <div class="faiz-half">
-                <label>Aylık Faiz %</label>
+            <div class="small-field">
+                <label>Aylık %</label>
                 <input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')">
+            </div>
+            <!-- Sübvansiyon kutusu da aynı boyuta getirildi -->
+            <div class="small-field" id="sub-input-box">
+                <label>Sübvansiyon %</label>
+                <input type="number" id="subOran" value="50" oninput="reset()">
             </div>
         </div>
 
-        <div class="field" id="sub-input-box"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
-        
         <div class="options-container" id="ziraiOpts">
             <div class="opt-row-wrapper">
                 <div class="opt-row">
