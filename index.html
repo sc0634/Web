@@ -56,9 +56,11 @@
         #prof-input-box, #tutar-input-box { width: 140px; }
         .px-faiz { width: 95px; }
         .px-vergi { width: 65px; }
-        .px-vade { width: 150px; }
+        
+        /* İstediğin düzenleme: Vade ve KKDF genişlikleri eşitlendi (65px) */
+        .px-vade-sync { width: 65px; }
+        .px-periyot { width: 150px; }
 
-        /* Slider Stil */
         .slider-container { width: 100%; display: none; flex-direction: column; gap: 8px; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; border: 1px solid var(--border); }
         .slider-label { display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; }
         input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--bireysel); }
@@ -116,12 +118,6 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        @media screen and (max-width: 600px) {
-            .container { padding: 10px; }
-            #prof-input-box, #tutar-input-box { width: 100px; }
-            .px-vade { width: 135px; }
-        }
-
         @media print { 
             .no-print, .btn-mini-print, .slider-container { display: none !important; } 
             #print-summary { display: grid !important; } 
@@ -155,19 +151,19 @@
 
     <div class="grid no-print">
         <div class="field" id="prof-input-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
+        <!-- Kredi Tutarı 100.000 olarak set edildi -->
+        <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="100.000" oninput="fmtMoney(this)"></div>
         
         <div class="compact-row">
             <div class="field px-faiz"><label>Yıllık Oran %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
             <div class="field px-faiz"><label>Aylık Oran %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
             <div class="field px-vergi" id="bsmv-box"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly tabindex="-1"></div>
-            <div class="field px-vergi" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly tabindex="-1"></div>
+            <div class="field px-vergi px-vade-sync" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly tabindex="-1"></div>
+            <!-- Vade süresi genişliği KKDF ile aynı (65px) yapıldı ve yanına taşındı -->
+            <div class="field px-vade-sync" id="vade-box"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
             <div class="field px-vergi" id="sub-input-box"><label>Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         </div>
 
-        <div class="field px-vade" id="vade-box"><label>Vade Süresi</label><select id="vade" onchange="reset()"></select></div>
-        
-        <!-- Sadece Bireyselde Görünecek Slider -->
         <div class="slider-container" id="bir-slider-box">
             <div class="slider-label">
                 <span>Vade Seçimi</span>
@@ -176,11 +172,11 @@
             <input type="range" id="vadeSlider" min="1" max="36" value="12" oninput="syncSlider(this.value)">
         </div>
 
-        <div class="field px-vade" id="periyot-box"><label>Ödeme Periyodu</label>
+        <div class="field px-periyot" id="periyot-box"><label>Ödeme Periyodu</label>
             <select id="periyot" onchange="reset()">
                 <option value="1">Aylık</option>
                 <option value="3">3 Ayda Bir</option>
-                <option value="6">6 Ayda Bir</option>
+                <option id="opt-6ay" value="6">6 Ayda Bir</option>
             </select>
         </div>
 
@@ -251,8 +247,15 @@
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
         document.getElementById('periyot-box').style.display = (m === 'zirai' || segment === 'ticari' || segment === 'bireysel') ? 'flex' : 'none';
         
-        // Slider sadece Bireysel/Tüketici kısmında aktif
-        document.getElementById('bir-slider-box').style.display = (m === 'tuketici') ? 'flex' : 'none';
+        // Bireysel/Tüketici özel kısıtlamalar
+        if (m === 'tuketici') {
+            document.getElementById('bir-slider-box').style.display = 'flex';
+            document.getElementById('opt-6ay').style.display = 'none'; // 6 aylık periyodu kaldır
+            if(document.getElementById('periyot').value === "6") document.getElementById('periyot').value = "1";
+        } else {
+            document.getElementById('bir-slider-box').style.display = 'none';
+            document.getElementById('opt-6ay').style.display = 'block';
+        }
 
         const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
         document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
@@ -289,7 +292,7 @@
         let isY = (segment === 'tarimsal');
         let max = (mode === 'tuketici') ? 36 : (isY ? 5 : 60);
         for(let i=1; i<=max; i++){
-            let o = document.createElement('option'); o.value = i; o.text = i + (segment !== 'tarimsal' ? " Ay" : " Yıl");
+            let o = document.createElement('option'); o.value = i; o.text = i + (segment !== 'tarimsal' ? "" : "");
             if(i === (segment !== 'tarimsal' ? 12 : max)) o.selected = true;
             s.appendChild(o);
         }
