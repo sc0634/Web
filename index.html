@@ -130,10 +130,10 @@
             <div class="field" id="prof-input-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
             <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
             
-            <div class="field px-faiz"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
-            <div class="field px-faiz"><label>Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
-            <div class="field px-vergi"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
-            <div class="field px-vergi"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
+            <div class="field px-faiz" id="f1"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
+            <div class="field px-faiz" id="f2"><label>Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
+            <div class="field px-vergi" id="v1"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
+            <div class="field px-vergi" id="v2"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
             
             <div class="field px-vade-sync" id="vade-box-select"><label>Vade</label><select id="vade-select" onchange="reset()"></select></div>
             <div class="field px-vade-slider" id="vade-box-slider">
@@ -156,7 +156,7 @@
             </div>
         </div>
 
-        <div class="actions no-print">
+        <div class="actions no-print" id="action-btns">
             <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
             <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF</button>
             <button class="btn btn-print" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
@@ -194,12 +194,7 @@
         const pSelect = document.getElementById('periyot');
         if(!pSelect) return;
         pSelect.innerHTML = '';
-        const options = [
-            {v: "1", t: "Aylık"},
-            {v: "3", t: "3 Ayda Bir"},
-            {v: "6", t: "6 Ayda Bir"},
-            {v: "12", t: "Yıllık"}
-        ];
+        const options = [{v: "1", t: "Aylık"}, {v: "3", t: "3 Ayda Bir"}, {v: "6", t: "6 Ayda Bir"}, {v: "12", t: "Yıllık"}];
         options.forEach(opt => {
             if (segment === 'bireysel' && (opt.v === "6" || opt.v === "12")) return;
             let o = document.createElement('option');
@@ -230,30 +225,47 @@
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
-        const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
-        const isHayvan = (mode === 'hayvancilik');
+        const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman'), isHayvan = (mode === 'hayvancilik');
 
+        // Hayvancılık seçilince Kredi Tutarı ve altını tamamen gizle
         document.getElementById('hayvan-konteynirlar').style.display = isHayvan ? 'block' : 'none';
+        document.getElementById('tutar-input-box').style.display = isHayvan ? 'none' : 'flex';
+        document.getElementById('f1').style.display = isHayvan ? 'none' : 'flex';
+        document.getElementById('f2').style.display = isHayvan ? 'none' : 'flex';
+        document.getElementById('v1').style.display = isHayvan ? 'none' : 'flex';
+        document.getElementById('v2').style.display = isHayvan ? 'none' : 'flex';
+        document.getElementById('action-btns').style.display = isHayvan ? 'none' : 'grid';
+        document.getElementById('result-main-container').style.display = 'none';
         
-        if(isSub) { document.getElementById('faiz').value = "40.50"; }
-        else if(mode === 'zirai' || isTic || isHayvan) { document.getElementById('faiz').value = "46.00"; }
-        else if(isBir) { document.getElementById('faizAylik').value = "4.39"; }
-        syncFaiz(isBir ? 'aylik' : 'yillik');
+        if(!isHayvan) {
+            if(isSub) document.getElementById('faiz').value = "40.50";
+            else if(mode === 'zirai' || isTic) document.getElementById('faiz').value = "46.00";
+            else if(isBir) document.getElementById('faizAylik').value = "4.39";
+            syncFaiz(isBir ? 'aylik' : 'yillik');
 
-        document.getElementById('vade-box-select').style.display = isTic ? 'flex' : 'none';
-        document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
-        document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
-        document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
-        document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-        document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai' && !isHayvan) ? 'flex' : 'none';
+            document.getElementById('vade-box-select').style.display = isTic ? 'flex' : 'none';
+            document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
+            document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
+            document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
+            document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
+            document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
 
-        if(segment === 'tarimsal') {
-            document.getElementById('bsmv').value = (mode === 'zirai' || isHayvan ? 15 : 5);
-            document.getElementById('kkdf').value = (mode === 'zirai' || isHayvan ? 15 : 0);
+            if(segment === 'tarimsal') {
+                document.getElementById('bsmv').value = (mode === 'zirai' ? 15 : 5);
+                document.getElementById('kkdf').value = (mode === 'zirai' ? 15 : 0);
+            } else {
+                document.getElementById('bsmv').value = (isTic ? 5 : 15);
+                document.getElementById('kkdf').value = (isTic ? 0 : 15);
+                fillVades();
+            }
         } else {
-            document.getElementById('bsmv').value = (isTic ? 5 : 15);
-            document.getElementById('kkdf').value = (isTic ? 0 : 15);
-            fillVades();
+            // Hayvancılıkta diğer tüm girişleri de kapat
+            document.getElementById('prof-input-box').style.display = 'none';
+            document.getElementById('vade-box-select').style.display = 'none';
+            document.getElementById('vade-box-slider').style.display = 'none';
+            document.getElementById('periyot-box').style.display = 'none';
+            document.getElementById('ziraiOpts').style.display = 'none';
+            document.getElementById('sub-input-box').style.display = 'none';
         }
         reset();
     }
@@ -276,24 +288,18 @@
         const res = document.getElementById('result-area');
         const titleEl = document.querySelector('.result-main-title');
         res.innerHTML = '';
-
-        if (segment === 'tarimsal') {
-            titleEl.innerText = "Yılda 1 ödemeli örnek planlar";
-        } else {
-            titleEl.innerText = "Ödeme Planı Detayları";
-        }
+        titleEl.innerText = (segment === 'tarimsal') ? "Yılda 1 ödemeli örnek planlar" : "Ödeme Planı Detayları";
 
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
         const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         const periyot = (segment === 'tarimsal' ? 12 : parseInt(document.getElementById('periyot').value));
         const subO = (isSubMod() ? document.getElementById('subOran').value / 100 : 0);
         
-        let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [ (segment === 'bireysel' ? parseInt(document.getElementById('vade-slider').value) : parseInt(document.getElementById('vade-select').value)) ];
+        let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [(segment === 'bireysel' ? parseInt(document.getElementById('vade-slider').value) : parseInt(document.getElementById('vade-select').value))];
 
         vades.forEach(v => {
             let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / (periyot === 12 ? 1 : periyot));
-            let dF = (yF / 12) * periyot;
-            let bF = dF * (1 + bsmv + kkdf);
+            let dF = (yF / 12) * periyot, bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
             let html = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Vade'}</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             let kalan = anaPara;
