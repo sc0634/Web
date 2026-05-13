@@ -54,10 +54,19 @@
         }
 
         #prof-input-box, #tutar-input-box { width: 140px; }
-        .px-faiz { width: 95px; }
+        .px-faiz { width: 85px; } /* Genişlik alt alta metin için optimize edildi */
         .px-vergi { width: 65px; }
         .px-vade-sync { width: 65px; }
         .px-periyot { width: 150px; }
+
+        /* Etiketleri alt alta getiren stil */
+        .px-faiz label { 
+            white-space: pre-line !important; 
+            line-height: 1.1; 
+            height: 24px; 
+            display: flex; 
+            align-items: flex-end;
+        }
 
         .slider-container { width: 100%; display: none; flex-direction: column; gap: 8px; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; border: 1px solid var(--border); }
         .slider-label { display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; }
@@ -129,16 +138,15 @@
         <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="100.000" oninput="fmtMoney(this)"></div>
         
         <div class="compact-row">
-            <div class="field px-faiz"><label>Yıllık Oran %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
-            <div class="field px-faiz"><label>Aylık Oran %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
+            <!-- Label içerikleri alt alta gelecek şekilde düzenlendi -->
+            <div class="field px-faiz"><label>Yıllık&#10;Oran %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
+            <div class="field px-faiz"><label>Aylık&#10;Oran %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
             <div class="field px-vergi" id="bsmv-box"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly tabindex="-1"></div>
             <div class="field px-vade-sync" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly tabindex="-1"></div>
-            <!-- Bireysel seçildiğinde bu kutucuk (vade-box) gizlenecek -->
             <div class="field px-vade-sync" id="vade-box"><label>Vade</label><select id="vade" onchange="reset()"></select></div>
             <div class="field px-vergi" id="sub-input-box"><label>Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         </div>
 
-        <!-- Bireysel özel slider -->
         <div class="slider-container" id="bir-slider-box">
             <div class="slider-label">
                 <span>Vade Seçimi</span>
@@ -221,7 +229,6 @@
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
         
-        // Bireysel ise üstteki Vade kutusunu gizle, sadece Slider göster
         document.getElementById('vade-box').style.display = (isSub || isBireysel) ? 'none' : 'flex';
         document.getElementById('bir-slider-box').style.display = isBireysel ? 'flex' : 'none';
 
