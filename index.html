@@ -49,12 +49,11 @@
         .px-vade-sync { width: 85px; }
         .px-periyot { width: 130px; }
         
-        /* Opsiyonlar - Küçük ve Sabit Genişlik */
         .options-container { 
             display: flex; flex-direction: row; gap: 10px; 
             padding: 5px 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
         }
-        .opt-row { display: flex; align-items: center; gap: 5px; cursor: pointer; width: 110px; } /* Sabit genişlik */
+        .opt-row { display: flex; align-items: center; gap: 5px; cursor: pointer; width: 110px; } 
         .opt-row label { height: auto; margin: 0; font-size: 11px; text-transform: none; cursor: pointer; }
         .opt-row input { width: 16px; height: 16px; cursor: pointer; }
 
@@ -64,10 +63,7 @@
             background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 10px;
         }
 
-        label { 
-            font-weight: bold; font-size: 9px; color: #57606f; 
-            text-transform: uppercase; margin-bottom: 2px;
-        }
+        label { font-weight: bold; font-size: 9px; color: #57606f; text-transform: uppercase; margin-bottom: 2px; }
         
         .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; }
@@ -80,11 +76,6 @@
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
-
-        @media (max-width: 600px) {
-            .actions { grid-template-columns: 1fr; }
-            #prof-input-box, #tutar-input-box { width: 48%; }
-        }
     </style>
 </head>
 <body onload="initApp()">
@@ -115,7 +106,6 @@
             <div class="field px-vergi"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
             <div class="field px-vergi"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
             
-            <!-- Vade Sadece Ticari ve Bireysel'de Görünür -->
             <div class="field px-vade-sync" id="vade-box-select"><label>Vade</label><select id="vade-select" onchange="reset()"></select></div>
             <div class="field px-vade-slider" id="vade-box-slider">
                 <label>Vade: <span id="vade-val">12</span></label>
@@ -128,12 +118,7 @@
 
             <div class="field px-periyot" id="periyot-box">
                 <label>Ödeme Periyodu</label>
-                <select id="periyot" onchange="reset()">
-                    <option value="1">Aylık</option>
-                    <option value="3">3 Ayda Bir</option>
-                    <option value="6">6 Ayda Bir</option>
-                    <option value="12" selected>Yıllık</option>
-                </select>
+                <select id="periyot" onchange="reset()"></select>
             </div>
 
             <div class="options-container" id="ziraiOpts">
@@ -176,10 +161,37 @@
         reset();
     }
 
+    function updatePeriyotOptions() {
+        const pSelect = document.getElementById('periyot');
+        pSelect.innerHTML = '';
+        const options = [
+            {v: "1", t: "Aylık"},
+            {v: "3", t: "3 Ayda Bir"},
+            {v: "6", t: "6 Ayda Bir"},
+            {v: "12", t: "Yıllık"}
+        ];
+
+        options.forEach(opt => {
+            // Bireysel ise 6 ve 12'yi atla
+            if (segment === 'bireysel' && (opt.v === "6" || opt.v === "12")) return;
+            
+            let o = document.createElement('option');
+            o.value = opt.v;
+            o.text = opt.t;
+            pSelect.appendChild(o);
+        });
+        
+        // Varsayılan seçimi ayarla
+        pSelect.value = (segment === 'tarimsal') ? "12" : "1";
+    }
+
     function switchSegment(seg) {
         segment = seg;
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('seg-' + seg.substring(0,3)).classList.add('active');
+        
+        updatePeriyotOptions(); // Periyotları güncelle
+
         if (seg === 'hakkimda') {
             document.getElementById('calculator-ui').style.display = 'none';
             document.getElementById('about-box').style.display = 'block';
@@ -198,13 +210,11 @@
         btn.classList.add('active'); mode = m;
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
         
-        // FAİZLER
         if(isSub) { document.getElementById('faiz').value = "40.50"; }
         else if(mode === 'zirai' || isTic) { document.getElementById('faiz').value = "46.00"; }
         else if(isBir) { document.getElementById('faizAylik').value = "4.39"; }
         syncFaiz(isBir ? 'aylik' : 'yillik');
 
-        // GÖRÜNÜRLÜK (TARIMDA VADE KALDIRILDI)
         document.getElementById('vade-box-select').style.display = isTic ? 'flex' : 'none';
         document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
         document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
@@ -247,7 +257,7 @@
         let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [ (segment === 'bireysel' ? parseInt(document.getElementById('vade-slider').value) : parseInt(document.getElementById('vade-select').value)) ];
 
         vades.forEach(v => {
-            let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / periyot);
+            let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / (periyot === 12 ? 1 : periyot));
             let dF = (yF / 12) * periyot;
             let bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
@@ -271,7 +281,7 @@
         else if(mode === 'ekipman') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 75 : 50;
         reset(); 
     }
-    function indir() { html2pdf().from(document.getElementById('pdf-area')).set({ margin: 10, filename: 'Kredi_Plani.pdf', jsPDF: { format: 'a4' } }).save(); }
+    function indir() { html2pdf().from(document.getElementById('pdf-area')).set({ margin: 10, filename: 'Plan.pdf', jsPDF: { format: 'a4' } }).save(); }
 </script>
 </body>
 </html>
