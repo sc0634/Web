@@ -141,19 +141,22 @@
         
         document.getElementById('sub-input-box').style.visibility = isSub ? 'visible' : 'hidden';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
-        
-        // Ekipmanda Buy Back kutusunu gizle
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
 
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
         document.getElementById('vergi-box').style.display = isSub ? 'none' : 'flex';
-        const isProformaHidden = (m === 'ticari' || m === 'tuketici');
+        
+        // Çiftçi Taksitli (zirai), Ticari ve Tüketici modlarında Proformayı gizle
+        const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
         document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
+        
         if(isProformaHidden) document.getElementById('tutar-input-box').classList.add('full-width');
         else document.getElementById('tutar-input-box').classList.remove('full-width');
+        
         document.getElementById('bsmv').value = (m === 'tuketici' ? 15 : 5);
         document.getElementById('kkdf').value = (m === 'tuketici' ? 15 : 0);
         document.getElementById('main-calc-btn').style.backgroundColor = { tarimsal: '#27ae60', ticari: '#e67e22', bireysel: '#3498db' }[segment];
+        
         if(isSub) updateYerli(); fillVade(); reset();
     }
 
