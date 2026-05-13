@@ -31,7 +31,11 @@
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .field { display: flex; flex-direction: column; gap: 2px; }
-        .full-width { grid-column: span 2 !important; }
+        
+        /* Kredi Tutarı Genişlik Ayarı */
+        #tutar-input-box { width: calc(100% - 10px); }
+        .full-width { grid-column: span 2 !important; width: calc(100% - 10px) !important; }
+        
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
@@ -172,7 +176,6 @@
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
         
-        // Ödeme Periyodu: Çiftçi Taksitli (zirai), Ticari ve Bireysel sekmelerinde görünür
         document.getElementById('periyot-box').style.display = (m === 'zirai' || segment === 'ticari' || segment === 'bireysel') ? 'flex' : 'none';
         
         const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
@@ -246,7 +249,6 @@
         let vades = (mode === 'traktor' || mode === 'ekipman') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach(v => {
-            // Eğer traktör/ekipman değilse periyoda göre taksit sayısını ayarla
             let taksitSayisi = isTarimSub ? v : Math.ceil(v / periyot);
             let dF = isTarimSub ? yF : (yF / 12) * periyot;
             let bF = dF * (1 + bsmv + kkdf);
