@@ -142,12 +142,13 @@
             <input type="range" id="vadeSlider" min="1" max="36" value="12" oninput="syncSlider(this.value)">
         </div>
 
+        <!-- Ödeme Periyodu Bölümü -->
         <div class="field px-periyot" id="periyot-box"><label>Ödeme Periyodu</label>
             <select id="periyot" onchange="reset()">
                 <option value="1">Aylık</option>
                 <option value="3">3 Ayda Bir</option>
                 <option value="6">6 Ayda Bir</option>
-                <option id="opt-12ay" value="12">Yılda 1 (Yıllık)</option>
+                <option value="12">Yılda 1 (Yıllık)</option>
             </select>
         </div>
 
@@ -214,32 +215,31 @@
         
         document.getElementById('vade-box').style.display = (isSub || isBir || isZirai) ? 'none' : 'flex';
         document.getElementById('bir-slider-box').style.display = isBir ? 'flex' : 'none';
-        document.getElementById('periyot-box').style.display = (isZirai || segment === 'ticari' || isBir) ? 'flex' : 'none';
         
-        // Periyot Reset ve Opt Ayarları
+        // Ödeme Periyodu Görünürlük Kontrolü
+        const periyotBox = document.getElementById('periyot-box');
         const periyotSelect = document.getElementById('periyot');
-        const opt12 = document.getElementById('opt-12ay');
-
-        if (isBir) {
-            opt12.style.display = 'none';
-            if(periyotSelect.value === "12") periyotSelect.value = "1";
-            document.getElementById('bsmv').value = 15; 
-            document.getElementById('kkdf').value = 15;
-            document.getElementById('faizAylik').value = 4.39; syncFaiz('aylik');
-        } else if (isZirai) {
-            // ÇİFTÇİ TAKSİTLİ AYARLARI
-            opt12.style.display = 'block';
-            periyotSelect.value = "12"; // ÖDEME PERİYODU YILDA 1 (12 AY)
+        
+        if (isZirai) {
+            periyotBox.style.display = 'none'; // ÇİFTÇİ TAKSİTLİDE GİZLE
+            periyotSelect.value = "12"; // ARKA PLANDA YILLIK YAP
             document.getElementById('bsmv').value = 15; 
             document.getElementById('kkdf').value = 15;
             document.getElementById('faiz').value = 46.00; syncFaiz('yillik');
+        } else if (isBir) {
+            periyotBox.style.display = 'flex';
+            periyotSelect.value = "1";
+            document.getElementById('bsmv').value = 15; 
+            document.getElementById('kkdf').value = 15;
+            document.getElementById('faizAylik').value = 4.39; syncFaiz('aylik');
         } else if (isSub) {
-            opt12.style.display = 'block';
+            periyotBox.style.display = 'flex';
+            periyotSelect.value = "12";
             document.getElementById('bsmv').value = 5; 
             document.getElementById('kkdf').value = 0;
             document.getElementById('faiz').value = 40.50; syncFaiz('yillik');
         } else {
-            opt12.style.display = 'none';
+            periyotBox.style.display = (segment === 'ticari') ? 'flex' : 'none';
             document.getElementById('bsmv').value = 5; 
             document.getElementById('kkdf').value = 0;
             if (segment === 'ticari') { document.getElementById('faiz').value = 46.00; syncFaiz('yillik'); }
