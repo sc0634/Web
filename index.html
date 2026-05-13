@@ -57,6 +57,13 @@
         .opt-row label { height: auto; margin: 0; font-size: 11px; text-transform: none; cursor: pointer; }
         .opt-row input { width: 16px; height: 16px; cursor: pointer; }
 
+        /* Hayvancılık Konteynır Yapısı */
+        .animal-container { 
+            width: 100%; padding: 15px; border: 1px solid var(--border); 
+            border-radius: 6px; margin-top: 10px; background: #fafafa;
+        }
+        .animal-title { font-weight: bold; color: var(--tarimsal); margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+
         .px-vade-slider { width: 180px; display: none; }
         .slider-container { 
             display: flex; align-items: center; gap: 10px; height: 40px; 
@@ -98,11 +105,30 @@
             <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
             <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
             <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
+            <button class="tab-btn" onclick="switchTab(this, 'hayvancilik')">Hayvancılık</button>
         </div>
         <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme</button></div>
         <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
 
-        <div class="grid no-print">
+        <!-- Hayvancılık Özel Konteynırları -->
+        <div id="hayvan-konteynirlar" style="display:none; margin-bottom: 20px;">
+            <div class="animal-container">
+                <div class="animal-title">KÜÇÜKBAŞ</div>
+                <div class="grid">
+                   <div class="field"><label>Hayvan Sayısı</label><input type="number" placeholder="0"></div>
+                   <div class="field"><label>Birim Fiyat</label><input type="text" oninput="fmtMoney(this)" placeholder="0"></div>
+                </div>
+            </div>
+            <div class="animal-container">
+                <div class="animal-title">BÜYÜKBAŞ</div>
+                <div class="grid">
+                    <div class="field"><label>Hayvan Sayısı</label><input type="number" placeholder="0"></div>
+                    <div class="field"><label>Birim Fiyat</label><input type="text" oninput="fmtMoney(this)" placeholder="0"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid no-print" id="main-inputs">
             <div class="field" id="prof-input-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
             <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
             
@@ -168,6 +194,7 @@
 
     function updatePeriyotOptions() {
         const pSelect = document.getElementById('periyot');
+        if(!pSelect) return;
         pSelect.innerHTML = '';
         const options = [
             {v: "1", t: "Aylık"},
@@ -206,9 +233,12 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
+        const isHayvan = (mode === 'hayvancilik');
+
+        document.getElementById('hayvan-konteynirlar').style.display = isHayvan ? 'block' : 'none';
         
         if(isSub) { document.getElementById('faiz').value = "40.50"; }
-        else if(mode === 'zirai' || isTic) { document.getElementById('faiz').value = "46.00"; }
+        else if(mode === 'zirai' || isTic || isHayvan) { document.getElementById('faiz').value = "46.00"; }
         else if(isBir) { document.getElementById('faizAylik').value = "4.39"; }
         syncFaiz(isBir ? 'aylik' : 'yillik');
 
@@ -217,11 +247,11 @@
         document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-        document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
+        document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai' && !isHayvan) ? 'flex' : 'none';
 
         if(segment === 'tarimsal') {
-            document.getElementById('bsmv').value = (mode === 'zirai' ? 15 : 5);
-            document.getElementById('kkdf').value = (mode === 'zirai' ? 15 : 0);
+            document.getElementById('bsmv').value = (mode === 'zirai' || isHayvan ? 15 : 5);
+            document.getElementById('kkdf').value = (mode === 'zirai' || isHayvan ? 15 : 0);
         } else {
             document.getElementById('bsmv').value = (isTic ? 5 : 15);
             document.getElementById('kkdf').value = (isTic ? 0 : 15);
