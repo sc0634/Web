@@ -48,27 +48,27 @@
         .px-faiz, .px-vergi { width: 65px; }
         .px-vade-sync { width: 85px; }
         .px-periyot { width: 130px; }
+        
+        /* Checkbox ve Label Sabitleme */
+        .options-container { display: flex; flex-direction: column; gap: 8px; justify-content: center; padding: 5px 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
+        .opt-row { display: flex; align-items: center; gap: 8px; width: 130px; cursor: pointer; }
+        .opt-row input[type="checkbox"] { width: 18px !important; height: 18px !important; margin: 0; cursor: pointer; }
+        .opt-row label { font-size: 11px; color: var(--dark); white-space: nowrap; cursor: pointer; line-height: 1; margin: 0; width: 90px; text-transform: none; font-weight: bold; }
 
-        .animal-container { 
-            width: 100%; padding: 15px; border: 1px solid var(--border); 
-            border-radius: 6px; margin-top: 10px; background: #fafafa;
-        }
+        .animal-container { width: 100%; padding: 15px; border: 1px solid var(--border); border-radius: 6px; margin-top: 10px; background: #fafafa; }
         .animal-title { font-weight: bold; color: var(--tarimsal); margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
 
         .px-vade-slider { width: 180px; display: none; }
-        .slider-container { 
-            display: flex; align-items: center; gap: 10px; height: 40px; 
-            background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 10px;
-        }
+        .slider-container { display: flex; align-items: center; gap: 10px; height: 40px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 10px; }
 
-        label { font-weight: bold; font-size: 9px; color: #57606f; text-transform: uppercase; margin-bottom: 2px; }
+        label.field-label { font-weight: bold; font-size: 9px; color: #57606f; text-transform: uppercase; margin-bottom: 2px; }
         
         .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; }
         .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
-        .row-total { background: #f8f9fa; font-weight: bold; }
+        .row-total { background: #f1f2f6; font-weight: bold; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
@@ -102,54 +102,60 @@
         <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme</button></div>
         <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
 
-        <!-- Hayvancılık Özel Alanları -->
+        <!-- Hayvancılık Özel Girişler -->
         <div id="hayvan-konteynirlar" style="display:none; margin-bottom: 20px;">
             <div class="animal-container">
                 <div class="animal-title">KÜÇÜKBAŞ</div>
                 <div class="grid">
-                   <div class="field"><label>Hayvan Sayısı</label><input type="number" id="kb-sayi" placeholder="0" oninput="reset()"></div>
-                   <div class="field"><label>Birim Fiyat</label><input type="text" id="kb-fiyat" oninput="fmtMoney(this)" placeholder="0"></div>
+                   <div class="field"><label class="field-label">Hayvan Sayısı</label><input type="number" id="kb-sayi" placeholder="0" oninput="reset()"></div>
+                   <div class="field"><label class="field-label">Birim Fiyat</label><input type="text" id="kb-fiyat" oninput="fmtMoney(this)" placeholder="0"></div>
                 </div>
             </div>
             <div class="animal-container">
                 <div class="animal-title">BÜYÜKBAŞ</div>
                 <div class="grid">
-                   <div class="field"><label>Hayvan Sayısı</label><input type="number" id="bb-sayi" placeholder="0" oninput="reset()"></div>
-                   <div class="field"><label>Birim Fiyat</label><input type="text" id="bb-fiyat" oninput="fmtMoney(this)" placeholder="0"></div>
+                   <div class="field"><label class="field-label">Hayvan Sayısı</label><input type="number" id="bb-sayi" placeholder="0" oninput="reset()"></div>
+                   <div class="field"><label class="field-label">Birim Fiyat</label><input type="text" id="bb-fiyat" oninput="fmtMoney(this)" placeholder="0"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Ana Giriş Paneli (Hayvancılık seçilince komple gizlenir) -->
+        <!-- Standart Giriş Paneli -->
         <div id="main-inputs-container">
             <div class="grid no-print" id="main-inputs">
-                <div class="field" id="prof-input-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
-                <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
+                <div class="field" id="prof-input-box"><label class="field-label">Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
+                <div class="field" id="tutar-input-box"><label class="field-label">Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
                 
                 <div id="dynamic-hide-group" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;">
-                    <div class="field px-faiz"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
-                    <div class="field px-faiz"><label>Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
-                    <div class="field px-vergi"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
-                    <div class="field px-vergi"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
+                    <div class="field px-faiz"><label class="field-label">Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
+                    <div class="field px-faiz"><label class="field-label">Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
+                    <div class="field px-vergi"><label class="field-label">BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
+                    <div class="field px-vergi"><label class="field-label">KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
                     
-                    <div class="field px-vade-sync" id="vade-box-select"><label>Vade</label><select id="vade-select" onchange="reset()"></select></div>
+                    <div class="field px-vade-sync" id="vade-box-select"><label class="field-label">Vade</label><select id="vade-select" onchange="reset()"></select></div>
                     <div class="field px-vade-slider" id="vade-box-slider">
-                        <label>Vade: <span id="vade-val">12</span></label>
+                        <label class="field-label">Vade: <span id="vade-val">12</span></label>
                         <div class="slider-container">
                             <input type="range" id="vade-slider" min="1" max="36" value="12" oninput="updateSliderVal(this.value)">
                         </div>
                     </div>
 
-                    <div class="field px-vergi" id="sub-input-box"><label>Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
+                    <div class="field px-vergi" id="sub-input-box"><label class="field-label">Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
 
                     <div class="field px-periyot" id="periyot-box">
-                        <label>Ödeme Periyodu</label>
+                        <label class="field-label">Ödeme Periyodu</label>
                         <select id="periyot" onchange="reset()"></select>
                     </div>
 
                     <div class="options-container" id="ziraiOpts">
-                        <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
-                        <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="updateYerli()"><label for="buyback">Buy Back</label></div>
+                        <div class="opt-row">
+                            <input type="checkbox" id="yerli" checked onchange="updateYerli()">
+                            <label for="yerli">Yerli Malı</label>
+                        </div>
+                        <div class="opt-row" id="bb-box">
+                            <input type="checkbox" id="buyback" checked onchange="updateYerli()">
+                            <label for="buyback">Buy Back</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -193,9 +199,7 @@
         const pSelect = document.getElementById('periyot');
         if(!pSelect) return;
         pSelect.innerHTML = '';
-        const options = [
-            {v: "1", t: "Aylık"}, {v: "3", t: "3 Ayda Bir"}, {v: "6", t: "6 Ayda Bir"}, {v: "12", t: "Yıllık"}
-        ];
+        const options = [{v: "1", t: "Aylık"}, {v: "3", t: "3 Ayda Bir"}, {v: "6", t: "6 Ayda Bir"}, {v: "12", t: "Yıllık"}];
         options.forEach(opt => {
             if (segment === 'bireysel' && (opt.v === "6" || opt.v === "12")) return;
             let o = document.createElement('option');
@@ -228,7 +232,6 @@
         btn.classList.add('active'); mode = m;
         const isHayvan = (mode === 'hayvancilik');
         
-        // Hayvancılık seçilince tüm ana girişleri gizle
         document.getElementById('main-inputs-container').style.display = isHayvan ? 'none' : 'block';
         document.getElementById('hayvan-konteynirlar').style.display = isHayvan ? 'block' : 'none';
         
@@ -278,8 +281,8 @@
         res.innerHTML = '';
         
         let anaPara = 0;
-        let yF = 46.00 / 100; // Hayvancılık için varsayılan faiz
-        let bsmv = 0.15, kkdf = 0.15; // Hayvancılık vergileri
+        let yF = 46.00 / 100; 
+        let bsmv = 0.15, kkdf = 0.15; 
         let subO = 0;
 
         if(mode === 'hayvancilik') {
@@ -289,6 +292,7 @@
             const bbF = parseFloat((document.getElementById('bb-fiyat').value || "0").replace(/\./g, "")) || 0;
             anaPara = (kbS * kbF) + (bbS * bbF);
             if(anaPara <= 0) { alert("Lütfen hayvan sayısı ve fiyatı giriniz."); return; }
+            bsmv = 0.15; kkdf = 0.15;
         } else {
             anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
             yF = document.getElementById('faiz').value / 100;
@@ -307,17 +311,17 @@
             let bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
             
-            let html = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Vade'} (Toplam Kredi: ${anaPara.toLocaleString('tr-TR')} TL)</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
+            let html = `<div style="margin-bottom:15px"><div style="background:#f8f9fa;padding:8px;text-align:center;font-weight:bold;border:1px solid #ddd;border-bottom:none;">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Vade'} (Toplam Kredi: ${Math.round(anaPara).toLocaleString('tr-TR')} TL)</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara, sumA = 0, sumF = 0, sumB = 0, sumT = 0, sumS = 0;
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), ind = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b);
                 let sTaksit = taksit - ind;
-                sumA += a; sumF += f; sumB += b; sumT += taksit; sumS += ind;
+                sumA += a; sumF += f; sumB += b; sumT += (taksit - ind); sumS += ind;
                 html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subO>0?`<td style="color:red">-${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan-a)).toLocaleString('tr-TR')}</td></tr>`;
                 kalan -= a;
             }
-            html += `<tr class="row-total"><td>TOPLAM</td><td>${Math.round(sumA).toLocaleString('tr-TR')}</td><td>${Math.round(sumF).toLocaleString('tr-TR')}</td>${subO>0?`<td>-${Math.round(sumS).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(sumB).toLocaleString('tr-TR')}</td><td>${Math.round(sumT - sumS).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
+            html += `<tr class="row-total"><td>TOPLAM</td><td>${Math.round(sumA).toLocaleString('tr-TR')}</td><td>${Math.round(sumF).toLocaleString('tr-TR')}</td>${subO>0?`<td>-${Math.round(sumS).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(sumB).toLocaleString('tr-TR')}</td><td>${Math.round(sumT).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
             res.innerHTML += html + `</tbody></table></div></div>`;
         });
         document.getElementById('result-main-container').style.display = 'block';
