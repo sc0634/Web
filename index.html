@@ -44,9 +44,9 @@
 
         .vade-header { background: var(--dark); color: white; padding: 6px; margin-top: 15px; border-radius: 4px 4px 0 0; font-weight: bold; text-align: center; font-size: 11px; }
         .table-res { overflow-x: hidden; width: 100%; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: #f8f9fa; padding: 4px 1px; font-size: 9px; border: 1px solid var(--border); }
-        td { padding: 6px 1px; text-align: center; border: 1px solid var(--border); font-size: 10px; word-break: break-all; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 10px; }
+        th { background: #f8f9fa; padding: 4px 1px; font-size: 8.5px; border: 1px solid var(--border); overflow: hidden; }
+        td { padding: 6px 1px; text-align: center; border: 1px solid var(--border); font-size: 9.5px; word-break: break-all; }
         .total-row { background: #f1f2f6; font-weight: bold; }
         .total-row td { border-top: 2px solid var(--dark); }
 
@@ -146,7 +146,6 @@
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
         document.getElementById('vergi-box').style.display = isSub ? 'none' : 'flex';
         
-        // Çiftçi Taksitli (zirai), Ticari ve Tüketici modlarında Proformayı gizle
         const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
         document.getElementById('prof-input-box').style.display = isProformaHidden ? 'none' : 'flex';
         
@@ -201,17 +200,44 @@
         vades.forEach(v => {
             let dF = isY ? yF : (yF / 12), bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, v)) / (Math.pow(1+bF, v)-1);
-            let html = `<div class="vade-header">${v} ${isY ? 'Yıl' : 'Ay'}</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana P.</th><th>Faiz</th>${subVal>0?'<th>İnd.</th>':''}<th>Vergi</th><th>Tutar</th><th>Kalan</th></tr></thead><tbody>`;
+            
+            // Kolon genişliklerini sabitledik (Toplam %100)
+            const subCol = subVal > 0 ? '<th style="width:12%">İnd.</th>' : '';
+            let html = `<div class="vade-header">${v} ${isY ? 'Yıl' : 'Ay'}</div><div class="table-res"><table><thead><tr>
+                <th style="width:7%">Tks</th>
+                <th style="width:18%">Ana P.</th>
+                <th style="width:15%">Faiz</th>
+                ${subCol}
+                <th style="width:12%">Vergi</th>
+                <th style="width:18%">Tutar</th>
+                <th style="width:18%">Kalan</th>
+                </tr></thead><tbody>`;
             
             let kalan = anaPara, tA = 0, tF = 0, tV = 0, tT = 0, tInd = 0;
             for(let i=1; i<=v; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), indF = f * subO, a = (i===v) ? kalan : taksit - (f + b), sTaksit = taksit - indF;
                 tA += a; tF += f; tV += b; tT += sTaksit; tInd += indF; kalan -= a;
-                html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subVal>0?`<td style="color:red">-${Math.round(indF).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
+                html += `<tr>
+                    <td>${i}</td>
+                    <td>${Math.round(a).toLocaleString('tr-TR')}</td>
+                    <td>${Math.round(f).toLocaleString('tr-TR')}</td>
+                    ${subVal>0?`<td style="color:red">-${Math.round(indF).toLocaleString('tr-TR')}</td>`:''}
+                    <td>${Math.round(b).toLocaleString('tr-TR')}</td>
+                    <td style="font-weight:bold">${Math.round(sTaksit).toLocaleString('tr-TR')}</td>
+                    <td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td>
+                </tr>`;
             }
             
-            if(v > 1) {
-                html += `<tr class="total-row"><td>TOP</td><td>${Math.round(tA).toLocaleString('tr-TR')}</td><td>${Math.round(tF).toLocaleString('tr-TR')}</td>${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tV).toLocaleString('tr-TR')}</td><td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
+            if(v >= 1) { 
+                html += `<tr class="total-row">
+                    <td>TOP</td>
+                    <td>${Math.round(tA).toLocaleString('tr-TR')}</td>
+                    <td>${Math.round(tF).toLocaleString('tr-TR')}</td>
+                    ${subVal>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}
+                    <td>${Math.round(tV).toLocaleString('tr-TR')}</td>
+                    <td style="color:#e67e22">${Math.round(tT).toLocaleString('tr-TR')}</td>
+                    <td>-</td>
+                </tr>`;
             }
             
             res.innerHTML += html + `</tbody></table></div>`;
