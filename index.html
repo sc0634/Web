@@ -48,13 +48,11 @@
             font-size: 12px; outline: none; background: white;
         }
 
-        /* --- İSTEDİĞİN SABİT GENİŞLİKLER --- */
+        /* Sabit Genişlikler */
         #prof-input-box, #tutar-input-box { width: 100px !important; }
         #prof-input-box input, #tutar-input-box input { width: 100px !important; }
-
         .px-faiz, .px-vergi, .px-vade-sync { width: 50px !important; }
         .px-faiz input, .px-vergi input, .px-vade-sync select { width: 50px !important; }
-        
         .px-periyot { width: 130px; }
 
         label { 
@@ -65,7 +63,6 @@
         }
         
         .compact-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
-
         .options-container { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row { display: flex; align-items: center; gap: 6px; }
 
@@ -74,7 +71,7 @@
 
         .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th, td { padding: 8px 4px; border: 1px solid var(--border); text-align: center; }
+        th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
         .total-row { background: #f9f9f9; font-weight: bold; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-top: 15px; }
@@ -83,9 +80,29 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        .vade-header { background: #f1f2f6; padding: 10px; font-weight: bold; text-align: center; border-bottom: 1px solid var(--border); }
+        .vade-header { background: #f1f2f6; padding: 8px; font-weight: bold; text-align: center; border-bottom: 1px solid var(--border); font-size: 11px; }
 
-        @media print { .no-print { display: none !important; } }
+        /* --- TEK SAYFAYA SIĞDIRMA KURALLARI --- */
+        @media print {
+            @page { size: auto; margin: 5mm; }
+            body { background: white; padding: 0; }
+            .no-print { display: none !important; }
+            .container { 
+                width: 100% !important; 
+                max-width: none !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                box-shadow: none !important; 
+                border: none !important;
+            }
+            .result-main-container { display: block !important; margin-top: 0; border-width: 1px; }
+            table { font-size: 9px !important; } /* Fontu küçülterek sığmayı kolaylaştırır */
+            .vade-header { padding: 4px; font-size: 10px; }
+            th, td { padding: 4px 1px !important; }
+            .table-res { overflow: visible !important; }
+            /* Sayfa kırılmasını önle */
+            tr, .vade-header { page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body onload="initApp()">
@@ -123,7 +140,7 @@
                 <option value="1">Aylık</option>
                 <option value="3">3 Ayda Bir</option>
                 <option value="6">6 Ayda Bir</option>
-                <option value="12" selected>Yılda 1 (Yıllık)</option>
+                <option value="12" selected>Yıllık</option>
             </select>
         </div>
 
@@ -179,19 +196,14 @@
         const periyotBox = document.getElementById('periyot-box');
         const periyotSelect = document.getElementById('periyot');
 
-        // Segment Bazlı Kurallar
         if (segment === 'tarimsal') {
             periyotBox.style.display = 'none';
             periyotSelect.value = "12";
             document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
             document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
             document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-            
-            if(isZirai) {
-                document.getElementById('bsmv').value = 15; document.getElementById('kkdf').value = 15;
-            } else {
-                document.getElementById('bsmv').value = 5; document.getElementById('kkdf').value = 0;
-            }
+            if(isZirai) { document.getElementById('bsmv').value = 15; document.getElementById('kkdf').value = 15; } 
+            else { document.getElementById('bsmv').value = 5; document.getElementById('kkdf').value = 0; }
         } else {
             periyotBox.style.display = 'flex';
             document.getElementById('ziraiOpts').style.display = 'none';
@@ -202,7 +214,6 @@
 
         document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && !isZirai) ? 'flex' : 'none';
         document.getElementById('vade-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
-        
         fillVade(); reset();
     }
 
@@ -247,15 +258,15 @@
             let bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
             
-            let html = `<div class="vade-header">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Dönem'} Ödeme Planı</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
+            let html = `<div class="vade-header">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Dönem'} Planı</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             
-            let kalan = anaPara, tA = 0, tF = 0, tV = 0, tT = 0, tInd = 0;
+            let kalan = anaPara;
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), indF = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b), sTaksit = taksit - indF;
-                tA += a; tF += f; tV += b; tT += sTaksit; tInd += indF; kalan -= a;
+                kalan -= a;
                 html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subO>0?`<td style="color:red">-${Math.round(indF).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan)).toLocaleString('tr-TR')}</td></tr>`;
             }
-            html += `<tr class="total-row"><td>TOP</td><td>${Math.round(tA).toLocaleString('tr-TR')}</td><td>${Math.round(tF).toLocaleString('tr-TR')}</td>${subO>0?`<td>-${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tV).toLocaleString('tr-TR')}</td><td>${Math.round(tT).toLocaleString('tr-TR')}</td><td>-</td></tr></tbody></table></div>`;
+            html += `</tbody></table></div>`;
             res.innerHTML += html;
         });
         
