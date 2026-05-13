@@ -59,22 +59,18 @@
         .px-vade-sync { width: 65px; }
         .px-periyot { width: 150px; }
 
-        /* Tüm etiketlerin hizalı durması için yükseklik ve dikey hizalama */
         label { 
             font-weight: bold; 
             font-size: 10px; 
             color: #57606f; 
             text-transform: uppercase;
-            height: 25px; /* Sabit yükseklik */
+            height: 25px; 
             display: flex;
-            align-items: flex-end; /* Metni aşağıya yasla */
+            align-items: flex-end;
             margin-bottom: 2px;
         }
 
-        .px-faiz label { 
-            white-space: pre-line !important; 
-            line-height: 1.1; 
-        }
+        .px-faiz label { white-space: pre-line !important; line-height: 1.1; }
 
         .slider-container { width: 100%; display: none; flex-direction: column; gap: 8px; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; border: 1px solid var(--border); }
         .slider-label { display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; }
@@ -142,7 +138,7 @@
 
     <div class="grid no-print">
         <div class="field" id="prof-input-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="100.000" oninput="fmtMoney(this)"></div>
+        <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
         
         <div class="compact-row">
             <div class="field px-faiz"><label>Yıllık&#10;Oran %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
@@ -194,7 +190,9 @@
     
     function initApp() { 
         fmtMoney(document.getElementById('proforma')); 
-        fmtMoney(document.getElementById('tutar')); 
+        const tutarInput = document.getElementById('tutar');
+        tutarInput.value = "1.000.000"; 
+        fmtMoney(tutarInput); 
         switchSegment('tarimsal'); 
     }
 
@@ -231,6 +229,14 @@
         const isSub = (m === 'traktor' || m === 'ekipman');
         const isBireysel = (m === 'tuketici');
         
+        const tutarInput = document.getElementById('tutar');
+        if (!isBireysel) {
+            tutarInput.value = "1.000.000";
+        } else {
+            tutarInput.value = "100.000";
+        }
+        fmtMoney(tutarInput);
+
         document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
@@ -241,13 +247,17 @@
         document.getElementById('periyot-box').style.display = (m === 'zirai' || segment === 'ticari' || isBireysel) ? 'flex' : 'none';
         
         if (isBireysel) {
+            // Bireyselde 6 ay seçeneğini gizle ve seçiliyse Aylık yap
             document.getElementById('opt-6ay').style.display = 'none';
-            if(document.getElementById('periyot').value === "6") document.getElementById('periyot').value = "1";
+            if(document.getElementById('periyot').value === "6") {
+                document.getElementById('periyot').value = "1";
+            }
             document.getElementById('bsmv').value = 15;
             document.getElementById('kkdf').value = 15;
             document.getElementById('faizAylik').value = 4.39;
             syncFaiz('aylik');
         } else {
+            // Diğerlerinde 6 ayı tekrar göster
             document.getElementById('opt-6ay').style.display = 'block';
             document.getElementById('bsmv').value = 5;
             document.getElementById('kkdf').value = 0;
