@@ -21,8 +21,9 @@
         .bg-tic { background: var(--ticari); }
         .bg-bir { background: var(--bireysel); }
 
-        .tabs { display: none; gap: 3px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 5px; }
-        .tab-btn { padding: 5px 8px; border: none; background: #eee; border-radius: 3px; cursor: pointer; font-weight: 600; font-size: 11px; }
+        .tabs { display: none; gap: 3px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 5px; overflow-x: auto; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { padding: 5px 8px; border: none; background: #eee; border-radius: 3px; cursor: pointer; font-weight: 600; font-size: 11px; white-space: nowrap; }
         .tab-btn.active { background: var(--dark); color: white; }
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -30,7 +31,7 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input { padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; outline: none; width: 100%; }
 
-        /* BİREYSEL İÇİN VADE SCROLL ÇUBUĞU */
+        /* BİREYSEL VADE SCROLL */
         #vade-scroll-container { grid-column: span 2; padding: 10px 0; background: #f9f9f9; border-radius: 8px; text-align: center; }
         .vade-display { font-size: 18px; font-weight: bold; color: var(--bireysel); margin-bottom: 5px; }
         .scroll-wrapper { position: relative; width: 100%; overflow-x: auto; padding: 15px 0; scrollbar-width: none; cursor: grab; }
@@ -42,9 +43,12 @@
         .vade-mark.active .vade-line { height: 25px; background: var(--bireysel); }
         .vade-num { font-size: 10px; font-weight: bold; }
 
-        .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; border: 1px dashed var(--border); border-radius: 5px; }
-        .opt-row { display: flex; align-items: center; gap: 10px; }
-        .opt-row label { font-size: 11px; cursor: pointer; }
+        /* AÇIKLAMA METİNLERİ */
+        .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px dashed var(--border); border-radius: 5px; background: #fdfdfd; }
+        .opt-wrapper { display: flex; flex-direction: column; gap: 2px; }
+        .opt-row { display: flex; align-items: center; gap: 8px; }
+        .opt-row label { font-size: 11px; font-weight: bold; cursor: pointer; color: var(--dark); }
+        .opt-desc { font-size: 9px; color: #7f8c8d; padding-left: 22px; line-height: 1.2; }
 
         .vade-header { background: var(--dark); color: white; padding: 6px; margin-top: 15px; border-radius: 4px 4px 0 0; font-weight: bold; text-align: center; font-size: 11px; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -69,34 +73,44 @@
         <button class="seg-btn bg-bir" onclick="switchSegment('bireysel')">BİREYSEL</button>
     </div>
 
-    <div class="tabs no-print" id="tabs-tarimsal" style="display: flex;">
+    <div class="tabs no-print" id="tabs-tarimsal">
         <button class="tab-btn active" onclick="switchTab(this, 'traktor')">Traktör</button>
         <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Mekanizasyon/Ekipman</button>
+        <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
     </div>
-    <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme</button></div>
-    <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
+    <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn active" onclick="switchTab(this, 'ticari')">Ticari İşletme</button></div>
+    <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn active" onclick="switchTab(this, 'tuketici')">İhtiyaç Kredisi</button></div>
 
     <div class="grid no-print">
-        <div class="field" id="prof-box"><label>Proforma</label><input type="text" id="proforma" value="1.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field" id="tutar-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="700.000" oninput="fmtMoney(this)"></div>
+        <div class="field"><label>Proforma</label><input type="text" id="proforma" value="1.000.000" oninput="fmtMoney(this)"></div>
+        <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="700.000" oninput="fmtMoney(this)"></div>
         <div class="field"><label>Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="resetResult()"></div>
         <div class="field" id="sub-box"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="resetResult()"></div>
 
-        <!-- ESKİ HALİ: SAYISAL VADE (Ticari ve Tarımsal için) -->
-        <div class="field" id="vade-input-container"><label id="vade-label">Vade</label><input type="number" id="vade-input" value="5" oninput="resetResult()"></div>
+        <div class="field" id="vade-input-container">
+            <label id="vade-label">Vade (Yıl)</label>
+            <input type="number" id="vade-input" value="5" oninput="resetResult()">
+        </div>
 
-        <!-- YENİ HALİ: BİREYSEL SCROLL (Sadece Bireysel için) -->
         <div id="vade-scroll-container" style="display:none;">
             <div class="vade-display"><span id="vade-scroll-val">12</span> <span>Ay</span></div>
-            <div class="scroll-wrapper" id="scroll-wrapper">
-                <div class="vade-timeline" id="vade-timeline"></div>
-            </div>
+            <div class="scroll-wrapper" id="scroll-wrapper"><div class="vade-timeline" id="vade-timeline"></div></div>
         </div>
 
         <div class="options-container" id="ziraiOpts">
-            <div class="opt-row">
-                <div id="yerli-wrapper"><input type="checkbox" id="yerli" checked onchange="updateSub()"> <label for="yerli">Yerli Malı</label></div>
-                <div id="bb-wrapper"><input type="checkbox" id="buyback" checked onchange="resetResult()"> <label for="buyback">Buy Back</label></div>
+            <div class="opt-wrapper" id="yerli-wrapper">
+                <div class="opt-row">
+                    <input type="checkbox" id="yerli" checked onchange="updateSub()"> 
+                    <label for="yerli">Yerli Malı Desteği</label>
+                </div>
+                <div class="opt-desc">✓ Yerli üretim makinelerde ilave sübvansiyon indirimi uygulanır.</div>
+            </div>
+            <div class="opt-wrapper" id="bb-wrapper">
+                <div class="opt-row">
+                    <input type="checkbox" id="buyback" checked onchange="resetResult()"> 
+                    <label for="buyback">Buy Back (Geri Alım)</label>
+                </div>
+                <div class="opt-desc">✓ Yetkili bayi tarafından sağlanan geri alım garantisi taahhüdüdür.</div>
             </div>
         </div>
 
@@ -109,7 +123,7 @@
     </div>
 
     <div class="actions no-print">
-        <button class="btn btn-calc" id="calcBtn" onclick="hesapla()">HESAPLA</button>
+        <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
         <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF</button>
         <button class="btn btn-print" id="printBtn" onclick="yazdir()" disabled>YAZDIR</button>
     </div>
@@ -118,7 +132,7 @@
 </div>
 
 <script>
-    let mode = 'traktor'; let segment = 'tarimsal'; let currentVade = 5;
+    let mode = 'traktor'; let segment = 'tarimsal'; let currentVadeScroll = 12;
     const scrollWrapper = document.getElementById('scroll-wrapper');
 
     function initApp() { fmtMoney(document.getElementById('proforma')); fmtMoney(document.getElementById('tutar')); switchSegment('tarimsal'); }
@@ -128,8 +142,7 @@
         timeline.innerHTML = '';
         for(let i=1; i<=36; i++) {
             const mark = document.createElement('div');
-            mark.className = 'vade-mark';
-            mark.setAttribute('data-vade', i);
+            mark.className = 'vade-mark'; mark.setAttribute('data-vade', i);
             mark.innerHTML = `<div class="vade-line"></div><div class="vade-num">${i}</div>`;
             mark.onclick = () => selectScrollVade(i);
             timeline.appendChild(mark);
@@ -138,7 +151,7 @@
     }
 
     function selectScrollVade(v) {
-        currentVade = v;
+        currentVadeScroll = v;
         document.getElementById('vade-scroll-val').innerText = v;
         document.querySelectorAll('.vade-mark').forEach(m => m.classList.toggle('active', m.getAttribute('data-vade') == v));
         resetResult();
@@ -162,7 +175,6 @@
         document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
         document.getElementById(`tabs-${seg}`).style.display = 'flex';
         
-        // Vade Görünümü Ayarla
         if(seg === 'bireysel') {
             document.getElementById('vade-input-container').style.display = 'none';
             document.getElementById('vade-scroll-container').style.display = 'block';
@@ -173,9 +185,8 @@
             document.getElementById('vade-label').innerText = (seg === 'tarimsal') ? 'Vade (Yıl)' : 'Vade (Ay)';
             document.getElementById('vade-input').value = (seg === 'tarimsal') ? 5 : 12;
         }
-
         const firstTab = document.getElementById(`tabs-${seg}`).querySelector('.tab-btn');
-        switchTab(firstTab, seg === 'tarimsal' ? 'traktor' : (seg === 'ticari' ? 'ticari' : 'tuketici'));
+        switchTab(firstTab, (seg === 'tarimsal' ? 'traktor' : (seg === 'ticari' ? 'ticari' : 'tuketici')));
         document.getElementById('faiz').value = (seg === 'tarimsal') ? 40.50 : 3.50;
     }
 
@@ -186,14 +197,14 @@
         document.getElementById('sub-box').style.display = isT ? 'flex' : 'none';
         document.getElementById('ziraiOpts').style.display = isT ? 'flex' : 'none';
         document.getElementById('vergi-box').style.display = isT ? 'none' : 'flex';
-        document.getElementById('bb-wrapper').style.display = (m === 'ekipman') ? 'none' : 'block';
+        document.getElementById('bb-wrapper').style.display = (m === 'traktor') ? 'flex' : 'none';
         if(isT) updateSub();
         resetResult();
     }
 
     function updateSub() {
         const isY = document.getElementById('yerli').checked;
-        document.getElementById('subOran').value = (mode === 'traktor') ? (isY ? 50 : 25) : (isY ? 75 : 50);
+        document.getElementById('subOran').value = (mode === 'traktor' || mode === 'zirai') ? (isY ? 50 : 25) : (isY ? 75 : 50);
         resetResult();
     }
 
@@ -203,7 +214,11 @@
         resetResult();
     }
 
-    function resetResult() { document.getElementById('result-area').innerHTML = ''; document.getElementById('pdfBtn').disabled = true; document.getElementById('printBtn').disabled = true; }
+    function resetResult() { 
+        document.getElementById('result-area').innerHTML = ''; 
+        document.getElementById('pdfBtn').disabled = true; 
+        document.getElementById('printBtn').disabled = true; 
+    }
 
     function hesapla() {
         const res = document.getElementById('result-area'); res.innerHTML = '';
@@ -212,7 +227,7 @@
         const sub = (segment === 'tarimsal') ? parseFloat(document.getElementById('subOran').value) / 100 : 0;
         const bsmv = parseFloat(document.getElementById('bsmv').value) / 100, kkdf = parseFloat(document.getElementById('kkdf').value) / 100;
         
-        let vade = (segment === 'bireysel') ? currentVade : parseInt(document.getElementById('vade-input').value);
+        let vade = (segment === 'bireysel') ? currentVadeScroll : parseInt(document.getElementById('vade-input').value);
         let vadeler = (segment === 'tarimsal') ? [5, 4, 3, 2, 1].filter(v => v <= vade) : [vade];
 
         vadeler.forEach(v => {
@@ -233,7 +248,7 @@
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
 
-    function indir() { html2pdf().from(document.getElementById('pdf-area')).set({ margin: 5, filename: 'Plan.pdf', jsPDF: { unit: 'mm', format: 'a4' } }).save(); }
+    function indir() { html2pdf().from(document.getElementById('pdf-area')).set({ margin: 5, filename: 'Kredi_Plani.pdf', jsPDF: { unit: 'mm', format: 'a4' } }).save(); }
     function yazdir() { window.print(); }
 </script>
 </body>
