@@ -35,6 +35,9 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
+        /* Readonly Alanlar İçin Stil */
+        input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; border: 1px solid #dcdde1; }
+
         .compact-row { grid-column: span 2; display: flex; gap: 4px; padding: 0; justify-content: flex-start; }
         .small-field { width: 19%; display: flex; flex-direction: column; gap: 2px; flex: none; }
 
@@ -94,8 +97,9 @@
         <div class="compact-row">
             <div class="small-field"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
             <div class="small-field"><label>Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
-            <div class="small-field" id="bsmv-box"><label>BSMV %</label><input type="number" id="bsmv" value="5" oninput="reset()"></div>
-            <div class="small-field" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" oninput="reset()"></div>
+            <!-- READONLY ALANLAR -->
+            <div class="small-field" id="bsmv-box"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly tabindex="-1"></div>
+            <div class="small-field" id="kkdf-box"><label>KKDF %</label><input type="number" id="kkdf" value="0" readonly tabindex="-1"></div>
             <div class="small-field" id="sub-input-box"><label>Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         </div>
 
@@ -165,12 +169,11 @@
         btn.classList.add('active'); mode = m;
         const isSub = (m === 'traktor' || m === 'ekipman');
         
-        document.getElementById('sub-input-box').style.visibility = isSub ? 'visible' : 'hidden';
+        // Alanların Görünürlüğü
+        document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
         document.getElementById('vade-box').style.display = isSub ? 'none' : 'flex';
-        
-        // Periyot sadece Ticari ve Bireysel'de görünür
         document.getElementById('periyot-box').style.display = (segment === 'ticari' || segment === 'bireysel') ? 'flex' : 'none';
         
         const isProformaHidden = (m === 'ticari' || m === 'tuketici' || m === 'zirai');
@@ -179,8 +182,15 @@
         if(isProformaHidden) document.getElementById('tutar-input-box').classList.add('full-width');
         else document.getElementById('tutar-input-box').classList.remove('full-width');
         
-        document.getElementById('bsmv').value = (m === 'tuketici' ? 15 : 5);
-        document.getElementById('kkdf').value = (m === 'tuketici' ? 15 : 0);
+        // VERGİ OTOMASYONU (Readonly olsa bile kod değiştirebilir)
+        if (m === 'tuketici') {
+            document.getElementById('bsmv').value = 15;
+            document.getElementById('kkdf').value = 15;
+        } else {
+            document.getElementById('bsmv').value = 5;
+            document.getElementById('kkdf').value = 0;
+        }
+
         document.getElementById('main-calc-btn').style.backgroundColor = { tarimsal: '#27ae60', ticari: '#e67e22', bireysel: '#3498db' }[segment];
         
         if(isSub) updateYerli(); fillVade(); reset();
@@ -221,7 +231,8 @@
 
     function hesapla() {
         const res = document.getElementById('result-area'); res.innerHTML = '';
-        const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
+        const anaParaStr = document.getElementById('tutar').value.replace(/\./g, "");
+        const anaPara = parseFloat(anaParaStr);
         const faizVal = document.getElementById('faiz').value;
         const subVal = (mode === 'traktor' || mode === 'ekipman') ? document.getElementById('subOran').value : 0;
         const periyot = parseInt(document.getElementById('periyot').value);
@@ -229,12 +240,11 @@
         const yF = faizVal / 100, subO = subVal / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         let isTarim = (segment === 'tarimsal');
         
-        // Vade ve taksit sayısı belirleme
         let vades = isTarim ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
 
         vades.forEach(v => {
             let taksitSayisi = isTarim ? v : Math.ceil(v / periyot);
-            let dF = isTarim ? yF : (yF / 12) * periyot; // Periyodik faiz
+            let dF = isTarim ? yF : (yF / 12) * periyot;
             let bF = dF * (1 + bsmv + kkdf);
             
             let taksit = (anaPara * bF * Math.pow(1+bF, taksitSayisi)) / (Math.pow(1+bF, taksitSayisi)-1);
