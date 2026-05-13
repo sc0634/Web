@@ -48,19 +48,24 @@
             font-size: 12px; outline: none; background: white;
         }
 
-        /* Sabit Genişlikler */
         #prof-input-box, #tutar-input-box { width: 100px !important; }
         #prof-input-box input, #tutar-input-box input { width: 100px !important; }
-        .px-faiz, .px-vergi, .px-vade-sync { width: 50px !important; }
-        .px-faiz input, .px-vergi input, .px-vade-sync select { width: 50px !important; }
+        .px-faiz, .px-vergi { width: 50px !important; }
+        .px-faiz input, .px-vergi input { width: 50px !important; }
         .px-periyot { width: 130px; }
+
+        /* Vade Alanları */
+        .px-vade-sync { width: 60px !important; }
+        .px-vade-slider { width: 150px !important; display: none; }
+        .slider-container { display: flex; align-items: center; gap: 8px; height: 40px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 8px; }
+        input[type="range"] { flex: 1; height: 4px !important; cursor: pointer; padding: 0 !important; }
+        #vade-val { font-weight: bold; color: var(--dark); min-width: 20px; text-align: center; font-size: 14px; }
 
         label { 
             font-weight: bold; font-size: 9px; color: #57606f; 
             text-transform: uppercase; height: 32px; display: flex; 
             align-items: flex-end; margin-bottom: 2px; line-height: 1.1; 
             white-space: pre-line;
-            overflow: hidden;
         }
         
         .compact-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
@@ -121,7 +126,19 @@
             <div class="field px-faiz"><label>Aylık&#10;Oran %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
             <div class="field px-vergi" id="bsmv-box"><label>BSMV&#10;%</label><input type="number" id="bsmv" value="5" readonly></div>
             <div class="field px-vergi" id="kkdf-box"><label>KKDF&#10;%</label><input type="number" id="kkdf" value="0" readonly></div>
-            <div class="field px-vade-sync" id="vade-box"><label>Vade&#10;Süresi</label><select id="vade" onchange="reset()"></select></div>
+            
+            <!-- Ticari İçin Select -->
+            <div class="field px-vade-sync" id="vade-box-select"><label>Vade&#10;Süresi</label><select id="vade-select" onchange="reset()"></select></div>
+            
+            <!-- Bireysel İçin Slider -->
+            <div class="field px-vade-slider" id="vade-box-slider">
+                <label>Vade&#10;Süresi</label>
+                <div class="slider-container">
+                    <input type="range" id="vade-slider" min="1" max="36" value="12" oninput="updateSliderVal(this.value)">
+                    <span id="vade-val">12</span>
+                </div>
+            </div>
+
             <div class="field px-vergi" id="sub-input-box"><label>Sübv.&#10;%</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         </div>
 
@@ -161,6 +178,11 @@
         switchSegment('tarimsal'); 
     }
 
+    function updateSliderVal(val) {
+        document.getElementById('vade-val').innerText = val;
+        reset();
+    }
+
     function syncFaiz(src) {
         const y = document.getElementById('faiz'), a = document.getElementById('faizAylik');
         if (src === 'yillik') a.value = (parseFloat(y.value) / 12).toFixed(2);
@@ -182,37 +204,39 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
         
-        const isBir = (m === 'tuketici'), isZirai = (m === 'zirai'), isSub = (m === 'traktor' || m === 'ekipman');
-        const periyotBox = document.getElementById('periyot-box');
-        const periyotSelect = document.getElementById('periyot');
+        const isBir = (segment === 'bireysel'), isSub = (mode === 'traktor' || mode === 'ekipman');
+        
+        // Vade Kontrolü: Sadece Bireysel'de Slider, diğerlerinde Select
+        document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
+        document.getElementById('vade-box-select').style.display = (segment === 'tarimsal') ? 'none' : (isBir ? 'none' : 'flex');
 
         if (segment === 'tarimsal') {
-            periyotBox.style.display = 'none';
-            periyotSelect.value = "12";
+            document.getElementById('periyot-box').style.display = 'none';
+            document.getElementById('periyot').value = "12";
             document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
-            document.getElementById('bb-box').style.display = (m === 'ekipman') ? 'none' : 'flex';
+            document.getElementById('bb-box').style.display = (mode === 'ekipman') ? 'none' : 'flex';
             document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-            if(isZirai) { document.getElementById('bsmv').value = 15; document.getElementById('kkdf').value = 15; } 
+            if(mode === 'zirai') { document.getElementById('bsmv').value = 15; document.getElementById('kkdf').value = 15; } 
             else { document.getElementById('bsmv').value = 5; document.getElementById('kkdf').value = 0; }
         } else {
-            periyotBox.style.display = 'flex';
+            document.getElementById('periyot-box').style.display = 'flex';
             document.getElementById('ziraiOpts').style.display = 'none';
             document.getElementById('sub-input-box').style.display = 'none';
             document.getElementById('bsmv').value = isBir ? 15 : 5;
             document.getElementById('kkdf').value = isBir ? 15 : 0;
+            fillVadeSelect();
         }
 
-        document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && !isZirai) ? 'flex' : 'none';
-        document.getElementById('vade-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
-        fillVade(); reset();
+        document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
+        reset();
     }
 
-    function fillVade() {
-        const s = document.getElementById('vade'); s.innerHTML = '';
-        let max = (segment === 'tarimsal') ? 5 : (mode === 'tuketici' ? 36 : 60);
+    function fillVadeSelect() {
+        const s = document.getElementById('vade-select'); s.innerHTML = '';
+        let max = (mode === 'ticari') ? 60 : 36;
         for(let i=1; i<=max; i++){
             let o = document.createElement('option'); o.value = i; o.text = i;
-            if(i === (segment === 'tarimsal' ? 5 : 12)) o.selected = true;
+            if(i === 12) o.selected = true;
             s.appendChild(o);
         }
     }
@@ -240,7 +264,14 @@
         const periyot = parseInt(document.getElementById('periyot').value);
         const subO = (mode === 'traktor' || mode === 'ekipman') ? document.getElementById('subOran').value / 100 : 0;
         
-        let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade').value)];
+        let vadeDegeri;
+        if (segment === 'bireysel') {
+            vadeDegeri = parseInt(document.getElementById('vade-slider').value);
+        } else if (segment === 'ticari') {
+            vadeDegeri = parseInt(document.getElementById('vade-select').value);
+        }
+
+        let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [vadeDegeri];
 
         vades.forEach(v => {
             let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / (periyot === 12 ? 1 : periyot));
