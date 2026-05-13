@@ -21,6 +21,8 @@
             padding: 20px; 
             border-radius: 8px; 
             box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
+            position: relative;
+            min-height: 400px;
         }
         
         .segment-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
@@ -78,7 +80,6 @@
         .options-container { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row { display: flex; align-items: center; gap: 6px; }
 
-        /* Hakkımda Kartı */
         #about-box { display: none; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
         .about-title { font-size: 18px; font-weight: bold; color: var(--dark); margin-bottom: 10px; }
         .about-text { font-size: 14px; line-height: 1.6; color: #57606f; }
@@ -108,17 +109,47 @@
             border-radius: 4px; font-size: 10px; cursor: pointer;
         }
 
+        /* Ziyaretçi Sayacı Stili */
+        .visitor-counter {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .v-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 5px;
+        }
+        .v-item {
+            font-size: 10px;
+            color: #7f8c8d;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .visitor-count {
+            background: var(--dark);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
         @media (max-width: 600px) {
             .px-vade-slider { width: 100% !important; }
             .compact-row { gap: 5px; }
             .field { flex-grow: 1; }
             .segment-nav { grid-template-columns: repeat(2, 1fr); }
+            .v-grid { gap: 8px; }
         }
 
         @media print {
             @page { size: auto; margin: 5mm; }
             body { background: white; padding: 0; }
-            .no-print, .single-print-btn { display: none !important; }
+            .no-print, .single-print-btn, .visitor-counter { display: none !important; }
             .container { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
             .result-main-container { display: block !important; margin-top: 0; border-width: 1px; }
             table { font-size: 9px !important; }
@@ -202,6 +233,15 @@
             Bu araç, en güncel faiz oranları ve yasal vergiler ışığında hızlı ve şeffaf ödeme planları oluşturmanız için tasarlanmıştır.
         </p>
     </div>
+
+    <!-- Gelişmiş Ziyaretçi Sayacı -->
+    <div class="visitor-counter no-print">
+        <div class="v-grid">
+            <div class="v-item">BUGÜN <span id="v-today" class="visitor-count">0</span></div>
+            <div class="v-item">BU HAFTA <span id="v-week" class="visitor-count">0</span></div>
+            <div class="v-item">BU AY <span id="v-month" class="visitor-count">0</span></div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -210,7 +250,46 @@
     function initApp() { 
         fmtMoney(document.getElementById('proforma'));
         fmtMoney(document.getElementById('tutar'));
+        updateVisitorStats();
         switchSegment('tarimsal'); 
+    }
+
+    // Gelişmiş Sayaç Fonksiyonu
+    function updateVisitorStats() {
+        const now = new Date();
+        const todayStr = now.toLocaleDateString();
+        
+        // Hafta numarasını bul (ISO 8601)
+        const getWeekNumber = (d) => {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        };
+        
+        const weekStr = now.getFullYear() + "-W" + getWeekNumber(now);
+        const monthStr = now.getFullYear() + "-" + (now.getMonth() + 1);
+
+        let stats = JSON.parse(localStorage.getItem('krediVisitorStats')) || {
+            today: { key: todayStr, count: 0 },
+            week: { key: weekStr, count: 0 },
+            month: { key: monthStr, count: 0 }
+        };
+
+        // Günlük Kontrol
+        if (stats.today.key !== todayStr) { stats.today = { key: todayStr, count: 1 }; } else { stats.today.count++; }
+        
+        // Haftalık Kontrol
+        if (stats.week.key !== weekStr) { stats.week = { key: weekStr, count: 1 }; } else { stats.week.count++; }
+        
+        // Aylık Kontrol
+        if (stats.month.key !== monthStr) { stats.month = { key: monthStr, count: 1 }; } else { stats.month.count++; }
+
+        localStorage.setItem('krediVisitorStats', JSON.stringify(stats));
+        
+        document.getElementById('v-today').innerText = stats.today.count;
+        document.getElementById('v-week').innerText = stats.week.count;
+        document.getElementById('v-month').innerText = stats.month.count;
     }
 
     function updateSliderVal(val) { document.getElementById('vade-val').innerText = val; reset(); }
