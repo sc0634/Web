@@ -20,6 +20,7 @@
             position: relative; min-height: 400px;
         }
         
+        /* MOBİL KAYDIRILABİLİR SEKME NAVİGASYONU */
         .segment-nav { 
             display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; 
             white-space: nowrap; padding-bottom: 8px; scrollbar-width: none; 
@@ -28,7 +29,7 @@
         .segment-nav::-webkit-scrollbar { display: none; }
 
         .seg-btn { 
-            flex: 1 0 auto; min-width: 90px; border: 2px solid transparent; 
+            flex: 1 0 auto; min-width: 95px; border: 2px solid transparent; 
             height: 40px; border-radius: 6px; color: white; font-weight: bold; 
             cursor: pointer; font-size: 11px; opacity: 0.5; transition: all 0.3s ease; padding: 0 15px;
         }
@@ -53,10 +54,11 @@
         }
         input[readonly] { background-color: #f1f2f6; cursor: not-allowed; color: #7f8c8d; }
 
-        #prof-input-box, #tutar-input-box { width: 120px; flex: 0 0 auto; }
-        .px-faiz, .px-vergi { width: 55px !important; }
+        /* TUTAR ALANLARI SOLA YASLI */
+        #prof-input-box, #tutar-input-box { width: 125px; flex: 0 0 auto; }
+        .px-faiz, .px-vergi { width: 58px !important; }
         .px-periyot { width: 130px; }
-        .px-vade-sync { width: 65px !important; }
+        .px-vade-sync { width: 68px !important; }
         
         .px-vade-slider { width: 180px !important; display: none; }
         .slider-container { 
@@ -76,18 +78,18 @@
         
         .compact-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; width: 100%; }
         
-        /* CHECKBOX DÜZENLEMESİ */
+        /* KÜÇÜLTÜLMÜŞ VE BİTİŞİK CHECKBOX */
         .options-container { 
-            width: 100%; display: flex; flex-direction: column; gap: 10px; 
-            padding: 12px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
+            width: 100%; display: flex; flex-direction: column; gap: 8px; 
+            padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
         }
-        .opt-row { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .opt-row { display: flex; align-items: center; gap: 8px; cursor: pointer; width: fit-content; }
         .opt-row input[type="checkbox"] { 
-            width: 18px !important; height: 18px !important; margin: 0; cursor: pointer; flex-shrink: 0;
+            width: 16px !important; height: 16px !important; margin: 0; cursor: pointer; flex-shrink: 0;
         }
         .opt-row label { 
             height: auto; margin: 0; font-size: 11px; color: var(--dark); 
-            text-transform: none; white-space: nowrap; cursor: pointer;
+            text-transform: none; white-space: nowrap; cursor: pointer; display: inline-block;
         }
 
         #about-box { display: none; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
@@ -138,7 +140,6 @@
             .container { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
             .result-main-container { display: block !important; margin-top: 0; border-width: 1px; }
             table { font-size: 9px !important; }
-            th, td { padding: 4px 1px !important; }
         }
     </style>
 </head>
@@ -193,11 +194,11 @@
             </div>
 
             <div class="options-container" id="ziraiOpts">
-                <div class="opt-row" onclick="document.getElementById('yerli').click()">
+                <div class="opt-row">
                     <input type="checkbox" id="yerli" checked onchange="updateYerli()">
                     <label for="yerli">Yerli Malı</label>
                 </div>
-                <div class="opt-row" id="bb-box" onclick="document.getElementById('buyback').click()">
+                <div class="opt-row" id="bb-box">
                     <input type="checkbox" id="buyback" checked onchange="updateYerli()">
                     <label for="buyback">Buy Back</label>
                 </div>
@@ -287,32 +288,32 @@
             document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
             document.getElementById(`tabs-${seg}`).style.display = 'flex';
             const firstTab = document.getElementById(`tabs-${seg}`).querySelector('.tab-btn');
-            switchTab(firstTab, firstTab.onclick.toString().match(/'(.*?)'/)[1]);
+            switchTab(firstTab, firstTab.onclick.toString().match(/'(.*?)'/)[1], true);
         }
     }
 
-    function switchTab(btn, m) {
+    function switchTab(btn, m, isSegmentSwitch = false) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
-        const pSel = document.getElementById('periyot'), fInp = document.getElementById('faiz');
-        const bsmvInp = document.getElementById('bsmv'), kkdfInp = document.getElementById('kkdf');
+        const pSel = document.getElementById('periyot'), bsmvInp = document.getElementById('bsmv'), kkdfInp = document.getElementById('kkdf');
+        
         document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
         document.getElementById('vade-box-select').style.display = (segment === 'tarimsal' || isBir) ? 'none' : 'flex';
+        
         if (segment === 'tarimsal') {
             document.getElementById('periyot-box').style.display = 'none'; pSel.value = "12";
             document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
             document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-            if(mode === 'zirai') { fInp.value = "46.00"; bsmvInp.value = 15; kkdfInp.value = 15; } 
-            else { fInp.value = "40.50"; bsmvInp.value = 5; kkdfInp.value = 0; }
+            if(mode === 'zirai') { bsmvInp.value = 15; kkdfInp.value = 15; } 
+            else { bsmvInp.value = 5; kkdfInp.value = 0; }
         } else {
             document.getElementById('periyot-box').style.display = 'flex'; pSel.value = "1";
             document.getElementById('ziraiOpts').style.display = 'none'; document.getElementById('sub-input-box').style.display = 'none';
-            if (isTic) { fInp.value = "46.00"; bsmvInp.value = 5; kkdfInp.value = 0; } 
-            else { fInp.value = "40.50"; bsmvInp.value = 15; kkdfInp.value = 15; }
+            if (isTic) { bsmvInp.value = 5; kkdfInp.value = 0; } 
+            else { bsmvInp.value = 15; kkdfInp.value = 15; }
             fillVadeSelect();
         }
-        syncFaiz('yillik');
         document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
         reset();
     }
