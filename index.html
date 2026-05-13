@@ -44,32 +44,22 @@
         }
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; }
 
-        #prof-input-box, #tutar-input-box { width: 140px; }
         .px-faiz, .px-vergi { width: 65px; }
         .px-vade-sync { width: 85px; }
         .px-periyot { width: 130px; }
         
         .options-container { 
-            display: flex; 
-            flex-direction: row; 
-            flex-wrap: wrap;
-            gap: 15px; 
-            align-items: center;
-            padding: 5px 12px; 
-            background: #fdfdfd; 
-            border: 1px dashed var(--border); 
-            border-radius: 5px;
-            min-height: var(--input-height);
+            display: flex; flex-direction: row; flex-wrap: wrap; gap: 15px; align-items: center;
+            padding: 5px 12px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; min-height: var(--input-height);
         }
         .opt-row { display: flex; align-items: center; gap: 6px; width: 110px; cursor: pointer; }
-        .opt-row input[type="checkbox"] { width: 18px !important; height: 18px !important; margin: 0; cursor: pointer; }
-        .opt-row label { font-size: 11px; color: var(--dark); white-space: nowrap; cursor: pointer; line-height: 1; margin: 0; width: 80px; text-transform: none; font-weight: bold; }
+        .opt-row label { font-size: 11px; color: var(--dark); font-weight: bold; cursor: pointer; }
 
         .animal-container { width: 100%; padding: 15px; border: 1px solid var(--border); border-radius: 6px; margin-top: 10px; background: #fafafa; }
-        .animal-title { font-weight: bold; color: var(--tarimsal); margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        .animal-title { font-weight: bold; color: var(--tarimsal); margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; text-transform: uppercase; }
 
-        .px-vade-slider { width: 180px; display: none; }
-        .slider-container { display: flex; align-items: center; gap: 10px; height: 40px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 10px; }
+        .bitki-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; margin-bottom: 8px; align-items: center; }
+        .bitki-row label { font-weight: 600; font-size: 11px; }
 
         label.field-label { font-weight: bold; font-size: 9px; color: #57606f; text-transform: uppercase; margin-bottom: 2px; }
         
@@ -88,8 +78,7 @@
 
         @media (max-width: 600px) {
             .actions { grid-template-columns: 1fr; }
-            #prof-input-box, #tutar-input-box { width: 48%; }
-            .options-container { flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
+            .bitki-row { grid-template-columns: 1fr; gap: 5px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         }
     </style>
 </head>
@@ -113,19 +102,44 @@
         <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme</button></div>
         <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
 
-        <!-- Özel Girişler -->
+        <!-- Özel Girişler (Bitkisel/Hayvancılık) -->
         <div id="hayvan-konteynirlar" style="display:none; margin-bottom: 20px;">
             <div class="animal-container">
-                <div class="animal-title">KÜÇÜKBAŞ</div>
-                <div class="grid">
-                   <div class="field"><label class="field-label">Hayvan Sayısı</label><input type="number" id="kb-sayi" placeholder="0" oninput="reset()"></div>
-                   <div class="field"><label class="field-label">Birim Fiyat</label><input type="text" id="kb-fiyat" oninput="fmtMoney(this)" placeholder="0"></div>
+                <div class="animal-title">BİTKİSEL ÜRETİM</div>
+                
+                <div class="bitki-row">
+                    <label>BUĞDAY</label>
+                    <input type="number" id="bugday-sayi" placeholder="Dönüm" oninput="reset()">
+                    <input type="text" id="bugday-fiyat" oninput="fmtMoney(this)" placeholder="Birim Limit">
+                </div>
+                <div class="bitki-row">
+                    <label>ARPA</label>
+                    <input type="number" id="arpa-sayi" placeholder="Dönüm" oninput="reset()">
+                    <input type="text" id="arpa-fiyat" oninput="fmtMoney(this)" placeholder="Birim Limit">
+                </div>
+                <div class="bitki-row">
+                    <label>MERCİMEK</label>
+                    <input type="number" id="mercimek-sayi" placeholder="Dönüm" oninput="reset()">
+                    <input type="text" id="mercimek-fiyat" oninput="fmtMoney(this)" placeholder="Birim Limit">
+                </div>
+                <div class="bitki-row">
+                    <label>NOHUT</label>
+                    <input type="number" id="nohut-sayi" placeholder="Dönüm" oninput="reset()">
+                    <input type="text" id="nohut-fiyat" oninput="fmtMoney(this)" placeholder="Birim Limit">
+                </div>
+                <div class="bitki-row">
+                    <label>PAMUK</label>
+                    <input type="number" id="pamuk-sayi" placeholder="Dönüm" oninput="reset()">
+                    <input type="text" id="pamuk-fiyat" oninput="fmtMoney(this)" placeholder="Birim Limit">
                 </div>
             </div>
+
             <div class="animal-container">
-                <div class="animal-title">BÜYÜKBAŞ</div>
+                <div class="animal-title">HAYVANCILIK</div>
                 <div class="grid">
-                   <div class="field"><label class="field-label">Hayvan Sayısı</label><input type="number" id="bb-sayi" placeholder="0" oninput="reset()"></div>
+                   <div class="field"><label class="field-label">Küçükbaş Sayısı</label><input type="number" id="kb-sayi" placeholder="0" oninput="reset()"></div>
+                   <div class="field"><label class="field-label">Birim Fiyat</label><input type="text" id="kb-fiyat" oninput="fmtMoney(this)" placeholder="0"></div>
+                   <div class="field"><label class="field-label">Büyükbaş Sayısı</label><input type="number" id="bb-sayi" placeholder="0" oninput="reset()"></div>
                    <div class="field"><label class="field-label">Birim Fiyat</label><input type="text" id="bb-fiyat" oninput="fmtMoney(this)" placeholder="0"></div>
                 </div>
             </div>
@@ -134,40 +148,21 @@
         <!-- Standart Giriş Paneli -->
         <div id="main-inputs-container">
             <div class="grid no-print" id="main-inputs">
-                <div class="field" id="prof-input-box"><label class="field-label">Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
-                <div class="field" id="tutar-input-box"><label class="field-label">Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
+                <div class="field" style="width:140px;" id="prof-input-box"><label class="field-label">Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
+                <div class="field" style="width:140px;" id="tutar-input-box"><label class="field-label">Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
                 
-                <div id="dynamic-hide-group" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;">
-                    <div class="field px-faiz"><label class="field-label">Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
-                    <div class="field px-faiz"><label class="field-label">Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
-                    <div class="field px-vergi"><label class="field-label">BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
-                    <div class="field px-vergi"><label class="field-label">KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
-                    
-                    <div class="field px-vade-sync" id="vade-box-select"><label class="field-label">Vade</label><select id="vade-select" onchange="reset()"></select></div>
-                    <div class="field px-vade-slider" id="vade-box-slider">
-                        <label class="field-label">Vade: <span id="vade-val">12</span></label>
-                        <div class="slider-container">
-                            <input type="range" id="vade-slider" min="1" max="36" value="12" oninput="updateSliderVal(this.value)">
-                        </div>
-                    </div>
+                <div class="field px-faiz"><label class="field-label">Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
+                <div class="field px-faiz"><label class="field-label">Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
+                <div class="field px-vergi"><label class="field-label">BSMV %</label><input type="number" id="bsmv" value="5" readonly></div>
+                <div class="field px-vergi"><label class="field-label">KKDF %</label><input type="number" id="kkdf" value="0" readonly></div>
+                
+                <div class="field px-vade-sync" id="vade-box-select"><label class="field-label">Vade</label><select id="vade-select" onchange="reset()"></select></div>
+                <div class="field px-vergi" id="sub-input-box"><label class="field-label">Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
+                <div class="field px-periyot" id="periyot-box"><label class="field-label">Ödeme Periyodu</label><select id="periyot" onchange="reset()"></select></div>
 
-                    <div class="field px-vergi" id="sub-input-box"><label class="field-label">Sübv. %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
-
-                    <div class="field px-periyot" id="periyot-box">
-                        <label class="field-label">Ödeme Periyodu</label>
-                        <select id="periyot" onchange="reset()"></select>
-                    </div>
-
-                    <div class="options-container" id="ziraiOpts">
-                        <div class="opt-row">
-                            <input type="checkbox" id="yerli" checked onchange="updateYerli()">
-                            <label for="yerli">Yerli Malı</label>
-                        </div>
-                        <div class="opt-row" id="bb-box">
-                            <input type="checkbox" id="buyback" checked onchange="updateYerli()">
-                            <label for="buyback">Buy Back</label>
-                        </div>
-                    </div>
+                <div class="options-container" id="ziraiOpts">
+                    <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
+                    <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="updateYerli()"><label for="buyback">Buy Back</label></div>
                 </div>
             </div>
         </div>
@@ -212,9 +207,7 @@
         pSelect.innerHTML = '';
         const options = [{v: "1", t: "Aylık"}, {v: "3", t: "3 Ayda Bir"}, {v: "6", t: "6 Ayda Bir"}, {v: "12", t: "Yıllık"}];
         options.forEach(opt => {
-            if (segment === 'bireysel' && (opt.v === "6" || opt.v === "12")) return;
-            let o = document.createElement('option');
-            o.value = opt.v; o.text = opt.t;
+            let o = document.createElement('option'); o.value = opt.v; o.text = opt.t;
             pSelect.appendChild(o);
         });
         pSelect.value = (segment === 'tarimsal') ? "12" : "1";
@@ -247,29 +240,12 @@
         document.getElementById('hayvan-konteynirlar').style.display = isHayvan ? 'block' : 'none';
         
         if(!isHayvan) {
-            const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
+            const isSub = (mode === 'traktor' || mode === 'ekipman');
             document.getElementById('bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
-            
-            if(isSub) document.getElementById('faiz').value = "40.50";
-            else if(mode === 'zirai' || isTic) document.getElementById('faiz').value = "46.00";
-            else if(isBir) document.getElementById('faizAylik').value = "4.39";
-            syncFaiz(isBir ? 'aylik' : 'yillik');
-
-            document.getElementById('vade-box-select').style.display = isTic ? 'flex' : 'none';
-            document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
-            document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
             document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
             document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-            document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
-            
-            if(segment === 'tarimsal') {
-                document.getElementById('bsmv').value = (mode === 'zirai' ? 15 : 5);
-                document.getElementById('kkdf').value = (mode === 'zirai' ? 15 : 0);
-            } else {
-                document.getElementById('bsmv').value = (isTic ? 5 : 15);
-                document.getElementById('kkdf').value = (isTic ? 0 : 15);
-                fillVades();
-            }
+            document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
+            fillVades();
         }
         reset();
     }
@@ -278,69 +254,84 @@
         const s = document.getElementById('vade-select'); s.innerHTML = '';
         let max = (segment === 'ticari') ? 60 : 36;
         for(let i=1; i<=max; i++){
-            let o = document.createElement('option'); o.value = i; o.text = i + " Ay";
-            if(i === 12) o.selected = true;
+            let o = document.createElement('option'); o.value = i; o.text = i + (segment === 'tarimsal' ? " Yıl" : " Ay");
+            if(i === 12 || i === 5) o.selected = true;
             s.appendChild(o);
         }
     }
 
-    function updateSliderVal(v) { document.getElementById('vade-val').innerText = v; reset(); }
-    function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
-    function reset() { document.getElementById('result-main-container').style.display = 'none'; document.getElementById('pdfBtn').disabled = true; document.getElementById('printBtn').disabled = true; }
+    function fmtMoney(i) { 
+        let v = i.value.replace(/\D/g, ""); 
+        if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); 
+        reset(); 
+    }
+
+    function reset() { 
+        document.getElementById('result-main-container').style.display = 'none'; 
+        document.getElementById('pdfBtn').disabled = true; 
+        document.getElementById('printBtn').disabled = true; 
+    }
+
+    function getVal(id) {
+        const val = document.getElementById(id).value.replace(/\./g, "");
+        return parseFloat(val) || 0;
+    }
 
     function hesapla() {
-        const res = document.getElementById('result-area');
-        const titleEl = document.querySelector('.result-main-title');
-        res.innerHTML = '';
+        const resArea = document.getElementById('result-area');
+        resArea.innerHTML = '';
         
         let anaPara = 0;
-        let yF = 46.00 / 100; 
-        let bsmv = 0.15, kkdf = 0.15; 
-        let subO = 0;
-
         if(mode === 'hayvancilik') {
-            const kbS = parseInt(document.getElementById('kb-sayi').value) || 0;
-            const kbF = parseFloat((document.getElementById('kb-fiyat').value || "0").replace(/\./g, "")) || 0;
-            const bbS = parseInt(document.getElementById('bb-sayi').value) || 0;
-            const bbF = parseFloat((document.getElementById('bb-fiyat').value || "0").replace(/\./g, "")) || 0;
-            anaPara = (kbS * kbF) + (bbS * bbF);
-            if(anaPara <= 0) { alert("Lütfen hayvan sayısı ve fiyatı giriniz."); return; }
+            // Bitkisel Üretim Toplamı
+            anaPara += (parseFloat(document.getElementById('bugday-sayi').value)||0) * getVal('bugday-fiyat');
+            anaPara += (parseFloat(document.getElementById('arpa-sayi').value)||0) * getVal('arpa-fiyat');
+            anaPara += (parseFloat(document.getElementById('mercimek-sayi').value)||0) * getVal('mercimek-fiyat');
+            anaPara += (parseFloat(document.getElementById('nohut-sayi').value)||0) * getVal('nohut-fiyat');
+            anaPara += (parseFloat(document.getElementById('pamuk-sayi').value)||0) * getVal('pamuk-fiyat');
+            // Hayvancılık Toplamı
+            anaPara += (parseFloat(document.getElementById('kb-sayi').value)||0) * getVal('kb-fiyat');
+            anaPara += (parseFloat(document.getElementById('bb-sayi').value)||0) * getVal('bb-fiyat');
         } else {
-            anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, ""));
-            yF = document.getElementById('faiz').value / 100;
-            bsmv = document.getElementById('bsmv').value / 100;
-            kkdf = document.getElementById('kkdf').value / 100;
-            subO = (isSubMod() ? document.getElementById('subOran').value / 100 : 0);
+            anaPara = getVal('tutar');
         }
 
-        titleEl.innerText = (segment === 'tarimsal') ? "Yılda 1 ödemeli örnek planlar" : "Ödeme Planı Detayları";
+        if(anaPara <= 0) { alert("Lütfen tutar veya miktar giriniz."); return; }
+
+        const yF = document.getElementById('faiz').value / 100;
+        const bsmv = document.getElementById('bsmv').value / 100;
+        const kkdf = document.getElementById('kkdf').value / 100;
+        const subO = (mode === 'traktor' || mode === 'ekipman') ? document.getElementById('subOran').value / 100 : 0;
         const periyot = (segment === 'tarimsal' ? 12 : parseInt(document.getElementById('periyot').value));
-        let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [ (segment === 'bireysel' ? parseInt(document.getElementById('vade-slider').value) : parseInt(document.getElementById('vade-select').value)) ];
+        
+        // Örnek planlar (Tarımsal ise 5 yıldan geriye, değilse seçili vade)
+        let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade-select').value)];
 
         vades.forEach(v => {
-            let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / (periyot === 12 ? 1 : periyot));
+            let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / periyot);
             let dF = (yF / 12) * periyot;
             let bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
             
-            let html = `<div style="margin-bottom:15px"><div style="background:#f8f9fa;padding:8px;text-align:center;font-weight:bold;border:1px solid #ddd;border-bottom:none;">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Vade'} (Toplam Kredi: ${Math.round(anaPara).toLocaleString('tr-TR')} TL)</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
+            let html = `<div style="margin-bottom:15px"><div style="background:#f8f9fa;padding:8px;text-align:center;font-weight:bold;border:1px solid #ddd; border-bottom:none;">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Vade'} (Kredi: ${Math.round(anaPara).toLocaleString('tr-TR')} TL)</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara, sumA = 0, sumF = 0, sumB = 0, sumT = 0;
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), ind = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b);
                 let sTaksit = taksit - ind;
-                sumA += a; sumF += f; sumB += b; sumT += (taksit - ind);
+                sumA += a; sumF += f; sumB += b; sumT += sTaksit;
                 html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subO>0?`<td style="color:red">-${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan-a)).toLocaleString('tr-TR')}</td></tr>`;
                 kalan -= a;
             }
             html += `<tr class="row-total"><td>TOPLAM</td><td>${Math.round(sumA).toLocaleString('tr-TR')}</td><td>${Math.round(sumF).toLocaleString('tr-TR')}</td>${subO>0?`<td>-${Math.round(sumF*subO).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(sumB).toLocaleString('tr-TR')}</td><td>${Math.round(sumT).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
-            res.innerHTML += html + `</tbody></table></div></div>`;
+            resArea.innerHTML += html + `</tbody></table></div></div>`;
         });
+
         document.getElementById('result-main-container').style.display = 'block';
-        document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
+        document.getElementById('pdfBtn').disabled = false; 
+        document.getElementById('printBtn').disabled = false;
     }
 
-    function isSubMod() { return (segment === 'tarimsal' && (mode === 'traktor' || mode === 'ekipman')); }
     function updateYerli() { 
         if(mode === 'traktor') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 50 : 25;
         else if(mode === 'ekipman') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 75 : 50;
