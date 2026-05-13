@@ -57,7 +57,6 @@
         .opt-row label { height: auto; margin: 0; font-size: 11px; text-transform: none; cursor: pointer; }
         .opt-row input { width: 16px; height: 16px; cursor: pointer; }
 
-        /* Hayvancılık Konteynır Yapısı */
         .animal-container { 
             width: 100%; padding: 15px; border: 1px solid var(--border); 
             border-radius: 6px; margin-top: 10px; background: #fafafa;
@@ -110,7 +109,6 @@
         <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme</button></div>
         <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
 
-        <!-- Hayvancılık Özel Konteynırları -->
         <div id="hayvan-konteynirlar" style="display:none; margin-bottom: 20px;">
             <div class="animal-container">
                 <div class="animal-title">KÜÇÜKBAŞ</div>
@@ -119,12 +117,9 @@
                    <div class="field"><label>Birim Fiyat</label><input type="text" oninput="fmtMoney(this)" placeholder="0"></div>
                 </div>
             </div>
+            <!-- Büyükbaş altındaki her şey silindi -->
             <div class="animal-container">
                 <div class="animal-title">BÜYÜKBAŞ</div>
-                <div class="grid">
-                    <div class="field"><label>Hayvan Sayısı</label><input type="number" placeholder="0"></div>
-                    <div class="field"><label>Birim Fiyat</label><input type="text" oninput="fmtMoney(this)" placeholder="0"></div>
-                </div>
             </div>
         </div>
 
