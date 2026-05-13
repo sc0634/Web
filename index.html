@@ -15,43 +15,22 @@
         body { background: #f5f6fa; margin: 0; padding: 10px; color: var(--dark); font-size: 13px; }
         
         .container { 
-            max-width: 1000px; 
-            margin: 10px auto; 
-            background: #fff; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
-            position: relative;
-            min-height: 400px;
+            max-width: 1000px; margin: 10px auto; background: #fff; padding: 20px; 
+            border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
+            position: relative; min-height: 400px;
         }
         
-        /* SEKME NAVİGASYONU - MOBİLDE KAYDIRILABİLİR */
         .segment-nav { 
-            display: flex; 
-            gap: 8px; 
-            margin-bottom: 20px; 
-            overflow-x: auto; 
-            white-space: nowrap; 
-            padding-bottom: 8px;
-            scrollbar-width: none; 
-            -ms-overflow-style: none;
-            -webkit-overflow-scrolling: touch;
+            display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; 
+            white-space: nowrap; padding-bottom: 8px; scrollbar-width: none; 
+            -ms-overflow-style: none; -webkit-overflow-scrolling: touch;
         }
         .segment-nav::-webkit-scrollbar { display: none; }
 
         .seg-btn { 
-            flex: 1 0 auto;
-            min-width: 90px;
-            border: 2px solid transparent; 
-            height: 40px; 
-            border-radius: 6px; 
-            color: white; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 11px; 
-            opacity: 0.5; 
-            transition: all 0.3s ease;
-            padding: 0 15px;
+            flex: 1 0 auto; min-width: 90px; border: 2px solid transparent; 
+            height: 40px; border-radius: 6px; color: white; font-weight: bold; 
+            cursor: pointer; font-size: 11px; opacity: 0.5; transition: all 0.3s ease; padding: 0 15px;
         }
         .seg-btn.active { opacity: 1; border-color: #fff; outline: 2px solid var(--dark); }
 
@@ -70,15 +49,11 @@
         input, select { 
             height: var(--input-height) !important; padding: 0 5px; 
             border: 1px solid var(--border); border-radius: 5px; 
-            font-size: 12px; outline: none; background: white;
-            width: 100%;
+            font-size: 12px; outline: none; background: white; width: 100%;
         }
-
         input[readonly] { background-color: #f1f2f6; cursor: not-allowed; color: #7f8c8d; }
 
-        /* TUTAR ALANLARINI SOLA YASLAMA */
         #prof-input-box, #tutar-input-box { width: 120px; flex: 0 0 auto; }
-        
         .px-faiz, .px-vergi { width: 55px !important; }
         .px-periyot { width: 130px; }
         .px-vade-sync { width: 65px !important; }
@@ -100,8 +75,20 @@
         }
         
         .compact-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; width: 100%; }
-        .options-container { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
-        .opt-row { display: flex; align-items: center; gap: 6px; }
+        
+        /* CHECKBOX DÜZENLEMESİ */
+        .options-container { 
+            width: 100%; display: flex; flex-direction: column; gap: 10px; 
+            padding: 12px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
+        }
+        .opt-row { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .opt-row input[type="checkbox"] { 
+            width: 18px !important; height: 18px !important; margin: 0; cursor: pointer; flex-shrink: 0;
+        }
+        .opt-row label { 
+            height: auto; margin: 0; font-size: 11px; color: var(--dark); 
+            text-transform: none; white-space: nowrap; cursor: pointer;
+        }
 
         #about-box { display: none; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
         .about-title { font-size: 18px; font-weight: bold; color: var(--dark); margin-bottom: 10px; }
@@ -132,7 +119,6 @@
             border-radius: 4px; font-size: 10px; cursor: pointer;
         }
 
-        /* Ziyaretçi Sayacı */
         .visitor-counter { margin-top: 30px; padding-top: 15px; border-top: 1px solid var(--border); text-align: center; }
         .v-grid { display: flex; justify-content: center; gap: 15px; margin-top: 5px; }
         .v-item { font-size: 10px; color: #7f8c8d; font-weight: bold; display: flex; flex-direction: column; gap: 2px; }
@@ -143,7 +129,6 @@
             .px-vade-slider { width: 100% !important; }
             .compact-row { gap: 5px; }
             .field { flex-grow: 1; }
-            .v-grid { gap: 8px; }
         }
 
         @media print {
@@ -154,7 +139,6 @@
             .result-main-container { display: block !important; margin-top: 0; border-width: 1px; }
             table { font-size: 9px !important; }
             th, td { padding: 4px 1px !important; }
-            .vade-group { page-break-inside: avoid; margin-bottom: 20px; }
         }
     </style>
 </head>
@@ -209,8 +193,14 @@
             </div>
 
             <div class="options-container" id="ziraiOpts">
-                <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
-                <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="updateYerli()"><label for="buyback">Buy Back</label></div>
+                <div class="opt-row" onclick="document.getElementById('yerli').click()">
+                    <input type="checkbox" id="yerli" checked onchange="updateYerli()">
+                    <label for="yerli">Yerli Malı</label>
+                </div>
+                <div class="opt-row" id="bb-box" onclick="document.getElementById('buyback').click()">
+                    <input type="checkbox" id="buyback" checked onchange="updateYerli()">
+                    <label for="buyback">Buy Back</label>
+                </div>
             </div>
         </div>
 
@@ -228,9 +218,7 @@
 
     <div id="about-box">
         <div class="about-title">Süleyman Coşkun</div>
-        <p class="about-text">
-            Bankacılık ve Finans alanında uzmanlaşmış, tarımsal, ticari ve bireysel kredi süreçlerinde doğru analizi ve pratik çözümleri hedefleyen bir bankacıyım.
-        </p>
+        <p class="about-text">Bankacılık ve Finans alanında uzmanlaşmış, tarımsal, ticari ve bireysel kredi süreçlerinde doğru analizi ve pratik çözümleri hedefleyen bir bankacıyım.</p>
     </div>
 
     <div class="visitor-counter no-print">
@@ -265,9 +253,7 @@
         const monthStr = now.getFullYear() + "-" + (now.getMonth() + 1);
 
         let stats = JSON.parse(localStorage.getItem('krediVisitorStats')) || {
-            today: { key: todayStr, count: 0 },
-            week: { key: weekStr, count: 0 },
-            month: { key: monthStr, count: 0 }
+            today: { key: todayStr, count: 0 }, week: { key: weekStr, count: 0 }, month: { key: monthStr, count: 0 }
         };
 
         if (stats.today.key !== todayStr) stats.today = { key: todayStr, count: 1 }; else stats.today.count++;
