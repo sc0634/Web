@@ -84,6 +84,14 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
+        @media print {
+            body { padding: 0; background: white; }
+            .container { box-shadow: none; margin: 0; width: 100%; padding: 10px; }
+            .table-res table { font-size: 10px; }
+            .result-main-title { padding: 5px; font-size: 12px; }
+            .no-print { display: none !important; }
+        }
+
         @media (max-width: 600px) {
             .actions { grid-template-columns: 1fr; }
             #prof-input-box, #tutar-input-box { width: 48%; }
@@ -93,6 +101,10 @@
 <body onload="initApp()">
 
 <div class="container" id="pdf-area">
+    <div style="text-align: center; margin-bottom: 10px;" class="only-print">
+        <h3 style="margin:0;">Süleyman Coşkun - Kredi Ödeme Planı</h3>
+    </div>
+
     <div class="segment-nav no-print">
         <button id="seg-tar" class="seg-btn bg-tar" onclick="switchSegment('tarimsal')">TARIMSAL</button>
         <button id="seg-tic" class="seg-btn bg-tic" onclick="switchSegment('ticari')">TİCARİ</button>
@@ -246,7 +258,6 @@
         document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         
-        // Buy Back sadece Traktörde görünsün
         document.getElementById('bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
         
         document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
@@ -310,7 +321,7 @@
             let bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
             
-            let html = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Vade'}</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
+            let html = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Vade'}</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>İndirimli Faiz</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara, sumA = 0, sumF = 0, sumB = 0, sumT = 0, sumS = 0;
             for(let i=1; i<=tSayisi; i++){
@@ -319,10 +330,10 @@
                 
                 sumA += a; sumF += f; sumB += b; sumT += (taksit - ind); sumS += ind;
                 
-                html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subO>0?`<td style="color:red">-${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan-a)).toLocaleString('tr-TR')}</td></tr>`;
+                html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(sTaksit).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan-a)).toLocaleString('tr-TR')}</td></tr>`;
                 kalan -= a;
             }
-            html += `<tr class="row-total"><td>TOPLAM</td><td>${Math.round(sumA).toLocaleString('tr-TR')}</td><td>${Math.round(sumF).toLocaleString('tr-TR')}</td>${subO>0?`<td>-${Math.round(sumS).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(sumB).toLocaleString('tr-TR')}</td><td>${Math.round(sumT).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
+            html += `<tr class="row-total"><td>TOPLAM</td><td>${Math.round(sumA).toLocaleString('tr-TR')}</td><td>${Math.round(sumF).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(sumS).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(sumB).toLocaleString('tr-TR')}</td><td>${Math.round(sumT).toLocaleString('tr-TR')}</td><td>-</td></tr>`;
             res.innerHTML += html + `</tbody></table></div></div>`;
         });
         document.getElementById('result-main-container').style.display = 'block';
@@ -338,13 +349,29 @@
     function indir() { 
         const element = document.getElementById('pdf-area');
         const opt = {
-            margin: 10,
+            margin: [5, 5, 5, 5],
             filename: 'Kredi_Plani.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, ignoreElements: (el) => el.classList.contains('no-print') },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true, 
+                letterRendering: true,
+                ignoreElements: (el) => el.classList.contains('no-print') 
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait',
+                compress: true 
+            }
         };
-        html2pdf().set(opt).from(element).save(); 
+        
+        const tables = element.querySelectorAll('table');
+        tables.forEach(table => table.style.zoom = "0.9"); 
+
+        html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+            tables.forEach(table => table.style.zoom = "1.0");
+        }).save(); 
     }
 </script>
 </body>
