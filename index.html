@@ -54,34 +54,41 @@
         }
 
         #prof-input-box, #tutar-input-box { width: 140px; }
-        .px-faiz { width: 85px; } /* Genişlik alt alta metin için optimize edildi */
+        .px-faiz { width: 85px; }
         .px-vergi { width: 65px; }
         .px-vade-sync { width: 65px; }
         .px-periyot { width: 150px; }
 
-        /* Etiketleri alt alta getiren stil */
+        /* Tüm etiketlerin hizalı durması için yükseklik ve dikey hizalama */
+        label { 
+            font-weight: bold; 
+            font-size: 10px; 
+            color: #57606f; 
+            text-transform: uppercase;
+            height: 25px; /* Sabit yükseklik */
+            display: flex;
+            align-items: flex-end; /* Metni aşağıya yasla */
+            margin-bottom: 2px;
+        }
+
         .px-faiz label { 
             white-space: pre-line !important; 
             line-height: 1.1; 
-            height: 24px; 
-            display: flex; 
-            align-items: flex-end;
         }
 
         .slider-container { width: 100%; display: none; flex-direction: column; gap: 8px; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; border: 1px solid var(--border); }
         .slider-label { display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; }
         input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--bireysel); }
 
-        label { font-weight: bold; font-size: 10px; color: #57606f; white-space: nowrap; text-transform: uppercase; }
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; }
 
-        .compact-row { width: 100%; display: flex; gap: 12px; padding: 0; justify-content: flex-start; flex-wrap: wrap; }
+        .compact-row { width: 100%; display: flex; gap: 12px; padding: 0; justify-content: flex-start; flex-wrap: wrap; align-items: flex-end; }
 
         .options-container { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row-wrapper { display: flex; flex-direction: row; gap: 20px; }
         .opt-row { display: flex; align-items: center; gap: 6px; }
         .opt-row input { width: 18px !important; height: 18px !important; margin: 0; cursor: pointer; }
-        .opt-row label { font-size: 11px; font-weight: bold; cursor: pointer; color: var(--dark); }
+        .opt-row label { font-size: 11px; font-weight: bold; cursor: pointer; color: var(--dark); height: auto; display: inline; }
 
         .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; font-size: 14px; text-transform: uppercase; }
@@ -138,7 +145,6 @@
         <div class="field" id="tutar-input-box"><label>Kredi Tutarı</label><input type="text" id="tutar" value="100.000" oninput="fmtMoney(this)"></div>
         
         <div class="compact-row">
-            <!-- Label içerikleri alt alta gelecek şekilde düzenlendi -->
             <div class="field px-faiz"><label>Yıllık&#10;Oran %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
             <div class="field px-faiz"><label>Aylık&#10;Oran %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
             <div class="field px-vergi" id="bsmv-box"><label>BSMV %</label><input type="number" id="bsmv" value="5" readonly tabindex="-1"></div>
