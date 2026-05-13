@@ -35,6 +35,9 @@
         label { font-weight: bold; font-size: 10px; color: #57606f; }
         input, select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
         
+        /* Aylık Faiz Bilgi Alanı */
+        .aylik-info { font-size: 10px; font-weight: bold; color: #2980b9; margin-top: 1px; }
+
         .options-container { grid-column: span 2; display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; }
         .opt-row-wrapper { display: flex; flex-direction: row; gap: 10px; }
         .opt-row { display: flex; align-items: center; gap: 5px; flex: 1; }
@@ -85,7 +88,11 @@
     <div class="grid no-print">
         <div class="field" id="prof-input-box"><label>Proforma</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
         <div class="field" id="tutar-input-box"><label>Kredi</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
-        <div class="field"><label>Faiz %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="reset()"></div>
+        <div class="field">
+            <label>Faiz % (Yıllık)</label>
+            <input type="number" id="faiz" value="40.50" step="0.01" oninput="updateAylikGosterge()">
+            <div id="aylik-gosterge" class="aylik-info">Aylık: %3.38</div>
+        </div>
         <div class="field" id="sub-input-box"><label>Sübvansiyon %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
         
         <div class="options-container" id="ziraiOpts">
@@ -122,7 +129,19 @@
 
 <script>
     let mode = 'traktor'; let segment = 'tarimsal';
-    function initApp() { fmtMoney(document.getElementById('proforma')); fmtMoney(document.getElementById('tutar')); switchSegment('tarimsal'); }
+    function initApp() { 
+        fmtMoney(document.getElementById('proforma')); 
+        fmtMoney(document.getElementById('tutar')); 
+        updateAylikGosterge();
+        switchSegment('tarimsal'); 
+    }
+
+    function updateAylikGosterge() {
+        const yF = parseFloat(document.getElementById('faiz').value) || 0;
+        const aF = (yF / 12).toFixed(2);
+        document.getElementById('aylik-gosterge').innerText = `Aylık: %${aF}`;
+        reset();
+    }
 
     function switchSegment(seg) {
         segment = seg;
@@ -201,7 +220,6 @@
             let dF = isY ? yF : (yF / 12), bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, v)) / (Math.pow(1+bF, v)-1);
             
-            // Kolon genişliklerini sabitledik (Toplam %100)
             const subCol = subVal > 0 ? '<th style="width:12%">İnd.</th>' : '';
             let html = `<div class="vade-header">${v} ${isY ? 'Yıl' : 'Ay'}</div><div class="table-res"><table><thead><tr>
                 <th style="width:7%">Tks</th>
