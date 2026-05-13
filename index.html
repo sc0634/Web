@@ -54,7 +54,6 @@
         .px-faiz input, .px-vergi input { width: 50px !important; }
         .px-periyot { width: 130px; }
 
-        /* Vade Alanları */
         .px-vade-sync { width: 60px !important; }
         .px-vade-slider { width: 150px !important; display: none; }
         .slider-container { display: flex; align-items: center; gap: 8px; height: 40px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 8px; }
@@ -78,7 +77,6 @@
         .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
-        .total-row { background: #f9f9f9; font-weight: bold; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
@@ -127,10 +125,8 @@
             <div class="field px-vergi" id="bsmv-box"><label>BSMV&#10;%</label><input type="number" id="bsmv" value="5" readonly></div>
             <div class="field px-vergi" id="kkdf-box"><label>KKDF&#10;%</label><input type="number" id="kkdf" value="0" readonly></div>
             
-            <!-- Ticari İçin Select -->
             <div class="field px-vade-sync" id="vade-box-select"><label>Vade&#10;Süresi</label><select id="vade-select" onchange="reset()"></select></div>
             
-            <!-- Bireysel İçin Slider -->
             <div class="field px-vade-slider" id="vade-box-slider">
                 <label>Vade&#10;Süresi</label>
                 <div class="slider-container">
@@ -147,7 +143,7 @@
                 <option value="1">Aylık</option>
                 <option value="3">3 Ayda Bir</option>
                 <option value="6">6 Ayda Bir</option>
-                <option value="12" selected>Yıllık</option>
+                <option value="12">Yıllık</option>
             </select>
         </div>
 
@@ -204,36 +200,59 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
         
-        const isBir = (segment === 'bireysel'), isSub = (mode === 'traktor' || mode === 'ekipman');
+        const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
+        const pSel = document.getElementById('periyot');
+        const fInp = document.getElementById('faiz');
         
-        // Vade Kontrolü: Sadece Bireysel'de Slider, diğerlerinde Select
         document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
         document.getElementById('vade-box-select').style.display = (segment === 'tarimsal') ? 'none' : (isBir ? 'none' : 'flex');
 
         if (segment === 'tarimsal') {
             document.getElementById('periyot-box').style.display = 'none';
-            document.getElementById('periyot').value = "12";
+            pSel.value = "12";
             document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
             document.getElementById('bb-box').style.display = (mode === 'ekipman') ? 'none' : 'flex';
             document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-            if(mode === 'zirai') { document.getElementById('bsmv').value = 15; document.getElementById('kkdf').value = 15; } 
-            else { document.getElementById('bsmv').value = 5; document.getElementById('kkdf').value = 0; }
-        } else {
+            
+            // Çiftçi Taksitli (zirai) faizini 46 yap
+            if(mode === 'zirai') {
+                fInp.value = "46.00";
+                document.getElementById('bsmv').value = 15;
+                document.getElementById('kkdf').value = 15;
+            } else {
+                fInp.value = "40.50";
+                document.getElementById('bsmv').value = 5;
+                document.getElementById('kkdf').value = 0;
+            }
+        } else if (isTic) {
             document.getElementById('periyot-box').style.display = 'flex';
+            pSel.value = "1";
             document.getElementById('ziraiOpts').style.display = 'none';
             document.getElementById('sub-input-box').style.display = 'none';
-            document.getElementById('bsmv').value = isBir ? 15 : 5;
-            document.getElementById('kkdf').value = isBir ? 15 : 0;
+            fInp.value = "46.00"; // Ticari faizini 46 yap
+            document.getElementById('bsmv').value = 5;
+            document.getElementById('kkdf').value = 0;
+            fillVadeSelect();
+        } else {
+            // Bireysel
+            document.getElementById('periyot-box').style.display = 'flex';
+            pSel.value = "1";
+            document.getElementById('ziraiOpts').style.display = 'none';
+            document.getElementById('sub-input-box').style.display = 'none';
+            fInp.value = "40.50";
+            document.getElementById('bsmv').value = 15;
+            document.getElementById('kkdf').value = 15;
             fillVadeSelect();
         }
 
+        syncFaiz('yillik');
         document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
         reset();
     }
 
     function fillVadeSelect() {
         const s = document.getElementById('vade-select'); s.innerHTML = '';
-        let max = (mode === 'ticari') ? 60 : 36;
+        let max = (segment === 'ticari') ? 60 : 36;
         for(let i=1; i<=max; i++){
             let o = document.createElement('option'); o.value = i; o.text = i;
             if(i === 12) o.selected = true;
@@ -265,11 +284,8 @@
         const subO = (mode === 'traktor' || mode === 'ekipman') ? document.getElementById('subOran').value / 100 : 0;
         
         let vadeDegeri;
-        if (segment === 'bireysel') {
-            vadeDegeri = parseInt(document.getElementById('vade-slider').value);
-        } else if (segment === 'ticari') {
-            vadeDegeri = parseInt(document.getElementById('vade-select').value);
-        }
+        if (segment === 'bireysel') vadeDegeri = parseInt(document.getElementById('vade-slider').value);
+        else if (segment === 'ticari') vadeDegeri = parseInt(document.getElementById('vade-select').value);
 
         let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [vadeDegeri];
 
@@ -279,7 +295,8 @@
             let bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
             
-            let html = `<div class="vade-header">${v} ${segment === 'tarimsal' ? 'Yıl' : 'Dönem'} Planı</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
+            let labelVade = (segment === 'tarimsal') ? 'Yıl' : (periyot === 1 ? 'Ay' : 'Dönem');
+            let html = `<div class="vade-header">${v} ${labelVade} Planı</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Faiz</th>${subO>0?'<th>Sübv.</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             
             let kalan = anaPara;
             for(let i=1; i<=tSayisi; i++){
