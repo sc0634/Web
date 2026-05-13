@@ -20,7 +20,6 @@
             position: relative; min-height: 400px;
         }
         
-        /* MOBİL KAYDIRILABİLİR SEKME NAVİGASYONU */
         .segment-nav { 
             display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; 
             white-space: nowrap; padding-bottom: 8px; scrollbar-width: none; 
@@ -54,7 +53,6 @@
         }
         input[readonly] { background-color: #f1f2f6; cursor: not-allowed; color: #7f8c8d; }
 
-        /* TUTAR ALANLARI SOLA YASLI */
         #prof-input-box, #tutar-input-box { width: 125px; flex: 0 0 auto; }
         .px-faiz, .px-vergi { width: 58px !important; }
         .px-periyot { width: 130px; }
@@ -78,9 +76,8 @@
         
         .compact-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; width: 100%; }
         
-        /* KÜÇÜLTÜLMÜŞ VE BİTİŞİK CHECKBOX */
         .options-container { 
-            width: 100%; display: flex; flex-direction: column; gap: 8px; 
+            width: 100%; display: flex; flex-direction: row; gap: 20px; 
             padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
         }
         .opt-row { display: flex; align-items: center; gap: 8px; cursor: pointer; width: fit-content; }
@@ -131,6 +128,7 @@
             .px-vade-slider { width: 100% !important; }
             .compact-row { gap: 5px; }
             .field { flex-grow: 1; }
+            .options-container { gap: 10px; }
         }
 
         @media print {
@@ -167,8 +165,8 @@
             <div class="field" id="tutar-input-box"><label>Kredi&#10;Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
             
             <div class="compact-row">
-                <div class="field px-faiz"><label>Yıllık&#10;Oran %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
-                <div class="field px-faiz"><label>Aylık&#10;Oran %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
+                <div class="field px-faiz"><label>Yıllık&#10;Oran %</label><input type="number" id="faiz" value="46.00" step="0.01" oninput="syncFaiz('yillik')"></div>
+                <div class="field px-faiz"><label>Aylık&#10;Oran %</label><input type="number" id="faizAylik" value="3.83" step="0.01" oninput="syncFaiz('aylik')"></div>
                 <div class="field px-vergi" id="bsmv-box"><label>BSMV&#10;%</label><input type="number" id="bsmv" value="5" readonly></div>
                 <div class="field px-vergi" id="kkdf-box"><label>KKDF&#10;%</label><input type="number" id="kkdf" value="0" readonly></div>
                 
@@ -288,11 +286,11 @@
             document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
             document.getElementById(`tabs-${seg}`).style.display = 'flex';
             const firstTab = document.getElementById(`tabs-${seg}`).querySelector('.tab-btn');
-            switchTab(firstTab, firstTab.onclick.toString().match(/'(.*?)'/)[1], true);
+            switchTab(firstTab, firstTab.onclick.toString().match(/'(.*?)'/)[1]);
         }
     }
 
-    function switchTab(btn, m, isSegmentSwitch = false) {
+    function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
@@ -315,6 +313,7 @@
             fillVadeSelect();
         }
         document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
+        // OTOMATİK FAİZ DEĞİŞİMİ SİLİNDİ - ARTIK "KENDİ KENDİNE" DEĞİŞMEZ
         reset();
     }
 
