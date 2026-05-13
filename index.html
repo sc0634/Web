@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
-            --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --hakkimda: #34495e;
+            --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --isermaye: #9b59b6; --hakkimda: #34495e;
             --success: #27ae60; --dark: #2c3e50; --light: #ecf0f1; --border: #dcdde1;
             --input-height: 40px;
         }
@@ -28,7 +28,7 @@
         }
         .seg-btn.active { opacity: 1; border-color: #fff; outline: 2px solid var(--dark); }
         .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); }
-        .bg-bir { background: var(--bireysel); } .bg-hak { background: var(--hakkimda); }
+        .bg-bir { background: var(--bireysel); } .bg-ise { background: var(--isermaye); } .bg-hak { background: var(--hakkimda); }
 
         .tabs { display: none; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 8px; }
         .tab-btn { padding: 6px 10px; border: none; background: #eee; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; }
@@ -56,12 +56,6 @@
         .opt-row { display: flex; align-items: center; gap: 5px; cursor: pointer; width: 110px; } 
         .opt-row label { height: auto; margin: 0; font-size: 11px; text-transform: none; cursor: pointer; }
         .opt-row input { width: 16px; height: 16px; cursor: pointer; }
-
-        .animal-container { 
-            width: 100%; padding: 15px; border: 1px solid var(--border); 
-            border-radius: 6px; margin-top: 10px; background: #fafafa;
-        }
-        .animal-title { font-weight: bold; color: var(--tarimsal); margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
 
         .px-vade-slider { width: 180px; display: none; }
         .slider-container { 
@@ -109,6 +103,7 @@
         <button id="seg-tar" class="seg-btn bg-tar" onclick="switchSegment('tarimsal')">TARIMSAL</button>
         <button id="seg-tic" class="seg-btn bg-tic" onclick="switchSegment('ticari')">TİCARİ</button>
         <button id="seg-bir" class="seg-btn bg-bir" onclick="switchSegment('bireysel')">BİREYSEL</button>
+        <button id="seg-ise" class="seg-btn bg-ise" onclick="switchSegment('isermaye')">İSERMAYE</button>
         <button id="seg-hak" class="seg-btn bg-hak" onclick="switchSegment('hakkimda')">HAKKIMDA</button>
     </div>
 
@@ -117,27 +112,10 @@
             <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
             <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
             <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
-            <button class="tab-btn" onclick="switchTab(this, 'hayvancilik')">İşletme Kredisi</button>
         </div>
         <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme</button></div>
         <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
-
-        <div id="hayvan-konteynirlar" style="display:none; margin-bottom: 20px;">
-            <div class="animal-container">
-                <div class="animal-title">KÜÇÜKBAŞ</div>
-                <div class="grid">
-                   <div class="field"><label>Hayvan Sayısı</label><input type="number" id="kb-sayi" oninput="updateHayvanTutar()" placeholder="0"></div>
-                   <div class="field"><label>Birim Fiyat</label><input type="text" id="kb-fiyat" oninput="fmtMoney(this); updateHayvanTutar()" placeholder="0"></div>
-                </div>
-            </div>
-            <div class="animal-container">
-                <div class="animal-title">BÜYÜKBAŞ</div>
-                <div class="grid">
-                   <div class="field"><label>Hayvan Sayısı</label><input type="number" id="bb-sayi" oninput="updateHayvanTutar()" placeholder="0"></div>
-                   <div class="field"><label>Birim Fiyat</label><input type="text" id="bb-fiyat" oninput="fmtMoney(this); updateHayvanTutar()" placeholder="0"></div>
-                </div>
-            </div>
-        </div>
+        <div class="tabs no-print" id="tabs-isermaye"></div>
 
         <div class="grid no-print" id="main-inputs">
             <div class="field" id="prof-input-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
@@ -171,7 +149,7 @@
             </div>
         </div>
 
-        <div class="actions no-print">
+        <div class="actions no-print" id="main-actions">
             <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
             <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF</button>
             <button class="btn btn-print" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
@@ -225,6 +203,11 @@
         segment = seg;
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('seg-' + seg.substring(0,3)).classList.add('active');
+        
+        const isIse = (seg === 'isermaye');
+        document.getElementById('main-inputs').style.display = isIse ? 'none' : 'flex';
+        document.getElementById('main-actions').style.display = isIse ? 'none' : 'grid';
+        
         updatePeriyotOptions();
         if (seg === 'hakkimda') {
             document.getElementById('calculator-ui').style.display = 'none';
@@ -234,43 +217,45 @@
             document.getElementById('about-box').style.display = 'none';
             document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
             document.getElementById(`tabs-${seg}`).style.display = 'flex';
+            
             const firstTab = document.getElementById(`tabs-${seg}`).querySelector('.tab-btn');
-            firstTab.click();
+            if (firstTab) firstTab.click();
         }
+        reset();
     }
 
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
+        
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
-        const isHayvan = (mode === 'hayvancilik');
-        
-        document.getElementById('dynamic-hide-group').style.display = isHayvan ? 'none' : 'flex';
-        document.getElementById('hayvan-konteynirlar').style.display = isHayvan ? 'block' : 'none';
-        
-        if(isSub) document.getElementById('faiz').value = "40.50";
-        else if(mode === 'zirai' || isTic || isHayvan) document.getElementById('faiz').value = "46.00";
-        else if(isBir) document.getElementById('faizAylik').value = "4.39";
-        syncFaiz(isBir ? 'aylik' : 'yillik');
 
-        document.getElementById('vade-box-select').style.display = isTic ? 'flex' : 'none';
-        document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
-        document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
-        document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
-        
-        document.getElementById('bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
-        
-        document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-        document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai' && !isHayvan) ? 'flex' : 'none';
+        document.getElementById('result-main-container').style.display = 'none';
 
-        if(segment === 'tarimsal') {
-            document.getElementById('bsmv').value = (mode === 'zirai' || isHayvan ? 15 : 5);
-            document.getElementById('kkdf').value = (mode === 'zirai' || isHayvan ? 15 : 0);
-            updateYerli();
-        } else {
-            document.getElementById('bsmv').value = (isTic ? 5 : 15);
-            document.getElementById('kkdf').value = (isTic ? 0 : 15);
-            fillVades();
+        if (segment !== 'isermaye') {
+            document.getElementById('dynamic-hide-group').style.display = 'flex';
+            if(isSub) document.getElementById('faiz').value = "40.50";
+            else if(mode === 'zirai' || isTic) document.getElementById('faiz').value = "46.00";
+            else if(isBir) document.getElementById('faizAylik').value = "4.39";
+            syncFaiz(isBir ? 'aylik' : 'yillik');
+
+            document.getElementById('vade-box-select').style.display = isTic ? 'flex' : 'none';
+            document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
+            document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
+            document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
+            document.getElementById('bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
+            document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
+            document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
+
+            if(segment === 'tarimsal') {
+                document.getElementById('bsmv').value = (mode === 'zirai' ? 15 : 5);
+                document.getElementById('kkdf').value = (mode === 'zirai' ? 15 : 0);
+                updateYerli();
+            } else {
+                document.getElementById('bsmv').value = (isTic ? 5 : 15);
+                document.getElementById('kkdf').value = (isTic ? 0 : 15);
+                fillVades();
+            }
         }
         reset();
     }
@@ -283,16 +268,6 @@
             if(i === 12) o.selected = true;
             s.appendChild(o);
         }
-    }
-
-    function updateHayvanTutar() {
-        const kbS = parseInt(document.getElementById('kb-sayi').value) || 0;
-        const kbF = parseFloat(document.getElementById('kb-fiyat').value.replace(/\./g, "")) || 0;
-        const bbS = parseInt(document.getElementById('bb-sayi').value) || 0;
-        const bbF = parseFloat(document.getElementById('bb-fiyat').value.replace(/\./g, "")) || 0;
-        const toplam = (kbS * kbF) + (bbS * bbF);
-        document.getElementById('tutar').value = new Intl.NumberFormat('tr-TR').format(toplam);
-        reset();
     }
 
     function updateSliderVal(v) { document.getElementById('vade-val').innerText = v; reset(); }
