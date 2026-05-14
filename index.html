@@ -71,6 +71,7 @@
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
 
+        /* WEB GÖRÜNÜMÜ AKSİYON BUTONLARI */
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         .btn:active { transform: scale(0.98); }
@@ -106,8 +107,18 @@
             .container { box-shadow: none; width: 100%; }
         }
 
+        /* MOBİL ÖZEL AYARLAR */
         @media (max-width: 600px) {
-            .actions { grid-template-columns: 1fr; }
+            /* 3 Butonu Yan Yana Getirir */
+            .actions { 
+                grid-template-columns: 1fr 1fr 1fr !important; 
+                gap: 5px;
+            }
+            .btn { 
+                font-size: 10px !important; 
+                height: 40px !important; 
+                padding: 0 2px;
+            }
             #prof-input-box, #tutar-input-box { width: 48%; }
             .apply-row-forced .btn { font-size: 9px; height: 40px; }
         }
@@ -249,14 +260,10 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m; reset();
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
-        
-        // Buy Back Mantığı: Sadece Ekipman sekmesinde gizle
         document.getElementById('bb-box').style.display = (mode === 'ekipman') ? 'none' : 'flex';
-        
         if(isSub) document.getElementById('faiz').value = "40.50";
         else if(mode === 'zirai' || isTic || mode === 'isletme') document.getElementById('faiz').value = "46.00";
         else if(isBir) document.getElementById('faizAylik').value = "4.39";
-        
         syncFaiz(isBir ? 'aylik' : 'yillik');
         document.getElementById('vade-box-select').style.display = isTic ? 'flex' : 'none';
         document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
