@@ -19,8 +19,17 @@
             border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
             position: relative; min-height: 400px;
         }
+
+        /* Sağ Üst Yazdır Butonu */
+        .top-print-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: var(--dark); color: white; border: none;
+            padding: 8px 15px; border-radius: 5px; font-weight: bold;
+            cursor: pointer; font-size: 11px; z-index: 10;
+        }
+        .top-print-btn:hover { opacity: 0.9; }
         
-        .segment-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; }
+        .segment-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; width: calc(100% - 100px); }
         .seg-btn { 
             flex: 1 0 auto; min-width: 95px; border: 2px solid transparent; 
             height: 40px; border-radius: 6px; color: white; font-weight: bold; 
@@ -42,6 +51,7 @@
             border: 1px solid var(--border); border-radius: 5px; 
             font-size: 12px; outline: none; background: white; width: 100%;
         }
+        input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; }
 
         #prof-input-box, #tutar-input-box { width: 140px; }
         .px-faiz, .px-vergi { width: 65px; }
@@ -57,23 +67,15 @@
         .opt-row label { font-size: 11px; cursor: pointer; }
         .opt-row input { width: 16px; height: 16px; cursor: pointer; }
 
-        /* Bilgi Kutuları */
         .info-box { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; font-weight: bold; display: none; text-align: center; }
         .hazine-box { width: 100%; padding: 8px; margin-top: 5px; border-radius: 5px; background: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; font-size: 11px; text-align: center; display: none; }
-        
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        .blink-text { animation: blink 1s infinite; }
-
-        .px-vade-slider { width: 180px; display: none; }
-        .slider-container { display: flex; align-items: center; gap: 10px; height: 40px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 10px; }
-
-        label { font-weight: bold; font-size: 9px; color: #57606f; text-transform: uppercase; margin-bottom: 2px; }
         
         .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; }
         .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
+        tfoot tr { background: #f8f9fa; font-weight: bold; border-top: 2px solid var(--dark); }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
@@ -81,18 +83,19 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        #chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-        .chat-bubble { display: none; width: 280px; background: white; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); margin-bottom: 15px; overflow: hidden; border: 1px solid var(--border); }
-
+        @media print { .no-print { display: none !important; } }
         @media (max-width: 600px) {
             .actions { grid-template-columns: 1fr 1fr 1fr !important; }
-            #prof-input-box, #tutar-input-box { width: 48%; }
+            .top-print-btn { padding: 5px 10px; font-size: 9px; top: 15px; right: 10px; }
         }
     </style>
 </head>
 <body onload="initApp()">
 
 <div class="container" id="pdf-area">
+    <!-- Sağ Üst Yazdır Butonu -->
+    <button class="top-print-btn no-print" onclick="window.print()">YAZDIR</button>
+
     <div class="segment-nav no-print">
         <button id="seg-tar" class="seg-btn bg-tar" onclick="switchSegment('tarimsal')">TARIMSAL</button>
         <button id="seg-tic" class="seg-btn bg-tic" onclick="switchSegment('ticari')">TİCARİ</button>
@@ -122,7 +125,7 @@
                 <label>Vade: <span id="vade-val">12</span> Ay</label>
                 <div class="slider-container"><input type="range" id="vade-slider" min="1" max="36" value="12" oninput="updateSliderVal(this.value)"></div>
             </div>
-            <div class="field px-vergi" id="sub-input-box"><label>İndirim %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
+            <div class="field px-vergi" id="sub-input-box"><label>İndirim %</label><input type="number" id="subOran" value="50" readonly></div>
             <div class="field px-periyot" id="periyot-box"><label>Ödeme Periyodu</label><select id="periyot" onchange="reset()"></select></div>
             
             <div class="options-container" id="ziraiOpts">
@@ -151,30 +154,9 @@
     </div>
 </div>
 
-<div id="chat-widget" class="no-print">
-    <div id="chat-bubble" class="chat-bubble">
-        <div style="background: var(--dark); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-            <span>Süleyman Coşkun</span>
-            <button onclick="toggleChat()" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">&times;</button>
-        </div>
-        <div style="padding: 10px 15px 15px;">
-            <a href="https://wa.me/905345217697" target="_blank" style="text-decoration: none;">
-                <button class="btn" style="background: #25d366; width: 100%;">WhatsApp'tan Yazın</button>
-            </a>
-        </div>
-    </div>
-    <button onclick="toggleChat()" style="width: 60px; height: 60px; border-radius: 50%; background: var(--dark); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-        <svg id="chat-icon" width="30" height="30" fill="white" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-    </button>
-</div>
-
 <script>
     let mode = 'traktor'; let segment = 'tarimsal';
     function initApp() { fmtMoney(document.getElementById('proforma')); fmtMoney(document.getElementById('tutar')); switchSegment('tarimsal'); }
-    function toggleChat() {
-        const b = document.getElementById('chat-bubble');
-        b.style.display = (b.style.display === 'none' || b.style.display === '') ? 'block' : 'none';
-    }
     function syncFaiz(src) {
         const y = document.getElementById('faiz'), a = document.getElementById('faizAylik');
         if (src === 'yillik') a.value = (parseFloat(y.value) / 12).toFixed(2);
@@ -250,30 +232,13 @@
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
         if(anaPara <= 0) return alert("Tutar giriniz.");
 
-        // TRAKTÖR/EKİPMAN ÖZEL BİLGİ MANTIĞI
         if (mode === 'traktor' || mode === 'ekipman') {
             const yerliCheck = document.getElementById('yerli').checked;
-            
-            // Yerli Malı Hazine Desteği Yazısı
             if(yerliCheck) {
                 hazineBox.style.display = 'block';
                 hazineBox.innerHTML = 'ℹ️ Yerli malı kapsamında faizin %25\'ini Hazine ödemektedir.';
             } else {
                 hazineBox.style.display = 'none';
-            }
-
-            // Sadece Traktör için Sabit/Değişken Faiz uyarısı
-            if(mode === 'traktor') {
-                const isBuyback = document.getElementById('buyback').checked;
-                infoBox.style.display = 'block';
-                infoBox.classList.remove('blink-text'); 
-                if(isBuyback) {
-                    infoBox.style.background = '#d4edda'; infoBox.style.color = '#155724'; infoBox.style.border = '1px solid #c3e6cb';
-                    infoBox.innerHTML = 'Krediniz Sabit Faizlidir.';
-                } else {
-                    infoBox.style.background = '#f8d7da'; infoBox.style.color = '#721c24'; infoBox.style.border = '1px solid #f5c6cb';
-                    infoBox.innerHTML = '<span class="blink-text">Krediniz Değişken Faizlidir.</span>';
-                }
             }
         }
 
@@ -286,14 +251,23 @@
             let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / periyot);
             let dF = (yF / 12) * periyot, bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
+            
             let h = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${v} ${segment==='tarimsal'?'Yıl':'Ay'}</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Brüt Faiz</th>${subO>0?'<th>Ind. Faiz</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
-            let kalan = anaPara;
+            
+            let kalan = anaPara, totA = 0, totF = 0, totI = 0, totV = 0, totT = 0;
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), ind = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b);
-                h += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(taksit-ind).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan-a)).toLocaleString('tr-TR')}</td></tr>`;
+                let tNet = taksit - ind;
+                
+                h += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(tNet).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan-a)).toLocaleString('tr-TR')}</td></tr>`;
+                
+                totA += a; totF += f; totI += ind; totV += b; totT += tNet;
                 kalan -= a;
             }
-            res.innerHTML += h + `</tbody></table></div></div>`;
+            
+            // TOPLAM SATIRI
+            h += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(totA).toLocaleString('tr-TR')}</td><td>${Math.round(totF).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(totI).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(totV).toLocaleString('tr-TR')}</td><td>${Math.round(totT).toLocaleString('tr-TR')}</td><td>-</td></tr></tfoot></table></div></div>`;
+            res.innerHTML += h;
         });
         document.getElementById('result-main-container').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
