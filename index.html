@@ -111,6 +111,7 @@
     <div class="tabs no-print" id="tabs-tarimsal">
         <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
         <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
+        <button class="tab-btn" onclick="switchTab(this, 'sulama')">Sulama</button>
         <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
     </div>
     <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari_taksitli')">Ticari Taksitli</button></div>
@@ -122,7 +123,7 @@
 
     <div id="calc-engine" class="no-print">
         <div class="opt-wrapper" id="extra-opts">
-            <div class="opt-box" onclick="document.getElementById('yerli').click()">
+            <div class="opt-box" id="yerli-box" onclick="document.getElementById('yerli').click()">
                 <div class="opt-header">
                     <input type="checkbox" id="yerli" checked onclick="event.stopPropagation(); Calculator.handleYerli()">
                     <span class="opt-label">Yerli Malı Avantajı</span>
@@ -192,6 +193,7 @@
         const cfg = {
             traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, unit: 'Yıl' },
             ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, unit: 'Yıl' },
+            sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, unit: 'Yıl' },
             zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, unit: 'Yıl' },
             ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, defVade: 24, unit: 'Ay' },
             konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, defVade: 120, unit: 'Ay' },
@@ -240,6 +242,8 @@
                 const isYerli = document.getElementById('yerli').checked;
                 if(mode === 'traktor') cfg.traktor.sub = isYerli ? 50 : 25;
                 if(mode === 'ekipman') cfg.ekipman.sub = isYerli ? 75 : 50;
+                if(mode === 'sulama') cfg.sulama.sub = 100; // Sulama her zaman %100 veya isteğe göre sabit
+                
                 document.getElementById('yerli-desc').style.display = isYerli ? 'block' : 'none';
                 document.getElementById('subOran').value = cfg[mode].sub || 0;
                 this.calculate();
@@ -280,11 +284,18 @@
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
                 const totalMaliyetOran = indirimliOran * (1 + bRate + kRate);
-                const pmt = (tutar * totalMaliyetOran * Math.pow(1+totalMaliyetOran, v)) / (Math.pow(1+totalMaliyetOran, v)-1);
                 
-                const labelFaiz = (mode === 'traktor' || mode === 'ekipman') ? 'İndirimli Faiz' : 'Faiz';
-                const labelTaksit = (mode === 'traktor' || mode === 'ekipman') ? 'İndirimli Taksit' : 'Taksit';
-                const showStandartFaiz = (mode === 'traktor' || mode === 'ekipman');
+                // PMT formulü (Faiz %100 indirimliyse yani 0 ise direkt bölme yap)
+                let pmt;
+                if (totalMaliyetOran === 0) {
+                    pmt = tutar / v;
+                } else {
+                    pmt = (tutar * totalMaliyetOran * Math.pow(1+totalMaliyetOran, v)) / (Math.pow(1+totalMaliyetOran, v)-1);
+                }
+                
+                const labelFaiz = (mode === 'traktor' || mode === 'ekipman' || mode === 'sulama') ? 'İndirimli Faiz' : 'Faiz';
+                const labelTaksit = (mode === 'traktor' || mode === 'ekipman' || mode === 'sulama') ? 'İndirimli Taksit' : 'Taksit';
+                const showStandartFaiz = (mode === 'traktor' || mode === 'ekipman' || mode === 'sulama');
 
                 let html = `<table><thead><tr><th>No</th><th>Ana Para</th>`;
                 if(showStandartFaiz) html += `<th>Faiz</th>`;
@@ -319,12 +330,7 @@
                     margin: 10, 
                     filename: name + '.pdf', 
                     image: { type: 'jpeg', quality: 0.98 }, 
-                    html2canvas: { 
-                        scale: 2, 
-                        useCORS: true,
-                        scrollY: 0,
-                        windowWidth: element.scrollWidth
-                    }, 
+                    html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: element.scrollWidth }, 
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
                 };
                 html2pdf().set(opt).from(element).save();
@@ -355,9 +361,13 @@
     function switchTab(btn, mode) {
         Calculator.setMode(mode);
         const s = Calculator.getState();
-        document.getElementById('box-proforma').style.display = (mode === 'traktor' || mode === 'ekipman') ? 'flex' : 'none';
-        document.getElementById('extra-opts').style.display = (mode === 'traktor' || mode === 'ekipman') ? 'flex' : 'none';
+        
+        // Form alanlarını göster/gizle
+        document.getElementById('box-proforma').style.display = (mode === 'traktor' || mode === 'ekipman' || mode === 'sulama') ? 'flex' : 'none';
+        document.getElementById('extra-opts').style.display = (mode === 'traktor' || mode === 'ekipman' || mode === 'sulama') ? 'flex' : 'none';
+        document.getElementById('yerli-box').style.display = (mode === 'traktor' || mode === 'ekipman') ? 'flex' : 'none';
         document.getElementById('col-bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
+        
         const boxVade = document.getElementById('box-vade');
         if(s.unit === 'Yıl') boxVade.style.display = 'none';
         else {
@@ -368,16 +378,20 @@
                 if(i === s.defVade) o.selected = true; vSel.appendChild(o);
             }
         }
+        
         document.getElementById('faiz').value = s.faiz.toFixed(2);
         document.getElementById('faizAylik').value = (s.faiz / 12).toFixed(2);
         document.getElementById('subOran').value = s.sub;
         document.getElementById('bsmv').value = s.bsmv;
         document.getElementById('kkdf').value = s.kkdf;
+        
         if(mode === 'traktor' || mode === 'ekipman') {
             Calculator.handleYerli();
             Calculator.handleBuyBack();
+        } else {
+            Calculator.calculate();
         }
-        else Calculator.calculate();
+        
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
