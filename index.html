@@ -242,7 +242,7 @@
                 const isYerli = document.getElementById('yerli').checked;
                 if(mode === 'traktor') cfg.traktor.sub = isYerli ? 50 : 25;
                 if(mode === 'ekipman') cfg.ekipman.sub = isYerli ? 75 : 50;
-                if(mode === 'sulama') cfg.sulama.sub = 100; // Sulama her zaman %100 veya isteğe göre sabit
+                if(mode === 'sulama') cfg.sulama.sub = 100; 
                 
                 document.getElementById('yerli-desc').style.display = isYerli ? 'block' : 'none';
                 document.getElementById('subOran').value = cfg[mode].sub || 0;
@@ -283,9 +283,18 @@
             drawTable: function(tutar, yF, sub, bRate, kRate, v, unit) {
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
-                const totalMaliyetOran = indirimliOran * (1 + bRate + kRate);
                 
-                // PMT formulü (Faiz %100 indirimliyse yani 0 ise direkt bölme yap)
+                // Sulama modunda BSMV brüt (sübvansiyonsuz) faiz üzerinden hesaplanır.
+                // KKDF genellikle ticari olmayan tarımsal ekipmanda 0'dır ancak formül korundu.
+                let totalMaliyetOran;
+                if (mode === 'sulama') {
+                    // Vergi = Brüt Faiz * Vergi Oranı
+                    totalMaliyetOran = indirimliOran + (faizOran * bRate) + (faizOran * kRate);
+                } else {
+                    // Diğerlerinde Vergi = İndirimli Faiz * Vergi Oranı
+                    totalMaliyetOran = indirimliOran * (1 + bRate + kRate);
+                }
+
                 let pmt;
                 if (totalMaliyetOran === 0) {
                     pmt = tutar / v;
@@ -306,8 +315,16 @@
                 for(let i=1; i<=v; i++) {
                     let fStandart = bal * faizOran;
                     let fIndirimli = bal * indirimliOran;
-                    let bsmv = fIndirimli * bRate;
-                    let kkdf = fIndirimli * kRate;
+                    
+                    let bsmv, kkdf;
+                    if (mode === 'sulama') {
+                        bsmv = fStandart * bRate;
+                        kkdf = fStandart * kRate;
+                    } else {
+                        bsmv = fIndirimli * bRate;
+                        kkdf = fIndirimli * kRate;
+                    }
+
                     let aPara = pmt - (fIndirimli + bsmv + kkdf);
                     if(i===v) aPara = bal;
                     tAP += aPara; tF += fStandart; tIF += fIndirimli; tBS += bsmv; tKK += kkdf; tPMT += pmt;
@@ -362,7 +379,6 @@
         Calculator.setMode(mode);
         const s = Calculator.getState();
         
-        // Form alanlarını göster/gizle
         document.getElementById('box-proforma').style.display = (mode === 'traktor' || mode === 'ekipman' || mode === 'sulama') ? 'flex' : 'none';
         document.getElementById('extra-opts').style.display = (mode === 'traktor' || mode === 'ekipman' || mode === 'sulama') ? 'flex' : 'none';
         document.getElementById('yerli-box').style.display = (mode === 'traktor' || mode === 'ekipman') ? 'flex' : 'none';
