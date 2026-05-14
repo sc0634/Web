@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
-            --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --hakkimda: #34495e;
+            --genel: #95a5a6; --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --hakkimda: #34495e;
             --success: #27ae60; --danger: #e74c3c; --dark: #2c3e50; --light: #ecf0f1; --border: #dcdde1;
             --input-height: 40px;
         }
@@ -27,7 +27,7 @@
             cursor: pointer; font-size: 11px; opacity: 0.5; transition: 0.3s; padding: 0 15px;
         }
         .seg-btn.active { opacity: 1; border-color: #fff; outline: 2px solid var(--dark); }
-        .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); }
+        .bg-gen { background: var(--genel); } .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); }
         .bg-bir { background: var(--bireysel); } .bg-hak { background: var(--hakkimda); }
 
         .tabs { display: none; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 8px; }
@@ -51,7 +51,6 @@
         }
         .opt-row { display: flex; align-items: center; gap: 6px; cursor: pointer; min-width: 90px; }
         
-        /* Checkbox boyutu sabitlendi ve küçültüldü */
         .opt-row input[type="checkbox"] { 
             width: 14px !important; 
             height: 14px !important; 
@@ -80,8 +79,6 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        /* Hemen Başvur bölümü kaldırıldı */
-
         @media print { .no-print { display: none !important; } }
     </style>
 </head>
@@ -90,6 +87,7 @@
 <div class="container" id="pdf-area">
 
     <div class="segment-nav no-print">
+        <button id="seg-gen" class="seg-btn bg-gen" onclick="switchSegment('genel')">GENEL VERİLER</button>
         <button id="seg-tar" class="seg-btn bg-tar" onclick="switchSegment('tarimsal')">TARIMSAL</button>
         <button id="seg-tic" class="seg-btn bg-tic" onclick="switchSegment('ticari')">TİCARİ</button>
         <button id="seg-bir" class="seg-btn bg-bir" onclick="switchSegment('bireysel')">BİREYSEL</button>
@@ -97,6 +95,11 @@
     </div>
 
     <div id="calculator-ui">
+        <!-- Genel Veriler Boş İçerik -->
+        <div id="content-genel" style="display:none; padding:20px; text-align:center; color:#7f8c8d;">
+            Henüz genel veri girişi yapılmamıştır.
+        </div>
+
         <div class="tabs no-print" id="tabs-tarimsal">
             <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
             <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
@@ -104,7 +107,7 @@
             <button class="tab-btn" onclick="switchTab(this, 'isletme')">İşletme Kredisi</button>
         </div>
 
-        <div class="grid no-print">
+        <div id="calc-fields" class="grid no-print">
             <div class="field" style="width:140px;" id="prof-input-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
             <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
             <div class="field" style="width:65px;"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
@@ -123,7 +126,7 @@
             <div id="dynamic-info-box" class="info-box"></div>
         </div>
 
-        <div class="actions no-print">
+        <div class="actions no-print" id="calc-actions">
             <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
             <button class="btn btn-pdf" id="pdfBtn" onclick="indir()" disabled>PDF İNDİR</button>
             <button class="btn btn-print" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
@@ -140,6 +143,7 @@
     <div id="about-box" style="display:none; padding:40px; text-align:center;">
         <h2 style="color:var(--dark)">Süleyman Coşkun</h2>
         <p>Finansal Çözümler ve Kredi Danışmanlığı</p>
+        <a href="https://wa.me/905345217697" class="no-print" style="color:#2ecc71; text-decoration:none; font-weight:bold;">WhatsApp ile İletişime Geçin</a>
     </div>
 </div>
 
@@ -158,10 +162,19 @@
         segment = seg;
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('seg-' + seg.substring(0,3)).classList.add('active');
+        
+        // UI Elemanlarını Gizle/Göster
+        const isSpecial = (seg === 'hakkimda' || seg === 'genel');
         document.getElementById('calculator-ui').style.display = seg === 'hakkimda' ? 'none' : 'block';
         document.getElementById('about-box').style.display = seg === 'hakkimda' ? 'block' : 'none';
+        document.getElementById('content-genel').style.display = seg === 'genel' ? 'block' : 'none';
         
-        if (seg !== 'hakkimda') {
+        // Hesaplayıcı bileşenlerini kontrol et
+        document.getElementById('calc-fields').style.display = isSpecial ? 'none' : 'flex';
+        document.getElementById('calc-actions').style.display = isSpecial ? 'none' : 'grid';
+        document.getElementById('ziraiOpts').style.display = (seg === 'tarimsal' && !isSpecial) ? 'flex' : 'none';
+
+        if (!isSpecial) {
             document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
             const tabEl = document.getElementById(`tabs-${seg}`);
             if(tabEl) { tabEl.style.display = 'flex'; tabEl.querySelector('.tab-btn').click(); }
