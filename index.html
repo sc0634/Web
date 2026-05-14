@@ -10,7 +10,7 @@
             --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --info: #95a5a6;
             --success: #27ae60; --dark: #2c3e50; --light: #f8f9fa; --border: #dcdde1;
         }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background: #f1f2f6; margin: 0; padding: 10px; color: var(--dark); font-size: 11px; }
         .container { max-width: 950px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         
@@ -38,22 +38,22 @@
         .result-main-container { margin-top: 15px; display: none; }
         .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 20px; display: none; background: white; }
         
-        /* Tablo Başlık ve Buton Alanı */
         .result-header { background: var(--dark); color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
         .result-title { font-weight: bold; font-size: 12px; }
         .table-actions { display: flex; gap: 5px; }
-        .mini-btn { border: none; border-radius: 3px; color: white; padding: 4px 8px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 3px; transition: 0.2s; }
+        .mini-btn { border: none; border-radius: 3px; color: white; padding: 4px 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .mini-btn-pdf { background: #8e44ad; }
         .mini-btn-print { background: #2980b9; }
-        .mini-btn:hover { opacity: 0.8; }
 
-        table { width: 100%; font-size: 10px; border-collapse: collapse; background: white; }
-        table th, table td { border: 1px solid #eee; padding: 7px 4px; text-align: center; }
+        table { width: 100%; font-size: 11px; border-collapse: collapse; background: white; }
+        table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; color: var(--dark); font-weight: normal; }
         table th { background: #f8f9fa; color: #444; font-weight: bold; }
-        table tfoot tr { background: #f1f2f6; font-weight: bold; }
+        table tfoot tr { background: #f1f2f6; }
+        table tfoot td { font-weight: bold !important; color: #000 !important; }
+
+        .txt-indirim { color: #27ae60; }
+        .txt-gray { color: #7f8c8d; text-decoration: line-through; }
         .txt-bold { font-weight: bold; }
-        .txt-indirim { color: #27ae60; font-weight: bold; }
-        .txt-gray { color: #7f8c8d; text-decoration: line-through; font-size: 9px; }
 
         .btn-calc-container { margin-bottom: 15px; display: none; }
         .btn-calc { background: var(--success); width: 100%; height: 38px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 12px; }
@@ -62,7 +62,8 @@
             .no-print { display: none !important; } 
             body { padding: 0; background: white; }
             .container { box-shadow: none; max-width: 100%; }
-            .plan-wrapper { border: 1px solid #000; break-inside: avoid; }
+            .plan-wrapper { border: 1px solid #000; display: block !important; break-inside: avoid; }
+            .result-header { background: #2c3e50 !important; color: white !important; -webkit-print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -105,6 +106,7 @@
         </div>
 
         <div class="grid">
+            <div class="field" id="box-proforma" style="width:140px;"><label>Proforma Tutarı</label><input type="text" id="proforma" oninput="Calculator.calcFromProforma(this)"></div>
             <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="Calculator.fmtMoney(this)"></div>
             <div class="field" style="width:70px;"><label>Aylık %</label><input type="number" id="faizAylik" step="0.01" oninput="Calculator.syncInterest('aylik')"></div>
             <div class="field" style="width:70px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
@@ -200,17 +202,30 @@
             setMode: m => mode = m,
             getState: () => cfg[mode],
             autoCalc: function() { if (cfg[mode].unit === 'Yıl') this.calculate(); },
+            
+            calcFromProforma: function(i) {
+                let v = i.value.replace(/\D/g, "");
+                if(v) {
+                    i.value = new Intl.NumberFormat('tr-TR').format(v);
+                    let krediTutar = Math.round(parseInt(v) * 0.75);
+                    document.getElementById('tutar').value = krediTutar.toLocaleString('tr-TR');
+                    this.autoCalc();
+                }
+            },
+
             fmtMoney: function(i) {
                 let v = i.value.replace(/\D/g, "");
                 if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
                 this.autoCalc();
             },
+
             syncInterest: function(type) {
                 const y = document.getElementById('faiz'), a = document.getElementById('faizAylik');
                 if (type === 'yillik') a.value = (parseFloat(y.value) / 12).toFixed(2);
                 else y.value = (parseFloat(a.value) * 12).toFixed(2);
                 this.autoCalc();
             },
+
             handleYerli: function() {
                 const isYerli = document.getElementById('yerli').checked;
                 if(mode === 'traktor') cfg.traktor.sub = isYerli ? 50 : 25;
@@ -219,6 +234,7 @@
                 document.getElementById('subOran').value = cfg[mode].sub || 0;
                 this.calculate();
             },
+
             calculate: function() {
                 const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
                 if(!tutar) return;
@@ -242,6 +258,7 @@
                     pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, bRate, kRate, v, 'Ay');
                 }
             },
+
             drawTable: function(tutar, yF, sub, bRate, kRate, v, unit) {
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
@@ -255,7 +272,7 @@
                     <th>İndirimli Faiz</th>
                     <th>BSMV</th>
                     <th>KKDF</th>
-                    <th>Taksit</th>
+                    <th>İndirimli Taksit</th>
                 </tr></thead><tbody>`;
                 
                 let bal = tutar;
@@ -290,21 +307,29 @@
                 </tr></tfoot></table>`;
                 return html;
             },
+
             exportSinglePDF: function(id, name) {
                 const element = document.getElementById(id);
-                const opt = { margin: 10, filename: name + '.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+                const opt = { 
+                    margin: 10, 
+                    filename: name + '.pdf', 
+                    image: { type: 'jpeg', quality: 1 }, 
+                    html2canvas: { scale: 2, useCORS: true }, 
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+                };
                 html2pdf().set(opt).from(element).save();
             },
+
             printSingle: function(id) {
                 const content = document.getElementById(id).innerHTML;
                 const win = window.open('', '', 'height=700,width=900');
                 win.document.write('<html><head><title>Yazdır</title>');
-                win.document.write('<style>body{font-family:sans-serif;padding:20px;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ddd;padding:8px;text-align:center;} th{background:#f4f4f4;} .no-print{display:none;} .result-header{background:#2c3e50;color:white;padding:10px;text-align:center;font-weight:bold;} .txt-gray{color:#777;text-decoration:line-through;} .txt-indirim{color:green;font-weight:bold;}</style>');
+                win.document.write('<style>body{font-family:sans-serif;padding:20px;} table{width:100%;border-collapse:collapse;margin-top:20px; font-size:11px;} th,td{border:1px solid #eee;padding:8px;text-align:center;} th{background:#f4f4f4;font-weight:bold;} tfoot td{font-weight:bold !important; color:#000 !important;} .no-print{display:none;} .result-header{background:#2c3e50;color:white;padding:10px;text-align:center;font-weight:bold;} .txt-gray{color:#777;text-decoration:line-through;} .txt-indirim{color:green;}</style>');
                 win.document.write('</head><body>');
                 win.document.write(content);
                 win.document.write('</body></html>');
                 win.document.close();
-                win.print();
+                setTimeout(() => { win.print(); }, 500);
             }
         };
     })();
@@ -321,8 +346,12 @@
     function switchTab(btn, mode) {
         Calculator.setMode(mode);
         const s = Calculator.getState();
+        
+        // Proforma sadece traktör ve ekipmanda görünür
+        document.getElementById('box-proforma').style.display = (mode === 'traktor' || mode === 'ekipman') ? 'flex' : 'none';
         document.getElementById('extra-opts').style.display = (mode === 'traktor' || mode === 'ekipman') ? 'flex' : 'none';
         document.getElementById('col-bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
+        
         const boxVade = document.getElementById('box-vade');
         if(s.unit === 'Yıl') boxVade.style.display = 'none';
         else {
@@ -333,20 +362,23 @@
                 if(i === s.defVade) o.selected = true; vSel.appendChild(o);
             }
         }
+        
         document.getElementById('faiz').value = s.faiz.toFixed(2);
         document.getElementById('faizAylik').value = (s.faiz / 12).toFixed(2);
         document.getElementById('subOran').value = s.sub;
         document.getElementById('bsmv').value = s.bsmv;
         document.getElementById('kkdf').value = s.kkdf;
+        
         if(mode === 'traktor' || mode === 'ekipman') Calculator.handleYerli();
         else Calculator.calculate();
+        
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
     function initApp() {
-        document.getElementById('tutar').value = "1.000.000";
-        Calculator.fmtMoney(document.getElementById('tutar'));
+        document.getElementById('proforma').value = "1.333.333";
+        Calculator.calcFromProforma(document.getElementById('proforma'));
         switchSegment('tarimsal');
     }
 </script>
