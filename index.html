@@ -180,6 +180,11 @@
         document.getElementById('content-genel').style.display = seg === 'genel' ? 'block' : 'none';
         document.getElementById('calc-fields').style.display = isSpecial ? 'none' : 'flex';
         document.getElementById('calc-actions').style.display = isSpecial ? 'none' : 'grid';
+        
+        // Önemli: Özel sekmelerde seçenekler kutusunu kapat
+        if (isSpecial) {
+            document.getElementById('ziraiOpts').style.display = 'none';
+        }
 
         document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
         if (!isSpecial) {
@@ -222,7 +227,7 @@
     
     function reset() { 
         document.getElementById('result-main-container').style.display = 'none'; 
-        document.getElementById('apply-section').style.display = 'none'; // Segment/Tab değişince gizle
+        document.getElementById('apply-section').style.display = 'none'; 
         document.getElementById('pdfBtn').disabled = true; 
         document.getElementById('printBtn').disabled = true; 
     }
@@ -260,7 +265,6 @@
         });
 
         document.getElementById('result-main-container').style.display = 'block';
-        // Sadece Hakkımda ve Genel Veriler değilse göster
         if(segment !== 'hakkimda' && segment !== 'genel') {
             document.getElementById('apply-section').style.display = 'block';
         }
