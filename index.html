@@ -17,17 +17,10 @@
         .container { 
             max-width: 1000px; margin: 10px auto; background: #fff; padding: 20px; 
             border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
-            position: relative; min-height: 400px;
-        }
-
-        .top-print-btn {
-            position: absolute; top: 20px; right: 20px;
-            background: var(--dark); color: white; border: none;
-            padding: 8px 15px; border-radius: 5px; font-weight: bold;
-            cursor: pointer; font-size: 11px; z-index: 10;
+            position: relative; min-height: 200px;
         }
         
-        .segment-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; width: calc(100% - 100px); }
+        .segment-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; width: 100%; }
         .seg-btn { 
             flex: 1 0 auto; min-width: 95px; border: 2px solid transparent; 
             height: 40px; border-radius: 6px; color: white; font-weight: bold; 
@@ -53,10 +46,20 @@
 
         .options-container { 
             display: flex; flex-direction: row; gap: 10px; width: 100%;
-            padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
-            margin-top: 5px; flex-wrap: wrap;
+            padding: 12px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
+            margin: 10px 0; flex-wrap: wrap; align-items: center;
         }
-        .opt-row { display: flex; align-items: center; gap: 5px; cursor: pointer; min-width: 110px; } 
+        .opt-row { display: flex; align-items: center; gap: 6px; cursor: pointer; min-width: 90px; }
+        
+        /* Checkbox boyutu sabitlendi ve küçültüldü */
+        .opt-row input[type="checkbox"] { 
+            width: 14px !important; 
+            height: 14px !important; 
+            margin: 0; 
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .opt-row label { font-weight: 600; font-size: 12px; cursor: pointer; user-select: none; }
 
         .info-box { width: 100%; padding: 12px; margin-top: 10px; border-radius: 5px; font-weight: bold; display: none; text-align: center; font-size: 14px; }
         .hazine-box { width: 100%; padding: 8px; margin-top: 5px; border-radius: 5px; background: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; font-size: 11px; text-align: center; display: none; }
@@ -77,27 +80,14 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        /* Başvuru Bölümü */
-        .apply-footer { 
-            margin-top: 30px; padding: 20px; border-top: 2px solid var(--light); 
-            background: #fcfcfc; border-radius: 0 0 8px 8px;
-        }
-        .apply-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .apply-info h4 { margin: 0 0 10px 0; color: var(--dark); border-bottom: 2px solid var(--tarimsal); display: inline-block; }
-        .apply-info p { margin: 5px 0; font-size: 12px; }
-        .contact-btn { 
-            display: inline-block; padding: 10px 20px; background: #25d366; color: white; 
-            text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;
-        }
+        /* Hemen Başvur bölümü kaldırıldı */
 
         @media print { .no-print { display: none !important; } }
-        @media (max-width: 600px) { .apply-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body onload="initApp()">
 
 <div class="container" id="pdf-area">
-    <button class="top-print-btn no-print" onclick="window.print()">YAZDIR</button>
 
     <div class="segment-nav no-print">
         <button id="seg-tar" class="seg-btn bg-tar" onclick="switchSegment('tarimsal')">TARIMSAL</button>
@@ -124,13 +114,13 @@
             <div class="field" style="width:85px;" id="vade-box-select"><label>Vade</label><select id="vade-select" onchange="reset()"></select></div>
             <div class="field" style="width:70px;" id="sub-input-box"><label>İndirim %</label><input type="number" id="subOran" value="50" readonly></div>
             <div class="field" style="width:130px;" id="periyot-box"><label>Ödeme Periyodu</label><select id="periyot" onchange="reset()"></select></div>
-            
-            <div class="options-container" id="ziraiOpts">
-                <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
-                <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Buy Back</label></div>
-                <div id="hazine-info-box" class="hazine-box"></div>
-                <div id="dynamic-info-box" class="info-box"></div>
-            </div>
+        </div>
+
+        <div class="options-container no-print" id="ziraiOpts">
+            <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
+            <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Buy Back</label></div>
+            <div id="hazine-info-box" class="hazine-box"></div>
+            <div id="dynamic-info-box" class="info-box"></div>
         </div>
 
         <div class="actions no-print">
@@ -145,28 +135,11 @@
         </div>
     </div>
 
+    <p style="font-size: 11px; color: #999; margin-top: 25px; text-align: center;">*Bu hesaplama bilgilendirme amaçlıdır. Banka nihai faiz oranlarında değişiklik yapma hakkını saklı tutar.</p>
+
     <div id="about-box" style="display:none; padding:40px; text-align:center;">
         <h2 style="color:var(--dark)">Süleyman Coşkun</h2>
         <p>Finansal Çözümler ve Kredi Danışmanlığı</p>
-    </div>
-
-    <!-- Başvuru Bölümü -->
-    <div class="apply-footer">
-        <div class="apply-grid">
-            <div class="apply-info">
-                <h4>Hemen Başvur</h4>
-                <p><strong>Danışman:</strong> Süleyman Coşkun</p>
-                <p><strong>E-posta:</strong> info@suleymancoskun.com</p>
-                <a href="https://wa.me/905000000000" class="contact-btn no-print">WhatsApp'tan Sorun</a>
-            </div>
-            <div class="apply-info">
-                <h4>Gerekli Belgeler</h4>
-                <p>• Çiftçi Belgesi / ÇKS</p>
-                <p>• Kimlik Fotokopisi</p>
-                <p>• İşletme Tapu/Kira Sözleşmeleri</p>
-            </div>
-        </div>
-        <p style="font-size: 10px; color: #7f8c8d; margin-top: 15px; text-align: center;">*Bu hesaplama bilgilendirme amaçlıdır. Banka nihai faiz oranlarında değişiklik yapma hakkını saklı tutar.</p>
     </div>
 </div>
 
