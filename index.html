@@ -8,246 +8,170 @@
     <style>
         :root { 
             --genel: #95a5a6; --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --hakkimda: #34495e;
-            --success: #27ae60; --danger: #e74c3c; --dark: #2c3e50; --light: #ecf0f1; --border: #dcdde1;
-            --input-height: 40px;
+            --success: #2ecc71; --dark: #2c3e50; --light: #f5f6fa; --border: #dcdde1;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #f5f6fa; margin: 0; padding: 10px; color: var(--dark); font-size: 13px; }
-        
-        .container { 
-            max-width: 1000px; margin: 10px auto; background: #fff; padding: 20px; 
-            border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
-            position: relative; min-height: 200px;
-        }
-        
+        .container { max-width: 600px; margin: 10px auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
         /* Navigasyon */
-        .segment-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; width: 100%; }
-        .seg-btn { 
-            flex: 1 0 auto; min-width: 95px; border: 2px solid transparent; 
-            height: 40px; border-radius: 6px; color: white; font-weight: bold; 
-            cursor: pointer; font-size: 11px; opacity: 0.5; transition: 0.3s; padding: 0 15px;
-        }
-        .seg-btn.active { opacity: 1; border-color: #fff; outline: 2px solid var(--dark); }
-        .bg-gen { background: var(--genel); } .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); }
-        .bg-bir { background: var(--bireysel); } .bg-hak { background: var(--hakkimda); }
+        .segment-nav { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; }
+        .seg-btn { flex: 1; min-width: 85px; height: 45px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 11px; opacity: 0.6; }
+        .seg-btn.active { opacity: 1; box-shadow: inset 0 0 0 3px rgba(0,0,0,0.2); }
 
-        .tabs { display: none; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 8px; }
-        .tab-btn { padding: 6px 10px; border: none; background: #eee; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; }
-        .tab-btn.active { background: var(--dark); color: white; }
-        
-        .grid { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
-        .field { display: flex; flex-direction: column; gap: 4px; }
-        
-        input, select, textarea { 
-            height: var(--input-height); padding: 0 8px; 
-            border: 1px solid var(--border); border-radius: 5px; 
-            font-size: 12px; outline: none; background: white; width: 100%;
-        }
-        textarea { height: 80px; padding: 8px; resize: none; }
+        .tabs { display: none; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab-btn { padding: 8px 12px; border: 1px solid var(--border); background: #f8f9fa; border-radius: 6px; cursor: pointer; font-size: 12px; color: #7f8c8d; }
+        .tab-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
 
-        /* Seçenekler Paneli */
-        .options-container { 
-            display: none; flex-direction: row; gap: 10px; width: 100%;
-            padding: 12px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
-            margin: 10px 0; flex-wrap: wrap; align-items: center;
-        }
-        .opt-row { display: flex; align-items: center; gap: 6px; cursor: pointer; min-width: 90px; }
-        
-        /* Başvuru Bölümü */
-        .apply-container { margin-top: 20px; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: #f9f9f9; display: none; }
-        .apply-title { font-weight: bold; font-size: 14px; margin-bottom: 15px; color: var(--dark); border-bottom: 2px solid var(--success); padding-bottom: 5px; }
+        /* Form Alanları */
+        .grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+        label { font-weight: 600; font-size: 11px; color: #7f8c8d; }
+        input, select { height: 42px; padding: 0 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; width: 100%; }
 
-        /* Sabit İletişim Butonu */
-        .contact-fab {
-            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
-            background: #25d366; color: white; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; font-size: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 999;
-            text-decoration: none; transition: 0.3s;
+        /* Büyümeyen Checkbox Algoritması */
+        .options-container { display: none; gap: 20px; padding: 15px; background: #fff; border: 1px dashed var(--border); border-radius: 8px; margin: 15px 0; }
+        .opt-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .opt-row input[type="checkbox"] {
+            appearance: none; -webkit-appearance: none;
+            width: 22px !important; height: 22px !important;
+            border: 2px solid var(--bireysel); border-radius: 6px;
+            cursor: pointer; position: relative; background: #fff; flex-shrink: 0; margin: 0;
         }
-        .contact-fab:hover { transform: scale(1.1); }
+        .opt-row input[type="checkbox"]:checked { background: var(--bireysel); }
+        .opt-row input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; font-size: 16px; left: 4px; top: -1px; }
 
-        .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
-        .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        /* Butonlar */
+        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn { height: 45px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 12px; }
         .btn-calc { background: var(--success); }
-        .btn-apply { background: var(--success); width: 100%; margin-top: 10px; }
-        
-        .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
-        .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; }
+        .btn-pdf { background: #9b59b6; }
+        .btn-print { background: var(--dark); }
 
-        @media print { .no-print, .contact-fab { display: none !important; } }
+        /* Tablo Stili */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        th, td { border: 1px solid #eee; padding: 8px 4px; text-align: center; }
+        th { background: #f8f9fa; }
+
+        .whatsapp-float { position: fixed; bottom: 25px; right: 25px; width: 55px; height: 55px; background: #2ecc71; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); text-decoration: none; z-index: 1000; }
+        .whatsapp-float svg { width: 30px; height: 30px; fill: white; }
+
+        @media print { .no-print, .whatsapp-float { display: none !important; } }
     </style>
 </head>
 <body onload="initApp()">
 
-<!-- Kaybolan İletişim Butonu (WhatsApp) -->
-<a href="https://wa.me/905XXXXXXXXX" class="contact-fab no-print" target="_blank" title="İletişime Geç">
-    <span style="font-style: normal;">💬</span>
-</a>
-
 <div class="container" id="pdf-area">
-
     <div class="segment-nav no-print">
-        <button id="seg-tar" class="seg-btn bg-tar" onclick="switchSegment('tarimsal')">TARIMSAL</button>
-        <button id="seg-tic" class="seg-btn bg-tic" onclick="switchSegment('ticari')">TİCARİ</button>
-        <button id="seg-bir" class="seg-btn bg-bir" onclick="switchSegment('bireysel')">BİREYSEL</button>
-        <button id="seg-hak" class="seg-btn bg-hak" onclick="switchSegment('hakkimda')">HAKKIMDA</button>
-        <button id="seg-gen" class="seg-btn bg-gen" onclick="switchSegment('genel')">GENEL VERİLER</button>
+        <button id="seg-tar" class="seg-btn active" style="background:var(--tarimsal)" onclick="switchSegment('tarimsal')">TARIMSAL</button>
+        <button id="seg-tic" class="seg-btn" style="background:var(--ticari)" onclick="switchSegment('ticari')">TİCARİ</button>
+        <button id="seg-bir" class="seg-btn" style="background:var(--bireysel)" onclick="switchSegment('bireysel')">BİREYSEL</button>
+        <button id="seg-hak" class="seg-btn" style="background:var(--hakkimda)" onclick="switchSegment('hakkimda')">HAKKIMDA</button>
     </div>
 
-    <div id="calculator-ui">
-        <div id="content-genel" style="display:none; padding:20px; text-align:center; color:#7f8c8d;">Henüz genel veri girişi yapılmamıştır.</div>
-
-        <div class="tabs no-print" id="tabs-tarimsal">
-            <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
-            <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
-            <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
-            <button class="tab-btn" onclick="switchTab(this, 'isletme')">İşletme Kredisi</button>
-        </div>
-        
-        <div class="tabs no-print" id="tabs-ticari">
-            <button class="tab-btn" onclick="switchTab(this, 'ticari_taksitli')">Ticari Taksitli</button>
-        </div>
-
-        <div class="tabs no-print" id="tabs-bireysel">
-            <button class="tab-btn" onclick="switchTab(this, 'konut')">Konut</button>
-            <button class="tab-btn" onclick="switchTab(this, 'tasit')">Taşıt</button>
-            <button class="tab-btn" onclick="switchTab(this, 'ihtiyac')">İhtiyaç</button>
-        </div>
-
-        <div id="calc-fields" class="grid no-print">
-            <div class="field" style="width:140px;"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
-            <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
-            <div class="field" style="width:65px;"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
-            <div class="field" style="width:65px;"><label>Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
-            <div class="field" style="width:85px;" id="vade-box-select"><label>Vade</label><select id="vade-select" onchange="reset()"></select></div>
-            <div class="field" style="width:70px; display:none;" id="sub-input-box"><label>İndirim %</label><input type="number" id="subOran" value="50" readonly></div>
-            <div class="field" style="width:130px;" id="periyot-box"><label>Ödeme Periyodu</label><select id="periyot" onchange="reset()"></select></div>
-        </div>
-
-        <div class="options-container no-print" id="ziraiOpts">
-            <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
-            <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Buy Back</label></div>
-        </div>
-
-        <div class="actions no-print" id="calc-actions">
-            <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
-            <button class="btn" style="background:#9b59b6" id="pdfBtn" onclick="indir()" disabled>PDF İNDİR</button>
-            <button class="btn" style="background:var(--dark)" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
-        </div>
-
-        <div id="result-main-container" class="result-main-container">
-            <div class="result-main-title">Ödeme Planı Detayları</div>
-            <div id="result-area" style="padding:10px;"></div>
-        </div>
-
-        <div id="apply-section" class="apply-container no-print">
-            <div class="apply-title">Hemen Başvur</div>
-            <div class="grid" style="gap:15px;">
-                <div class="field" style="flex:1; min-width:200px;"><label>TC Kimlik Numarası</label><input type="text" id="app-tckn" maxlength="11"></div>
-                <div class="field" style="flex:1; min-width:200px;"><label>Cep Telefonu</label><input type="tel" id="app-phone"></div>
-                <div class="field" style="width:100%;"><label>Açıklama / Not</label><textarea id="app-note"></textarea></div>
-                <button class="btn btn-apply" onclick="alert('Başvurunuz iletilmiştir.')">BAŞVURUYU TAMAMLA</button>
-            </div>
-        </div>
+    <div class="tabs no-print" id="tabs-tar" style="display:flex;">
+        <button class="tab-btn active" onclick="switchTab(this,'traktor')">Traktör</button>
+        <button class="tab-btn" onclick="switchTab(this,'ekipman')">Ekipman</button>
+        <button class="tab-btn" onclick="switchTab(this,'zirai')">Çiftçi Taksitli</button>
+        <button class="tab-btn" onclick="switchTab(this,'isletme')">İşletme</button>
     </div>
 
-    <div id="about-box" style="display:none; padding:40px; text-align:center;">
-        <h2 style="color:var(--dark)">Süleyman Coşkun</h2>
-        <p>Finansal Çözümler ve Kredi Danışmanlığı</p>
+    <div class="grid no-print">
+        <div class="field"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
+        <div class="field" style="max-width:80px;"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01"></div>
+        <div class="field" id="vade-alan" style="display:none;"><label>Vade (Ay)</label><input type="number" id="vade" value="12"></div>
+    </div>
+
+    <div class="options-container no-print" id="opts-zirai" style="display:flex;">
+        <div class="opt-row"><input type="checkbox" id="yerli" checked><label for="yerli">Yerli Malı</label></div>
+        <div class="opt-row" id="bb-row"><input type="checkbox" id="buyback" checked><label for="buyback">Buy Back</label></div>
+    </div>
+
+    <div class="actions no-print">
+        <button class="btn btn-calc" onclick="hesapla()">HESAPLA</button>
+        <button class="btn btn-pdf" id="pdfBtn" onclick="window.print()" disabled>PDF İNDİR</button>
+        <button class="btn btn-print" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
+    </div>
+
+    <div id="result-main" style="margin-top:20px; display:none;">
+        <div id="res-content"></div>
     </div>
 </div>
 
+<a href="https://wa.me/905345217697" class="whatsapp-float no-print" target="_blank">
+    <svg viewBox="0 0 24 24"><path d="M20.2 3.8C18.1 1.7 15.2 0.5 12.1 0.5c-6.2 0-11.2 5-11.2 11.2 0 2 .5 3.9 1.5 5.6L0.6 23.4l6.3-1.6c1.6.9 3.5 1.3 5.4 1.3 6.2 0 11.2-5 11.2-11.2 0-3-1.2-5.9-3.3-8.1zm-8.1 17.4c-1.7 0-3.3-.5-4.8-1.3l-.3-.2-3.6.9 1-3.5-.2-.3c-.9-1.5-1.4-3.3-1.4-5.1 0-5.2 4.2-9.4 9.4-9.4 2.5 0 4.9 1 6.7 2.8 1.8 1.8 2.8 4.2 2.8 6.7-.1 5.2-4.3 9.4-9.6 9.4zm5.1-7.1c-.3-.1-1.7-.9-1.9-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1s-1.2-.4-2.3-1.4c-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6s.3-.3.4-.5c.1-.1.2-.3.3-.5.1-.2 0-.4 0-.5C10 9 9.3 7.3 9 6.7c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.7.4-.3.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.3-.3-.4-.6-.5z"/></svg>
+</a>
+
 <script>
-    let mode = 'traktor'; let segment = 'tarimsal';
-    function initApp() { fmtMoney(document.getElementById('proforma')); fmtMoney(document.getElementById('tutar')); switchSegment('tarimsal'); }
-    
-    function switchSegment(seg) {
-        segment = seg;
+    let currentSegment = 'tarimsal';
+    let currentMode = 'traktor';
+
+    function initApp() { fmtMoney(document.getElementById('tutar')); }
+
+    function switchSegment(s) {
+        currentSegment = s;
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('seg-' + seg.substring(0,3)).classList.add('active');
-        
-        const isSpecial = (seg === 'hakkimda' || seg === 'genel');
-        document.getElementById('calculator-ui').style.display = seg === 'hakkimda' ? 'none' : 'block';
-        document.getElementById('about-box').style.display = seg === 'hakkimda' ? 'block' : 'none';
-        document.getElementById('content-genel').style.display = seg === 'genel' ? 'block' : 'none';
-        document.getElementById('calc-fields').style.display = isSpecial ? 'none' : 'flex';
-        document.getElementById('calc-actions').style.display = isSpecial ? 'none' : 'grid';
-        
-        document.getElementById('ziraiOpts').style.display = 'none'; // Başlangıçta gizle
-        document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
-        
-        if (!isSpecial) {
-            const tabEl = document.getElementById(`tabs-${seg}`);
-            if(tabEl) { tabEl.style.display = 'flex'; tabEl.querySelector('.tab-btn').click(); }
-        }
+        event.target.classList.add('active');
+        document.getElementById('tabs-tar').style.display = (s === 'tarimsal') ? 'flex' : 'none';
+        document.getElementById('vade-alan').style.display = (s !== 'tarimsal') ? 'flex' : 'none';
+        document.getElementById('opts-zirai').style.display = 'none';
         reset();
     }
 
     function switchTab(btn, m) {
+        currentMode = m;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active'); mode = m;
-        const isSub = (mode === 'traktor' || mode === 'ekipman');
-        document.getElementById('vade-box-select').style.display = (segment !== 'tarimsal' || mode === 'isletme') ? 'flex' : 'none';
-        document.getElementById('periyot-box').style.display = (segment !== 'tarimsal' || mode === 'isletme') ? 'flex' : 'none';
-        document.getElementById('ziraiOpts').style.display = (segment === 'tarimsal' && isSub) ? 'flex' : 'none';
-        document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-        fillVades(segment === 'ticari' ? 60 : 36);
-        updatePeriyotOptions();
+        btn.classList.add('active');
+        document.getElementById('opts-zirai').style.display = (m === 'traktor' || m === 'ekipman') ? 'flex' : 'none';
+        document.getElementById('bb-row').style.display = (m === 'traktor') ? 'flex' : 'none';
+        document.getElementById('vade-alan').style.display = (m === 'isletme') ? 'flex' : 'none';
         reset();
     }
 
-    function syncFaiz(src) {
-        const y = document.getElementById('faiz'), a = document.getElementById('faizAylik');
-        if (src === 'yillik') a.value = (parseFloat(y.value) / 12).toFixed(2);
-        else y.value = (parseFloat(a.value) * 12).toFixed(2);
+    function fmtMoney(i) {
+        let v = i.value.replace(/\D/g, "");
+        if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
         reset();
     }
 
-    function updatePeriyotOptions() {
-        const p = document.getElementById('periyot'); p.innerHTML = '';
-        const opts = [{v:"1",t:"Aylık"}, {v:"3",t:"3 Ayda Bir"}, {v:"6",t:"6 Ayda Bir"}, {v:"12",t:"Yıllık"}];
-        opts.forEach(o => { let el = document.createElement('option'); el.value = o.v; el.text = o.t; p.appendChild(el); });
-        p.value = segment === 'tarimsal' ? "12" : "1";
-    }
-
-    function fillVades(max) {
-        const s = document.getElementById('vade-select'); s.innerHTML = '';
-        for(let i=1; i<=max; i++) {
-            let o = document.createElement('option'); o.value = i; o.text = i + " Ay";
-            if(i===12) o.selected = true; s.appendChild(o);
-        }
-    }
-
-    function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
-    function reset() { 
-        document.getElementById('result-main-container').style.display = 'none'; 
-        document.getElementById('apply-section').style.display = 'none';
-        document.getElementById('pdfBtn').disabled = true; 
-        document.getElementById('printBtn').disabled = true; 
-    }
-
-    function updateYerli() { 
-        if(mode === 'traktor') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 50 : 25;
-        else if(mode === 'ekipman') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 75 : 50;
-        reset(); 
+    function reset() {
+        document.getElementById('result-main').style.display = 'none';
+        document.getElementById('pdfBtn').disabled = true;
+        document.getElementById('printBtn').disabled = true;
     }
 
     function hesapla() {
-        const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
-        if(anaPara <= 0) return;
-        document.getElementById('result-main-container').style.display = 'block';
-        document.getElementById('apply-section').style.display = 'block';
-        document.getElementById('pdfBtn').disabled = false; 
-        document.getElementById('printBtn').disabled = false;
-        
-        const res = document.getElementById('result-area'); res.innerHTML = 'Ödeme Planı Tablosu Burada Oluşacak...'; 
-        // (Hesaplama fonksiyonunun devamı öncekiyle aynıdır)
-    }
+        const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
+        const faizYillik = parseFloat(document.getElementById('faiz').value) / 100;
+        const resDiv = document.getElementById('res-content');
+        resDiv.innerHTML = '';
 
-    function indir() {
-        const el = document.getElementById('pdf-area');
-        html2pdf().set({ margin: 5, filename: 'Kredi_Plani.pdf', html2canvas: { scale: 2, ignoreElements: (e) => e.classList.contains('no-print') } }).from(el).save();
+        if(tutar <= 0) return alert("Lütfen tutar giriniz.");
+
+        let vadeler = (currentSegment === 'tarimsal' && currentMode !== 'isletme') ? [1, 2, 3, 4, 5] : [parseInt(document.getElementById('vade').value) || 12];
+        
+        vadeler.forEach(v => {
+            let baslik = (currentSegment === 'tarimsal' && currentMode !== 'isletme') ? v + ". Yıl Sonu Ödemesi" : v + " Ay Vade Planı";
+            let tablo = `<h3>${baslik}</h3><table><thead><tr><th>Taksit</th><th>Anapara</th><th>Faiz+Vergi</th><th>Taksit Tutarı</th></tr></thead><tbody>`;
+            
+            let aylikFaiz = faizYillik / 12;
+            let taksitSayisi = (currentSegment === 'tarimsal' && currentMode !== 'isletme') ? v : v; // Basitleştirilmiş mantık
+            
+            // Örnek Hesaplama (Temsili Tablo Oluşturma)
+            let taksitTutari = (tutar * aylikFaiz) / (1 - Math.pow(1 + aylikFaiz, -v));
+            if(currentSegment === 'tarimsal') taksitTutari = (tutar + (tutar * faizYillik * v)) / v;
+
+            for(let i = 1; i <= v; i++) {
+                tablo += `<tr><td>${i}</td><td>${Math.round(tutar/v).toLocaleString('tr-TR')} TL</td><td>${Math.round(taksitTutari - (tutar/v)).toLocaleString('tr-TR')} TL</td><td><b>${Math.round(taksitTutari).toLocaleString('tr-TR')} TL</b></td></tr>`;
+                if(currentSegment === 'tarimsal' && currentMode !== 'isletme') break; // Yıllık tek ödeme gösterimi
+            }
+            tablo += `</tbody></table>`;
+            resDiv.innerHTML += tablo;
+        });
+
+        document.getElementById('result-main').style.display = 'block';
+        document.getElementById('pdfBtn').disabled = false;
+        document.getElementById('printBtn').disabled = false;
     }
 </script>
 </body>
