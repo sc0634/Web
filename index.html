@@ -46,7 +46,7 @@
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; }
 
         .options-container { 
-            display: none; flex-direction: row; gap: 10px; width: 100%;
+            display: flex; flex-direction: row; gap: 10px; width: 100%;
             padding: 12px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
             margin: 10px 0; flex-wrap: wrap; align-items: center;
         }
@@ -56,6 +56,7 @@
         .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; }
         
+        /* Başvuru Konteynırı */
         .apply-container { margin-top: 20px; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: #f9f9f9; display: none; }
         .apply-title { font-weight: bold; font-size: 14px; margin-bottom: 15px; color: var(--dark); border-bottom: 2px solid var(--success); padding-bottom: 5px; }
 
@@ -86,7 +87,6 @@
             Henüz genel veri girişi yapılmamıştır.
         </div>
 
-        <!-- Sekmeler -->
         <div class="tabs no-print" id="tabs-tarimsal">
             <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
             <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
@@ -104,7 +104,6 @@
             <button class="tab-btn" onclick="switchTab(this, 'ihtiyac')">İhtiyaç</button>
         </div>
 
-        <!-- Giriş Alanları -->
         <div id="calc-fields" class="grid no-print">
             <div class="field" style="width:140px;"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
             <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
@@ -117,7 +116,6 @@
             <div class="field" style="width:130px;" id="periyot-box"><label>Ödeme Periyodu</label><select id="periyot" onchange="reset()"></select></div>
         </div>
 
-        <!-- Sadece Tarımsal Seçili olduğunda görünecek seçenekler -->
         <div class="options-container no-print" id="ziraiOpts">
             <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
             <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Buy Back</label></div>
@@ -129,7 +127,6 @@
             <button class="btn btn-print" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
         </div>
 
-        <!-- Sonuç Alanı -->
         <div id="result-main-container" class="result-main-container">
             <div class="result-main-title">Ödeme Planı Detayları</div>
             <div id="result-area" style="padding:10px;"></div>
@@ -156,7 +153,6 @@
         </div>
     </div>
 
-    <!-- Hakkımda -->
     <div id="about-box" style="display:none; padding:40px; text-align:center;">
         <h2 style="color:var(--dark)">Süleyman Coşkun</h2>
         <p>Finansal Çözümler ve Kredi Danışmanlığı</p>
@@ -165,11 +161,7 @@
 
 <script>
     let mode = 'traktor'; let segment = 'tarimsal';
-    function initApp() { 
-        fmtMoney(document.getElementById('proforma')); 
-        fmtMoney(document.getElementById('tutar')); 
-        switchSegment('tarimsal'); 
-    }
+    function initApp() { fmtMoney(document.getElementById('proforma')); fmtMoney(document.getElementById('tutar')); switchSegment('tarimsal'); }
     
     function syncFaiz(src) {
         const y = document.getElementById('faiz'), a = document.getElementById('faizAylik');
@@ -189,17 +181,11 @@
         document.getElementById('content-genel').style.display = seg === 'genel' ? 'block' : 'none';
         document.getElementById('calc-fields').style.display = isSpecial ? 'none' : 'flex';
         document.getElementById('calc-actions').style.display = isSpecial ? 'none' : 'grid';
-        
-        // Zirai seçenekleri segment bazında başlangıçta gizle
-        document.getElementById('ziraiOpts').style.display = 'none';
 
         document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
         if (!isSpecial) {
             const tabEl = document.getElementById(`tabs-${seg}`);
-            if(tabEl) { 
-                tabEl.style.display = 'flex'; 
-                tabEl.querySelector('.tab-btn').click(); 
-            }
+            if(tabEl) { tabEl.style.display = 'flex'; tabEl.querySelector('.tab-btn').click(); }
         }
         reset();
     }
@@ -207,18 +193,12 @@
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
-        
         const isSub = (mode === 'traktor' || mode === 'ekipman');
         const showVadePeriyot = (segment !== 'tarimsal' || mode === 'isletme');
-        
         document.getElementById('vade-box-select').style.display = showVadePeriyot ? 'flex' : 'none';
         document.getElementById('periyot-box').style.display = showVadePeriyot ? 'flex' : 'none';
-        
-        // Sadece Traktör/Ekipman modunda Yerli Malı/Buyback kutusunu göster
-        document.getElementById('ziraiOpts').style.display = (segment === 'tarimsal' && isSub) ? 'flex' : 'none';
+        document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-        document.getElementById('bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
-        
         fillVades(segment === 'ticari' ? 60 : 36);
         updatePeriyotOptions();
         reset();
@@ -243,7 +223,7 @@
     
     function reset() { 
         document.getElementById('result-main-container').style.display = 'none'; 
-        document.getElementById('apply-section').style.display = 'none';
+        document.getElementById('apply-section').style.display = 'none'; // Segment/Tab değişince gizle
         document.getElementById('pdfBtn').disabled = true; 
         document.getElementById('printBtn').disabled = true; 
     }
@@ -281,6 +261,7 @@
         });
 
         document.getElementById('result-main-container').style.display = 'block';
+        // Sadece Hakkımda ve Genel Veriler değilse göster
         if(segment !== 'hakkimda' && segment !== 'genel') {
             document.getElementById('apply-section').style.display = 'block';
         }
