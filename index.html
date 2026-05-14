@@ -112,6 +112,7 @@
             <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
             <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
             <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
+            <button class="tab-btn" onclick="switchTab(this, 'isletme')">İşletme Kredisi</button>
         </div>
         <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari')">İşletme</button></div>
         <div class="tabs no-print" id="tabs-bireysel"><button class="tab-btn" onclick="switchTab(this, 'tuketici')">İhtiyaç</button></div>
@@ -234,8 +235,11 @@
 
         if (segment !== 'isermaye') {
             document.getElementById('dynamic-hide-group').style.display = 'flex';
+            document.getElementById('main-inputs').style.display = 'flex';
+            document.getElementById('main-actions').style.display = 'grid';
+
             if(isSub) document.getElementById('faiz').value = "40.50";
-            else if(mode === 'zirai' || isTic) document.getElementById('faiz').value = "46.00";
+            else if(mode === 'zirai' || isTic || mode === 'isletme') document.getElementById('faiz').value = "46.00";
             else if(isBir) document.getElementById('faizAylik').value = "4.39";
             syncFaiz(isBir ? 'aylik' : 'yillik');
 
@@ -245,11 +249,11 @@
             document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
             document.getElementById('bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
             document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-            document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai') ? 'flex' : 'none';
+            document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && mode !== 'zirai' && mode !== 'isletme') ? 'flex' : 'none';
 
             if(segment === 'tarimsal') {
-                document.getElementById('bsmv').value = (mode === 'zirai' ? 15 : 5);
-                document.getElementById('kkdf').value = (mode === 'zirai' ? 15 : 0);
+                document.getElementById('bsmv').value = (mode === 'zirai' || mode === 'isletme' ? 15 : 5);
+                document.getElementById('kkdf').value = (mode === 'zirai' || mode === 'isletme' ? 15 : 0);
                 updateYerli();
             } else {
                 document.getElementById('bsmv').value = (isTic ? 5 : 15);
