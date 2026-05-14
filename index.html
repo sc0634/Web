@@ -79,13 +79,21 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        /* Başvuru Paneli Yeni Yerleşim */
-        .apply-container { display: flex; flex-direction: column; gap: 12px; padding: 15px; }
-        .apply-row-dual { display: flex; gap: 10px; }
-        .apply-row-dual .field { flex: 1; }
-        .apply-row-single { width: 100%; }
+        /* BAŞVURU PANELİ KESİN TEK SATIR (MOBİL DAHİL) */
+        .apply-row-forced { 
+            display: flex !important; 
+            flex-direction: row !important; 
+            flex-wrap: nowrap !important; 
+            gap: 5px; 
+            padding: 10px; 
+            align-items: flex-end; 
+            width: 100%;
+        }
+        .apply-row-forced .field { flex: 1; min-width: 0; }
+        .apply-row-forced .btn-box { flex: 1; min-width: 0; }
+        .apply-row-forced input { font-size: 10px; padding: 0 4px; }
+        .apply-row-forced label { font-size: 7px; white-space: nowrap; overflow: hidden; }
 
-        /* Chat Widget */
         #chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
         .chat-bubble { 
             display: none; width: 280px; background: white; border-radius: 12px; 
@@ -101,8 +109,8 @@
 
         @media (max-width: 600px) {
             .actions { grid-template-columns: 1fr; }
-            .apply-row-dual { flex-direction: column; }
             #prof-input-box, #tutar-input-box { width: 48%; }
+            .apply-row-forced .btn { font-size: 9px; height: 40px; }
         }
     </style>
 </head>
@@ -161,20 +169,14 @@
             <div id="result-area"></div>
         </div>
 
-        <!-- Hızlı Başvuru Paneli -->
+        <!-- HIZLI BAŞVURU PANELİ - KESİN TEK SATIR -->
         <div id="basvuru-paneli" class="result-main-container no-print" style="margin-top: 20px; border-color: var(--success);">
             <div class="result-main-title" style="background: var(--success);">Hızlı Başvuru Paneli</div>
-            <div class="apply-container">
-                <div class="apply-row-dual">
-                    <div class="field"><label>T.C. Kimlik No</label><input type="text" id="app-tckn" maxlength="11" placeholder="11 Haneli TCKN"></div>
-                    <div class="field"><label>Telefon</label><input type="tel" id="app-phone" placeholder="05XX XXX XX XX"></div>
-                </div>
-                <div class="apply-row-single">
-                    <div class="field"><label>Notunuz</label><input type="text" id="app-note" placeholder="Eklemek istediğiniz not..."></div>
-                </div>
-                <div class="apply-row-single">
-                    <button class="btn btn-calc" style="width:100%" onclick="alert('Başvurunuz Süleyman Bey\'e iletildi!')">BAŞVURUYU GÖNDER</button>
-                </div>
+            <div class="apply-row-forced">
+                <div class="field"><label>TCKN</label><input type="text" id="app-tckn" maxlength="11" placeholder="TCKN"></div>
+                <div class="field"><label>Telefon</label><input type="tel" id="app-phone" placeholder="05xx"></div>
+                <div class="field"><label>Not</label><input type="text" id="app-note" placeholder="Not..."></div>
+                <div class="btn-box"><button class="btn btn-calc" style="width:100%" onclick="alert('Başvurunuz iletildi!')">BAŞVUR</button></div>
             </div>
         </div>
     </div>
@@ -191,9 +193,8 @@
             <span>Süleyman Coşkun</span>
             <button onclick="toggleChat()" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">&times;</button>
         </div>
-        <div style="padding: 15px; font-size: 12px;">Merhaba! Detaylı danışmanlık için WhatsApp'tan yazabilirsiniz.</div>
         <div style="padding: 10px 15px 15px;">
-            <a href="https://wa.me/905345217697?text=Merhaba%20Süleyman%20Bey,%20kredi%20hesaplaması%20hakkında%20bilgi%20almak%20istiyorum." target="_blank" style="text-decoration: none;">
+            <a href="https://wa.me/905345217697?text=Bilgi%20istiyorum." target="_blank" style="text-decoration: none;">
                 <button class="btn" style="background: #25d366; width: 100%;">WhatsApp'tan Yazın</button>
             </a>
         </div>
@@ -296,7 +297,7 @@
             let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / periyot);
             let dF = (yF / 12) * periyot, bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
-            let h = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${v} ${segment==='tarimsal'?'Yıl':'Ay'}</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Brüt Faiz</th>${subO>0?'<th>İnd. Faiz</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
+            let h = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${v} ${segment==='tarimsal'?'Yıl':'Ay'}</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Brüt Faiz</th>${subO>0?'<th>Ind. Faiz</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
             let kalan = anaPara;
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), ind = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b);
