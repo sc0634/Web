@@ -218,26 +218,48 @@
         const isIsletme = (mode === 'isletme');
         const isSub = (mode === 'traktor' || mode === 'ekipman');
 
-        if(mode === 'zirai' || mode === 'ticari_taksitli') {
+        // Varsayılan Vergi Oranları Sıfırlama
+        document.getElementById('bsmv').value = 5;
+        document.getElementById('kkdf').value = 0;
+
+        // Modlara Özel Ayarlar
+        if(mode === 'zirai') {
+            document.getElementById('faiz').value = 46; syncFaiz('yillik');
+            document.getElementById('bsmv').value = 15;
+            document.getElementById('kkdf').value = 15;
+        } else if (mode === 'ticari_taksitli') {
             document.getElementById('faiz').value = 46; syncFaiz('yillik');
         } else if (mode === 'ihtiyac') {
             document.getElementById('faizAylik').value = 4.39; syncFaiz('aylik');
+            document.getElementById('bsmv').value = 15;
+            document.getElementById('kkdf').value = 15;
         } else if (mode === 'konut') {
             document.getElementById('faizAylik').value = 2.84; syncFaiz('aylik');
+            document.getElementById('bsmv').value = 0;
+            document.getElementById('kkdf').value = 0;
+        } else if (mode === 'tasit') {
+            document.getElementById('bsmv').value = 15;
+            document.getElementById('kkdf').value = 15;
         }
 
+        // Proforma Görünürlük
         const hideProforma = (mode === 'ihtiyac' || mode === 'ticari_taksitli' || mode === 'zirai');
         document.getElementById('proforma-box').style.display = hideProforma ? 'none' : 'flex';
+
+        // Vade ve Periyot Görünürlük (Çiftçi Taksitli'de TAMAMEN GİZLİ)
+        const isZirai = (mode === 'zirai');
+        const showVadePeriyot = (segment !== 'tarimsal' || (mode !== 'traktor' && mode !== 'ekipman' && mode !== 'isletme'));
+        
+        document.getElementById('vade-box-select').style.display = (showVadePeriyot && !isZirai) ? 'flex' : 'none';
+        document.getElementById('periyot-box').style.display = (showVadePeriyot && !isZirai) ? 'flex' : 'none';
 
         document.getElementById('isletme-ozel').style.display = isIsletme ? 'block' : 'none';
         document.getElementById('calc-fields').style.display = isIsletme ? 'none' : 'flex';
         document.getElementById('calc-actions').style.display = isIsletme ? 'none' : 'grid';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
+
         if(!isIsletme) {
-            const showVadePeriyot = (segment !== 'tarimsal' || mode === 'zirai');
-            document.getElementById('vade-box-select').style.display = showVadePeriyot ? 'flex' : 'none';
-            document.getElementById('periyot-box').style.display = showVadePeriyot ? 'flex' : 'none';
             const maxVade = (mode === 'konut') ? 120 : (segment === 'ticari' ? 60 : 36);
             fillVades(maxVade, mode === 'konut' ? 120 : 12);
             updatePeriyotOptions();
@@ -285,17 +307,31 @@
         const res = document.getElementById('result-area'); res.innerHTML = '';
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
         if(anaPara <= 0) return;
-        const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
+        
+        const yF = document.getElementById('faiz').value / 100, 
+              bsmv = document.getElementById('bsmv').value / 100, 
+              kkdf = document.getElementById('kkdf').value / 100;
+        
         const periyot = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? 12 : parseInt(document.getElementById('periyot').value);
         const subO = (segment === 'tarimsal' && (mode === 'traktor' || mode === 'ekipman')) ? document.getElementById('subOran').value / 100 : 0;
-        let vades = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade-select').value)];
+        
+        // Çiftçi Taksitli ise 1-5 yıl arası, değilse seçili vade
+        let vades = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? [5, 4, 3, 2, 1] : 
+                    (mode === 'zirai' ? [60, 48, 36, 24, 12] : [parseInt(document.getElementById('vade-select').value)]);
         
         vades.forEach(v => {
             let tSayisi = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? v : Math.ceil(v / periyot);
-            let dF = (yF / 12) * periyot, bF = dF * (1 + bsmv + kkdf);
+            if(mode === 'zirai') tSayisi = v / 12; // Zirai için taksit sayısı yıl bazlıdır
+
+            let dF = (yF / 12) * (mode === 'zirai' ? 12 : periyot); 
+            let bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
-            let label = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? `${v} Yıl` : `${v} Ay`;
-            let h = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${label}</div><table style="width:100%;font-size:11px;border-collapse:collapse;"><thead><tr style="background:#eee"><th>Tks</th><th>Ana Para</th><th>Brüt Faiz</th>${subO>0?'<th>Ind. Faiz</th>':''}<th>Taksit</th></tr></thead><tbody>`;
+            
+            let label = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? `${v} Yıl` : 
+                        (mode === 'zirai' ? `${v/12} Yıl` : `${v} Ay`);
+            
+            let h = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${label}</div><table style="width:100%;font-size:11px;border-collapse:collapse;"><thead><tr style="background:#eee"><th>Tks</th><th>Ana Para</th><th>Brüt Faiz+Vergi</th>${subO>0?'<th>Ind. Faiz</th>':''}<th>Taksit</th></tr></thead><tbody>`;
+            
             let kalan = anaPara, tAna = 0, tFaiz = 0, tInd = 0, tTaksit = 0;
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), ind = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b);
