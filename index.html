@@ -26,7 +26,7 @@
         
         .grid { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
         .field { display: flex; flex-direction: column; gap: 4px; }
-        input, select { height: var(--input-height); padding: 0 8px; border: 1px solid var(--border); border-radius: 5px; font-size: 12px; }
+        input, select { height: var(--input-height); padding: 0 8px; border: 1px solid var(--border); border-radius: 5px; font-size: 12px; outline: none; }
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; }
 
         .options-container { display: none; flex-direction: row; gap: 15px; width: 100%; padding: 8px 12px; background: #fdfdfd; border: 1px solid var(--light); border-radius: 5px; margin: 10px 0; align-items: center; }
@@ -39,10 +39,17 @@
         table th, table td { border: 1px solid #ddd; padding: 4px; text-align: center; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
-        .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
+        .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         .btn-calc { background: var(--success); } .btn-pdf { background: #9b59b6; } .btn-print { background: var(--dark); }
 
         #isletme-ozel { display: none; padding: 15px; background: #fcfcfc; border: 1px solid var(--border); border-radius: 5px; margin-bottom: 10px; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .container { box-shadow: none; padding: 0; }
+            table { font-size: 10px; }
+            @page { size: auto; margin: 5mm; }
+        }
     </style>
 </head>
 <body onload="initApp()">
@@ -79,14 +86,16 @@
 
         <div id="calc-fields" class="grid no-print">
             <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="fmtMoney(this)"></div>
-            <div class="field" style="width:70px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="updateFaiz()"></div>
-            <div class="field" style="width:65px;"><label>BSMV %</label><input type="number" id="bsmv" readonly></div>
-            <div class="field" style="width:65px;"><label>KKDF %</label><input type="number" id="kkdf" readonly></div>
+            <div class="field" style="width:70px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="updateFaiz('yillik')"></div>
+            <div class="field" style="width:70px;"><label>Aylık %</label><input type="number" id="faizAylik" step="0.01" oninput="updateFaiz('aylik')"></div>
+            <div class="field" id="box-sub" style="width:65px;"><label>Sübv. %</label><input type="number" id="subOran" oninput="updateSub()"></div>
+            <div class="field" style="width:55px;"><label>BSMV %</label><input type="number" id="bsmv" readonly></div>
+            <div class="field" style="width:55px;"><label>KKDF %</label><input type="number" id="kkdf" readonly></div>
             <div class="field" id="box-vade" style="width:85px;"><label>Vade (Ay)</label><select id="vade-select" onchange="resetResults()"></select></div>
         </div>
 
         <div class="options-container no-print" id="extra-opts">
-            <div class="opt-row" id="row-yerli"><input type="checkbox" id="yerli" checked><label for="yerli">Yerli Malı</label></div>
+            <div class="opt-row" id="row-yerli"><input type="checkbox" id="yerli" checked onchange="handleYerli()"><label for="yerli">Yerli Malı</label></div>
             <div class="opt-row" id="row-bb"><input type="checkbox" id="buyback" checked><label for="buyback">Buy Back</label></div>
         </div>
 
@@ -106,14 +115,14 @@
 <script>
     let currentMode = 'traktor';
     const states = {
-        traktor: { faiz: 40.50, bsmv: 5, kkdf: 0 },
-        ekipman: { faiz: 40.50, bsmv: 5, kkdf: 0 },
-        zirai: { faiz: 46.00, bsmv: 15, kkdf: 15 },
-        isletme: { faiz: 40.50, bsmv: 5, kkdf: 0 },
-        ticari_taksitli: { faiz: 46.00, bsmv: 5, kkdf: 0 },
-        konut: { faiz: 34.08, bsmv: 0, kkdf: 0 },
-        tasit: { faiz: 40.50, bsmv: 15, kkdf: 15 },
-        ihtiyac: { faiz: 52.68, bsmv: 15, kkdf: 15 }
+        traktor: { faiz: 40.50, bsmv: 5, kkdf: 0, sub: 50, defVade: 60 },
+        ekipman: { faiz: 40.50, bsmv: 5, kkdf: 0, sub: 75, defVade: 60 },
+        zirai: { faiz: 46.00, bsmv: 15, kkdf: 15, sub: 0, defVade: 12 },
+        isletme: { faiz: 40.50, bsmv: 5, kkdf: 0, sub: 0, defVade: 12 },
+        ticari_taksitli: { faiz: 46.00, bsmv: 5, kkdf: 0, sub: 0, defVade: 12 },
+        konut: { faiz: 34.08, bsmv: 0, kkdf: 0, sub: 0, defVade: 120 },
+        tasit: { faiz: 40.50, bsmv: 15, kkdf: 15, sub: 0, defVade: 48 },
+        ihtiyac: { faiz: 52.68, bsmv: 15, kkdf: 15, sub: 0, defVade: 24 }
     };
 
     function initApp() {
@@ -137,38 +146,71 @@
         btn.classList.add('active');
         const s = states[mode];
         
-        // İşletme Kredisi ise Butonları Kapat
         const isIsletme = (mode === 'isletme');
+        const isTarim = (mode === 'traktor' || mode === 'ekipman' || mode === 'zirai');
+        const isSubActive = (mode === 'traktor' || mode === 'ekipman');
+
         document.getElementById('action-group').style.display = isIsletme ? 'none' : 'grid';
         document.getElementById('isletme-ozel').style.display = isIsletme ? 'block' : 'none';
         document.getElementById('calc-fields').style.display = isIsletme ? 'none' : 'flex';
-
-        const isTarimAna = (mode === 'traktor' || mode === 'ekipman');
-        document.getElementById('extra-opts').style.display = isTarimAna ? 'flex' : 'none';
+        
+        // Vade kutusunu Traktör, Ekipman ve Çiftçi Taksitli'de (zirai) gizle
+        document.getElementById('box-vade').style.display = isTarim ? 'none' : 'flex';
+        
+        document.getElementById('box-sub').style.display = isSubActive ? 'flex' : 'none';
+        document.getElementById('extra-opts').style.display = isSubActive ? 'flex' : 'none';
         document.getElementById('row-bb').style.display = (mode === 'traktor') ? 'flex' : 'none';
 
         if(!isIsletme) {
-            document.getElementById('faiz').value = s.faiz;
+            document.getElementById('faiz').value = s.faiz.toFixed(2);
+            document.getElementById('faizAylik').value = (s.faiz / 12).toFixed(2);
+            document.getElementById('subOran').value = s.sub;
             document.getElementById('bsmv').value = s.bsmv;
             document.getElementById('kkdf').value = s.kkdf;
+            
             const vSel = document.getElementById('vade-select'); vSel.innerHTML = '';
             const maxV = (mode === 'konut') ? 120 : 60;
+            
             for(let i=12; i<=maxV; i+=12) {
                 let o = document.createElement('option'); o.value = i; o.text = i + " Ay";
+                if(i === s.defVade) o.selected = true;
                 vSel.appendChild(o);
             }
         }
         resetResults();
     }
 
-    function updateFaiz() { states[currentMode].faiz = parseFloat(document.getElementById('faiz').value); resetResults(); }
+    function handleYerli() {
+        const isYerli = document.getElementById('yerli').checked;
+        if(currentMode === 'traktor') states.traktor.sub = isYerli ? 50 : 25;
+        if(currentMode === 'ekipman') states.ekipman.sub = isYerli ? 75 : 50;
+        document.getElementById('subOran').value = states[currentMode].sub;
+        resetResults();
+    }
+
+    function updateSub() {
+        states[currentMode].sub = parseFloat(document.getElementById('subOran').value) || 0;
+        resetResults();
+    }
+
+    function updateFaiz(type) {
+        const y = document.getElementById('faiz'), a = document.getElementById('faizAylik');
+        if (type === 'yillik') a.value = (parseFloat(y.value) / 12).toFixed(2);
+        else y.value = (parseFloat(a.value) * 12).toFixed(2);
+        states[currentMode].faiz = parseFloat(y.value);
+        resetResults();
+    }
+
     function fmtMoney(i) { 
         let v = i.value.replace(/\D/g, "");
         if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
         resetResults();
     }
+
     function resetResults() { 
         document.getElementById('result-main-container').style.display = 'none';
+        document.getElementById('pdfBtn').disabled = true;
+        document.getElementById('printBtn').disabled = true;
     }
 
     function hesaplaHayvan() {
@@ -182,15 +224,19 @@
         const yF = parseFloat(document.getElementById('faiz').value) / 100;
         const b = parseFloat(document.getElementById('bsmv').value) / 100;
         const k = parseFloat(document.getElementById('kkdf').value) / 100;
+        const sub = (parseFloat(document.getElementById('subOran').value) || 0) / 100;
         const vade = parseInt(document.getElementById('vade-select').value);
 
-        const aylikBrut = (yF / 12) * (1 + b + k);
+        const aylikNetFaiz = (yF / 12);
+        const aylikIndirimliFaiz = aylikNetFaiz * (1 - sub);
+        const aylikBrut = aylikIndirimliFaiz * (1 + b + k);
+
         const taksit = (tutar * aylikBrut * Math.pow(1+aylikBrut, vade)) / (Math.pow(1+aylikBrut, vade)-1);
 
         let html = `<table><thead><tr style="background:#eee"><th>Tks</th><th>Ana Para</th><th>Faiz+Vergi</th><th>Kalan</th><th>Tutar</th></tr></thead><tbody>`;
         let kalan = tutar;
         for(let i=1; i<=vade; i++) {
-            let fv = kalan * (yF / 12) * (1 + b + k);
+            let fv = kalan * aylikBrut;
             let ana = taksit - fv;
             if(i === vade) ana = kalan;
             kalan -= ana;
