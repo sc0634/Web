@@ -49,7 +49,6 @@
         .px-vade-sync { width: 85px; }
         .px-periyot { width: 130px; }
         
-        /* WEB görünümünde alt satıra almak için width: 100% eklendi */
         .options-container { 
             display: flex; flex-direction: row; gap: 10px; width: 100%;
             padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
@@ -58,6 +57,9 @@
         .opt-row { display: flex; align-items: center; gap: 5px; cursor: pointer; min-width: 110px; } 
         .opt-row label { font-size: 11px; text-transform: none; cursor: pointer; }
         .opt-row input { width: 16px; height: 16px; cursor: pointer; }
+
+        /* Bilgi kutusu stili */
+        .info-box { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; font-weight: 500; display: none; }
 
         .px-vade-slider { width: 180px; display: none; }
         .slider-container { 
@@ -72,8 +74,6 @@
         .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
-
-        .info-box { padding: 10px; margin-bottom: 10px; border-radius: 5px; font-weight: 500; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
@@ -133,10 +133,11 @@
             <div class="field px-vergi" id="sub-input-box"><label>İndirim %</label><input type="number" id="subOran" value="50" oninput="reset()"></div>
             <div class="field px-periyot" id="periyot-box"><label>Ödeme Periyodu</label><select id="periyot" onchange="reset()"></select></div>
             
-            <!-- Bu container artık grid içinde width:100% ile en alta yerleşir -->
             <div class="options-container" id="ziraiOpts">
                 <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
-                <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked><label for="buyback">Buy Back</label></div>
+                <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Buy Back</label></div>
+                <!-- Bilgi Kutusu Buy Back'in hemen altına taşındı -->
+                <div id="dynamic-info-box" class="info-box"></div>
             </div>
         </div>
 
@@ -261,25 +262,43 @@
     }
     function updateSliderVal(v) { document.getElementById('vade-val').innerText = v; reset(); }
     function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
+    
     function reset() { 
-        document.getElementById('result-main-container').style.display = 'none'; document.getElementById('basvuru-paneli').style.display = 'none';
-        document.getElementById('pdfBtn').disabled = true; document.getElementById('printBtn').disabled = true; 
+        document.getElementById('result-main-container').style.display = 'none'; 
+        document.getElementById('basvuru-paneli').style.display = 'none';
+        document.getElementById('pdfBtn').disabled = true; 
+        document.getElementById('printBtn').disabled = true; 
+        document.getElementById('dynamic-info-box').style.display = 'none';
     }
+
     function updateYerli() { 
         if(mode === 'traktor') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 50 : 25;
         else if(mode === 'ekipman') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 75 : 50;
         reset(); 
     }
+
     function hesapla() {
         const res = document.getElementById('result-area'); res.innerHTML = '';
+        const infoBox = document.getElementById('dynamic-info-box');
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
         if(anaPara <= 0) return alert("Tutar giriniz.");
+
+        // Dinamik Bilgi Satırı Güncelleme ve Buy Back altına taşıma
         const isBuyback = document.getElementById('buyback').checked;
-        res.innerHTML = `<div class="info-box" style="background:${(isBuyback && mode !== 'ekipman') ? '#fff3cd' : '#d1ecf1'}; border:1px solid ${(isBuyback && mode !== 'ekipman') ? '#ffeeba' : '#bee5eb'};"><strong>Bilgi:</strong> Krediniz <b>${(isBuyback && mode !== 'ekipman') ? 'sabit' : 'değişken'} faizlidir</b>.</div>`;
+        const infoMsg = (isBuyback && mode !== 'ekipman') ? 'Sabit Faizli (Buyback)' : 'Değişken Faizli';
+        const infoBg = (isBuyback && mode !== 'ekipman') ? '#fff3cd' : '#d1ecf1';
+        const infoBorder = (isBuyback && mode !== 'ekipman') ? '#ffeeba' : '#bee5eb';
+        
+        infoBox.style.display = 'block';
+        infoBox.style.background = infoBg;
+        infoBox.style.border = `1px solid ${infoBorder}`;
+        infoBox.innerHTML = `<strong>Bilgi:</strong> Krediniz <b>${infoMsg}</b> modelidir.`;
+
         const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         const periyot = (segment === 'tarimsal' ? 12 : parseInt(document.getElementById('periyot').value));
         const subO = (segment === 'tarimsal' && (mode === 'traktor' || mode === 'ekipman')) ? document.getElementById('subOran').value / 100 : 0;
         let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [(segment === 'bireysel' ? parseInt(document.getElementById('vade-slider').value) : parseInt(document.getElementById('vade-select').value))];
+        
         vades.forEach(v => {
             let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / periyot);
             let dF = (yF / 12) * periyot, bF = dF * (1 + bsmv + kkdf);
