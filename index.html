@@ -204,7 +204,6 @@
 
                 if (s.unit === 'Yıl') {
                     const maxV = (mode === 'zirai') ? 1 : 5;
-                    // 5'ten 1'e Doğru Sıralı Döngü
                     for (let v = maxV; v >= 1; v--) {
                         const pEl = document.getElementById(`plan-${v}`);
                         pEl.style.display = 'block';
@@ -279,9 +278,17 @@
     }
 
     function initApp() {
+        // İlk değerleri ata
         document.getElementById('tutar').value = "1.000.000";
         Calculator.fmtMoney(document.getElementById('tutar'));
+        
+        // Tarımsal segmentini ve Traktör sekmesini aktifleştir
         switchSegment('tarimsal');
+        
+        // SAYFA AÇILDIĞINDA OTOMATİK HESAPLA
+        setTimeout(() => {
+            Calculator.calculate();
+        }, 100);
     }
 </script>
 </body>
