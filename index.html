@@ -57,8 +57,10 @@
         .opt-row label { font-size: 11px; cursor: pointer; }
         .opt-row input { width: 16px; height: 16px; cursor: pointer; }
 
-        /* Bilgi Kutusu & Blink */
-        .info-box { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; font-weight: bold; display: none; text-align: center; }
+        /* Bilgi Kutuları */
+        .info-box { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; font-weight: bold; display: none; text-align: center; }
+        .hazine-box { width: 100%; padding: 8px; margin-top: 5px; border-radius: 5px; background: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; font-size: 11px; text-align: center; display: none; }
+        
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
         .blink-text { animation: blink 1s infinite; }
 
@@ -127,6 +129,7 @@
                 <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
                 <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Buy Back</label></div>
                 <div id="dynamic-info-box" class="info-box"></div>
+                <div id="hazine-info-box" class="hazine-box"></div>
             </div>
         </div>
 
@@ -232,6 +235,7 @@
         document.getElementById('pdfBtn').disabled = true; 
         document.getElementById('printBtn').disabled = true; 
         document.getElementById('dynamic-info-box').style.display = 'none';
+        document.getElementById('hazine-info-box').style.display = 'none';
     }
     function updateYerli() { 
         if(mode === 'traktor') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 50 : 25;
@@ -242,23 +246,35 @@
     function hesapla() {
         const res = document.getElementById('result-area'); res.innerHTML = '';
         const infoBox = document.getElementById('dynamic-info-box');
+        const hazineBox = document.getElementById('hazine-info-box');
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
         if(anaPara <= 0) return alert("Tutar giriniz.");
 
-        // TRAKTÖR ÖZEL BİLGİ SATIRI MANTIĞI
-        if (mode === 'traktor') {
-            const isBuyback = document.getElementById('buyback').checked;
-            infoBox.style.display = 'block';
-            infoBox.classList.remove('blink-text'); 
-            if(isBuyback) {
-                infoBox.style.background = '#d4edda'; infoBox.style.color = '#155724'; infoBox.style.border = '1px solid #c3e6cb';
-                infoBox.innerHTML = 'Krediniz Sabit Faizlidir.';
+        // TRAKTÖR/EKİPMAN ÖZEL BİLGİ MANTIĞI
+        if (mode === 'traktor' || mode === 'ekipman') {
+            const yerliCheck = document.getElementById('yerli').checked;
+            
+            // Yerli Malı Hazine Desteği Yazısı
+            if(yerliCheck) {
+                hazineBox.style.display = 'block';
+                hazineBox.innerHTML = 'ℹ️ Yerli malı kapsamında faizin %25\'ini Hazine ödemektedir.';
             } else {
-                infoBox.style.background = '#f8d7da'; infoBox.style.color = '#721c24'; infoBox.style.border = '1px solid #f5c6cb';
-                infoBox.innerHTML = '<span class="blink-text">Krediniz Değişken Faizlidir.</span>';
+                hazineBox.style.display = 'none';
             }
-        } else {
-            infoBox.style.display = 'none';
+
+            // Sadece Traktör için Sabit/Değişken Faiz uyarısı
+            if(mode === 'traktor') {
+                const isBuyback = document.getElementById('buyback').checked;
+                infoBox.style.display = 'block';
+                infoBox.classList.remove('blink-text'); 
+                if(isBuyback) {
+                    infoBox.style.background = '#d4edda'; infoBox.style.color = '#155724'; infoBox.style.border = '1px solid #c3e6cb';
+                    infoBox.innerHTML = 'Krediniz Sabit Faizlidir.';
+                } else {
+                    infoBox.style.background = '#f8d7da'; infoBox.style.color = '#721c24'; infoBox.style.border = '1px solid #f5c6cb';
+                    infoBox.innerHTML = '<span class="blink-text">Krediniz Değişken Faizlidir.</span>';
+                }
+            }
         }
 
         const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
