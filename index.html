@@ -37,11 +37,12 @@
         .grid { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
         .field { display: flex; flex-direction: column; gap: 4px; }
         
-        input, select { 
-            height: var(--input-height) !important; padding: 0 8px; 
+        input, select, textarea { 
+            height: var(--input-height); padding: 0 8px; 
             border: 1px solid var(--border); border-radius: 5px; 
             font-size: 12px; outline: none; background: white; width: 100%;
         }
+        textarea { height: 80px; padding: 8px; resize: none; }
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; }
 
         .options-container { 
@@ -50,34 +51,21 @@
             margin: 10px 0; flex-wrap: wrap; align-items: center;
         }
         .opt-row { display: flex; align-items: center; gap: 6px; cursor: pointer; min-width: 90px; }
+        .opt-row input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: pointer; flex-shrink: 0; }
         
-        .opt-row input[type="checkbox"] { 
-            width: 14px !important; 
-            height: 14px !important; 
-            margin: 0; 
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .opt-row label { font-weight: 600; font-size: 12px; cursor: pointer; user-select: none; }
-
-        .info-box { width: 100%; padding: 12px; margin-top: 10px; border-radius: 5px; font-weight: bold; display: none; text-align: center; font-size: 14px; }
-        .hazine-box { width: 100%; padding: 8px; margin-top: 5px; border-radius: 5px; background: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; font-size: 11px; text-align: center; display: none; }
-        
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
-        .blink-text { animation: blink 1.2s infinite; }
-
         .result-main-container { margin-top: 15px; border: 2px solid var(--dark); border-radius: 6px; overflow: hidden; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 10px; text-align: center; font-weight: bold; }
-        .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
-        tfoot tr { background: #f8f9fa; font-weight: bold; border-top: 2px solid var(--dark); }
+        
+        /* Başvuru Konteynırı */
+        .apply-container { margin-top: 20px; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: #f9f9f9; display: none; }
+        .apply-title { font-weight: bold; font-size: 14px; margin-bottom: 15px; color: var(--dark); border-bottom: 2px solid var(--success); padding-bottom: 5px; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         .btn-calc { background: var(--success); }
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
+        .btn-apply { background: var(--success); width: 100%; margin-top: 10px; }
 
         @media print { .no-print { display: none !important; } }
     </style>
@@ -87,15 +75,14 @@
 <div class="container" id="pdf-area">
 
     <div class="segment-nav no-print">
-        <button id="seg-gen" class="seg-btn bg-gen" onclick="switchSegment('genel')">GENEL VERİLER</button>
         <button id="seg-tar" class="seg-btn bg-tar" onclick="switchSegment('tarimsal')">TARIMSAL</button>
         <button id="seg-tic" class="seg-btn bg-tic" onclick="switchSegment('ticari')">TİCARİ</button>
         <button id="seg-bir" class="seg-btn bg-bir" onclick="switchSegment('bireysel')">BİREYSEL</button>
         <button id="seg-hak" class="seg-btn bg-hak" onclick="switchSegment('hakkimda')">HAKKIMDA</button>
+        <button id="seg-gen" class="seg-btn bg-gen" onclick="switchSegment('genel')">GENEL VERİLER</button>
     </div>
 
     <div id="calculator-ui">
-        <!-- Genel Veriler Boş İçerik -->
         <div id="content-genel" style="display:none; padding:20px; text-align:center; color:#7f8c8d;">
             Henüz genel veri girişi yapılmamıştır.
         </div>
@@ -106,9 +93,19 @@
             <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
             <button class="tab-btn" onclick="switchTab(this, 'isletme')">İşletme Kredisi</button>
         </div>
+        
+        <div class="tabs no-print" id="tabs-ticari">
+            <button class="tab-btn" onclick="switchTab(this, 'ticari_taksitli')">Ticari Taksitli</button>
+        </div>
+
+        <div class="tabs no-print" id="tabs-bireysel">
+            <button class="tab-btn" onclick="switchTab(this, 'konut')">Konut</button>
+            <button class="tab-btn" onclick="switchTab(this, 'tasit')">Taşıt</button>
+            <button class="tab-btn" onclick="switchTab(this, 'ihtiyac')">İhtiyaç</button>
+        </div>
 
         <div id="calc-fields" class="grid no-print">
-            <div class="field" style="width:140px;" id="prof-input-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
+            <div class="field" style="width:140px;"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
             <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
             <div class="field" style="width:65px;"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
             <div class="field" style="width:65px;"><label>Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
@@ -122,8 +119,6 @@
         <div class="options-container no-print" id="ziraiOpts">
             <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
             <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Buy Back</label></div>
-            <div id="hazine-info-box" class="hazine-box"></div>
-            <div id="dynamic-info-box" class="info-box"></div>
         </div>
 
         <div class="actions no-print" id="calc-actions">
@@ -136,14 +131,31 @@
             <div class="result-main-title">Ödeme Planı Detayları</div>
             <div id="result-area" style="padding:10px;"></div>
         </div>
-    </div>
 
-    <p style="font-size: 11px; color: #999; margin-top: 25px; text-align: center;">*Bu hesaplama bilgilendirme amaçlıdır. Banka nihai faiz oranlarında değişiklik yapma hakkını saklı tutar.</p>
+        <!-- Başvuru Bölümü -->
+        <div id="apply-section" class="apply-container no-print">
+            <div class="apply-title">Hemen Başvur</div>
+            <div class="grid" style="gap:15px;">
+                <div class="field" style="flex:1; min-width:200px;">
+                    <label>TC Kimlik Numarası</label>
+                    <input type="text" id="app-tckn" maxlength="11" placeholder="11 Haneli TCKN">
+                </div>
+                <div class="field" style="flex:1; min-width:200px;">
+                    <label>Cep Telefonu</label>
+                    <input type="tel" id="app-phone" placeholder="05xx xxx xx xx">
+                </div>
+                <div class="field" style="width:100%;">
+                    <label>Açıklama / Not</label>
+                    <textarea id="app-note" placeholder="Eklemek istediğiniz notlar..."></textarea>
+                </div>
+                <button class="btn btn-apply" onclick="alert('Başvurunuz iletilmiştir.')">BAŞVURUYU TAMAMLA</button>
+            </div>
+        </div>
+    </div>
 
     <div id="about-box" style="display:none; padding:40px; text-align:center;">
         <h2 style="color:var(--dark)">Süleyman Coşkun</h2>
         <p>Finansal Çözümler ve Kredi Danışmanlığı</p>
-        <a href="https://wa.me/905345217697" class="no-print" style="color:#2ecc71; text-decoration:none; font-weight:bold;">WhatsApp ile İletişime Geçin</a>
     </div>
 </div>
 
@@ -163,22 +175,31 @@
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('seg-' + seg.substring(0,3)).classList.add('active');
         
-        // UI Elemanlarını Gizle/Göster
         const isSpecial = (seg === 'hakkimda' || seg === 'genel');
         document.getElementById('calculator-ui').style.display = seg === 'hakkimda' ? 'none' : 'block';
         document.getElementById('about-box').style.display = seg === 'hakkimda' ? 'block' : 'none';
         document.getElementById('content-genel').style.display = seg === 'genel' ? 'block' : 'none';
-        
-        // Hesaplayıcı bileşenlerini kontrol et
         document.getElementById('calc-fields').style.display = isSpecial ? 'none' : 'flex';
         document.getElementById('calc-actions').style.display = isSpecial ? 'none' : 'grid';
-        document.getElementById('ziraiOpts').style.display = (seg === 'tarimsal' && !isSpecial) ? 'flex' : 'none';
 
+        document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
         if (!isSpecial) {
-            document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
             const tabEl = document.getElementById(`tabs-${seg}`);
             if(tabEl) { tabEl.style.display = 'flex'; tabEl.querySelector('.tab-btn').click(); }
         }
+        reset();
+    }
+
+    function switchTab(btn, m) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active'); mode = m;
+        const isSub = (mode === 'traktor' || mode === 'ekipman');
+        const showVadePeriyot = (segment !== 'tarimsal' || mode === 'isletme');
+        document.getElementById('vade-box-select').style.display = showVadePeriyot ? 'flex' : 'none';
+        document.getElementById('periyot-box').style.display = showVadePeriyot ? 'flex' : 'none';
+        document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
+        document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
+        fillVades(segment === 'ticari' ? 60 : 36);
         updatePeriyotOptions();
         reset();
     }
@@ -186,23 +207,8 @@
     function updatePeriyotOptions() {
         const p = document.getElementById('periyot'); p.innerHTML = '';
         const opts = [{v:"1",t:"Aylık"}, {v:"3",t:"3 Ayda Bir"}, {v:"6",t:"6 Ayda Bir"}, {v:"12",t:"Yıllık"}];
-        opts.forEach(o => {
-            let el = document.createElement('option'); el.value = o.v; el.text = o.t; p.appendChild(el);
-        });
+        opts.forEach(o => { let el = document.createElement('option'); el.value = o.v; el.text = o.t; p.appendChild(el); });
         p.value = segment === 'tarimsal' ? "12" : "1";
-    }
-
-    function switchTab(btn, m) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active'); mode = m;
-        const isSub = (mode === 'traktor' || mode === 'ekipman');
-        document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
-        document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-        document.getElementById('bb-box').style.display = mode === 'traktor' ? 'flex' : 'none';
-        
-        fillVades(segment === 'ticari' ? 60 : 36);
-        if(isSub) updateYerli();
-        reset();
     }
 
     function fillVades(max) {
@@ -217,10 +223,9 @@
     
     function reset() { 
         document.getElementById('result-main-container').style.display = 'none'; 
+        document.getElementById('apply-section').style.display = 'none'; // Segment/Tab değişince gizle
         document.getElementById('pdfBtn').disabled = true; 
         document.getElementById('printBtn').disabled = true; 
-        document.getElementById('dynamic-info-box').style.display = 'none';
-        document.getElementById('hazine-info-box').style.display = 'none';
     }
 
     function updateYerli() { 
@@ -231,53 +236,35 @@
 
     function hesapla() {
         const res = document.getElementById('result-area'); res.innerHTML = '';
-        const infoBox = document.getElementById('dynamic-info-box');
-        const hazineBox = document.getElementById('hazine-info-box');
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
         if(anaPara <= 0) return;
 
-        if (mode === 'traktor' || mode === 'ekipman') {
-            if(document.getElementById('yerli').checked) {
-                hazineBox.style.display = 'block';
-                hazineBox.innerHTML = 'ℹ️ Yerli malı kapsamında faizin %25\'ini Hazine ödemektedir.';
-            }
-            if(mode === 'traktor') {
-                const isBuyback = document.getElementById('buyback').checked;
-                infoBox.style.display = 'block';
-                if(isBuyback) {
-                    infoBox.style.background = '#d4edda'; infoBox.style.color = '#155724'; infoBox.style.border = '1px solid #c3e6cb';
-                    infoBox.innerHTML = 'Krediniz Sabit Faizlidir.';
-                } else {
-                    infoBox.style.background = '#f8d7da'; infoBox.style.color = '#721c24'; infoBox.style.border = '1px solid #f5c6cb';
-                    infoBox.innerHTML = '<span class="blink-text">Krediniz Değişken Faizlidir.</span>';
-                }
-            }
-        }
-
         const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
-        const periyot = (segment === 'tarimsal' ? 12 : parseInt(document.getElementById('periyot').value));
+        const periyot = (segment === 'tarimsal' && mode !== 'isletme') ? 12 : parseInt(document.getElementById('periyot').value);
         const subO = (segment === 'tarimsal' && (mode === 'traktor' || mode === 'ekipman')) ? document.getElementById('subOran').value / 100 : 0;
         
-        let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade-select').value)];
+        let vades = (segment === 'tarimsal' && mode !== 'isletme') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade-select').value)];
         
         vades.forEach(v => {
-            let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / periyot);
+            let tSayisi = (segment === 'tarimsal' && mode !== 'isletme') ? v : Math.ceil(v / periyot);
             let dF = (yF / 12) * periyot, bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
-            
-            let h = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${v} ${segment==='tarimsal'?'Yıl':'Ay'}</div><div class="table-res"><table><thead><tr><th>Tks</th><th>Ana Para</th><th>Brüt Faiz</th>${subO>0?'<th>Ind. Faiz</th>':''}<th>Vergi</th><th>Taksit</th><th>Kalan</th></tr></thead><tbody>`;
-            
-            let kalan = anaPara, totA = 0, totF = 0, totI = 0, totV = 0, totT = 0;
+            let label = (segment === 'tarimsal' && mode !== 'isletme') ? `${v} Yıl` : `${v} Ay`;
+            let h = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${label}</div><table style="width:100%;font-size:11px;border-collapse:collapse;"><thead><tr style="background:#eee"><th>Tks</th><th>Ana Para</th><th>Brüt Faiz</th>${subO>0?'<th>Ind. Faiz</th>':''}<th>Taksit</th></tr></thead><tbody>`;
+            let kalan = anaPara;
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), ind = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b);
-                let tNet = taksit - ind;
-                h += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(tNet).toLocaleString('tr-TR')}</td><td>${Math.max(0,Math.round(kalan-a)).toLocaleString('tr-TR')}</td></tr>`;
-                totA += a; totF += f; totI += ind; totV += b; totT += tNet; kalan -= a;
+                h += `<tr style="text-align:center;border-bottom:1px solid #ddd"><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f+b).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(taksit-ind).toLocaleString('tr-TR')}</td></tr>`;
+                kalan -= a;
             }
-            h += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(totA).toLocaleString('tr-TR')}</td><td>${Math.round(totF).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(totI).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(totV).toLocaleString('tr-TR')}</td><td>${Math.round(totT).toLocaleString('tr-TR')}</td><td>-</td></tr></tfoot></table></div></div>`;
-            res.innerHTML += h;
+            h += `</tbody></table></div>`; res.innerHTML += h;
         });
+
         document.getElementById('result-main-container').style.display = 'block';
+        // Sadece Hakkımda ve Genel Veriler değilse göster
+        if(segment !== 'hakkimda' && segment !== 'genel') {
+            document.getElementById('apply-section').style.display = 'block';
+        }
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
 
