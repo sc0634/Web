@@ -70,7 +70,6 @@
         .table-res { overflow-x: auto; width: 100%; background: white; padding: 5px; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
-        .row-total { background: #f8f9fa; font-weight: bold; }
 
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
@@ -79,7 +78,7 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        /* BAŞVURU PANELİ KESİN TEK SATIR (MOBİL DAHİL) */
+        /* BAŞVURU PANELİ KESİN TEK SATIR */
         .apply-row-forced { 
             display: flex !important; 
             flex-direction: row !important; 
@@ -169,7 +168,6 @@
             <div id="result-area"></div>
         </div>
 
-        <!-- HIZLI BAŞVURU PANELİ - KESİN TEK SATIR -->
         <div id="basvuru-paneli" class="result-main-container no-print" style="margin-top: 20px; border-color: var(--success);">
             <div class="result-main-title" style="background: var(--success);">Hızlı Başvuru Paneli</div>
             <div class="apply-row-forced">
@@ -251,9 +249,14 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m; reset();
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
+        
+        // Buy Back Mantığı: Sadece Ekipman sekmesinde gizle
+        document.getElementById('bb-box').style.display = (mode === 'ekipman') ? 'none' : 'flex';
+        
         if(isSub) document.getElementById('faiz').value = "40.50";
         else if(mode === 'zirai' || isTic || mode === 'isletme') document.getElementById('faiz').value = "46.00";
         else if(isBir) document.getElementById('faizAylik').value = "4.39";
+        
         syncFaiz(isBir ? 'aylik' : 'yillik');
         document.getElementById('vade-box-select').style.display = isTic ? 'flex' : 'none';
         document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
