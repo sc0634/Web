@@ -78,7 +78,10 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        /* Tek Satır Başvuru Paneli Stili */
+        .apply-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; align-items: flex-end; }
+        .apply-row .field { flex: 1; min-width: 150px; }
+        .apply-row .btn-box { flex: 0.5; min-width: 150px; }
 
         @media print {
             body { padding: 0; background: white; }
@@ -88,8 +91,8 @@
 
         @media (max-width: 600px) {
             .actions { grid-template-columns: 1fr; }
-            .form-grid { grid-template-columns: 1fr; }
             #prof-input-box, #tutar-input-box { width: 48%; }
+            .apply-row .field, .apply-row .btn-box { flex: 1 1 100%; }
         }
     </style>
 </head>
@@ -161,24 +164,24 @@
             <div id="result-area"></div>
         </div>
 
-        <!-- Başvuru Paneli -->
+        <!-- Tek Satır Başvuru Paneli -->
         <div id="basvuru-paneli" class="result-main-container no-print" style="margin-top: 20px; border-color: var(--success);">
             <div class="result-main-title" style="background: var(--success);">Hemen Başvuru Yapın</div>
-            <div class="form-grid">
+            <div class="apply-row">
                 <div class="field">
-                    <label>Adınız Soyadınız</label>
-                    <input type="text" id="app-name" placeholder="Ad Soyad">
+                    <label>T.C. Kimlik No</label>
+                    <input type="text" id="app-tckn" maxlength="11" placeholder="TCKN" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
                 <div class="field">
-                    <label>Telefon Numaranız</label>
+                    <label>Telefon</label>
                     <input type="tel" id="app-phone" placeholder="05xx xxx xx xx">
                 </div>
-                <div class="field" style="grid-column: 1 / -1;">
-                    <label>Mesajınız</label>
-                    <input type="text" id="app-note" placeholder="Eklemek istediğiniz not...">
+                <div class="field">
+                    <label>Not</label>
+                    <input type="text" id="app-note" placeholder="Mesajınız">
                 </div>
-                <div style="grid-column: 1 / -1;">
-                    <button class="btn btn-calc" style="width:100%" onclick="alert('Başvurunuz iletildi!')">BAŞVURUYU TAMAMLA</button>
+                <div class="btn-box">
+                    <button class="btn btn-calc" style="width:100%" onclick="handleApply()">BAŞVUR</button>
                 </div>
             </div>
         </div>
@@ -291,6 +294,15 @@
         document.getElementById('basvuru-paneli').style.display = 'none';
         document.getElementById('pdfBtn').disabled = true; 
         document.getElementById('printBtn').disabled = true; 
+    }
+
+    function handleApply() {
+        const tckn = document.getElementById('app-tckn').value;
+        if(tckn.length !== 11) {
+            alert('Lütfen geçerli bir T.C. Kimlik Numarası giriniz (11 hane).');
+            return;
+        }
+        alert('Başvurunuz iletildi!');
     }
 
     function hesapla() {
