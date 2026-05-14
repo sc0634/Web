@@ -64,6 +64,11 @@
         .btn-calc-container { margin-bottom: 15px; display: none; }
         .btn-calc { background: var(--success); width: 100%; height: 38px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 12px; }
 
+        /* Başvuru Konteyneri Stilleri */
+        .apply-container { margin-top: 25px; padding: 20px; background: #f8f9fa; border: 2px dashed var(--border); border-radius: 8px; text-align: center; }
+        .btn-apply { background: var(--dark); color: white; padding: 12px 30px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s; }
+        .btn-apply:hover { background: #1a252f; transform: scale(1.05); }
+
         @media print { 
             .no-print { display: none !important; } 
             body { padding: 0; background: white; }
@@ -144,6 +149,14 @@
         <div id="plan-2" class="plan-wrapper"><div class="result-header"><span class="result-title">2 Yıl Vadeli Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-2', '2_Yil_Plan')">PDF</button><button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-2')">YAZDIR</button></div></div><div class="tbl-res"></div></div>
         <div id="plan-1" class="plan-wrapper"><div class="result-header"><span class="result-title">1 Yıl Vadeli Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-1', '1_Yil_Plan')">PDF</button><button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-1')">YAZDIR</button></div></div><div class="tbl-res"></div></div>
         <div id="plan-custom" class="plan-wrapper"><div class="result-header"><span class="result-title" id="custom-title">Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-custom', 'Odeme_Plani')">PDF</button><button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-custom')">YAZDIR</button></div></div><div class="tbl-res"></div></div>
+    </div>
+
+    <!-- Geri Getirilen Başvuru Konteyneri -->
+    <div class="apply-container no-print">
+        <p style="margin-top:0; font-weight:700; color:var(--dark); font-size: 12px;">Planlama uygunsa hemen iletişime geçin.</p>
+        <button class="btn-apply" onclick="window.location.href='mailto:iletisim@sc.com?subject=Kredi Planlama Basvurusu'">
+            BAŞVURU YAP
+        </button>
     </div>
 </div>
 
