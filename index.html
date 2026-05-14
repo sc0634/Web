@@ -71,7 +71,8 @@
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th, td { padding: 6px 2px; border: 1px solid var(--border); text-align: center; }
 
-        /* WEB GÖRÜNÜMÜ AKSİYON BUTONLARI */
+        .info-box { padding: 10px; margin-bottom: 10px; border-radius: 5px; font-weight: 500; }
+
         .actions { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 8px; margin-top: 15px; }
         .btn { height: 45px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         .btn:active { transform: scale(0.98); }
@@ -79,7 +80,6 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        /* BAŞVURU PANELİ KESİN TEK SATIR */
         .apply-row-forced { 
             display: flex !important; 
             flex-direction: row !important; 
@@ -107,18 +107,9 @@
             .container { box-shadow: none; width: 100%; }
         }
 
-        /* MOBİL ÖZEL AYARLAR */
         @media (max-width: 600px) {
-            /* 3 Butonu Yan Yana Getirir */
-            .actions { 
-                grid-template-columns: 1fr 1fr 1fr !important; 
-                gap: 5px;
-            }
-            .btn { 
-                font-size: 10px !important; 
-                height: 40px !important; 
-                padding: 0 2px;
-            }
+            .actions { grid-template-columns: 1fr 1fr 1fr !important; gap: 5px; }
+            .btn { font-size: 10px !important; height: 40px !important; padding: 0 2px; }
             #prof-input-box, #tutar-input-box { width: 48%; }
             .apply-row-forced .btn { font-size: 9px; height: 40px; }
         }
@@ -176,7 +167,7 @@
 
         <div id="result-main-container" class="result-main-container">
             <div class="result-main-title">Ödeme Planı Detayları</div>
-            <div id="result-area"></div>
+            <div id="result-area" style="padding:10px;"></div>
         </div>
 
         <div id="basvuru-paneli" class="result-main-container no-print" style="margin-top: 20px; border-color: var(--success);">
@@ -259,6 +250,15 @@
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m; reset();
+
+        // Görsel talebi: İşletme kredisinde vergi alanlarını gizle
+        const isIsletme = (mode === 'isletme');
+        document.querySelectorAll('.px-vergi').forEach(el => {
+            if (el.id !== 'sub-input-box') {
+                el.style.display = isIsletme ? 'none' : 'flex';
+            }
+        });
+
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
         document.getElementById('bb-box').style.display = (mode === 'ekipman') ? 'none' : 'flex';
         if(isSub) document.getElementById('faiz').value = "40.50";
@@ -299,10 +299,22 @@
         const res = document.getElementById('result-area'); res.innerHTML = '';
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
         if(anaPara <= 0) return alert("Tutar giriniz.");
+        
+        // Dinamik Bilgi Notu
+        const isBuyback = document.getElementById('buyback').checked;
+        let infoHtml = "";
+        if (isBuyback && mode !== 'ekipman') {
+            infoHtml = `<div class="info-box" style="background:#fff3cd; border:1px solid #ffeeba;"><strong>Bilgi:</strong> Krediniz <b>sabit faizlidir</b>. (Geri alım garantili)</div>`;
+        } else {
+            infoHtml = `<div class="info-box" style="background:#d1ecf1; border:1px solid #bee5eb;"><strong>Bilgi:</strong> Krediniz <b>değişken faizlidir</b>.</div>`;
+        }
+        res.innerHTML = infoHtml;
+
         const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         const periyot = (segment === 'tarimsal' ? 12 : parseInt(document.getElementById('periyot').value));
         const subO = (segment === 'tarimsal' && (mode === 'traktor' || mode === 'ekipman')) ? document.getElementById('subOran').value / 100 : 0;
         let vades = (segment === 'tarimsal') ? [5, 4, 3, 2, 1] : [ (segment === 'bireysel' ? parseInt(document.getElementById('vade-slider').value) : parseInt(document.getElementById('vade-select').value)) ];
+        
         vades.forEach(v => {
             let tSayisi = (segment === 'tarimsal') ? v : Math.ceil(v / periyot);
             let dF = (yF / 12) * periyot, bF = dF * (1 + bsmv + kkdf);
