@@ -14,7 +14,6 @@
         body { background: #f1f2f6; margin: 0; padding: 10px; color: var(--dark); font-size: 12px; }
         .container { max-width: 850px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         
-        /* Menü Yapısı */
         .segment-nav { display: flex; gap: 5px; margin-bottom: 15px; }
         .seg-btn { flex: 1; border: none; height: 35px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; opacity: 0.4; transition: 0.2s; font-size: 11px; }
         .seg-btn.active { opacity: 1; transform: scale(1.02); }
@@ -24,10 +23,8 @@
         .tab-btn { padding: 5px 10px; border: 1px solid var(--border); background: #fff; border-radius: 3px; cursor: pointer; font-size: 11px; }
         .tab-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
         
-        /* İçerik Kartları */
-        .content-section { display: none; padding: 15px; border: 1px solid #eee; border-radius: 6px; background: #fafafa; line-height: 1.6; }
+        .content-section { display: none; padding: 15px; border: 1px solid #eee; border-radius: 6px; background: #fafafa; }
 
-        /* Checkbox Container Yapısı */
         .opt-wrapper { display: none; gap: 10px; margin-bottom: 10px; }
         .opt-box { 
             flex: 1; background: var(--light); border: 1px solid var(--border); 
@@ -35,26 +32,23 @@
             gap: 2px; cursor: pointer; min-height: 48px; justify-content: center;
         }
         .opt-header { display: flex; align-items: center; gap: 8px; }
-        .opt-header input { width: 16px; height: 16px; margin: 0; cursor: pointer; }
         .opt-label { font-weight: 600; font-size: 11px; color: #555; }
-        .opt-subtext { font-size: 9px; color: var(--success); font-weight: 600; margin-left: 24px; line-height: 1; display: none; }
+        .opt-subtext { font-size: 9px; color: var(--success); font-weight: 600; margin-left: 24px; display: none; }
 
-        /* Giriş Alanları */
         .grid { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
         .field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 5px; }
         label { font-size: 11px; font-weight: 700; color: #666; }
         input, select { height: 34px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
-        input[readonly] { background-color: #f9f9f9; font-weight: bold; }
 
-        /* İşletme Kredisi Bilgi Paneli */
         #isletme-ozel { display: none; background: #fff; border: 2px solid #3498db; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
         .livestock-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; margin-bottom: 8px; }
 
-        .result-main-container { margin-top: 15px; border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; display: none; }
+        .result-main-container { margin-top: 15px; display: none; }
+        .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 10px; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 6px; text-align: center; font-weight: bold; font-size: 12px; }
-        table { width: 100%; font-size: 11px; border-collapse: collapse; }
+        table { width: 100%; font-size: 11px; border-collapse: collapse; background: white; }
         table th, table td { border: 1px solid #eee; padding: 5px; text-align: center; }
-        .plan-header { background: #f8f9fa; padding: 4px; font-weight: bold; border-top: 1px solid #ccc; font-size: 11px; }
+        table th { background: #f8f9fa; }
 
         .actions { display: flex; gap: 5px; margin-top: 15px; }
         .btn { flex: 1; height: 38px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 12px; }
@@ -90,12 +84,12 @@
         <button class="tab-btn" onclick="switchTab(this, 'genelveriler')">Genel Veriler</button>
     </div>
 
-    <div id="hakkimda" class="content-section"><b>Süleyman Coşkun</b><br>Kredi Uzmanı. Bu portal profesyonel hesaplama desteği sunar.</div>
-    <div id="kararname" class="content-section"><b>Resmi Kararname Verileri</b><br>İlgili faiz destekleri ve sübvansiyon oranları Resmi Gazete baz alınarak güncellenmektedir.</div>
-    <div id="genelveriler" class="content-section"><b>Birim Masraflar</b><br>Küçükbaş: 2.500 ₺/Yıl | Büyükbaş: 15.000 ₺/Yıl</div>
+    <div id="hakkimda" class="content-section"><b>Süleyman Coşkun</b> - Kredi Planlama Uzmanı</div>
+    <div id="kararname" class="content-section"><b>Kararname Bilgileri:</b> Resmi sübvansiyon oranları uygulanmaktadır.</div>
+    <div id="genelveriler" class="content-section"><b>Genel Veriler:</b> Küçükbaş Masraf: 2.500₺ | Büyükbaş Masraf: 15.000₺</div>
 
     <div id="isletme-ozel" class="no-print">
-        <div style="font-weight: bold; color: #3498db; margin-bottom: 8px; font-size: 11px;">İşletme Gider Bilgi Paneli</div>
+        <div style="font-weight: bold; color: #3498db; margin-bottom: 8px;">İşletme Gider Bilgi Paneli</div>
         <div class="livestock-grid">
             <div class="field"><label>Küçükbaş Adet</label><input type="number" id="hayvanSayisi" oninput="Calculator.updateLivestockInfo()"></div>
             <div class="field"><label>KB Yıllık İhtiyaç (2.500 ₺)</label><input type="text" id="kbMasraf" readonly></div>
@@ -123,11 +117,11 @@
             </div>
         </div>
 
-        <div id="calc-fields" class="grid no-print">
+        <div class="grid no-print">
             <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="Calculator.fmtMoney(this)"></div>
             <div class="field" style="width:70px;"><label>Aylık %</label><input type="number" id="faizAylik" step="0.01" oninput="Calculator.syncInterest('aylik')"></div>
             <div class="field" style="width:70px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
-            <div class="field" id="box-vade" style="width:90px;"><label id="label-vade">Vade</label><select id="vade-select" onchange="Calculator.reset()"></select></div>
+            <div class="field" id="box-vade" style="width:90px;"><label>Vade</label><select id="vade-select" onchange="Calculator.reset()"></select></div>
             <div class="field" id="box-sub" style="width:60px;"><label>Sübv %</label><input type="number" id="subOran" oninput="Calculator.reset()"></div>
             <div class="field" style="width:55px;"><label>BSMV</label><input type="number" id="bsmv" readonly></div>
             <div class="field" style="width:55px;"><label>KKDF</label><input type="number" id="kkdf" readonly></div>
@@ -141,8 +135,12 @@
     </div>
 
     <div id="result-main-container" class="result-main-container">
-        <div class="result-main-title">Ödeme Planı Detayları</div>
-        <div id="result-area" style="padding:5px;"></div>
+        <div id="plan-5" class="plan-wrapper"><div class="result-main-title">5 Yıl Vadeli Ödeme Planı</div><div class="tbl-res"></div></div>
+        <div id="plan-4" class="plan-wrapper"><div class="result-main-title">4 Yıl Vadeli Ödeme Planı</div><div class="tbl-res"></div></div>
+        <div id="plan-3" class="plan-wrapper"><div class="result-main-title">3 Yıl Vadeli Ödeme Planı</div><div class="tbl-res"></div></div>
+        <div id="plan-2" class="plan-wrapper"><div class="result-main-title">2 Yıl Vadeli Ödeme Planı</div><div class="tbl-res"></div></div>
+        <div id="plan-1" class="plan-wrapper"><div class="result-main-title">1 Yıl Vadeli Ödeme Planı</div><div class="tbl-res"></div></div>
+        <div id="plan-custom" class="plan-wrapper"><div class="result-main-title" id="custom-title">Ödeme Planı</div><div class="tbl-res"></div></div>
     </div>
 </div>
 
@@ -165,8 +163,8 @@
             getState: () => cfg[mode],
             reset: () => { 
                 document.getElementById('result-main-container').style.display = 'none';
+                document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
                 document.getElementById('pdfBtn').disabled = true;
-                document.getElementById('printBtn').disabled = true;
             },
             fmtMoney: function(i) {
                 let v = i.value.replace(/\D/g, "");
@@ -194,27 +192,38 @@
                 this.reset();
             },
             calculate: function() {
-                const res = document.getElementById('result-area'); res.innerHTML = '';
                 const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
                 if(!tutar) return;
+                
                 const yF = parseFloat(document.getElementById('faiz').value) / 100, sub = (parseFloat(document.getElementById('subOran').value) || 0) / 100;
                 const b = parseFloat(document.getElementById('bsmv').value) / 100, k = parseFloat(document.getElementById('kkdf').value) / 100;
                 const s = cfg[mode];
+
+                document.getElementById('result-main-container').style.display = 'block';
+                document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
+
                 if (s.unit === 'Yıl') {
                     const maxV = (mode === 'zirai') ? 1 : 5;
-                    for (let v = maxV; v >= 1; v--) res.innerHTML += this.drawTable(tutar, yF, sub, b, k, v, 'Yıl');
+                    // 5'ten 1'e Doğru Sıralı Döngü
+                    for (let v = maxV; v >= 1; v--) {
+                        const pEl = document.getElementById(`plan-${v}`);
+                        pEl.style.display = 'block';
+                        pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, b, k, v, 'Yıl');
+                    }
                 } else {
                     const v = parseInt(document.getElementById('vade-select').value);
-                    res.innerHTML = this.drawTable(tutar, yF, 0, b, k, v, 'Ay');
+                    const pEl = document.getElementById('plan-custom');
+                    document.getElementById('custom-title').innerText = `${v} Ay Vadeli Ödeme Planı`;
+                    pEl.style.display = 'block';
+                    pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, b, k, v, 'Ay');
                 }
-                document.getElementById('result-main-container').style.display = 'block';
                 document.getElementById('pdfBtn').disabled = false;
                 document.getElementById('printBtn').disabled = false;
             },
             drawTable: function(tutar, yF, sub, b, k, v, unit) {
                 const net = (unit === 'Yıl') ? (yF * (1 - sub) * (1 + b + k)) : ((yF / 12) * (1 + b + k));
                 const pmt = (tutar * net * Math.pow(1+net, v)) / (Math.pow(1+net, v)-1);
-                let html = `<div class="plan-header">${v} ${unit} Planı</div><table><thead><tr><th>No</th><th>Ana Para</th><th>Faiz+Vergi</th><th>Taksit</th></tr></thead><tbody>`;
+                let html = `<table><thead><tr><th>No</th><th>Ana Para</th><th>Faiz+Vergi</th><th>Taksit</th></tr></thead><tbody>`;
                 let bal = tutar;
                 for(let i=1; i<=v; i++) {
                     let f = bal * net, a = pmt - f; if(i===v) a = bal; bal -= a;
@@ -260,7 +269,7 @@
             document.getElementById('subOran').value = s.sub;
             document.getElementById('bsmv').value = s.bsmv;
             document.getElementById('kkdf').value = s.kkdf;
-            Calculator.handleYerli();
+            if(mode === 'traktor' || mode === 'ekipman') Calculator.handleYerli();
         } else {
             document.getElementById(mode).style.display = 'block';
         }
