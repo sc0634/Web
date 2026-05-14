@@ -39,6 +39,7 @@
         .field { display: flex; flex-direction: column; gap: 3px; }
         label { font-size: 10px; font-weight: 700; color: #666; }
         input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
+        input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; }
 
         .result-main-container { margin-top: 15px; display: none; }
         .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 20px; display: none; background: white; }
@@ -118,8 +119,8 @@
             <div class="field" style="width:70px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
             <div class="field" id="box-vade" style="width:90px;"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
             <div class="field" id="box-sub" style="width:60px;"><label>Sübv %</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
-            <div class="field" style="width:55px;"><label>BSMV %</label><input type="number" id="bsmv" oninput="Calculator.autoCalc()"></div>
-            <div class="field" style="width:55px;"><label>KKDF %</label><input type="number" id="kkdf" oninput="Calculator.autoCalc()"></div>
+            <div class="field" style="width:55px;"><label>BSMV %</label><input type="number" id="bsmv" readonly></div>
+            <div class="field" style="width:55px;"><label>KKDF %</label><input type="number" id="kkdf" readonly></div>
         </div>
 
         <div class="btn-calc-container" id="manual-calc-area">
@@ -138,7 +139,6 @@
             </div>
             <div class="tbl-res"></div>
         </div>
-        <!-- Diğer plan kutuları aynı kalır -->
         <div id="plan-4" class="plan-wrapper"><div class="result-header"><span class="result-title">4 Yıl Vadeli Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-4', '4_Yil_Plan')">PDF</button><button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-4')">YAZDIR</button></div></div><div class="tbl-res"></div></div>
         <div id="plan-3" class="plan-wrapper"><div class="result-header"><span class="result-title">3 Yıl Vadeli Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-3', '3_Yil_Plan')">PDF</button><button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-3')">YAZDIR</button></div></div><div class="tbl-res"></div></div>
         <div id="plan-2" class="plan-wrapper"><div class="result-header"><span class="result-title">2 Yıl Vadeli Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-2', '2_Yil_Plan')">PDF</button><button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-2')">YAZDIR</button></div></div><div class="tbl-res"></div></div>
