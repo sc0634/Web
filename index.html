@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Süleyman Coşkun - Kredi Hesaplama & İletişim</title>
+    <title>Süleyman Coşkun - Kredi Hesaplama</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
             --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --hakkimda: #34495e;
-            --success: #27ae60; --dark: #2c3e50; --light: #ecf0f1; --border: #dcdde1;
+            --success: #27ae60; --danger: #e74c3c; --dark: #2c3e50; --light: #ecf0f1; --border: #dcdde1;
             --input-height: 40px;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
@@ -42,7 +42,6 @@
             border: 1px solid var(--border); border-radius: 5px; 
             font-size: 12px; outline: none; background: white; width: 100%;
         }
-        input[readonly] { background-color: #f1f2f6; color: #7f8c8d; }
 
         #prof-input-box, #tutar-input-box { width: 140px; }
         .px-faiz, .px-vergi { width: 65px; }
@@ -52,20 +51,19 @@
         .options-container { 
             display: flex; flex-direction: row; gap: 10px; width: 100%;
             padding: 10px; background: #fdfdfd; border: 1px dashed var(--border); border-radius: 5px; 
-            margin-top: 5px;
+            margin-top: 5px; flex-wrap: wrap;
         }
         .opt-row { display: flex; align-items: center; gap: 5px; cursor: pointer; min-width: 110px; } 
-        .opt-row label { font-size: 11px; text-transform: none; cursor: pointer; }
+        .opt-row label { font-size: 11px; cursor: pointer; }
         .opt-row input { width: 16px; height: 16px; cursor: pointer; }
 
-        /* Bilgi kutusu stili */
-        .info-box { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; font-weight: 500; display: none; }
+        /* Bilgi Kutusu & Blink */
+        .info-box { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; font-weight: bold; display: none; text-align: center; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .blink-text { animation: blink 1s infinite; }
 
         .px-vade-slider { width: 180px; display: none; }
-        .slider-container { 
-            display: flex; align-items: center; gap: 10px; height: 40px; 
-            background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 10px;
-        }
+        .slider-container { display: flex; align-items: center; gap: 10px; height: 40px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 0 10px; }
 
         label { font-weight: bold; font-size: 9px; color: #57606f; text-transform: uppercase; margin-bottom: 2px; }
         
@@ -81,19 +79,11 @@
         .btn-pdf { background: #9b59b6; }
         .btn-print { background: var(--dark); }
 
-        .apply-row-forced { 
-            display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; 
-            gap: 5px; padding: 10px; align-items: flex-end; width: 100%;
-        }
-        .apply-row-forced .field { flex: 1; min-width: 0; }
-        .apply-row-forced .btn-box { flex: 1; min-width: 0; }
-
         #chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
         .chat-bubble { display: none; width: 280px; background: white; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); margin-bottom: 15px; overflow: hidden; border: 1px solid var(--border); }
 
         @media (max-width: 600px) {
-            .actions { grid-template-columns: 1fr 1fr 1fr !important; gap: 5px; }
-            .btn { font-size: 10px !important; height: 40px !important; }
+            .actions { grid-template-columns: 1fr 1fr 1fr !important; }
             #prof-input-box, #tutar-input-box { width: 48%; }
         }
     </style>
@@ -136,7 +126,6 @@
             <div class="options-container" id="ziraiOpts">
                 <div class="opt-row"><input type="checkbox" id="yerli" checked onchange="updateYerli()"><label for="yerli">Yerli Malı</label></div>
                 <div class="opt-row" id="bb-box"><input type="checkbox" id="buyback" checked onchange="reset()"><label for="buyback">Buy Back</label></div>
-                <!-- Bilgi Kutusu Buy Back'in hemen altına taşındı -->
                 <div id="dynamic-info-box" class="info-box"></div>
             </div>
         </div>
@@ -150,16 +139,6 @@
         <div id="result-main-container" class="result-main-container">
             <div class="result-main-title">Ödeme Planı Detayları</div>
             <div id="result-area" style="padding:10px;"></div>
-        </div>
-
-        <div id="basvuru-paneli" class="result-main-container no-print" style="margin-top: 20px; border-color: var(--success);">
-            <div class="result-main-title" style="background: var(--success);">Hızlı Başvuru Paneli</div>
-            <div class="apply-row-forced">
-                <div class="field"><label>TCKN</label><input type="text" id="app-tckn" maxlength="11" placeholder="TCKN"></div>
-                <div class="field"><label>Telefon</label><input type="tel" id="app-phone" placeholder="05xx"></div>
-                <div class="field"><label>Not</label><input type="text" id="app-note" placeholder="Not..."></div>
-                <div class="btn-box"><button class="btn btn-calc" style="width:100%" onclick="alert('Başvurunuz iletildi!')">BAŞVUR</button></div>
-            </div>
         </div>
     </div>
 
@@ -176,7 +155,7 @@
             <button onclick="toggleChat()" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">&times;</button>
         </div>
         <div style="padding: 10px 15px 15px;">
-            <a href="https://wa.me/905345217697?text=Bilgi%20istiyorum." target="_blank" style="text-decoration: none;">
+            <a href="https://wa.me/905345217697" target="_blank" style="text-decoration: none;">
                 <button class="btn" style="background: #25d366; width: 100%;">WhatsApp'tan Yazın</button>
             </a>
         </div>
@@ -190,12 +169,8 @@
     let mode = 'traktor'; let segment = 'tarimsal';
     function initApp() { fmtMoney(document.getElementById('proforma')); fmtMoney(document.getElementById('tutar')); switchSegment('tarimsal'); }
     function toggleChat() {
-        const b = document.getElementById('chat-bubble'); const i = document.getElementById('chat-icon');
-        if (b.style.display === 'none' || b.style.display === '') {
-            b.style.display = 'block'; i.innerHTML = '<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>';
-        } else {
-            b.style.display = 'none'; i.innerHTML = '<path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>';
-        }
+        const b = document.getElementById('chat-bubble');
+        b.style.display = (b.style.display === 'none' || b.style.display === '') ? 'block' : 'none';
     }
     function syncFaiz(src) {
         const y = document.getElementById('faiz'), a = document.getElementById('faizAylik');
@@ -232,24 +207,14 @@
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m; reset();
-        const isIsletme = (mode === 'isletme');
-        document.querySelectorAll('.px-vergi').forEach(el => {
-            if (el.id !== 'sub-input-box') el.style.display = isIsletme ? 'none' : 'flex';
-        });
         const isBir = (segment === 'bireysel'), isTic = (segment === 'ticari'), isSub = (mode === 'traktor' || mode === 'ekipman');
         document.getElementById('bb-box').style.display = (mode === 'ekipman') ? 'none' : 'flex';
-        if(isSub) document.getElementById('faiz').value = "40.50";
-        else if(mode === 'zirai' || isTic || mode === 'isletme') document.getElementById('faiz').value = "46.00";
-        else if(isBir) document.getElementById('faizAylik').value = "4.39";
-        syncFaiz(isBir ? 'aylik' : 'yillik');
         document.getElementById('vade-box-select').style.display = isTic ? 'flex' : 'none';
         document.getElementById('vade-box-slider').style.display = isBir ? 'flex' : 'none';
         document.getElementById('periyot-box').style.display = (segment === 'tarimsal') ? 'none' : 'flex';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
         document.getElementById('prof-input-box').style.display = (segment === 'tarimsal' && !['zirai','isletme'].includes(mode)) ? 'flex' : 'none';
-        document.getElementById('bsmv').value = (isBir || mode === 'zirai' || mode === 'isletme') ? 15 : 5;
-        document.getElementById('kkdf').value = (isBir || mode === 'zirai' || mode === 'isletme') ? 15 : 0;
         if(isTic) fillVades(60); else if(isBir) fillVades(36);
         if(isSub) updateYerli();
     }
@@ -262,15 +227,12 @@
     }
     function updateSliderVal(v) { document.getElementById('vade-val').innerText = v; reset(); }
     function fmtMoney(i) { let v = i.value.replace(/\D/g, ""); if(v) i.value = new Intl.NumberFormat('tr-TR').format(v); reset(); }
-    
     function reset() { 
         document.getElementById('result-main-container').style.display = 'none'; 
-        document.getElementById('basvuru-paneli').style.display = 'none';
         document.getElementById('pdfBtn').disabled = true; 
         document.getElementById('printBtn').disabled = true; 
         document.getElementById('dynamic-info-box').style.display = 'none';
     }
-
     function updateYerli() { 
         if(mode === 'traktor') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 50 : 25;
         else if(mode === 'ekipman') document.getElementById('subOran').value = document.getElementById('yerli').checked ? 75 : 50;
@@ -283,16 +245,21 @@
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
         if(anaPara <= 0) return alert("Tutar giriniz.");
 
-        // Dinamik Bilgi Satırı Güncelleme ve Buy Back altına taşıma
-        const isBuyback = document.getElementById('buyback').checked;
-        const infoMsg = (isBuyback && mode !== 'ekipman') ? 'Sabit Faizli (Buyback)' : 'Değişken Faizli';
-        const infoBg = (isBuyback && mode !== 'ekipman') ? '#fff3cd' : '#d1ecf1';
-        const infoBorder = (isBuyback && mode !== 'ekipman') ? '#ffeeba' : '#bee5eb';
-        
-        infoBox.style.display = 'block';
-        infoBox.style.background = infoBg;
-        infoBox.style.border = `1px solid ${infoBorder}`;
-        infoBox.innerHTML = `<strong>Bilgi:</strong> Krediniz <b>${infoMsg}</b> modelidir.`;
+        // TRAKTÖR ÖZEL BİLGİ SATIRI MANTIĞI
+        if (mode === 'traktor') {
+            const isBuyback = document.getElementById('buyback').checked;
+            infoBox.style.display = 'block';
+            infoBox.classList.remove('blink-text'); 
+            if(isBuyback) {
+                infoBox.style.background = '#d4edda'; infoBox.style.color = '#155724'; infoBox.style.border = '1px solid #c3e6cb';
+                infoBox.innerHTML = 'Krediniz Sabit Faizlidir.';
+            } else {
+                infoBox.style.background = '#f8d7da'; infoBox.style.color = '#721c24'; infoBox.style.border = '1px solid #f5c6cb';
+                infoBox.innerHTML = '<span class="blink-text">Krediniz Değişken Faizlidir.</span>';
+            }
+        } else {
+            infoBox.style.display = 'none';
+        }
 
         const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
         const periyot = (segment === 'tarimsal' ? 12 : parseInt(document.getElementById('periyot').value));
@@ -312,7 +279,7 @@
             }
             res.innerHTML += h + `</tbody></table></div></div>`;
         });
-        document.getElementById('result-main-container').style.display = 'block'; document.getElementById('basvuru-paneli').style.display = 'block';
+        document.getElementById('result-main-container').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
     function indir() {
