@@ -66,8 +66,8 @@
         .btn-print { background: var(--dark); }
         .btn-apply { background: var(--success); width: 100%; margin-top: 10px; }
 
-        /* İşletme Özel Alanı */
         #isletme-ozel { display: none; padding: 15px; background: #fcfcfc; border: 1px solid var(--border); border-radius: 5px; margin-bottom: 10px; }
+        table tfoot tr { background: #eee; font-weight: bold; }
 
         @media print { .no-print { display: none !important; } }
     </style>
@@ -120,7 +120,7 @@
         </div>
 
         <div id="calc-fields" class="grid no-print">
-            <div class="field" style="width:140px;"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
+            <div class="field" style="width:140px;" id="proforma-box"><label>Proforma Bedeli</label><input type="text" id="proforma" value="2.000.000" oninput="fmtMoney(this)"></div>
             <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" value="1.000.000" oninput="fmtMoney(this)"></div>
             <div class="field" style="width:65px;"><label>Yıllık %</label><input type="number" id="faiz" value="40.50" step="0.01" oninput="syncFaiz('yillik')"></div>
             <div class="field" style="width:65px;"><label>Aylık %</label><input type="number" id="faizAylik" value="3.38" step="0.01" oninput="syncFaiz('aylik')"></div>
@@ -188,16 +188,13 @@
         segment = seg;
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('seg-' + seg.substring(0,3)).classList.add('active');
-        
         const isSpecial = (seg === 'hakkimda' || seg === 'genel');
         document.getElementById('calculator-ui').style.display = seg === 'hakkimda' ? 'none' : 'block';
         document.getElementById('about-box').style.display = seg === 'hakkimda' ? 'block' : 'none';
         document.getElementById('content-genel').style.display = seg === 'genel' ? 'block' : 'none';
         document.getElementById('calc-fields').style.display = isSpecial ? 'none' : 'flex';
         document.getElementById('calc-actions').style.display = isSpecial ? 'none' : 'grid';
-        
         if (isSpecial) document.getElementById('ziraiOpts').style.display = 'none';
-
         document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
         if (!isSpecial) {
             const tabEl = document.getElementById(`tabs-${seg}`);
@@ -209,22 +206,33 @@
     function switchTab(btn, m) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); mode = m;
-        
         const isIsletme = (mode === 'isletme');
         const isSub = (mode === 'traktor' || mode === 'ekipman');
-        
-        // İşletme sekmesi ise her şeyi gizle, özel alanı göster
+
+        // Faiz Ayarları
+        if(mode === 'zirai' || mode === 'ticari_taksitli') {
+            document.getElementById('faiz').value = 46; syncFaiz('yillik');
+        } else if (mode === 'ihtiyac') {
+            document.getElementById('faizAylik').value = 4.39; syncFaiz('aylik');
+        } else if (mode === 'konut') {
+            document.getElementById('faizAylik').value = 2.84; syncFaiz('aylik');
+        }
+
+        // Proforma Görünürlük Ayarı (İhtiyaç, Ticari Taksitli ve Çiftçi Taksitli'de gizli)
+        const hideProforma = (mode === 'ihtiyac' || mode === 'ticari_taksitli' || mode === 'zirai');
+        document.getElementById('proforma-box').style.display = hideProforma ? 'none' : 'flex';
+
         document.getElementById('isletme-ozel').style.display = isIsletme ? 'block' : 'none';
         document.getElementById('calc-fields').style.display = isIsletme ? 'none' : 'flex';
         document.getElementById('calc-actions').style.display = isIsletme ? 'none' : 'grid';
         document.getElementById('ziraiOpts').style.display = isSub ? 'flex' : 'none';
         document.getElementById('sub-input-box').style.display = isSub ? 'flex' : 'none';
-
         if(!isIsletme) {
-            const showVadePeriyot = (segment !== 'tarimsal');
+            const showVadePeriyot = (segment !== 'tarimsal' || mode === 'zirai');
             document.getElementById('vade-box-select').style.display = showVadePeriyot ? 'flex' : 'none';
             document.getElementById('periyot-box').style.display = showVadePeriyot ? 'flex' : 'none';
-            fillVades(segment === 'ticari' ? 60 : 36);
+            const maxVade = (mode === 'konut') ? 120 : (segment === 'ticari' ? 60 : 36);
+            fillVades(maxVade, mode === 'konut' ? 120 : 12);
             updatePeriyotOptions();
         }
         reset();
@@ -240,14 +248,14 @@
         const p = document.getElementById('periyot'); p.innerHTML = '';
         const opts = [{v:"1",t:"Aylık"}, {v:"3",t:"3 Ayda Bir"}, {v:"6",t:"6 Ayda Bir"}, {v:"12",t:"Yıllık"}];
         opts.forEach(o => { let el = document.createElement('option'); el.value = o.v; el.text = o.t; p.appendChild(el); });
-        p.value = segment === 'tarimsal' ? "12" : "1";
+        p.value = (segment === 'tarimsal' && mode !== 'zirai') ? "12" : "1";
     }
 
-    function fillVades(max) {
+    function fillVades(max, defaultSel) {
         const s = document.getElementById('vade-select'); s.innerHTML = '';
         for(let i=1; i<=max; i++) {
             let o = document.createElement('option'); o.value = i; o.text = i + " Ay";
-            if(i===12) o.selected = true; s.appendChild(o);
+            if(i === defaultSel) o.selected = true; s.appendChild(o);
         }
     }
 
@@ -270,32 +278,29 @@
         const res = document.getElementById('result-area'); res.innerHTML = '';
         const anaPara = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
         if(anaPara <= 0) return;
-
         const yF = document.getElementById('faiz').value / 100, bsmv = document.getElementById('bsmv').value / 100, kkdf = document.getElementById('kkdf').value / 100;
-        const periyot = (segment === 'tarimsal' && mode !== 'isletme') ? 12 : parseInt(document.getElementById('periyot').value);
+        const periyot = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? 12 : parseInt(document.getElementById('periyot').value);
         const subO = (segment === 'tarimsal' && (mode === 'traktor' || mode === 'ekipman')) ? document.getElementById('subOran').value / 100 : 0;
-        
-        let vades = (segment === 'tarimsal' && mode !== 'isletme') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade-select').value)];
+        let vades = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? [5, 4, 3, 2, 1] : [parseInt(document.getElementById('vade-select').value)];
         
         vades.forEach(v => {
-            let tSayisi = (segment === 'tarimsal' && mode !== 'isletme') ? v : Math.ceil(v / periyot);
+            let tSayisi = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? v : Math.ceil(v / periyot);
             let dF = (yF / 12) * periyot, bF = dF * (1 + bsmv + kkdf);
             let taksit = (anaPara * bF * Math.pow(1+bF, tSayisi)) / (Math.pow(1+bF, tSayisi)-1);
-            let label = (segment === 'tarimsal' && mode !== 'isletme') ? `${v} Yıl` : `${v} Ay`;
+            let label = (segment === 'tarimsal' && mode !== 'isletme' && mode !== 'zirai') ? `${v} Yıl` : `${v} Ay`;
             let h = `<div style="margin-bottom:15px"><div style="background:#f1f2f6;padding:8px;text-align:center;font-weight:bold">${label}</div><table style="width:100%;font-size:11px;border-collapse:collapse;"><thead><tr style="background:#eee"><th>Tks</th><th>Ana Para</th><th>Brüt Faiz</th>${subO>0?'<th>Ind. Faiz</th>':''}<th>Taksit</th></tr></thead><tbody>`;
-            let kalan = anaPara;
+            let kalan = anaPara, tAna = 0, tFaiz = 0, tInd = 0, tTaksit = 0;
             for(let i=1; i<=tSayisi; i++){
                 let f = kalan * dF, b = f * (bsmv + kkdf), ind = f * subO, a = (i===tSayisi) ? kalan : taksit - (f + b);
-                h += `<tr style="text-align:center;border-bottom:1px solid #ddd"><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f+b).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(taksit-ind).toLocaleString('tr-TR')}</td></tr>`;
-                kalan -= a;
+                let tksTutari = taksit - ind;
+                h += `<tr style="text-align:center;border-bottom:1px solid #ddd"><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f+b).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(ind).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tksTutari).toLocaleString('tr-TR')}</td></tr>`;
+                tAna += a; tFaiz += (f+b); tInd += ind; tTaksit += tksTutari; kalan -= a;
             }
-            h += `</tbody></table></div>`; res.innerHTML += h;
+            h += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(tAna).toLocaleString('tr-TR')}</td><td>${Math.round(tFaiz).toLocaleString('tr-TR')}</td>${subO>0?`<td>${Math.round(tInd).toLocaleString('tr-TR')}</td>`:''}<td>${Math.round(tTaksit).toLocaleString('tr-TR')}</td></tr></tfoot></table></div>`;
+            res.innerHTML += h;
         });
-
         document.getElementById('result-main-container').style.display = 'block';
-        if(segment !== 'hakkimda' && segment !== 'genel') {
-            document.getElementById('apply-section').style.display = 'block';
-        }
+        if(segment !== 'hakkimda' && segment !== 'genel') document.getElementById('apply-section').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
 
