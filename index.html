@@ -32,16 +32,7 @@
             gap: 2px; cursor: pointer; min-height: 48px; justify-content: center;
         }
         .opt-header { display: flex; align-items: center; gap: 6px; }
-        
-        /* Küçültülmüş Checkbox Stili */
-        .opt-header input[type="checkbox"] { 
-            width: 13px; 
-            height: 13px; 
-            margin: 0; 
-            cursor: pointer; 
-            vertical-align: middle;
-        }
-        
+        .opt-header input[type="checkbox"] { width: 13px; height: 13px; margin: 0; cursor: pointer; }
         .opt-label { font-weight: 600; font-size: 10.5px; color: #555; }
         .opt-subtext { font-size: 9px; color: var(--success); font-weight: 600; margin-left: 19px; display: none; }
 
@@ -62,7 +53,8 @@
 
         .actions { display: flex; gap: 5px; margin-top: 15px; }
         .btn { flex: 1; height: 38px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 12px; }
-        .btn-calc { background: var(--success); flex: 2; } 
+        /* Hesapla butonu sadece tarımsal olmayan modlarda görünecek */
+        .btn-calc { background: var(--success); flex: 2; display: none; } 
         .btn-pdf { background: #8e44ad; } .btn-print { background: #34495e; }
     </style>
 </head>
@@ -94,10 +86,6 @@
         <button class="tab-btn" onclick="switchTab(this, 'genelveriler')">Genel Veriler</button>
     </div>
 
-    <div id="hakkimda" class="content-section"><b>Süleyman Coşkun</b> - Kredi Planlama Uzmanı</div>
-    <div id="kararname" class="content-section"><b>Kararname Bilgileri:</b> Resmi sübvansiyon oranları uygulanmaktadır.</div>
-    <div id="genelveriler" class="content-section"><b>Genel Veriler:</b> Küçükbaş Masraf: 2.500₺ | Büyükbaş Masraf: 15.000₺</div>
-
     <div id="isletme-ozel" class="no-print">
         <div style="font-weight: bold; color: #3498db; margin-bottom: 8px;">İşletme Gider Bilgi Paneli</div>
         <div class="livestock-grid">
@@ -121,7 +109,7 @@
             </div>
             <div class="opt-box" id="col-bb-box" onclick="document.getElementById('buyback').click()">
                 <div class="opt-header">
-                    <input type="checkbox" id="buyback" checked onclick="event.stopPropagation(); Calculator.reset()">
+                    <input type="checkbox" id="buyback" checked onclick="event.stopPropagation(); Calculator.autoCalc()">
                     <span class="opt-label">Buy Back (Sabit Faiz)</span>
                 </div>
             </div>
@@ -131,16 +119,16 @@
             <div class="field" style="width:140px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="Calculator.fmtMoney(this)"></div>
             <div class="field" style="width:70px;"><label>Aylık %</label><input type="number" id="faizAylik" step="0.01" oninput="Calculator.syncInterest('aylik')"></div>
             <div class="field" style="width:70px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
-            <div class="field" id="box-vade" style="width:90px;"><label>Vade</label><select id="vade-select" onchange="Calculator.reset()"></select></div>
-            <div class="field" id="box-sub" style="width:60px;"><label>Sübv %</label><input type="number" id="subOran" oninput="Calculator.reset()"></div>
+            <div class="field" id="box-vade" style="width:90px;"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
+            <div class="field" id="box-sub" style="width:60px;"><label>Sübv %</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
             <div class="field" style="width:55px;"><label>BSMV</label><input type="number" id="bsmv" readonly></div>
             <div class="field" style="width:55px;"><label>KKDF</label><input type="number" id="kkdf" readonly></div>
         </div>
 
         <div class="actions no-print">
-            <button class="btn btn-calc" onclick="Calculator.calculate()">HESAPLA</button>
-            <button class="btn btn-pdf" id="pdfBtn" onclick="Calculator.exportPDF()" disabled>PDF</button>
-            <button class="btn btn-print" id="printBtn" onclick="window.print()" disabled>YAZDIR</button>
+            <button class="btn btn-calc" id="manual-calc-btn" onclick="Calculator.calculate()">HESAPLA</button>
+            <button class="btn btn-pdf" id="pdfBtn" onclick="Calculator.exportPDF()">PDF</button>
+            <button class="btn btn-print" id="printBtn" onclick="window.print()">YAZDIR</button>
         </div>
     </div>
 
@@ -171,27 +159,20 @@
         return {
             setMode: m => mode = m,
             getState: () => cfg[mode],
-            reset: () => { 
-                document.getElementById('result-main-container').style.display = 'none';
-                document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
-                document.getElementById('pdfBtn').disabled = true;
+            autoCalc: function() {
+                // Tarımsal modlarda butona basmadan otomatik hesaplar
+                if (cfg[mode].unit === 'Yıl') this.calculate();
             },
             fmtMoney: function(i) {
                 let v = i.value.replace(/\D/g, "");
                 if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
-                this.reset();
+                this.autoCalc();
             },
             syncInterest: function(type) {
                 const y = document.getElementById('faiz'), a = document.getElementById('faizAylik');
                 if (type === 'yillik') a.value = (parseFloat(y.value) / 12).toFixed(2);
                 else y.value = (parseFloat(a.value) * 12).toFixed(2);
-                this.reset();
-            },
-            updateLivestockInfo: function() {
-                const kb = (parseInt(document.getElementById('hayvanSayisi').value) || 0) * 2500;
-                const bb = (parseInt(document.getElementById('buyukbasSayisi').value) || 0) * 15000;
-                document.getElementById('kbMasraf').value = kb.toLocaleString('tr-TR') + " ₺";
-                document.getElementById('bbMasraf').value = bb.toLocaleString('tr-TR') + " ₺";
+                this.autoCalc();
             },
             handleYerli: function() {
                 const isYerli = document.getElementById('yerli').checked;
@@ -199,7 +180,7 @@
                 if(mode === 'traktor') cfg.traktor.sub = isYerli ? 50 : 25;
                 if(mode === 'ekipman') cfg.ekipman.sub = isYerli ? 75 : 50;
                 document.getElementById('subOran').value = cfg[mode].sub || 0;
-                this.reset();
+                this.calculate();
             },
             calculate: function() {
                 const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
@@ -226,8 +207,6 @@
                     pEl.style.display = 'block';
                     pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, b, k, v, 'Ay');
                 }
-                document.getElementById('pdfBtn').disabled = false;
-                document.getElementById('printBtn').disabled = false;
             },
             drawTable: function(tutar, yF, sub, b, k, v, unit) {
                 const net = (unit === 'Yıl') ? (yF * (1 - sub) * (1 + b + k)) : ((yF / 12) * (1 + b + k));
@@ -240,6 +219,12 @@
                 }
                 return html + `</tbody></table>`;
             },
+            updateLivestockInfo: function() {
+                const kb = (parseInt(document.getElementById('hayvanSayisi').value) || 0) * 2500;
+                const bb = (parseInt(document.getElementById('buyukbasSayisi').value) || 0) * 15000;
+                document.getElementById('kbMasraf').value = kb.toLocaleString('tr-TR') + " ₺";
+                document.getElementById('bbMasraf').value = bb.toLocaleString('tr-TR') + " ₺";
+            },
             exportPDF: () => html2pdf().set({ margin: 5, filename: 'Kredi_Plani.pdf' }).from(document.getElementById('pdf-area')).save()
         };
     })();
@@ -250,6 +235,9 @@
         document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
         const target = document.getElementById(`tabs-${seg}`);
         if(target) { target.style.display = 'flex'; target.querySelector('.tab-btn').click(); }
+        
+        // Tarımsal modda butonu gizle, diğerlerinde göster
+        document.getElementById('manual-calc-btn').style.display = (seg === 'tarimsal') ? 'none' : 'block';
     }
 
     function switchTab(btn, mode) {
@@ -263,6 +251,7 @@
             document.getElementById('isletme-ozel').style.display = (mode === 'isletme') ? 'block' : 'none';
             document.getElementById('extra-opts').style.display = (mode === 'traktor' || mode === 'ekipman') ? 'flex' : 'none';
             document.getElementById('col-bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
+            
             const boxVade = document.getElementById('box-vade');
             if(s.unit === 'Yıl') boxVade.style.display = 'none';
             else {
@@ -279,19 +268,16 @@
             document.getElementById('bsmv').value = s.bsmv;
             document.getElementById('kkdf').value = s.kkdf;
             if(mode === 'traktor' || mode === 'ekipman') Calculator.handleYerli();
-        } else {
-            document.getElementById(mode).style.display = 'block';
+            else Calculator.calculate();
         }
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        Calculator.reset();
     }
 
     function initApp() {
         document.getElementById('tutar').value = "1.000.000";
         Calculator.fmtMoney(document.getElementById('tutar'));
         switchSegment('tarimsal');
-        setTimeout(() => { Calculator.calculate(); }, 100);
     }
 </script>
 </body>
