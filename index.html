@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
-            --genel: #95a5a6; --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --hakkimda: #34495e;
+            --genel: #95a5a6; --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --hakkimda: #34495e; --kararname: #7f8c8d;
             --success: #27ae60; --danger: #e74c3c; --dark: #2c3e50; --light: #ecf0f1; --border: #dcdde1;
             --input-height: 40px;
         }
@@ -28,7 +28,7 @@
         }
         .seg-btn.active { opacity: 1; border-color: #fff; outline: 2px solid var(--dark); }
         .bg-gen { background: var(--genel); } .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); }
-        .bg-bir { background: var(--bireysel); } .bg-hak { background: var(--hakkimda); }
+        .bg-bir { background: var(--bireysel); } .bg-hak { background: var(--hakkimda); } .bg-kar { background: var(--kararname); }
 
         .tabs { display: none; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--light); padding-bottom: 8px; }
         .tab-btn { padding: 6px 10px; border: none; background: #eee; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; }
@@ -82,11 +82,16 @@
         <button id="seg-bir" class="seg-btn bg-bir" onclick="switchSegment('bireysel')">BİREYSEL</button>
         <button id="seg-hak" class="seg-btn bg-hak" onclick="switchSegment('hakkimda')">HAKKIMDA</button>
         <button id="seg-gen" class="seg-btn bg-gen" onclick="switchSegment('genel')">GENEL VERİLER</button>
+        <button id="seg-kar" class="seg-btn bg-kar" onclick="switchSegment('kararname')">KARARNAME</button>
     </div>
 
     <div id="calculator-ui">
         <div id="content-genel" style="display:none; padding:20px; text-align:center; color:#7f8c8d;">
             Henüz genel veri girişi yapılmamıştır.
+        </div>
+
+        <div id="content-kararname" style="display:none; padding:20px; text-align:center; color:#7f8c8d;">
+            Kararname içeriği buraya eklenecektir.
         </div>
 
         <div class="tabs no-print" id="tabs-tarimsal">
@@ -188,13 +193,17 @@
         segment = seg;
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('seg-' + seg.substring(0,3)).classList.add('active');
-        const isSpecial = (seg === 'hakkimda' || seg === 'genel');
+        const isSpecial = (seg === 'hakkimda' || seg === 'genel' || seg === 'kararname');
+        
         document.getElementById('calculator-ui').style.display = seg === 'hakkimda' ? 'none' : 'block';
         document.getElementById('about-box').style.display = seg === 'hakkimda' ? 'block' : 'none';
         document.getElementById('content-genel').style.display = seg === 'genel' ? 'block' : 'none';
+        document.getElementById('content-kararname').style.display = seg === 'kararname' ? 'block' : 'none';
+        
         document.getElementById('calc-fields').style.display = isSpecial ? 'none' : 'flex';
         document.getElementById('calc-actions').style.display = isSpecial ? 'none' : 'grid';
         if (isSpecial) document.getElementById('ziraiOpts').style.display = 'none';
+        
         document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
         if (!isSpecial) {
             const tabEl = document.getElementById(`tabs-${seg}`);
@@ -209,7 +218,6 @@
         const isIsletme = (mode === 'isletme');
         const isSub = (mode === 'traktor' || mode === 'ekipman');
 
-        // Faiz Ayarları
         if(mode === 'zirai' || mode === 'ticari_taksitli') {
             document.getElementById('faiz').value = 46; syncFaiz('yillik');
         } else if (mode === 'ihtiyac') {
@@ -218,7 +226,6 @@
             document.getElementById('faizAylik').value = 2.84; syncFaiz('aylik');
         }
 
-        // Proforma Görünürlük Ayarı (İhtiyaç, Ticari Taksitli ve Çiftçi Taksitli'de gizli)
         const hideProforma = (mode === 'ihtiyac' || mode === 'ticari_taksitli' || mode === 'zirai');
         document.getElementById('proforma-box').style.display = hideProforma ? 'none' : 'flex';
 
@@ -300,7 +307,7 @@
             res.innerHTML += h;
         });
         document.getElementById('result-main-container').style.display = 'block';
-        if(segment !== 'hakkimda' && segment !== 'genel') document.getElementById('apply-section').style.display = 'block';
+        if(segment !== 'hakkimda' && segment !== 'genel' && segment !== 'kararname') document.getElementById('apply-section').style.display = 'block';
         document.getElementById('pdfBtn').disabled = false; document.getElementById('printBtn').disabled = false;
     }
 
