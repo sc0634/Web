@@ -11,51 +11,48 @@
             --success: #27ae60; --dark: #2c3e50; --light: #f8f9fa; --border: #dcdde1;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f1f2f6; margin: 0; padding: 10px; color: var(--dark); font-size: 12px; }
-        .container { max-width: 850px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        body { background: #f1f2f6; margin: 0; padding: 10px; color: var(--dark); font-size: 11px; }
+        .container { max-width: 950px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         
         .segment-nav { display: flex; gap: 5px; margin-bottom: 15px; }
         .seg-btn { flex: 1; border: none; height: 35px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; opacity: 0.4; transition: 0.2s; font-size: 11px; }
         .seg-btn.active { opacity: 1; transform: scale(1.02); }
-        .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); } .bg-bir { background: var(--bireysel); } .bg-inf { background: var(--info); }
+        .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); } .bg-bir { background: var(--bireysel); }
         
         .tabs { display: none; gap: 3px; margin-bottom: 10px; flex-wrap: wrap; }
         .tab-btn { padding: 5px 10px; border: 1px solid var(--border); background: #fff; border-radius: 3px; cursor: pointer; font-size: 11px; }
         .tab-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
         
-        .content-section { display: none; padding: 15px; border: 1px solid #eee; border-radius: 6px; background: #fafafa; }
-
         .opt-wrapper { display: none; gap: 10px; margin-bottom: 10px; }
-        .opt-box { 
-            flex: 1; background: var(--light); border: 1px solid var(--border); 
-            padding: 6px 8px; border-radius: 5px; display: flex; flex-direction: column; 
-            gap: 2px; cursor: pointer; min-height: 48px; justify-content: center;
-        }
+        .opt-box { flex: 1; background: var(--light); border: 1px solid var(--border); padding: 6px 8px; border-radius: 5px; cursor: pointer; min-height: 45px; display: flex; flex-direction: column; justify-content: center; }
         .opt-header { display: flex; align-items: center; gap: 6px; }
-        .opt-header input[type="checkbox"] { width: 13px; height: 13px; margin: 0; cursor: pointer; }
+        .opt-header input[type="checkbox"] { width: 13px; height: 13px; margin: 0; }
         .opt-label { font-weight: 600; font-size: 10.5px; color: #555; }
         .opt-subtext { font-size: 9px; color: var(--success); font-weight: 600; margin-left: 19px; display: none; }
 
         .grid { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
         .field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 5px; }
-        label { font-size: 11px; font-weight: 700; color: #666; }
-        input, select { height: 34px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
-
-        #isletme-ozel { display: none; background: #fff; border: 2px solid #3498db; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
-        .livestock-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; margin-bottom: 8px; }
+        label { font-size: 10px; font-weight: 700; color: #666; }
+        input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
 
         .result-main-container { margin-top: 15px; display: none; }
-        .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 10px; display: none; }
+        .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 15px; display: none; }
         .result-main-title { background: var(--dark); color: white; padding: 6px; text-align: center; font-weight: bold; font-size: 12px; }
-        table { width: 100%; font-size: 11px; border-collapse: collapse; background: white; }
-        table th, table td { border: 1px solid #eee; padding: 5px; text-align: center; }
-        table th { background: #f8f9fa; }
+        
+        table { width: 100%; font-size: 10px; border-collapse: collapse; background: white; }
+        table th, table td { border: 1px solid #eee; padding: 6px 3px; text-align: center; }
+        table th { background: #f8f9fa; color: #444; font-weight: bold; }
+        table tfoot tr { background: #f1f2f6; font-weight: bold; }
+        .txt-bold { font-weight: bold; }
+        .txt-indirim { color: #27ae60; font-weight: bold; }
+        .txt-gray { color: #7f8c8d; text-decoration: line-through; font-size: 9px; }
 
         .actions { display: flex; gap: 5px; margin-top: 15px; }
         .btn { flex: 1; height: 38px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 12px; }
-        /* Hesapla butonu sadece tarımsal olmayan modlarda görünecek */
         .btn-calc { background: var(--success); flex: 2; display: none; } 
         .btn-pdf { background: #8e44ad; } .btn-print { background: #34495e; }
+        
+        @media print { .no-print { display: none !important; } }
     </style>
 </head>
 <body onload="initApp()">
@@ -65,37 +62,18 @@
         <button id="seg-tar" class="seg-btn bg-tar" onclick="switchSegment('tarimsal')">TARIMSAL</button>
         <button id="seg-tic" class="seg-btn bg-tic" onclick="switchSegment('ticari')">TİCARİ</button>
         <button id="seg-bir" class="seg-btn bg-bir" onclick="switchSegment('bireysel')">BİREYSEL</button>
-        <button id="seg-gen" class="seg-btn bg-inf" onclick="switchSegment('genel')">GENEL BİLGİLER</button>
     </div>
 
     <div class="tabs no-print" id="tabs-tarimsal">
         <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
         <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
         <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
-        <button class="tab-btn" onclick="switchTab(this, 'isletme')">İşletme Kredisi Bilgi</button>
     </div>
     <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari_taksitli')">Ticari Taksitli</button></div>
     <div class="tabs no-print" id="tabs-bireysel">
         <button class="tab-btn" onclick="switchTab(this, 'konut')">Konut</button>
         <button class="tab-btn" onclick="switchTab(this, 'tasit')">Taşıt</button>
         <button class="tab-btn" onclick="switchTab(this, 'ihtiyac')">İhtiyaç</button>
-    </div>
-    <div class="tabs no-print" id="tabs-genel">
-        <button class="tab-btn" onclick="switchTab(this, 'hakkimda')">Hakkımda</button>
-        <button class="tab-btn" onclick="switchTab(this, 'kararname')">Kararname</button>
-        <button class="tab-btn" onclick="switchTab(this, 'genelveriler')">Genel Veriler</button>
-    </div>
-
-    <div id="isletme-ozel" class="no-print">
-        <div style="font-weight: bold; color: #3498db; margin-bottom: 8px;">İşletme Gider Bilgi Paneli</div>
-        <div class="livestock-grid">
-            <div class="field"><label>Küçükbaş Adet</label><input type="number" id="hayvanSayisi" oninput="Calculator.updateLivestockInfo()"></div>
-            <div class="field"><label>KB Yıllık İhtiyaç (2.500 ₺)</label><input type="text" id="kbMasraf" readonly></div>
-        </div>
-        <div class="livestock-grid">
-            <div class="field"><label>Büyükbaş Adet</label><input type="number" id="buyukbasSayisi" oninput="Calculator.updateLivestockInfo()"></div>
-            <div class="field"><label>BB Yıllık İhtiyaç (15.000 ₺)</label><input type="text" id="bbMasraf" readonly></div>
-        </div>
     </div>
 
     <div id="calc-engine">
@@ -121,8 +99,8 @@
             <div class="field" style="width:70px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
             <div class="field" id="box-vade" style="width:90px;"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
             <div class="field" id="box-sub" style="width:60px;"><label>Sübv %</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
-            <div class="field" style="width:55px;"><label>BSMV</label><input type="number" id="bsmv" readonly></div>
-            <div class="field" style="width:55px;"><label>KKDF</label><input type="number" id="kkdf" readonly></div>
+            <div class="field" style="width:55px;"><label>BSMV %</label><input type="number" id="bsmv" oninput="Calculator.autoCalc()"></div>
+            <div class="field" style="width:55px;"><label>KKDF %</label><input type="number" id="kkdf" oninput="Calculator.autoCalc()"></div>
         </div>
 
         <div class="actions no-print">
@@ -149,7 +127,6 @@
             traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, unit: 'Yıl' },
             ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, unit: 'Yıl' },
             zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, unit: 'Yıl' },
-            isletme: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 0, defVade: 12, unit: 'Ay' },
             ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, defVade: 24, unit: 'Ay' },
             konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, defVade: 120, unit: 'Ay' },
             tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, defVade: 48, unit: 'Ay' },
@@ -159,10 +136,7 @@
         return {
             setMode: m => mode = m,
             getState: () => cfg[mode],
-            autoCalc: function() {
-                // Tarımsal modlarda butona basmadan otomatik hesaplar
-                if (cfg[mode].unit === 'Yıl') this.calculate();
-            },
+            autoCalc: function() { if (cfg[mode].unit === 'Yıl') this.calculate(); },
             fmtMoney: function(i) {
                 let v = i.value.replace(/\D/g, "");
                 if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
@@ -176,54 +150,86 @@
             },
             handleYerli: function() {
                 const isYerli = document.getElementById('yerli').checked;
-                document.getElementById('yerli-desc').style.display = isYerli ? 'block' : 'none';
                 if(mode === 'traktor') cfg.traktor.sub = isYerli ? 50 : 25;
                 if(mode === 'ekipman') cfg.ekipman.sub = isYerli ? 75 : 50;
+                document.getElementById('yerli-desc').style.display = isYerli ? 'block' : 'none';
                 document.getElementById('subOran').value = cfg[mode].sub || 0;
                 this.calculate();
             },
             calculate: function() {
                 const tutar = parseFloat(document.getElementById('tutar').value.replace(/\./g, "")) || 0;
                 if(!tutar) return;
-                
                 const yF = parseFloat(document.getElementById('faiz').value) / 100, sub = (parseFloat(document.getElementById('subOran').value) || 0) / 100;
-                const b = parseFloat(document.getElementById('bsmv').value) / 100, k = parseFloat(document.getElementById('kkdf').value) / 100;
-                const s = cfg[mode];
-
+                const bRate = parseFloat(document.getElementById('bsmv').value) / 100, kRate = parseFloat(document.getElementById('kkdf').value) / 100;
+                
                 document.getElementById('result-main-container').style.display = 'block';
                 document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
 
-                if (s.unit === 'Yıl') {
-                    const maxV = (mode === 'zirai') ? 1 : 5;
-                    for (let v = maxV; v >= 1; v--) {
+                if (cfg[mode].unit === 'Yıl') {
+                    for (let v = ((mode === 'zirai') ? 1 : 5); v >= 1; v--) {
                         const pEl = document.getElementById(`plan-${v}`);
                         pEl.style.display = 'block';
-                        pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, b, k, v, 'Yıl');
+                        pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, bRate, kRate, v, 'Yıl');
                     }
                 } else {
                     const v = parseInt(document.getElementById('vade-select').value);
                     const pEl = document.getElementById('plan-custom');
-                    document.getElementById('custom-title').innerText = `${v} Ay Vadeli Ödeme Planı`;
                     pEl.style.display = 'block';
-                    pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, b, k, v, 'Ay');
+                    pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, bRate, kRate, v, 'Ay');
                 }
             },
-            drawTable: function(tutar, yF, sub, b, k, v, unit) {
-                const net = (unit === 'Yıl') ? (yF * (1 - sub) * (1 + b + k)) : ((yF / 12) * (1 + b + k));
-                const pmt = (tutar * net * Math.pow(1+net, v)) / (Math.pow(1+net, v)-1);
-                let html = `<table><thead><tr><th>No</th><th>Ana Para</th><th>Faiz+Vergi</th><th>Taksit</th></tr></thead><tbody>`;
+            drawTable: function(tutar, yF, sub, bRate, kRate, v, unit) {
+                const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
+                const indirimliOran = faizOran * (1 - sub);
+                const totalMaliyetOran = indirimliOran * (1 + bRate + kRate);
+                const pmt = (tutar * totalMaliyetOran * Math.pow(1+totalMaliyetOran, v)) / (Math.pow(1+totalMaliyetOran, v)-1);
+                
+                let html = `<table><thead><tr>
+                    <th>No</th>
+                    <th>Ana Para</th>
+                    <th>Faiz</th>
+                    <th>İndirimli Faiz</th>
+                    <th>BSMV</th>
+                    <th>KKDF</th>
+                    <th>Taksit</th>
+                </tr></thead><tbody>`;
+                
                 let bal = tutar;
+                let tAP = 0, tF = 0, tIF = 0, tBS = 0, tKK = 0, tPMT = 0;
+
                 for(let i=1; i<=v; i++) {
-                    let f = bal * net, a = pmt - f; if(i===v) a = bal; bal -= a;
-                    html += `<tr><td>${i}</td><td>${Math.round(a).toLocaleString('tr-TR')}</td><td>${Math.round(f).toLocaleString('tr-TR')}</td><td><b>${Math.round(pmt).toLocaleString('tr-TR')}</b></td></tr>`;
+                    let fStandart = bal * faizOran;
+                    let fIndirimli = bal * indirimliOran;
+                    let bsmv = fIndirimli * bRate;
+                    let kkdf = fIndirimli * kRate;
+                    let aPara = pmt - (fIndirimli + bsmv + kkdf);
+                    if(i===v) aPara = bal;
+                    
+                    tAP += aPara; tF += fStandart; tIF += fIndirimli; tBS += bsmv; tKK += kkdf; tPMT += pmt;
+                    
+                    html += `<tr>
+                        <td>${i}</td>
+                        <td>${Math.round(aPara).toLocaleString('tr-TR')}</td>
+                        <td class="txt-gray">${Math.round(fStandart).toLocaleString('tr-TR')}</td>
+                        <td class="txt-indirim">${Math.round(fIndirimli).toLocaleString('tr-TR')}</td>
+                        <td>${Math.round(bsmv).toLocaleString('tr-TR')}</td>
+                        <td>${Math.round(kkdf).toLocaleString('tr-TR')}</td>
+                        <td class="txt-bold">${Math.round(pmt).toLocaleString('tr-TR')}</td>
+                    </tr>`;
+                    bal -= aPara;
                 }
-                return html + `</tbody></table>`;
-            },
-            updateLivestockInfo: function() {
-                const kb = (parseInt(document.getElementById('hayvanSayisi').value) || 0) * 2500;
-                const bb = (parseInt(document.getElementById('buyukbasSayisi').value) || 0) * 15000;
-                document.getElementById('kbMasraf').value = kb.toLocaleString('tr-TR') + " ₺";
-                document.getElementById('bbMasraf').value = bb.toLocaleString('tr-TR') + " ₺";
+                
+                html += `</tbody><tfoot><tr>
+                    <td>TOPLAM</td>
+                    <td>${Math.round(tAP).toLocaleString('tr-TR')}</td>
+                    <td class="txt-gray">${Math.round(tF).toLocaleString('tr-TR')}</td>
+                    <td class="txt-indirim">${Math.round(tIF).toLocaleString('tr-TR')}</td>
+                    <td>${Math.round(tBS).toLocaleString('tr-TR')}</td>
+                    <td>${Math.round(tKK).toLocaleString('tr-TR')}</td>
+                    <td class="txt-bold">${Math.round(tPMT).toLocaleString('tr-TR')}</td>
+                </tr></tfoot></table>`;
+                
+                return html;
             },
             exportPDF: () => html2pdf().set({ margin: 5, filename: 'Kredi_Plani.pdf' }).from(document.getElementById('pdf-area')).save()
         };
@@ -235,41 +241,31 @@
         document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
         const target = document.getElementById(`tabs-${seg}`);
         if(target) { target.style.display = 'flex'; target.querySelector('.tab-btn').click(); }
-        
-        // Tarımsal modda butonu gizle, diğerlerinde göster
         document.getElementById('manual-calc-btn').style.display = (seg === 'tarimsal') ? 'none' : 'block';
     }
 
     function switchTab(btn, mode) {
-        const infoTabs = ['hakkimda', 'kararname', 'genelveriler'];
-        document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-        document.getElementById('calc-engine').style.display = infoTabs.includes(mode) ? 'none' : 'block';
-        
-        if (!infoTabs.includes(mode)) {
-            Calculator.setMode(mode);
-            const s = Calculator.getState();
-            document.getElementById('isletme-ozel').style.display = (mode === 'isletme') ? 'block' : 'none';
-            document.getElementById('extra-opts').style.display = (mode === 'traktor' || mode === 'ekipman') ? 'flex' : 'none';
-            document.getElementById('col-bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
-            
-            const boxVade = document.getElementById('box-vade');
-            if(s.unit === 'Yıl') boxVade.style.display = 'none';
-            else {
-                boxVade.style.display = 'flex';
-                const vSel = document.getElementById('vade-select'); vSel.innerHTML = '';
-                for(let i=12; i<=60; i+=12) {
-                    let o = document.createElement('option'); o.value = i; o.text = i + " Ay";
-                    if(i === s.defVade) o.selected = true; vSel.appendChild(o);
-                }
+        Calculator.setMode(mode);
+        const s = Calculator.getState();
+        document.getElementById('extra-opts').style.display = (mode === 'traktor' || mode === 'ekipman') ? 'flex' : 'none';
+        document.getElementById('col-bb-box').style.display = (mode === 'traktor') ? 'flex' : 'none';
+        const boxVade = document.getElementById('box-vade');
+        if(s.unit === 'Yıl') boxVade.style.display = 'none';
+        else {
+            boxVade.style.display = 'flex';
+            const vSel = document.getElementById('vade-select'); vSel.innerHTML = '';
+            for(let i=12; i<=60; i+=12) {
+                let o = document.createElement('option'); o.value = i; o.text = i + " Ay";
+                if(i === s.defVade) o.selected = true; vSel.appendChild(o);
             }
-            document.getElementById('faiz').value = s.faiz.toFixed(2);
-            document.getElementById('faizAylik').value = (s.faiz / 12).toFixed(2);
-            document.getElementById('subOran').value = s.sub;
-            document.getElementById('bsmv').value = s.bsmv;
-            document.getElementById('kkdf').value = s.kkdf;
-            if(mode === 'traktor' || mode === 'ekipman') Calculator.handleYerli();
-            else Calculator.calculate();
         }
+        document.getElementById('faiz').value = s.faiz.toFixed(2);
+        document.getElementById('faizAylik').value = (s.faiz / 12).toFixed(2);
+        document.getElementById('subOran').value = s.sub;
+        document.getElementById('bsmv').value = s.bsmv;
+        document.getElementById('kkdf').value = s.kkdf;
+        if(mode === 'traktor' || mode === 'ekipman') Calculator.handleYerli();
+        else Calculator.calculate();
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
