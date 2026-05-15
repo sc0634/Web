@@ -37,21 +37,33 @@
         label { font-size: 10px; font-weight: 700; color: #666; }
         input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
 
-        /* Efektif Faiz Kutusu Genişliği Azaltıldı */
+        /* Efektif Faiz Kutusu ve Yazı Ortalaması */
         .efektif-field {
-            width: 110px; /* 140px'den düşürüldü */
+            width: 110px;
             background: var(--dark);
             border-radius: 4px;
-            padding: 2px 6px;
+            padding: 2px 4px;
             height: 32px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center; /* Yatay ortalama */
+            text-align: center;   /* Yazı ortalama */
             color: var(--gold);
             border-left: 3px solid var(--gold);
         }
-        .efektif-field label { color: #ccc; font-size: 7.5px; margin-bottom: -2px; white-space: nowrap; }
-        .efektif-field .rate-value { font-weight: 800; font-size: 12px; }
+        .efektif-field label { 
+            color: #ccc; 
+            font-size: 7.5px; 
+            margin-bottom: -1px; 
+            white-space: nowrap; 
+            width: 100%;
+        }
+        .efektif-field .rate-value { 
+            font-weight: 800; 
+            font-size: 12px; 
+            width: 100%;
+        }
 
         .print-all-container { margin-bottom: 15px; display: none; }
         .btn-print-all { 
@@ -161,6 +173,7 @@
             </div>
             <div class="tbl-res"></div>
         </div>
+        <!-- Diğer plan kutuları JS tarafından doldurulur -->
         <div id="plan-4" class="plan-wrapper"><div class="result-header"><span class="result-title">4 Yıl Vadeli Ödeme Planı</span><div class="header-actions no-print"><button class="mini-btn btn-prt" onclick="Calculator.printSection('plan-4')">YAZDIR</button><button class="mini-btn btn-pdf" onclick="Calculator.exportSinglePDF('plan-4', '4_Yil_Plan')">PDF</button></div></div><div class="tbl-res"></div></div>
         <div id="plan-3" class="plan-wrapper"><div class="result-header"><span class="result-title">3 Yıl Vadeli Ödeme Planı</span><div class="header-actions no-print"><button class="mini-btn btn-prt" onclick="Calculator.printSection('plan-3')">YAZDIR</button><button class="mini-btn btn-pdf" onclick="Calculator.exportSinglePDF('plan-3', '3_Yil_Plan')">PDF</button></div></div><div class="tbl-res"></div></div>
         <div id="plan-2" class="plan-wrapper"><div class="result-header"><span class="result-title">2 Yıl Vadeli Ödeme Planı</span><div class="header-actions no-print"><button class="mini-btn btn-prt" onclick="Calculator.printSection('plan-2')">YAZDIR</button><button class="mini-btn btn-pdf" onclick="Calculator.exportSinglePDF('plan-2', '2_Yil_Plan')">PDF</button></div></div><div class="tbl-res"></div></div>
