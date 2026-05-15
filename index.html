@@ -151,7 +151,6 @@
                 const state = cfg[currentMode];
                 const komPct = state.kom || 0.5;
                 
-                // Arka planda otomatik proforma/kasko bağıntısı
                 let kaskoTemeli = tutar;
                 if(state.pro) {
                     const profVal = parseFloat(document.getElementById('proforma').value.replace(/\./g, "")) || 0;
@@ -159,9 +158,12 @@
                 }
                 const kasko = kaskoTemeli * 0.02;
                 
-                const yillikAzalis = 0.001; 
-                const bazOran = 0.02; 
-                const dinamikOran = bazOran - ((vade - 1) * yillikAzalis);
+                // --- %2'DEN BAŞLAYAN VE HER YIL %0.10 ARTAN HAYAT SİGORTASI MANTIĞI ---
+                const bazOran = 0.02; // 1. Yıl Başlangıç Oranı (%2.00)
+                const artisMiktari = 0.001; // Her yıl artış miktarı (%0.10)
+                
+                // Yıllık vadeler için dinamik artış, aylık vadeler için %2 sabit kalır
+                const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
                 const hayat = tutar * dinamikOran;
 
                 let tarsimUcreti = state.tarsim ? (tutar * 0.04) : 0;
@@ -171,6 +173,7 @@
                     komisyon: komisyonBrut, 
                     kasko: kasko,
                     hayat: hayat,
+                    hayatOran: dinamikOran * 100,
                     tarsim: tarsimUcreti,
                     rehin: REHIN_SABIT,
                     toplam: komisyonBrut + kasko + hayat + tarsimUcreti + REHIN_SABIT 
@@ -253,15 +256,12 @@
                 }
                 html += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(tAP).toLocaleString('tr-TR')}</td><td>${Math.round(tBazF).toLocaleString('tr-TR')}</td><td>${Math.round(tIF).toLocaleString('tr-TR')}</td><td>${Math.round(tBS).toLocaleString('tr-TR')}</td><td>${Math.round(tKK).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(tPMT).toLocaleString('tr-TR')}</td></tr></tfoot></table>`;
                 
-                const bazOranLabel = 2.0;
-                const guncelOran = unit === 'Yıl' ? (bazOranLabel - ((v - 1) * 0.10)).toFixed(2) : bazOranLabel.toFixed(2);
-
                 html += `<div class="dosya-banner">
                     <div class="db-item"><span class="db-label">Komisyon</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.komisyon).toLocaleString('tr-TR')} TL</span></div>
                     <div class="db-divider"></div>
                     <div class="db-item"><span class="db-label">Kasko</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.kasko).toLocaleString('tr-TR')} TL</span></div>
                     <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">Hayat Sigortası (%${guncelOran})</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.hayat).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="db-item"><span class="db-label">Hayat Sigortası (%${masraf.hayatOran.toFixed(2)})</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.hayat).toLocaleString('tr-TR')} TL</span></div>
                     ${masraf.tarsim > 0 ? `
                     <div class="db-divider"></div>
                     <div class="db-item"><span class="db-label">Tarsim (Her Yıl)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.tarsim).toLocaleString('tr-TR')} TL</span></div>
