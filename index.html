@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kredi Planlama - S.C.</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
             --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; 
@@ -43,7 +42,7 @@
         
         table { width: 100%; font-size: 11px; border-collapse: collapse; }
         table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; }
-        table th { background: #f8f9fa; }
+        table th { background: #f8f9fa; font-size: 9px; }
         table tfoot td { font-weight: bold; background: #eef2f7; border-top: 2px solid var(--dark); }
 
         .dosya-banner { background: #fdf2f2; border-top: 2px solid var(--dosya); display: flex; padding: 8px 12px; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
@@ -90,10 +89,6 @@
             <div class="field" id="box-sub" style="width:45px;"><label>Sübv%</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
             <div class="field" style="width:45px;"><label>BSMV%</label><input type="number" id="bsmv" readonly></div>
             <div class="field" style="width:45px;"><label>KKDF%</label><input type="number" id="kkdf" readonly></div>
-            
-            <div class="field" style="width:80px;"><label>KOMİSYON %</label><input type="number" id="komisyonOran" step="0.01" oninput="Calculator.autoCalc()"></div>
-            <div class="field" style="width:85px;"><label>KASKO</label><input type="text" id="kasko" oninput="Calculator.fmtMoney(this)"></div>
-            <div class="field" style="width:85px;"><label>HAYAT SİG.</label><input type="text" id="hayat" oninput="Calculator.fmtMoney(this)"></div>
 
             <div class="info-field subv-field"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
@@ -138,31 +133,37 @@
             fmtMoney: function(i) {
                 let v = i.value.replace(/\D/g, "");
                 if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
-                if(i.id === 'tutar') {
-                    const tutarInt = parseFloat(v) || 0;
-                    const hSig = Math.round(tutarInt * 0.02);
-                    document.getElementById('hayat').value = new Intl.NumberFormat('tr-TR').format(hSig);
-                }
                 this.autoCalc();
             },
             fmtProforma: function(i) {
                 let v = i.value.replace(/\D/g, "");
                 if(v) {
                     i.value = new Intl.NumberFormat('tr-TR').format(v);
+                    const profInt = parseInt(v);
                     const rate = cfg[currentMode].pRate || 0.75;
-                    const tutar = Math.floor(parseInt(v) * rate);
+                    const tutar = Math.floor(profInt * rate);
                     document.getElementById('tutar').value = new Intl.NumberFormat('tr-TR').format(tutar);
-                    const hSig = Math.round(tutar * 0.02);
-                    document.getElementById('hayat').value = new Intl.NumberFormat('tr-TR').format(hSig);
                 }
                 this.autoCalc();
             },
             syncInterest: function() { this.autoCalc(); },
-            getExtraCosts: function(tutar) {
+            getExtraCosts: function(tutar, vade = 1) {
                 const state = cfg[currentMode];
-                const komPct = parseFloat(document.getElementById('komisyonOran').value) || 0;
-                const kasko = parseFloat(document.getElementById('kasko').value.replace(/\./g, "")) || 0;
-                const hayat = parseFloat(document.getElementById('hayat').value.replace(/\./g, "")) || 0;
+                const komPct = state.kom || 0.5;
+                
+                // Arka planda otomatik proforma/kasko bağıntısı
+                let kaskoTemeli = tutar;
+                if(state.pro) {
+                    const profVal = parseFloat(document.getElementById('proforma').value.replace(/\./g, "")) || 0;
+                    if(profVal > 0) kaskoTemeli = profVal;
+                }
+                const kasko = kaskoTemeli * 0.02;
+                
+                const yillikAzalis = 0.001; 
+                const bazOran = 0.02; 
+                const dinamikOran = bazOran - ((vade - 1) * yillikAzalis);
+                const hayat = tutar * dinamikOran;
+
                 let tarsimUcreti = state.tarsim ? (tutar * 0.04) : 0;
                 const netKomisyon = tutar * (komPct/100);
                 const komisyonBrut = netKomisyon * 1.05; 
@@ -204,24 +205,30 @@
                 const sub = (parseFloat(document.getElementById('subOran').value) || 0) / 100;
                 const bRate = parseFloat(document.getElementById('bsmv').value) / 100;
                 const kRate = parseFloat(document.getElementById('kkdf').value) / 100;
-                const masraf = this.getExtraCosts(tutar);
+                
                 document.getElementById('subv-rate-display').innerText = `%${(yF * (1 - sub) * 100).toFixed(2)}`;
+                
+                const masrafVarsayilan = this.getExtraCosts(tutar, 5);
                 const repVade = (state.unit === 'Yıl') ? 5 : parseInt(document.getElementById('vade-select').value || 12);
-                const efektif = this.calcEfektif(tutar, yF, sub, bRate, kRate, repVade, state.unit, masraf.toplam);
+                const efektif = this.calcEfektif(tutar, yF, sub, bRate, kRate, repVade, state.unit, masrafVarsayilan.toplam);
                 document.getElementById('effective-rate-display').innerText = `%${efektif.toFixed(2)}`;
+                
                 document.getElementById('result-main-container').style.display = 'block';
                 document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
+                
                 if (state.unit === 'Yıl') {
                     const vades = (currentMode === 'modern_sulama' || currentMode === 'zirai') ? [5] : [1,2,3,4,5];
                     vades.forEach(v => {
                         const pEl = document.getElementById(`plan-${v}`); pEl.style.display = 'block';
-                        pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, bRate, kRate, v, 'Yıl', masraf);
+                        const masrafVadeyeOzel = this.getExtraCosts(tutar, v);
+                        pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, bRate, kRate, v, 'Yıl', masrafVadeyeOzel);
                     });
                 } else {
                     const v = parseInt(document.getElementById('vade-select').value);
                     const pEl = document.getElementById('plan-custom'); pEl.style.display = 'block';
                     document.getElementById('custom-title').innerText = `${v} Ay Vadeli Plan`;
-                    pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, bRate, kRate, v, 'Ay', masraf);
+                    const masrafAylik = this.getExtraCosts(tutar, 1);
+                    pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik);
                 }
             },
             drawTable: function(tutar, yF, sub, bRate, kRate, v, unit, masraf) {
@@ -229,22 +236,32 @@
                 const indirimliOran = faizOran * (1 - sub);
                 const maliyetOran = indirimliOran + (faizOran * bRate) + (indirimliOran * kRate);
                 let pmt = (maliyetOran === 0) ? (tutar / v) : (tutar * maliyetOran * Math.pow(1+maliyetOran, v)) / (Math.pow(1+maliyetOran, v)-1);
-                let html = `<table><thead><tr><th>No</th><th>Ana Para</th><th>Net Faiz</th><th>BSMV</th><th>KKDF</th><th>Taksit</th></tr></thead><tbody>`;
-                let bal = tutar, tAP = 0, tIF = 0, tBS = 0, tKK = 0, tPMT = 0;
+                
+                let html = `<table><thead><tr><th>No</th><th>Ana Para</th><th>Faiz</th><th>İnd. Faiz</th><th>BSMV</th><th>KKDF</th><th>Taksit</th></tr></thead><tbody>`;
+                let bal = tutar, tAP = 0, tBazF = 0, tIF = 0, tBS = 0, tKK = 0, tPMT = 0;
                 for(let i = 1; i <= v; i++) {
-                    let fI = bal * indirimliOran, b = (bal * faizOran) * bRate, k = fI * kRate;
+                    let bazF = bal * faizOran; 
+                    let fI = bal * indirimliOran; 
+                    let b = (bal * faizOran) * bRate;
+                    let k = fI * kRate;
                     let aPara = (i === v) ? bal : (pmt - (fI + b + k));
-                    tAP += aPara; tIF += fI; tBS += b; tKK += k; tPMT += pmt;
-                    html += `<tr><td>${i}</td><td>${Math.round(aPara).toLocaleString('tr-TR')}</td><td>${Math.round(fI).toLocaleString('tr-TR')}</td><td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(k).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(pmt).toLocaleString('tr-TR')}</td></tr>`;
+                    
+                    tAP += aPara; tBazF += bazF; tIF += fI; tBS += b; tKK += k; tPMT += pmt;
+                    
+                    html += `<tr><td>${i}</td><td>${Math.round(aPara).toLocaleString('tr-TR')}</td><td>${Math.round(bazF).toLocaleString('tr-TR')}</td><td>${Math.round(fI).toLocaleString('tr-TR')}</td><td>${Math.round(b).toLocaleString('tr-TR')}</td><td>${Math.round(k).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(pmt).toLocaleString('tr-TR')}</td></tr>`;
                     bal -= aPara;
                 }
-                html += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(tAP).toLocaleString('tr-TR')}</td><td>${Math.round(tIF).toLocaleString('tr-TR')}</td><td>${Math.round(tBS).toLocaleString('tr-TR')}</td><td>${Math.round(tKK).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(tPMT).toLocaleString('tr-TR')}</td></tr></tfoot></table>`;
+                html += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(tAP).toLocaleString('tr-TR')}</td><td>${Math.round(tBazF).toLocaleString('tr-TR')}</td><td>${Math.round(tIF).toLocaleString('tr-TR')}</td><td>${Math.round(tBS).toLocaleString('tr-TR')}</td><td>${Math.round(tKK).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(tPMT).toLocaleString('tr-TR')}</td></tr></tfoot></table>`;
+                
+                const bazOranLabel = 2.0;
+                const guncelOran = unit === 'Yıl' ? (bazOranLabel - ((v - 1) * 0.10)).toFixed(2) : bazOranLabel.toFixed(2);
+
                 html += `<div class="dosya-banner">
                     <div class="db-item"><span class="db-label">Komisyon</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.komisyon).toLocaleString('tr-TR')} TL</span></div>
                     <div class="db-divider"></div>
                     <div class="db-item"><span class="db-label">Kasko</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.kasko).toLocaleString('tr-TR')} TL</span></div>
                     <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">Hayat Sig. (%2)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.hayat).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="db-item"><span class="db-label">Hayat Sigortası (%${guncelOran})</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.hayat).toLocaleString('tr-TR')} TL</span></div>
                     ${masraf.tarsim > 0 ? `
                     <div class="db-divider"></div>
                     <div class="db-item"><span class="db-label">Tarsim (Her Yıl)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.tarsim).toLocaleString('tr-TR')} TL</span></div>
@@ -281,7 +298,11 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
         document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
         document.getElementById('box-vade').style.display = s.unit === 'Yıl' ? 'none' : 'flex';
-        if (s.pro) Calculator.resetProforma();
+        if (s.pro) {
+            Calculator.resetProforma();
+        } else {
+            Calculator.fmtMoney(document.getElementById('tutar'));
+        }
         if(s.unit === 'Ay') {
             const vSel = document.getElementById('vade-select'); vSel.innerHTML = '';
             const vades = m === 'konut' ? [12,24,36,48,60,72,84,96,108,120] : [12,24,36,48,60];
@@ -291,14 +312,10 @@
         document.getElementById('subOran').value = s.sub;
         document.getElementById('bsmv').value = s.bsmv;
         document.getElementById('kkdf').value = s.kkdf;
-        document.getElementById('komisyonOran').value = s.kom.toFixed(2);
         Calculator.calculate();
     }
     function initApp() {
         document.getElementById('tutar').value = "1.500.000";
-        document.getElementById('kasko').value = "0"; 
-        const initTutar = 1500000;
-        document.getElementById('hayat').value = new Intl.NumberFormat('tr-TR').format(Math.round(initTutar * 0.02));
         switchSegment('tarimsal');
     }
 </script>
