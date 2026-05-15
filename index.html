@@ -9,55 +9,84 @@
         :root { 
             --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --info: #95a5a6;
             --success: #27ae60; --dark: #2c3e50; --light: #f8f9fa; --border: #dcdde1;
-            --danger: #e74c3c;
-            --whatsapp: #25d366;
+            --danger: #e74c3c; --whatsapp: #25d366;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background: #f1f2f6; margin: 0; padding: 10px; color: var(--dark); font-size: 11px; }
         .container { max-width: 950px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; }
+        
         .segment-nav { display: flex; gap: 5px; margin-bottom: 15px; }
         .seg-btn { flex: 1; border: none; height: 35px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; opacity: 0.4; transition: 0.2s; font-size: 11px; }
         .seg-btn.active { opacity: 1; transform: scale(1.02); }
         .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); } .bg-bir { background: var(--bireysel); }
+        
         .tabs { display: none; gap: 3px; margin-bottom: 10px; flex-wrap: wrap; }
         .tab-btn { padding: 5px 10px; border: 1px solid var(--border); background: #fff; border-radius: 3px; cursor: pointer; font-size: 11px; }
         .tab-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
+        
         .opt-wrapper { display: none; gap: 10px; margin-bottom: 10px; }
         .opt-box { flex: 1; background: var(--light); border: 1px solid var(--border); padding: 6px 8px; border-radius: 5px; cursor: pointer; min-height: 45px; display: flex; flex-direction: column; justify-content: center; }
         .opt-header { display: flex; align-items: center; gap: 6px; }
         .opt-header input[type="checkbox"] { width: 13px; height: 13px; margin: 0; }
         .opt-label { font-weight: 600; font-size: 10.5px; color: #555; }
         .opt-subtext { font-size: 9px; font-weight: 600; margin-left: 19px; }
+
         .txt-fixed { color: var(--success); }
         .txt-variable { color: var(--danger); animation: blink 1s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
         .grid { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin-bottom: 15px; }
         .field { display: flex; flex-direction: column; gap: 3px; }
         label { font-size: 10px; font-weight: 700; color: #666; }
         input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
         input[readonly] { background-color: #f1f2f6; color: #7f8c8d; cursor: not-allowed; }
+
         .result-main-container { margin-top: 15px; display: none; }
         .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 20px; display: none; background: white; }
+        
         .result-header { background: var(--dark); color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
         .result-title { font-weight: bold; font-size: 12px; }
         .table-actions { display: flex; gap: 5px; }
         .mini-btn { border: none; border-radius: 3px; color: white; padding: 4px 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .mini-btn-pdf { background: #8e44ad; }
         .mini-btn-print { background: #2980b9; }
+
         table { width: 100%; font-size: 11px; border-collapse: collapse; background: white; }
         table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; color: var(--dark); font-weight: normal; }
         table th { background: #f8f9fa; color: #444; font-weight: bold; }
         table tfoot tr { background: #eef2f7; }
         table tfoot td { font-weight: bold !important; color: #000 !important; border-top: 2px solid var(--dark); }
+
         .txt-gray { color: #7f8c8d; text-decoration: line-through; }
         .txt-indirim { color: var(--dark); } 
         .txt-bold { font-weight: bold; }
+
         .btn-calc-container { margin-bottom: 15px; display: none; }
         .btn-calc { background: var(--success); width: 100%; height: 38px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 12px; }
+
+        /* Başvuru Bölümü Tasarımı */
+        .apply-container { margin-top: 20px; padding: 15px; background: #f8f9fa; border: 2px dashed var(--border); border-radius: 8px; }
+        .apply-form-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+        .apply-form-row input { flex: 1 1 120px; min-width: 0; }
+        .apply-form-row #app-msg { flex: 2 1 200px; }
+        .apply-form-row .btn-apply { flex: 1 1 100%; height: 35px; background: var(--dark); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; margin-top: 5px; transition: 0.3s; }
+        .apply-form-row .btn-apply:hover { background: #1a252f; }
+
+        @media (min-width: 600px) {
+            .apply-form-row .btn-apply { flex: 1 1 120px; margin-top: 0; }
+        }
+
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; transition: 0.3s; text-decoration: none; }
         .whatsapp-fixed:hover { transform: scale(1.1); }
         .whatsapp-fixed svg { width: 30px; height: 30px; fill: white; }
-        @media print { .no-print { display: none !important; } body { padding: 0; background: white; } .container { box-shadow: none; max-width: 100%; } .plan-wrapper { border: 1px solid #000; display: block !important; break-inside: avoid; } .result-header { background: #2c3e50 !important; color: white !important; -webkit-print-color-adjust: exact; } }
+
+        @media print { 
+            .no-print { display: none !important; } 
+            body { padding: 0; background: white; }
+            .container { box-shadow: none; max-width: 100%; }
+            .plan-wrapper { border: 1px solid #000; display: block !important; break-inside: avoid; }
+            .result-header { background: #2c3e50 !important; color: white !important; -webkit-print-color-adjust: exact; }
+        }
     </style>
 </head>
 <body onload="initApp()">
@@ -117,14 +146,9 @@
     </div>
 
     <div id="result-main-container" class="result-main-container">
+        <!-- Plan Bölümleri -->
         <div id="plan-5" class="plan-wrapper">
-            <div class="result-header">
-                <span class="result-title">5 Yıl Vadeli Ödeme Planı</span>
-                <div class="table-actions no-print">
-                    <button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-5', '5_Yil_Plan')">PDF</button>
-                    <button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-5')">YAZDIR</button>
-                </div>
-            </div>
+            <div class="result-header"><span class="result-title">5 Yıl Vadeli Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-5', '5_Yil_Plan')">PDF</button><button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-5')">YAZDIR</button></div></div>
             <div class="tbl-res"></div>
         </div>
         <div id="plan-4" class="plan-wrapper"><div class="result-header"><span class="result-title">4 Yıl Vadeli Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-4', '4_Yil_Plan')">PDF</button><button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-4')">YAZDIR</button></div></div><div class="tbl-res"></div></div>
@@ -134,14 +158,14 @@
         <div id="plan-custom" class="plan-wrapper"><div class="result-header"><span class="result-title" id="custom-title">Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn mini-btn-pdf" onclick="Calculator.exportSinglePDF('plan-custom', 'Odeme_Plani')">PDF</button><button class="mini-btn mini-btn-print" onclick="Calculator.printSingle('plan-custom')">YAZDIR</button></div></div><div class="tbl-res"></div></div>
     </div>
 
-    <!-- BAŞVURU BÖLÜMÜ (TEK SATIR) -->
-    <div class="apply-container no-print" style="margin-top: 25px; padding: 15px; background: #f8f9fa; border: 2px dashed var(--border); border-radius: 8px;">
-        <p style="margin: 0 0 10px 0; font-weight: 700; color: var(--dark); font-size: 12px; text-align: center;">Planlama uygunsa bilgilerinizi girip hemen iletişime geçin.</p>
-        <div style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: nowrap;">
-            <input type="text" id="app-tckn" placeholder="TCKN" maxlength="11" style="flex: 1; height: 32px; min-width: 100px;">
-            <input type="tel" id="app-phone" placeholder="Cep Tel" style="flex: 1; height: 32px; min-width: 100px;">
-            <input type="text" id="app-msg" placeholder="Mesajınız" style="flex: 2; height: 32px; min-width: 150px;">
-            <button class="btn-apply" onclick="Calculator.sendWhatsApp()" style="flex: 1; height: 32px; padding: 0 15px; white-space: nowrap; font-size: 11px; background: var(--dark); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">BAŞVURU YAP</button>
+    <!-- Başvuru Formu -->
+    <div class="apply-container no-print">
+        <p style="margin: 0 0 10px 0; font-weight: 700; color: var(--dark); font-size: 11px; text-align: center;">Hızlı Başvuru Formu</p>
+        <div class="apply-form-row">
+            <input type="text" id="app-tckn" placeholder="TCKN" maxlength="11">
+            <input type="tel" id="app-phone" placeholder="Cep Tel">
+            <input type="text" id="app-msg" placeholder="Mesajınız">
+            <button class="btn-apply" onclick="Calculator.sendWhatsApp()">BAŞVURU YAP</button>
         </div>
     </div>
 </div>
@@ -220,8 +244,8 @@
                              `*Tel:* ${tel}%0A` +
                              `*Mesaj:* ${msg}%0A%0A` +
                              `*--- Kredi Detayları ---*%0A` +
-                             `*Kredi Tipi:* ${tip}%0A` +
-                             `*Kredi Tutarı:* ${tutar} TL%0A` +
+                             `*Tip:* ${tip}%0A` +
+                             `*Tutar:* ${tutar} TL%0A` +
                              `*Yıllık Faiz:* %${faiz}%0A` +
                              `*Vade:* ${vade}`;
                 
@@ -257,7 +281,7 @@
                 const indirimliOran = faizOran * (1 - sub);
                 let totalMaliyetOran = (mode === 'sulama') ? indirimliOran + (faizOran * bRate) + (faizOran * kRate) : indirimliOran * (1 + bRate + kRate);
                 let pmt = (totalMaliyetOran === 0) ? tutar / v : (tutar * totalMaliyetOran * Math.pow(1+totalMaliyetOran, v)) / (Math.pow(1+totalMaliyetOran, v)-1);
-                const showStandartFaiz = (mode === 'traktor' || mode === 'ekipman' || mode === 'sulama');
+                const showStandartFaiz = (['traktor', 'ekipman', 'sulama'].includes(mode));
                 let html = `<table><thead><tr><th>No</th><th>Ana Para</th>`;
                 if(showStandartFaiz) html += `<th>Faiz</th>`;
                 html += `<th>${(showStandartFaiz ? 'İndirimli Faiz' : 'Faiz')}</th><th>BSMV</th><th>KKDF</th><th>${(showStandartFaiz ? 'İndirimli Taksit' : 'Taksit')}</th></tr></thead><tbody>`;
