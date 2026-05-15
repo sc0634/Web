@@ -93,7 +93,6 @@
             <div class="field" style="width:80px;"><label style="color:var(--dosya);">KOMİSYON %</label><input type="number" id="komisyonOran" step="0.01" oninput="Calculator.autoCalc()"></div>
             <div class="field" style="width:80px;"><label>KASKO</label><input type="text" id="kasko" oninput="Calculator.fmtMoney(this)"></div>
             <div class="field" style="width:80px;"><label>HAYAT SİG.</label><input type="text" id="hayat" oninput="Calculator.fmtMoney(this)"></div>
-            <div class="field" style="width:80px;"><label>REHİN ÜCR.</label><input type="text" id="rehin" oninput="Calculator.fmtMoney(this)"></div>
 
             <div class="info-field subv-field"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
@@ -117,6 +116,8 @@
 
 <script>
     const Calculator = (function() {
+        const REHIN_SABIT = 1500;
+        const DEFAULT_PROFORMA = "2.000.000";
         const cfg = {
             traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', pro: true, pRate: 0.75 },
             modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, kom: 1.0, unit: 'Yıl', pro: true, pRate: 1.0 },
@@ -153,10 +154,9 @@
                 const komPct = parseFloat(document.getElementById('komisyonOran').value) || 0;
                 const kasko = parseFloat(document.getElementById('kasko').value.replace(/\./g, "")) || 0;
                 const hayat = parseFloat(document.getElementById('hayat').value.replace(/\./g, "")) || 0;
-                const rehin = parseFloat(document.getElementById('rehin').value.replace(/\./g, "")) || 0;
                 const netKomisyon = tutar * (komPct/100);
                 const komisyonBrut = netKomisyon * 1.05; 
-                return { komisyon: komisyonBrut, diger: kasko + hayat + rehin, toplam: komisyonBrut + kasko + hayat + rehin };
+                return { komisyon: komisyonBrut, diger: kasko + hayat + REHIN_SABIT, toplam: komisyonBrut + kasko + hayat + REHIN_SABIT };
             },
             calcEfektif: function(tutar, yF, sub, bRate, kRate, v, unit, mToplam) {
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
@@ -231,15 +231,20 @@
                 html += `<div class="dosya-banner">
                     <div class="db-item"><span class="db-label">Komisyon (+%5 BSMV)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.komisyon).toLocaleString('tr-TR')} TL</span></div>
                     <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">Sigorta+Rehin</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.diger).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="db-item"><span class="db-label">Sigorta+Rehin (1.500₺)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.diger).toLocaleString('tr-TR')} TL</span></div>
                     <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">GENEL TOPLAM</span><span class="db-value" style="color:var(--success)">${Math.round(tPMT + masraf.toplam).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="db-item"><span class="db-label">MASRAFLAR TOPLAMI</span><span class="db-value" style="color:var(--success)">${Math.round(masraf.toplam).toLocaleString('tr-TR')} TL</span></div>
                 </div>`;
                 return html;
             },
             sendWhatsApp: function() {
                 const text = `Kredi Planlama: ${document.getElementById('tutar').value} TL, Efektif Faiz: ${document.getElementById('effective-rate-display').innerText}`;
                 window.open(`https://wa.me/905345217697?text=${encodeURIComponent(text)}`, '_blank');
+            },
+            resetProforma: function() {
+                const profInput = document.getElementById('proforma');
+                profInput.value = DEFAULT_PROFORMA;
+                this.fmtProforma(profInput);
             }
         };
     })();
@@ -256,10 +261,13 @@
         const s = Calculator.getState(m);
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
         
-        // Proforma Görünürlük Kontrolü
         document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
-        
         document.getElementById('box-vade').style.display = s.unit === 'Yıl' ? 'none' : 'flex';
+        
+        if (s.pro) {
+            Calculator.resetProforma();
+        }
+
         if(s.unit === 'Ay') {
             const vSel = document.getElementById('vade-select'); vSel.innerHTML = '';
             const vades = m === 'konut' ? [12,24,36,48,60,72,84,96,108,120] : [12,24,36,48,60];
@@ -273,8 +281,8 @@
         Calculator.calculate();
     }
     function initApp() {
-        document.getElementById('tutar').value = "1.000.000";
-        document.getElementById('kasko').value = "0"; document.getElementById('hayat').value = "0"; document.getElementById('rehin').value = "0";
+        document.getElementById('tutar').value = "1.500.000";
+        document.getElementById('kasko').value = "0"; document.getElementById('hayat').value = "0";
         switchSegment('tarimsal');
     }
 </script>
