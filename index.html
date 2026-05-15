@@ -31,6 +31,7 @@
         input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
         
         #komisyonOran { border-color: var(--dosya); color: var(--dosya); font-weight: 700; background: #fff5f5; }
+        #tarsim { background: #e8f8f5; border-color: var(--tarimsal); font-weight: bold; }
         
         .info-field { width: 110px; border-radius: 4px; padding: 2px 4px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 3px solid; }
         .info-field label { color: #ccc; font-size: 7.5px; margin-bottom: -1px; width: 100%; }
@@ -82,17 +83,18 @@
 
     <div id="calc-engine" class="no-print">
         <div class="grid">
-            <div class="field" id="box-proforma" style="width:120px;"><label>Proforma Tutarı</label><input type="text" id="proforma" oninput="Calculator.fmtProforma(this)"></div>
-            <div class="field" style="width:120px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="Calculator.fmtMoney(this)"></div>
-            <div class="field" style="width:60px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest()"></div>
+            <div class="field" id="box-proforma" style="width:110px;"><label>Proforma Tutarı</label><input type="text" id="proforma" oninput="Calculator.fmtProforma(this)"></div>
+            <div class="field" style="width:110px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="Calculator.fmtMoney(this)"></div>
+            <div class="field" style="width:55px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest()"></div>
             <div class="field" id="box-vade" style="width:85px;"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
-            <div class="field" id="box-sub" style="width:50px;"><label>Sübv%</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
-            <div class="field" style="width:50px;"><label>BSMV%</label><input type="number" id="bsmv" readonly></div>
-            <div class="field" style="width:50px;"><label>KKDF%</label><input type="number" id="kkdf" readonly></div>
+            <div class="field" id="box-sub" style="width:45px;"><label>Sübv%</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
+            <div class="field" style="width:45px;"><label>BSMV%</label><input type="number" id="bsmv" readonly></div>
+            <div class="field" style="width:45px;"><label>KKDF%</label><input type="number" id="kkdf" readonly></div>
             
-            <div class="field" style="width:80px;"><label style="color:var(--dosya);">KOMİSYON %</label><input type="number" id="komisyonOran" step="0.01" oninput="Calculator.autoCalc()"></div>
-            <div class="field" style="width:80px;"><label>KASKO</label><input type="text" id="kasko" oninput="Calculator.fmtMoney(this)"></div>
-            <div class="field" style="width:80px;"><label>HAYAT SİG.</label><input type="text" id="hayat" oninput="Calculator.fmtMoney(this)"></div>
+            <div class="field" style="width:75px;"><label style="color:var(--dosya);">KOMİSYON %</label><input type="number" id="komisyonOran" step="0.01" oninput="Calculator.autoCalc()"></div>
+            <div class="field" style="width:75px;"><label>KASKO</label><input type="text" id="kasko" oninput="Calculator.fmtMoney(this)"></div>
+            <div class="field" style="width:75px;"><label>HAYAT SİG.</label><input type="text" id="hayat" oninput="Calculator.fmtMoney(this)"></div>
+            <div class="field" id="box-tarsim" style="width:85px;"><label>TARSİM (%5)</label><input type="text" id="tarsim" readonly></div>
 
             <div class="info-field subv-field"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
@@ -119,14 +121,14 @@
         const REHIN_SABIT = 1500;
         const DEFAULT_PROFORMA = "2.000.000";
         const cfg = {
-            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', pro: true, pRate: 0.75 },
-            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, kom: 1.0, unit: 'Yıl', pro: true, pRate: 1.0 },
-            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', pro: true, pRate: 0.75 },
-            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', pro: false },
-            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, unit: 'Ay', pro: false },
-            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, unit: 'Ay', pro: false },
-            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 48, unit: 'Ay', pro: false },
-            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 24, unit: 'Ay', pro: false }
+            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', pro: true, pRate: 0.75, tarsim: true },
+            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, kom: 1.0, unit: 'Yıl', pro: true, pRate: 1.0, tarsim: true },
+            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', pro: true, pRate: 0.75, tarsim: true },
+            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', pro: false, tarsim: false },
+            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, unit: 'Ay', pro: false, tarsim: false },
+            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, unit: 'Ay', pro: false, tarsim: false },
+            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 48, unit: 'Ay', pro: false, tarsim: false },
+            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 24, unit: 'Ay', pro: false, tarsim: false }
         };
         let currentMode = 'traktor';
 
@@ -151,12 +153,29 @@
             },
             syncInterest: function() { this.autoCalc(); },
             getExtraCosts: function(tutar) {
+                const state = cfg[currentMode];
                 const komPct = parseFloat(document.getElementById('komisyonOran').value) || 0;
                 const kasko = parseFloat(document.getElementById('kasko').value.replace(/\./g, "")) || 0;
                 const hayat = parseFloat(document.getElementById('hayat').value.replace(/\./g, "")) || 0;
+                
+                // Tarsim Hesaplama (%5)
+                let tarsimUcreti = 0;
+                if(state.tarsim) {
+                    tarsimUcreti = tutar * 0.05;
+                    document.getElementById('tarsim').value = Math.round(tarsimUcreti).toLocaleString('tr-TR');
+                } else {
+                    document.getElementById('tarsim').value = "0";
+                }
+
                 const netKomisyon = tutar * (komPct/100);
                 const komisyonBrut = netKomisyon * 1.05; 
-                return { komisyon: komisyonBrut, diger: kasko + hayat + REHIN_SABIT, toplam: komisyonBrut + kasko + hayat + REHIN_SABIT };
+                
+                return { 
+                    komisyon: komisyonBrut, 
+                    tarsim: tarsimUcreti,
+                    diger: kasko + hayat + REHIN_SABIT, 
+                    toplam: komisyonBrut + kasko + hayat + REHIN_SABIT + tarsimUcreti 
+                };
             },
             calcEfektif: function(tutar, yF, sub, bRate, kRate, v, unit, mToplam) {
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
@@ -231,7 +250,7 @@
                 html += `<div class="dosya-banner">
                     <div class="db-item"><span class="db-label">Komisyon (+%5 BSMV)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.komisyon).toLocaleString('tr-TR')} TL</span></div>
                     <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">Sigorta+Rehin (1.500₺)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.diger).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="db-item"><span class="db-label">Sigorta+Tarsim+Rehin</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.diger + masraf.tarsim).toLocaleString('tr-TR')} TL</span></div>
                     <div class="db-divider"></div>
                     <div class="db-item"><span class="db-label">MASRAFLAR TOPLAMI</span><span class="db-value" style="color:var(--success)">${Math.round(masraf.toplam).toLocaleString('tr-TR')} TL</span></div>
                 </div>`;
@@ -263,6 +282,7 @@
         
         document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
         document.getElementById('box-vade').style.display = s.unit === 'Yıl' ? 'none' : 'flex';
+        document.getElementById('box-tarsim').style.display = s.tarsim ? 'flex' : 'none';
         
         if (s.pro) {
             Calculator.resetProforma();
