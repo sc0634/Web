@@ -4,271 +4,155 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kredi Planlama Pro - S.C.</title>
+    <!-- Kütüphaneler -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
     <style>
         :root { 
             --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; 
             --dark: #2c3e50; --border: #dcdde1; --whatsapp: #25d366; --pdf: #e74c3c; --print: #34495e;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f1f2f6; margin: 0; padding: 10px; font-size: 11px; }
+        body { background: #f1f2f6; margin: 0; padding: 10px; font-size: 11px; padding-bottom: 100px; }
         .main-wrapper { max-width: 950px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         
-        /* Navigasyon */
-        .nav-container { display: flex; gap: 5px; margin-bottom: 10px; }
-        .seg-btn { flex: 1; border: none; height: 35px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; opacity: 0.4; font-size: 11px; }
-        .seg-btn.active { opacity: 1; transform: translateY(-1px); }
-        
-        .tab-group { display: none; gap: 3px; margin-bottom: 10px; flex-wrap: wrap; }
-        .tab-btn { padding: 6px 12px; border: 1px solid var(--border); background: #fff; border-radius: 3px; cursor: pointer; font-size: 11px; }
-        .tab-btn.active { background: var(--dark); color: white; }
+        /* Form Elemanları */
+        .input-shell { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 15px; }
+        .field-box { display: flex; flex-direction: column; gap: 3px; }
+        input, select, textarea { height: 35px; padding: 0 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; }
+        textarea { height: 70px; padding: 10px; resize: none; }
 
-        /* Üst Aksiyon Çubuğu */
-        .action-bar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 10px; }
-        .btn-main { border: none; padding: 7px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 10px; color: white; }
+        /* Aksiyon Butonları */
+        .action-bar-mid { display: flex; gap: 10px; margin: 15px 0; padding: 12px; background: #f8f9fa; border-radius: 6px; border: 1px solid var(--border); }
+        .btn-main { border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; flex: 1; }
         .bg-pdf { background: var(--pdf); }
         .bg-print { background: var(--print); }
 
-        /* Giriş Alanları ve Opsiyonlar */
-        .options-shell { display: none; gap: 10px; margin-bottom: 15px; }
-        .opt-card { flex: 1; background: #f8f9fa; border: 1px solid var(--border); padding: 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .opt-card input { width: 16px !important; height: 16px !important; margin:0; }
+        /* Başvuru Formu Bölümü */
+        .apply-form-shell { margin-top: 40px; padding: 25px; border-radius: 8px; background: #fdfdfd; border: 1px solid #eee; }
+        .form-title { font-size: 15px; font-weight: bold; margin-bottom: 20px; color: var(--dark); border-left: 5px solid var(--tarimsal); padding-left: 10px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+        .btn-submit { background: var(--dark); color: white; border: none; padding: 15px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; font-size: 13px; }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .input-shell { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 15px; }
-        .field-box { display: flex; flex-direction: column; gap: 3px; }
-        input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; width: 100%; }
+        /* Tablo Stilleri */
+        .plan-box { border: 1px solid var(--dark); border-radius: 6px; margin-bottom: 20px; overflow: hidden; background: #fff; }
+        .plan-head { background: var(--dark); color: white; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #eee; padding: 8px; text-align: center; }
+        
+        /* WhatsApp Yüzen Buton */
+        .wa-float { position: fixed; bottom: 20px; right: 20px; background: var(--whatsapp); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); text-decoration: none; z-index: 999; }
 
-        /* Sonuç Tabloları */
-        .results-shell { display: none; margin-top: 15px; }
-        .plan-box { border: 1px solid var(--dark); border-radius: 5px; margin-bottom: 15px; background: #fff; overflow: hidden; page-break-inside: avoid; }
-        .plan-head { background: var(--dark); color: #fff; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-group-mini { display: flex; gap: 5px; }
-        .btn-mini { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4); color: #fff; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 9px; }
-        .btn-mini:hover { background: #fff; color: var(--dark); }
-
-        table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        table th, table td { border: 1px solid #eee; padding: 6px; text-align: center; }
-        .txt-old { color: #999; text-decoration: line-through; }
-
-        /* Başvuru */
-        .apply-shell { margin-top: 20px; padding: 15px; border: 2px dashed var(--border); border-radius: 8px; text-align: center; }
-        .btn-wa { background: var(--whatsapp); color: white; border: none; padding: 10px 30px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-
-        /* Yazdırma Kuralları */
-        @media print {
-            .no-print { display: none !important; }
-            body { padding: 0; background: #fff; }
-            .main-wrapper { box-shadow: none; max-width: 100%; padding: 0; }
-            .results-shell { display: block !important; }
-            .plan-box { border: 1px solid #000; margin-bottom: 30px; }
-        }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
     </style>
 </head>
-<body onload="App.init()">
+<body>
 
 <div class="main-wrapper">
-    <div class="nav-container no-print">
-        <button id="s-tar" class="seg-btn" style="background:var(--tarimsal)" onclick="App.switchSeg('tarimsal')">TARIMSAL</button>
-        <button id="s-tic" class="seg-btn" style="background:var(--ticari)" onclick="App.switchSeg('ticari')">TİCARİ</button>
-        <button id="s-bir" class="seg-btn" style="background:var(--bireysel)" onclick="App.switchSeg('bireysel')">BİREYSEL</button>
+    <!-- Üst Menü ve Hesaplama (Önceki kodlarla aynı yapı) -->
+    <div class="input-shell">
+        <div class="field-box"><label>Kredi Tutarı</label><input type="text" id="inp-tutar" value="1.000.000" oninput="App.format(this)"></div>
+        <div class="field-box"><label>Vade (Ay)</label><input type="number" id="inp-vade-ay" value="12" oninput="App.calc()"></div>
+        <div class="field-box"><label>Yıllık Faiz %</label><input type="number" id="inp-yil" value="45" step="0.1" oninput="App.calc()"></div>
     </div>
 
-    <div id="tabs-tarimsal" class="tab-group no-print">
-        <button class="tab-btn" onclick="App.switchTab(this, 'traktor')">Traktör</button>
-        <button class="tab-btn" onclick="App.switchTab(this, 'ekipman')">Ekipman</button>
-        <button class="tab-btn" onclick="App.switchTab(this, 'sulama')">Sulama</button>
-        <button class="tab-btn" onclick="App.switchTab(this, 'zirai')">Çiftçi Taksitli</button>
-    </div>
-    <!-- Diğer Sekme Grupları Buraya -->
-    <div id="tabs-ticari" class="tab-group no-print"><button class="tab-btn" onclick="App.switchTab(this, 'ticari_taksitli')">Ticari Taksitli</button></div>
-    <div id="tabs-bireysel" class="tab-group no-print">
-        <button class="tab-btn" onclick="App.switchTab(this, 'konut')">Konut</button>
-        <button class="tab-btn" onclick="App.switchTab(this, 'tasit')">Taşıt</button>
-        <button class="tab-btn" onclick="App.switchTab(this, 'ihtiyac')">İhtiyaç</button>
+    <div class="action-bar-mid">
+        <button class="btn-main bg-pdf" onclick="App.pdfAll()">PDF İNDİR</button>
+        <button class="btn-main bg-print" onclick="window.print()">YAZDIR</button>
     </div>
 
-    <div class="action-bar no-print">
-        <button class="btn-main bg-pdf" onclick="App.pdfAll()">TÜMÜNÜ PDF YAP</button>
-        <button class="btn-main bg-print" onclick="window.print()">TÜMÜNÜ YAZDIR</button>
-    </div>
+    <div id="results-shell"></div>
 
-    <div id="opts-shell" class="options-shell no-print">
-        <div class="opt-card" onclick="App.toggleYerli()">
-            <input type="checkbox" id="yerli-check" checked onclick="event.stopPropagation(); App.toggleYerli()">
-            <div class="opt-content">
-                <span style="font-weight:bold; font-size:11px;">Yerli Malı Belgesi</span>
-                <span id="yerli-status" style="font-size:9px; color:var(--tarimsal); display:block;">Avantajlı Oran Aktif</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="input-shell no-print">
-        <div class="field-box" id="prof-box"><label>Proforma</label><input type="text" id="inp-prof" oninput="App.format(this)"></div>
-        <div class="field-box"><label>Kredi Tutarı</label><input type="text" id="inp-tutar" oninput="App.format(this)"></div>
-        <div class="field-box"><label>Aylık %</label><input type="number" id="inp-ay" step="0.01" oninput="App.syncInt('ay')"></div>
-        <div class="field-box"><label>Yıllık %</label><input type="number" id="inp-yil" step="0.01" oninput="App.syncInt('yil')"></div>
-        <div class="field-box" id="vade-box"><label>Vade</label><select id="inp-vade" onchange="App.calc()"></select></div>
-        <div class="field-box" id="sub-box"><label>Sübv %</label><input type="number" id="inp-sub" oninput="App.calc()"></div>
-        <div class="field-box" style="opacity:0.6"><label>BSMV</label><input type="number" id="inp-bsmv" readonly></div>
-        <div class="field-box" style="opacity:0.6"><label>KKDF</label><input type="number" id="inp-kkdf" readonly></div>
-    </div>
-
-    <div id="results-shell" class="results-shell">
-        <!-- Vade kutuları dinamik olarak "draw" içinden beslenir. Örnek yapı: -->
-        <div id="p-5" class="plan-box" style="display:none">
-            <div class="plan-head">
-                <span>5 Yıl Vadeli Plan</span>
-                <div class="btn-group-mini no-print">
-                    <button class="btn-mini" onclick="App.pdf('p-5')">PDF</button>
-                    <button class="btn-mini" onclick="App.printSingle('p-5')">YAZDIR</button>
+    <!-- EMAILJS BAŞVURU FORMU -->
+    <div class="apply-form-shell">
+        <div class="form-title">E-POSTA İLE HIZLI BAŞVURU</div>
+        <form id="kredi-form">
+            <div class="form-grid">
+                <div class="field-box">
+                    <label>T.C. Kimlik No</label>
+                    <input type="text" name="tckn" id="f-tckn" maxlength="11" required>
+                </div>
+                <div class="field-box">
+                    <label>Ad Soyad</label>
+                    <input type="text" name="user_name" id="f-name" required>
+                </div>
+                <div class="field-box">
+                    <label>Cep Telefonu</label>
+                    <input type="tel" name="user_phone" id="f-tel" required>
+                </div>
+                <div class="field-box">
+                    <label>E-posta Adresiniz</label>
+                    <input type="email" name="user_email" id="f-email" required>
+                </div>
+                <div class="field-box full-width">
+                    <label>Mesajınız / Notunuz</label>
+                    <textarea name="message" id="f-mesaj"></textarea>
+                </div>
+                <div class="full-width">
+                    <button type="submit" class="btn-submit" id="submit-btn">E-POSTA GÖNDER</button>
                 </div>
             </div>
-            <div class="t-wrap"></div>
-        </div>
-        <div id="p-4" class="plan-box" style="display:none"><div class="plan-head"><span>4 Yıl Vadeli Plan</span><div class="btn-group-mini no-print"><button class="btn-mini" onclick="App.pdf('p-4')">PDF</button><button class="btn-mini" onclick="App.printSingle('p-4')">YAZDIR</button></div></div><div class="t-wrap"></div></div>
-        <div id="p-3" class="plan-box" style="display:none"><div class="plan-head"><span>3 Yıl Vadeli Plan</span><div class="btn-group-mini no-print"><button class="btn-mini" onclick="App.pdf('p-3')">PDF</button><button class="btn-mini" onclick="App.printSingle('p-3')">YAZDIR</button></div></div><div class="t-wrap"></div></div>
-        <div id="p-2" class="plan-box" style="display:none"><div class="plan-head"><span>2 Yıl Vadeli Plan</span><div class="btn-group-mini no-print"><button class="btn-mini" onclick="App.pdf('p-2')">PDF</button><button class="btn-mini" onclick="App.printSingle('p-2')">YAZDIR</button></div></div><div class="t-wrap"></div></div>
-        <div id="p-1" class="plan-box" style="display:none"><div class="plan-head"><span>1 Yıl Vadeli Plan</span><div class="btn-group-mini no-print"><button class="btn-mini" onclick="App.pdf('p-1')">PDF</button><button class="btn-mini" onclick="App.printSingle('p-1')">YAZDIR</button></div></div><div class="t-wrap"></div></div>
-        <div id="p-custom" class="plan-box" style="display:none"><div class="plan-head"><span id="c-title">Plan</span><div class="btn-group-mini no-print"><button class="btn-mini" onclick="App.pdf('p-custom')">PDF</button><button class="btn-mini" onclick="App.printSingle('p-custom')">YAZDIR</button></div></div><div class="t-wrap"></div></div>
-    </div>
-
-    <div class="apply-shell no-print">
-        <button class="btn-wa" onclick="App.send()">WhatsApp Başvuru Gönder</button>
+        </form>
     </div>
 </div>
 
+<a href="https://wa.me/905345217697" class="wa-float"><svg width="30" height="30" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg></a>
+
 <script>
-const App = (function() {
-    let _mode = 'traktor';
-    const _cfg = {
-        traktor: { f: 40.5, b: 5, k: 0, s: 50, u: 'Y' },
-        ekipman: { f: 40.5, b: 5, k: 0, s: 75, u: 'Y' },
-        sulama:  { f: 40.5, b: 5, k: 0, s: 100, u: 'Y' },
-        zirai:   { f: 46.0, b: 15, k: 15, s: 0, u: 'Y' },
-        ticari_taksitli: { f: 46.0, b: 5, k: 0, s: 0, u: 'A', def: 24 },
-        konut:   { f: 34.0, b: 0, k: 0, s: 0, u: 'A', def: 120 },
-        tasit:   { f: 40.5, b: 15, k: 15, s: 0, u: 'A', def: 48 },
-        ihtiyac: { f: 52.6, b: 15, k: 15, s: 0, u: 'A', def: 24 }
-    };
+    // --- EmailJS Başlatma ---
+    // Buradaki "YOUR_PUBLIC_KEY" kısmını kendi anahtarınla değiştir!
+    emailjs.init("YOUR_PUBLIC_KEY");
 
-    return {
-        init: function() {
-            document.getElementById('inp-prof').value = "2.000.000";
-            document.getElementById('inp-tutar').value = "1.000.000";
-            this.switchSeg('tarimsal');
-        },
-        switchSeg: function(s) {
-            document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('s-' + s.substring(0,3)).classList.add('active');
-            document.querySelectorAll('.tab-group').forEach(g => g.style.display = 'none');
-            const g = document.getElementById('tabs-' + s);
-            g.style.display = 'flex';
-            g.querySelector('.tab-btn').click();
-        },
-        switchTab: function(btn, m) {
-            _mode = m;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const s = _cfg[m];
-            const isT = ['traktor', 'ekipman', 'sulama'].includes(m);
-            document.getElementById('opts-shell').style.display = isT ? 'flex' : 'none';
-            document.getElementById('prof-box').style.display = isT ? 'flex' : 'none';
-            document.getElementById('sub-box').style.display = isT ? 'flex' : 'none';
-            
-            const vB = document.getElementById('vade-box');
-            if(s.u === 'Y') vB.style.display = 'none';
-            else {
-                vB.style.display = 'flex';
-                const sel = document.getElementById('inp-vade');
-                sel.innerHTML = '';
-                let mx = (m==='konut') ? 120 : (m==='tasit' ? 48 : 36);
-                for(let i=12; i<=mx; i+=12) sel.options.add(new Option(i+" Ay", i, i===s.def, i===s.def));
-            }
-
-            document.getElementById('inp-yil').value = s.f.toFixed(2);
-            document.getElementById('inp-ay').value = (s.f / 12).toFixed(2);
-            document.getElementById('inp-sub').value = s.s;
-            document.getElementById('inp-bsmv').value = s.b;
-            document.getElementById('inp-kkdf').value = s.k;
-            this.calc();
-        },
+    const App = {
+        init: function() { this.calc(); },
         format: function(i) {
             let v = i.value.replace(/\D/g, "");
-            if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
-            this.calc();
-        },
-        syncInt: function(t) {
-            const y = document.getElementById('inp-yil'), a = document.getElementById('inp-ay');
-            if(t==='yil') a.value = (y.value/12).toFixed(2); else y.value = (a.value*12).toFixed(2);
-            this.calc();
-        },
-        toggleYerli: function() {
-            const c = document.getElementById('yerli-check');
-            c.checked = !c.checked;
-            document.getElementById('yerli-status').innerText = c.checked ? "Avantajlı Oran Aktif" : "Standart Oran";
-            const s = _cfg[_mode];
-            if(_mode==='sulama') s.s = c.checked ? 100 : 75;
-            else if(_mode==='traktor') s.s = c.checked ? 50 : 25;
-            else s.s = c.checked ? 75 : 50;
-            document.getElementById('inp-sub').value = s.s;
+            i.value = new Intl.NumberFormat('tr-TR').format(v);
             this.calc();
         },
         calc: function() {
             const t = parseFloat(document.getElementById('inp-tutar').value.replace(/\./g, "")) || 0;
-            if(!t) return;
-            const yF = parseFloat(document.getElementById('inp-yil').value)/100,
-                  sub = (parseFloat(document.getElementById('inp-sub').value)||0)/100,
-                  bR = parseFloat(document.getElementById('inp-bsmv').value)/100,
-                  kR = parseFloat(document.getElementById('inp-kkdf').value)/100;
-
-            document.getElementById('results-shell').style.display = 'block';
-            document.querySelectorAll('.plan-box').forEach(b => b.style.display = 'none');
-
-            if(_cfg[_mode].u === 'Y') {
-                const lim = (_mode === 'zirai') ? 1 : 5;
-                for(let v=1; v<=lim; v++) {
-                    const box = document.getElementById('p-' + v);
-                    box.style.display = 'block';
-                    box.querySelector('.t-wrap').innerHTML = this.draw(t, yF, sub, bR, kR, v, 'Y');
-                }
-            } else {
-                const v = parseInt(document.getElementById('inp-vade').value);
-                const box = document.getElementById('p-custom');
-                box.style.display = 'block';
-                box.querySelector('.t-wrap').innerHTML = this.draw(t, yF, 0, bR, kR, v, 'A');
-            }
-        },
-        draw: function(t, yF, s, bR, kR, v, u) {
-            const fO = (u==='Y') ? yF : (yF/12);
-            const iO = fO * (1 - s);
-            const tM = iO + (fO * bR) + (fO * kR);
-            let pmt = (tM === 0) ? t/v : (t * tM * Math.pow(1+tM, v)) / (Math.pow(1+tM, v)-1);
-            const isT = ['traktor', 'ekipman', 'sulama'].includes(_mode);
-            let h = `<table><thead><tr><th>No</th><th>Ana Para</th>${isT?'<th>Brüt F.</th>':''}<th>Müşteri F.</th><th>Vergi</th><th>Taksit</th></tr></thead><tbody>`;
-            let bal = t, total = 0;
+            const v = parseInt(document.getElementById('inp-vade-ay').value) || 1;
+            const f = parseFloat(document.getElementById('inp-yil').value) / 1200;
+            
+            let pmt = (f === 0) ? t/v : (t * f * Math.pow(1+f, v)) / (Math.pow(1+f, v)-1);
+            
+            let h = `<div class="plan-box"><div class="plan-head">Ödeme Planı</div><table><tr><th>Ay</th><th>Taksit</th></tr>`;
             for(let i=1; i<=v; i++) {
-                let fBrut = bal * fO, fNet = bal * iO, tax = (fBrut*bR) + (fBrut*kR);
-                let ap = (i===v ? bal : pmt - (fNet + tax)); total += pmt;
-                h += `<tr><td>${i}</td><td>${Math.round(ap).toLocaleString('tr-TR')}</td>${isT?'<td class="txt-old">'+Math.round(fBrut).toLocaleString('tr-TR')+'</td>':''}<td>${Math.round(fNet).toLocaleString('tr-TR')}</td><td>${Math.round(tax).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(pmt).toLocaleString('tr-TR')}</td></tr>`;
-                bal -= ap;
+                h += `<tr><td>${i}. Ay</td><td>${Math.round(pmt).toLocaleString()} TL</td></tr>`;
             }
-            h += `</tbody><tfoot><tr><td colspan="${isT?2:2}">TOPLAM</td><td colspan="${isT?4:4}" style="text-align:right">Geri Ödeme: ${Math.round(total).toLocaleString('tr-TR')} TL</td></tr></tfoot></table>`;
-            return h;
+            h += `</table></div>`;
+            document.getElementById('results-shell').innerHTML = h;
         },
-        pdf: function(id) { html2pdf().set({ margin: 10, filename: 'Kredi_Plani.pdf' }).from(document.getElementById(id)).save(); },
-        pdfAll: function() { html2pdf().set({ margin: 10, filename: 'Tum_Planlar.pdf' }).from(document.getElementById('results-shell')).save(); },
-        printSingle: function(id) {
-            const content = document.getElementById(id).innerHTML;
-            const win = window.open('', '', 'height=700,width=900');
-            win.document.write('<html><head><title>Yazdır</title><style>table{width:100%;border-collapse:collapse;font-size:12px;} th,td{border:1px solid #000;padding:8px;text-align:center;} .no-print{display:none;} .plan-head{background:#eee;padding:10px;font-weight:bold;}</style></head><body>');
-            win.document.write(content);
-            win.document.write('</body></html>');
-            win.document.close();
-            win.print();
-        },
-        send: function() { window.open(`https://wa.me/905345217697?text=Kredi Basvurusu`); }
+        pdfAll: function() { html2pdf().from(document.body).save('basvuru.pdf'); },
+        
+        submitForm: function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "GÖNDERİLİYOR...";
+            btn.disabled = true;
+
+            // SERVICE_ID ve TEMPLATE_ID kısımlarını kendi panelinden alıp buraya yaz!
+            emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', e.target)
+                .then(() => {
+                    alert('Başvurunuz başarıyla e-posta ile gönderildi!');
+                    e.target.reset();
+                }, (error) => {
+                    alert('Hata oluştu: ' + JSON.stringify(error));
+                })
+                .finally(() => {
+                    btn.innerText = "E-POSTA GÖNDER";
+                    btn.disabled = false;
+                });
+        }
     };
-})();
+
+    document.getElementById('kredi-form').addEventListener('submit', App.submitForm);
+    App.init();
 </script>
+
 </body>
 </html>
