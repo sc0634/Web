@@ -36,7 +36,6 @@
         label { font-size: 10px; font-weight: 700; color: #666; }
         input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
 
-        /* Efektif Faiz Kutusu - Proforma boyutu ile aynılaştırıldı */
         .efektif-field {
             width: 140px;
             background: var(--dark);
@@ -120,7 +119,6 @@
             <div class="field" style="width:55px;"><label>BSMV %</label><input type="number" id="bsmv" readonly></div>
             <div class="field" style="width:55px;"><label>KKDF %</label><input type="number" id="kkdf" readonly></div>
             
-            <!-- KKDF'den sonraya eklenen Efektif Faiz Alanı -->
             <div class="efektif-field" id="box-efektif">
                 <label>EFEKTİF FAİZ (YILLIK)</label>
                 <div class="rate-value" id="effective-rate-display">%0.00</div>
@@ -212,10 +210,14 @@
                 document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
 
                 if (cfg[mode].unit === 'Yıl') {
-                    const maxVade = (mode === 'modern_sulama') ? 5 : ((mode === 'zirai') ? 1 : 5);
-                    for (let v = 1; v <= 5; v++) {
-                        const pEl = document.getElementById(`plan-${v}`);
-                        if(v <= maxVade) {
+                    // Modern Sulama ve Zirai (Çiftçi Taksitli): Sadece 5. yılı göster
+                    if (mode === 'modern_sulama' || mode === 'zirai') {
+                        const p5 = document.getElementById('plan-5');
+                        p5.style.display = 'block';
+                        p5.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, bRate, kRate, 5, 'Yıl');
+                    } else {
+                        for (let v = 1; v <= 5; v++) {
+                            const pEl = document.getElementById(`plan-${v}`);
                             pEl.style.display = 'block';
                             pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, bRate, kRate, v, 'Yıl');
                         }
@@ -236,7 +238,7 @@
 
                 let pmt = (maliyetOran === 0) ? (tutar / v) : (tutar * maliyetOran * Math.pow(1+maliyetOran, v)) / (Math.pow(1+maliyetOran, v)-1);
                 
-                const isTar = (mode === 'traktor' || mode === 'ekipman' || mode === 'modern_sulama');
+                const isTar = (mode === 'traktor' || mode === 'ekipman' || mode === 'modern_sulama' || mode === 'zirai');
                 let html = `<table><thead><tr><th>No</th><th>Ana Para</th>${isTar ? '<th>Brüt Faiz</th>' : ''}<th>Net Faiz</th><th>BSMV</th><th>KKDF</th><th>Taksit</th></tr></thead><tbody>`;
                 
                 let bal = tutar;
