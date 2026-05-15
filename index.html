@@ -51,14 +51,19 @@
         .efektif-field label { color: #ccc; font-size: 8px; margin-bottom: -2px; }
         .efektif-field .rate-value { font-weight: 800; font-size: 13px; }
 
+        .print-all-container { margin-bottom: 15px; display: none; }
+        .btn-print-all { background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 11px; }
+
         .result-main-container { margin-top: 5px; display: none; }
         .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 20px; display: none; background: white; }
         
         .result-header { background: var(--dark); color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
         .result-title { font-weight: bold; font-size: 12px; }
         
-        .mini-btn { background: #8e44ad; color: white; border: none; padding: 4px 10px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; }
-        .mini-btn:hover { background: #9b59b6; }
+        .header-actions { display: flex; gap: 5px; }
+        .mini-btn { color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; }
+        .btn-pdf { background: #8e44ad; }
+        .btn-prt { background: #2980b9; }
 
         table { width: 100%; font-size: 11px; border-collapse: collapse; background: white; }
         table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; color: var(--dark); }
@@ -69,7 +74,12 @@
         .txt-bold { font-weight: bold; }
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
 
-        @media print { .no-print { display: none !important; } }
+        @media print { 
+            .no-print { display: none !important; } 
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; width: 100%; }
+            .plan-wrapper { border: 1px solid #000; page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body onload="initApp()">
@@ -127,51 +137,76 @@
                 <div class="rate-value" id="effective-rate-display">%0.00</div>
             </div>
         </div>
+
+        <div class="print-all-container" id="print-all-btn-wrapper">
+            <button class="btn-print-all" onclick="window.print()">TÜM ÖDEME PLANLARINI YAZDIR / PDF YAP</button>
+        </div>
     </div>
 
     <div id="result-main-container" class="result-main-container">
-        <!-- 5 Yıl Planı -->
+        <!-- 5 Yıl -->
         <div id="plan-5" class="plan-wrapper">
             <div class="result-header">
                 <span class="result-title">5 Yıl Vadeli Ödeme Planı</span>
-                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-5', '5_Yil_Plan')">PDF</button>
+                <div class="header-actions no-print">
+                    <button class="mini-btn btn-prt" onclick="Calculator.printSection('plan-5')">YAZDIR</button>
+                    <button class="mini-btn btn-pdf" onclick="Calculator.exportSinglePDF('plan-5', '5_Yil_Plan')">PDF</button>
+                </div>
             </div>
             <div class="tbl-res"></div>
         </div>
-        <!-- Diğer Yıllar -->
+        <!-- 4 Yıl -->
         <div id="plan-4" class="plan-wrapper">
             <div class="result-header">
                 <span class="result-title">4 Yıl Vadeli Ödeme Planı</span>
-                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-4', '4_Yil_Plan')">PDF</button>
+                <div class="header-actions no-print">
+                    <button class="mini-btn btn-prt" onclick="Calculator.printSection('plan-4')">YAZDIR</button>
+                    <button class="mini-btn btn-pdf" onclick="Calculator.exportSinglePDF('plan-4', '4_Yil_Plan')">PDF</button>
+                </div>
             </div>
             <div class="tbl-res"></div>
         </div>
+        <!-- 3 Yıl -->
         <div id="plan-3" class="plan-wrapper">
             <div class="result-header">
                 <span class="result-title">3 Yıl Vadeli Ödeme Planı</span>
-                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-3', '3_Yil_Plan')">PDF</button>
+                <div class="header-actions no-print">
+                    <button class="mini-btn btn-prt" onclick="Calculator.printSection('plan-3')">YAZDIR</button>
+                    <button class="mini-btn btn-pdf" onclick="Calculator.exportSinglePDF('plan-3', '3_Yil_Plan')">PDF</button>
+                </div>
             </div>
             <div class="tbl-res"></div>
         </div>
+        <!-- 2 Yıl -->
         <div id="plan-2" class="plan-wrapper">
             <div class="result-header">
                 <span class="result-title">2 Yıl Vadeli Ödeme Planı</span>
-                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-2', '2_Yil_Plan')">PDF</button>
+                <div class="header-actions no-print">
+                    <button class="mini-btn btn-prt" onclick="Calculator.printSection('plan-2')">YAZDIR</button>
+                    <button class="mini-btn btn-pdf" onclick="Calculator.exportSinglePDF('plan-2', '2_Yil_Plan')">PDF</button>
+                </div>
             </div>
             <div class="tbl-res"></div>
         </div>
+        <!-- 1 Yıl -->
         <div id="plan-1" class="plan-wrapper">
             <div class="result-header">
                 <span class="result-title">1 Yıl Vadeli Ödeme Planı</span>
-                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-1', '1_Yil_Plan')">PDF</button>
+                <div class="header-actions no-print">
+                    <button class="mini-btn btn-prt" onclick="Calculator.printSection('plan-1')">YAZDIR</button>
+                    <button class="mini-btn btn-pdf" onclick="Calculator.exportSinglePDF('plan-1', '1_Yil_Plan')">PDF</button>
+                </div>
             </div>
             <div class="tbl-res"></div>
         </div>
-        <!-- Özel Vade Planı -->
+        <!-- Özel Vade -->
         <div id="plan-custom" class="plan-wrapper">
             <div class="result-header">
                 <span class="result-title" id="custom-title">Ödeme Planı</span>
-                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-custom', 'Odeme_Plani')">PDF</button>
+                <div class="header-actions no-print">
+                    <button class="mini-btn btn-prt" onclick="Calculator.printSection('plan-custom')">YAZDIR</button>
+                    <button class="mini-btn btn-pdf" onclick="Calculator.exportSinglePDF('plan-custom', 'Odeme_Plani')">PDF</button>
+                </div>
             </div>
             <div class="tbl-res"></div>
         </div>
@@ -230,6 +265,7 @@
                 if(!tutar) {
                     document.getElementById('effective-rate-display').innerText = '%0.00';
                     document.getElementById('result-main-container').style.display = 'none';
+                    document.getElementById('print-all-btn-wrapper').style.display = 'none';
                     return;
                 }
 
@@ -241,11 +277,11 @@
                 const aylikBrutFaiz = yF / 12;
                 const aylikNetFaiz = aylikBrutFaiz * (1 - sub);
                 const aylikVergiVeFaiz = aylikNetFaiz + (aylikBrutFaiz * bRate) + (aylikNetFaiz * kRate);
-                
                 const efektifYillik = (Math.pow(1 + aylikVergiVeFaiz, 12) - 1) * 100;
                 
                 document.getElementById('effective-rate-display').innerText = `%${efektifYillik.toFixed(2)}`;
                 document.getElementById('result-main-container').style.display = 'block';
+                document.getElementById('print-all-btn-wrapper').style.display = 'block';
                 document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
 
                 if (cfg[mode].unit === 'Yıl') {
@@ -273,12 +309,9 @@
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
                 const maliyetOran = indirimliOran + (faizOran * bRate) + (indirimliOran * kRate);
-
                 let pmt = (maliyetOran === 0) ? (tutar / v) : (tutar * maliyetOran * Math.pow(1+maliyetOran, v)) / (Math.pow(1+maliyetOran, v)-1);
-                
                 const isTar = (mode === 'traktor' || mode === 'ekipman' || mode === 'modern_sulama' || mode === 'zirai');
                 let html = `<table><thead><tr><th>No</th><th>Ana Para</th>${isTar ? '<th>Brüt Faiz</th>' : ''}<th>Net Faiz</th><th>BSMV</th><th>KKDF</th><th>Taksit</th></tr></thead><tbody>`;
-                
                 let bal = tutar;
                 let tAP = 0, tF = 0, tIF = 0, tBS = 0, tKK = 0, tPMT = 0;
                 for(let i=1; i<=v; i++) {
@@ -287,7 +320,6 @@
                     let bsmv = fStandart * bRate;
                     let kkdf = fIndirimli * kRate;
                     let aPara = (i===v) ? bal : (pmt - (fIndirimli + bsmv + kkdf));
-                    
                     tAP += aPara; tF += fStandart; tIF += fIndirimli; tBS += bsmv; tKK += kkdf; tPMT += pmt;
                     html += `<tr><td>${i}</td><td>${Math.round(aPara).toLocaleString('tr-TR')}</td>${isTar ? '<td class="txt-gray">'+Math.round(fStandart).toLocaleString('tr-TR')+'</td>' : ''}<td>${Math.round(fIndirimli).toLocaleString('tr-TR')}</td><td>${Math.round(bsmv).toLocaleString('tr-TR')}</td><td>${Math.round(kkdf).toLocaleString('tr-TR')}</td><td class="txt-bold">${Math.round(pmt).toLocaleString('tr-TR')}</td></tr>`;
                     bal -= aPara;
@@ -298,14 +330,18 @@
 
             exportSinglePDF: function(id, name) {
                 const element = document.getElementById(id);
-                const opt = {
-                    margin: 10,
-                    filename: name + '.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
+                const opt = { margin: 10, filename: name + '.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
                 html2pdf().set(opt).from(element).save();
+            },
+
+            printSection: function(id) {
+                const element = document.getElementById(id);
+                const originalContent = document.body.innerHTML;
+                const printContent = element.outerHTML;
+                document.body.innerHTML = printContent;
+                window.print();
+                document.body.innerHTML = originalContent;
+                location.reload(); // Sayfayı yenilemek state'leri korumak için en basit yol
             },
 
             sendWhatsApp: function() {
@@ -328,10 +364,8 @@
         const s = Calculator.getState();
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
         document.getElementById('box-proforma').style.display = (m === 'traktor' || m === 'ekipman' || m === 'modern_sulama') ? 'flex' : 'none';
         document.getElementById('extra-opts').style.display = (m === 'traktor' || m === 'ekipman' || m === 'modern_sulama') ? 'flex' : 'none';
-        
         const boxVade = document.getElementById('box-vade');
         if(s.unit === 'Yıl') boxVade.style.display = 'none';
         else {
@@ -342,13 +376,11 @@
                 if(v === s.defVade) o.selected = true; vSel.appendChild(o);
             });
         }
-        
         document.getElementById('faiz').value = s.faiz.toFixed(2);
         document.getElementById('faizAylik').value = (s.faiz / 12).toFixed(2);
         document.getElementById('subOran').value = s.sub;
         document.getElementById('bsmv').value = s.bsmv;
         document.getElementById('kkdf').value = s.kkdf;
-        
         if(m === 'traktor' || m === 'ekipman' || m === 'modern_sulama') Calculator.handleYerli();
         else Calculator.calculate();
     }
