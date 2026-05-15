@@ -36,19 +36,21 @@
         label { font-size: 10px; font-weight: 700; color: #666; }
         input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
 
-        .effective-rate-card {
-            background: linear-gradient(135deg, #2c3e50, #4b6584);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0 15px 0;
-            display: none;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-left: 5px solid var(--gold);
+        /* Efektif Faiz Kutusu - Proforma boyutu ile aynılaştırıldı */
+        .efektif-field {
+            width: 140px;
+            background: var(--dark);
+            border-radius: 4px;
+            padding: 2px 8px;
+            height: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: var(--gold);
+            border-left: 3px solid var(--gold);
         }
-        .effective-rate-card h4 { margin: 0 0 5px 0; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; }
-        .effective-rate-card .rate-value { font-size: 24px; font-weight: 800; color: var(--gold); }
+        .efektif-field label { color: #ccc; font-size: 8px; margin-bottom: -2px; }
+        .efektif-field .rate-value { font-weight: 800; font-size: 13px; }
 
         .result-main-container { margin-top: 5px; display: none; }
         .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 20px; display: none; background: white; }
@@ -117,12 +119,13 @@
             <div class="field" id="box-sub" style="width:60px;"><label>Sübv %</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
             <div class="field" style="width:55px;"><label>BSMV %</label><input type="number" id="bsmv" readonly></div>
             <div class="field" style="width:55px;"><label>KKDF %</label><input type="number" id="kkdf" readonly></div>
+            
+            <!-- KKDF'den sonraya eklenen Efektif Faiz Alanı -->
+            <div class="efektif-field" id="box-efektif">
+                <label>EFEKTİF FAİZ (YILLIK)</label>
+                <div class="rate-value" id="effective-rate-display">%0.00</div>
+            </div>
         </div>
-    </div>
-
-    <div id="effective-card" class="effective-rate-card">
-        <h4>Yıllık Toplam Maliyet Oranı (Efektif Faiz)</h4>
-        <div class="rate-value" id="effective-rate-display">%0.00</div>
     </div>
 
     <div id="result-main-container" class="result-main-container">
@@ -188,7 +191,7 @@
                 const tutarRaw = document.getElementById('tutar').value.replace(/\./g, "");
                 const tutar = parseFloat(tutarRaw) || 0;
                 if(!tutar) {
-                    document.getElementById('effective-card').style.display = 'none';
+                    document.getElementById('effective-rate-display').innerText = '%0.00';
                     document.getElementById('result-main-container').style.display = 'none';
                     return;
                 }
@@ -198,17 +201,13 @@
                 const bRate = parseFloat(document.getElementById('bsmv').value) / 100;
                 const kRate = parseFloat(document.getElementById('kkdf').value) / 100;
                 
-                // Efektif faiz hesaplamasında BSMV'nin brüt üzerinden gelmesi (Tarım kredisi farkı)
-                // Formül: [Net Faiz + (Brüt Faiz * BSMV Oranı) + (Net Faiz * KKDF Oranı)]
                 const aylikBrutFaiz = yF / 12;
                 const aylikNetFaiz = aylikBrutFaiz * (1 - sub);
                 const aylikVergiVeFaiz = aylikNetFaiz + (aylikBrutFaiz * bRate) + (aylikNetFaiz * kRate);
                 
                 const efektifYillik = (Math.pow(1 + aylikVergiVeFaiz, 12) - 1) * 100;
                 
-                document.getElementById('effective-card').style.display = 'block';
                 document.getElementById('effective-rate-display').innerText = `%${efektifYillik.toFixed(2)}`;
-
                 document.getElementById('result-main-container').style.display = 'block';
                 document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
 
@@ -233,8 +232,6 @@
             drawTable: function(tutar, yF, sub, bRate, kRate, v, unit) {
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
-                
-                // Sabit taksit (PMT) için yeni maliyet oranı: Net Faiz + (Brüt * BSMV) + (Net * KKDF)
                 const maliyetOran = indirimliOran + (faizOran * bRate) + (indirimliOran * kRate);
 
                 let pmt = (maliyetOran === 0) ? (tutar / v) : (tutar * maliyetOran * Math.pow(1+maliyetOran, v)) / (Math.pow(1+maliyetOran, v)-1);
@@ -247,11 +244,8 @@
                 for(let i=1; i<=v; i++) {
                     let fStandart = bal * faizOran;
                     let fIndirimli = bal * indirimliOran;
-                    
-                    // BSMV BRÜT FAİZ üzerinden hesaplanıyor
                     let bsmv = fStandart * bRate;
                     let kkdf = fIndirimli * kRate;
-                    
                     let aPara = (i===v) ? bal : (pmt - (fIndirimli + bsmv + kkdf));
                     
                     tAP += aPara; tF += fStandart; tIF += fIndirimli; tBS += bsmv; tKK += kkdf; tPMT += pmt;
