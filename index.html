@@ -80,7 +80,7 @@
         <button class="tab-btn" onclick="switchTab(this, 'ticari_taksitli')">Ticari Taksitli</button>
     </div>
 
-    <!-- Bireysel Sekmeler (İhtiyaç ilk sıraya, Konut son sıraya alındı) -->
+    <!-- Bireysel Sekmeler -->
     <div class="tabs no-print" id="tabs-bireysel">
         <button class="tab-btn" onclick="switchTab(this, 'ihtiyac')">İhtiyaç</button>
         <button class="tab-btn" onclick="switchTab(this, 'tasit')">Taşıt</button>
@@ -91,7 +91,8 @@
         <div class="grid">
             <div class="field" id="box-proforma" style="width:110px;"><label>Proforma Tutarı</label><input type="text" id="proforma" oninput="Calculator.fmtProforma(this)"></div>
             <div class="field" style="width:110px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="Calculator.fmtMoney(this)"></div>
-            <div class="field" style="width:55px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest()"></div>
+            <div class="field" style="width:55px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
+            <div class="field" style="width:55px;"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.01" oninput="Calculator.syncInterest('aylik')"></div>
             <div class="field" id="box-vade" style="width:85px;"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
             <div class="field" id="box-sub" style="width:45px;"><label>Sübv%</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
             <div class="field" style="width:45px;"><label>BSMV%</label><input type="number" id="bsmv" readonly></div>
@@ -153,7 +154,19 @@
                 }
                 this.autoCalc();
             },
-            syncInterest: function() { this.autoCalc(); },
+            syncInterest: function(triggerSource) {
+                const yillikInput = document.getElementById('faiz');
+                const aylikInput = document.getElementById('faiz-aylik');
+                
+                if (triggerSource === 'yillik') {
+                    const yf = parseFloat(yillikInput.value) || 0;
+                    aylikInput.value = (yf / 12).toFixed(2);
+                } else if (triggerSource === 'aylik') {
+                    const af = parseFloat(aylikInput.value) || 0;
+                    yillikInput.value = (af * 12).toFixed(2);
+                }
+                this.autoCalc();
+            },
             getExtraCosts: function(tutar, vade = 1) {
                 const state = cfg[currentMode];
                 const komPct = state.kom || 0.5;
@@ -314,6 +327,7 @@
             vades.forEach(v => { let o = document.createElement('option'); o.value = v; o.text = v + " Ay"; if(v===s.defVade) o.selected=true; vSel.appendChild(o); });
         }
         document.getElementById('faiz').value = s.faiz.toFixed(2);
+        document.getElementById('faiz-aylik').value = (s.faiz / 12).toFixed(2);
         document.getElementById('subOran').value = s.sub;
         document.getElementById('bsmv').value = s.bsmv;
         document.getElementById('kkdf').value = s.kkdf;
