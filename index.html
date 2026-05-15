@@ -56,6 +56,9 @@
         
         .result-header { background: var(--dark); color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
         .result-title { font-weight: bold; font-size: 12px; }
+        
+        .mini-btn { background: #8e44ad; color: white; border: none; padding: 4px 10px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; }
+        .mini-btn:hover { background: #9b59b6; }
 
         table { width: 100%; font-size: 11px; border-collapse: collapse; background: white; }
         table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; color: var(--dark); }
@@ -127,15 +130,51 @@
     </div>
 
     <div id="result-main-container" class="result-main-container">
+        <!-- 5 Yıl Planı -->
         <div id="plan-5" class="plan-wrapper">
-            <div class="result-header"><span class="result-title">5 Yıl Vadeli Ödeme Planı</span><div class="table-actions no-print"><button class="mini-btn" style="background:#8e44ad; color:white; border:none; padding:4px; cursor:pointer;" onclick="Calculator.exportSinglePDF('plan-5', '5_Yil_Plan')">PDF</button></div></div>
+            <div class="result-header">
+                <span class="result-title">5 Yıl Vadeli Ödeme Planı</span>
+                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-5', '5_Yil_Plan')">PDF</button>
+            </div>
             <div class="tbl-res"></div>
         </div>
-        <div id="plan-4" class="plan-wrapper"><div class="result-header"><span class="result-title">4 Yıl Vadeli Ödeme Planı</span></div><div class="tbl-res"></div></div>
-        <div id="plan-3" class="plan-wrapper"><div class="result-header"><span class="result-title">3 Yıl Vadeli Ödeme Planı</span></div><div class="tbl-res"></div></div>
-        <div id="plan-2" class="plan-wrapper"><div class="result-header"><span class="result-title">2 Yıl Vadeli Ödeme Planı</span></div><div class="tbl-res"></div></div>
-        <div id="plan-1" class="plan-wrapper"><div class="result-header"><span class="result-title">1 Yıl Vadeli Ödeme Planı</span></div><div class="tbl-res"></div></div>
-        <div id="plan-custom" class="plan-wrapper"><div class="result-header"><span class="result-title" id="custom-title">Ödeme Planı</span></div><div class="tbl-res"></div></div>
+        <!-- Diğer Yıllar -->
+        <div id="plan-4" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title">4 Yıl Vadeli Ödeme Planı</span>
+                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-4', '4_Yil_Plan')">PDF</button>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
+        <div id="plan-3" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title">3 Yıl Vadeli Ödeme Planı</span>
+                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-3', '3_Yil_Plan')">PDF</button>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
+        <div id="plan-2" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title">2 Yıl Vadeli Ödeme Planı</span>
+                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-2', '2_Yil_Plan')">PDF</button>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
+        <div id="plan-1" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title">1 Yıl Vadeli Ödeme Planı</span>
+                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-1', '1_Yil_Plan')">PDF</button>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
+        <!-- Özel Vade Planı -->
+        <div id="plan-custom" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title" id="custom-title">Ödeme Planı</span>
+                <button class="mini-btn no-print" onclick="Calculator.exportSinglePDF('plan-custom', 'Odeme_Plani')">PDF</button>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
     </div>
 </div>
 
@@ -210,7 +249,6 @@
                 document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
 
                 if (cfg[mode].unit === 'Yıl') {
-                    // Modern Sulama ve Zirai (Çiftçi Taksitli): Sadece 5. yılı göster
                     if (mode === 'modern_sulama' || mode === 'zirai') {
                         const p5 = document.getElementById('plan-5');
                         p5.style.display = 'block';
@@ -260,7 +298,14 @@
 
             exportSinglePDF: function(id, name) {
                 const element = document.getElementById(id);
-                html2pdf().from(element).save(name + '.pdf');
+                const opt = {
+                    margin: 10,
+                    filename: name + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(element).save();
             },
 
             sendWhatsApp: function() {
