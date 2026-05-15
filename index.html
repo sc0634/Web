@@ -175,13 +175,13 @@
 
     <div class="apply-container no-print">
         <p style="margin-top:0; font-weight:700; color:var(--dark); font-size: 12px;">Planlama uygunsa hemen iletişime geçin.</p>
-        <button class="btn-apply" onclick="window.location.href='mailto:iletisim@sc.com?subject=Kredi Planlama Basvurusu'">
+        <button class="btn-apply" onclick="Calculator.sendWhatsApp()">
             BAŞVURU YAP
         </button>
     </div>
 </div>
 
-<a href="https://wa.me/905345217697" class="whatsapp-fixed no-print" target="_blank">
+<a href="javascript:void(0)" onclick="Calculator.sendWhatsApp()" class="whatsapp-fixed no-print">
     <svg viewBox="0 0 32 32">
         <path d="M16 0c-8.837 0-16 7.163-16 16 0 2.825 0.733 5.476 2.016 7.781l-2.016 7.219 7.426-1.948c2.152 1.137 4.596 1.748 7.174 1.748 8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 29.333c-2.316 0-4.515-0.613-6.435-1.776l-0.461-0.279-4.309 1.13 1.151-4.116-0.306-0.487c-1.285-2.039-1.966-4.409-1.966-6.805 0-7.353 5.98-13.333 13.333-13.333s13.333 5.98 13.333 13.333-5.98 13.333-13.333 13.333zM22.951 19.349c-0.38-0.191-2.251-1.111-2.601-1.238s-0.603-0.191-0.857 0.191-0.984 1.238-1.206 1.492-0.444 0.286-0.825 0.095c-0.381-0.191-1.606-0.592-3.059-1.888-1.13-1.008-1.892-2.253-2.114-2.634s-0.024-0.587 0.167-0.777c0.171-0.171 0.381-0.444 0.571-0.667s0.254-0.381 0.381-0.635c0.127-0.254 0.063-0.476-0.032-0.667s-0.857-2.063-1.175-2.825c-0.31-0.742-0.623-0.641-0.857-0.653-0.222-0.011-0.476-0.013-0.73-0.013s-0.667 0.095-1.016 0.476c-0.349 0.381-1.333 1.302-1.333 3.175s1.365 3.683 1.556 3.937c0.191 0.254 2.686 4.102 6.508 5.75 0.908 0.392 1.616 0.627 2.17 0.803 0.913 0.29 1.745 0.249 2.402 0.151 0.733-0.109 2.251-0.92 2.569-1.81s0.317-1.651 0.222-1.81c-0.095-0.159-0.349-0.254-0.73-0.444z"></path>
     </svg>
@@ -191,14 +191,14 @@
     const Calculator = (function() {
         let mode = 'traktor';
         const cfg = {
-            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, unit: 'Yıl' },
-            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, unit: 'Yıl' },
-            sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, unit: 'Yıl' },
-            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, unit: 'Yıl' },
-            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, defVade: 24, unit: 'Ay' },
-            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, defVade: 120, unit: 'Ay' },
-            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, defVade: 48, unit: 'Ay' },
-            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, defVade: 24, unit: 'Ay' }
+            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, unit: 'Yıl', label: 'Traktör Kredisi' },
+            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, unit: 'Yıl', label: 'Ekipman Kredisi' },
+            sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, unit: 'Yıl', label: 'Sulama Kredisi' },
+            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, unit: 'Yıl', label: 'Çiftçi Taksitli' },
+            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, defVade: 24, unit: 'Ay', label: 'Ticari Taksitli' },
+            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, defVade: 120, unit: 'Ay', label: 'Konut Kredisi' },
+            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, defVade: 48, unit: 'Ay', label: 'Taşıt Kredisi' },
+            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, defVade: 24, unit: 'Ay', label: 'İhtiyaç Kredisi' }
         };
 
         return {
@@ -249,6 +249,22 @@
                 this.calculate();
             },
 
+            sendWhatsApp: function() {
+                const tutar = document.getElementById('tutar').value;
+                const faiz = document.getElementById('faiz').value;
+                const tip = cfg[mode].label;
+                const vade = (cfg[mode].unit === 'Ay') ? document.getElementById('vade-select').value + ' Ay' : 'Yıllık Planlar';
+                
+                const text = `Merhaba, bir kredi planlaması yaptım ve bilgi almak istiyorum:%0A%0A` +
+                             `*Kredi Tipi:* ${tip}%0A` +
+                             `*Kredi Tutarı:* ${tutar} TL%0A` +
+                             `*Yıllık Faiz:* %${faiz}%0A` +
+                             `*Vade:* ${vade}%0A%0A` +
+                             `Uygunluk durumu ve süreç hakkında dönüş yapabilir misiniz?`;
+                
+                window.open(`https://wa.me/905345217697?text=${text}`, '_blank');
+            },
+
             calculate: function() {
                 const tutarRaw = document.getElementById('tutar').value.replace(/\./g, "");
                 const tutar = parseFloat(tutarRaw) || 0;
@@ -284,14 +300,10 @@
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
                 
-                // Sulama modunda BSMV brüt (sübvansiyonsuz) faiz üzerinden hesaplanır.
-                // KKDF genellikle ticari olmayan tarımsal ekipmanda 0'dır ancak formül korundu.
                 let totalMaliyetOran;
                 if (mode === 'sulama') {
-                    // Vergi = Brüt Faiz * Vergi Oranı
                     totalMaliyetOran = indirimliOran + (faizOran * bRate) + (faizOran * kRate);
                 } else {
-                    // Diğerlerinde Vergi = İndirimli Faiz * Vergi Oranı
                     totalMaliyetOran = indirimliOran * (1 + bRate + kRate);
                 }
 
