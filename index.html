@@ -44,13 +44,13 @@
         .table-actions { display: flex; gap: 5px; }
         .mini-btn { border: none; border-radius: 3px; color: white; padding: 4px 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .mini-btn-pdf { background: #8e44ad; }
-        .mini-btn-print { background: #2980b9; }
 
         table { width: 100%; font-size: 11px; border-collapse: collapse; background: white; }
         table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; }
         table th { background: #f8f9fa; color: #444; font-weight: bold; }
         table tfoot td { font-weight: bold; border-top: 2px solid var(--dark); background: #eef2f7; }
 
+        /* Başvuru Formu Mobil Sığdırma */
         .apply-container { margin-top: 20px; padding: 12px; background: #f8f9fa; border: 2px dashed var(--border); border-radius: 8px; }
         .apply-form-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
         .apply-form-row input { flex: 1 1 120px; min-width: 0; height: 32px; }
@@ -88,6 +88,7 @@
 
     <div id="calc-engine" class="no-print">
         <div class="opt-wrapper" id="extra-opts">
+            <!-- Yerli Malı Box (Artık Sulama için de Görünür) -->
             <div class="opt-box" id="yerli-box" onclick="document.getElementById('yerli').click()">
                 <div class="opt-header">
                     <input type="checkbox" id="yerli" checked onclick="event.stopPropagation(); Calculator.handleYerli()">
@@ -169,8 +170,11 @@
                 this.autoCalc();
             },
             handleYerli: function() {
-                if(mode === 'traktor') cfg.traktor.sub = document.getElementById('yerli').checked ? 50 : 25;
-                if(mode === 'ekipman') cfg.ekipman.sub = document.getElementById('yerli').checked ? 75 : 50;
+                const isChecked = document.getElementById('yerli').checked;
+                if(mode === 'traktor') cfg.traktor.sub = isChecked ? 50 : 25;
+                if(mode === 'ekipman') cfg.ekipman.sub = isChecked ? 75 : 50;
+                if(mode === 'sulama') cfg.sulama.sub = 100; // Sulama genelde tam sübv. ama box kalsın istenirse sabit kalır.
+                
                 document.getElementById('subOran').value = cfg[mode].sub;
                 this.calculate();
             },
@@ -191,7 +195,6 @@
                 document.querySelectorAll('.plan-wrapper').forEach(p => p.style.display = 'none');
 
                 if (cfg[mode].unit === 'Yıl') {
-                    // SULAMA FİLTRESİ: Sadece 5. yıl görünsün
                     if(mode === 'sulama') {
                         const p5 = document.getElementById('plan-5');
                         p5.style.display = 'block';
@@ -248,7 +251,10 @@
         Calculator.setMode(m); const s = Calculator.getState();
         document.getElementById('box-proforma').style.display = (['traktor','ekipman','sulama'].includes(m)) ? 'flex' : 'none';
         document.getElementById('extra-opts').style.display = (['traktor','ekipman','sulama'].includes(m)) ? 'flex' : 'none';
-        document.getElementById('yerli-box').style.display = (['traktor','ekipman'].includes(m)) ? 'flex' : 'none';
+        
+        // Yerli Malı Box: Traktör, Ekipman ve SULAMA için görünür yapıldı
+        document.getElementById('yerli-box').style.display = (['traktor','ekipman','sulama'].includes(m)) ? 'flex' : 'none';
+        
         document.getElementById('col-bb-box').style.display = (m === 'traktor') ? 'flex' : 'none';
         const boxV = document.getElementById('box-vade');
         if(s.unit === 'Yıl') boxV.style.display = 'none';
