@@ -67,17 +67,24 @@
         <button id="seg-bir" class="seg-btn bg-bir" onclick="switchSegment('bireysel')">BİREYSEL</button>
     </div>
 
+    <!-- Tarımsal Sekmeler -->
     <div class="tabs no-print" id="tabs-tarimsal">
         <button class="tab-btn" onclick="switchTab(this, 'traktor')">Traktör</button>
         <button class="tab-btn" onclick="switchTab(this, 'modern_sulama')">Modern Sulama</button>
         <button class="tab-btn" onclick="switchTab(this, 'ekipman')">Ekipman</button>
         <button class="tab-btn" onclick="switchTab(this, 'zirai')">Çiftçi Taksitli</button>
     </div>
-    <div class="tabs no-print" id="tabs-ticari"><button class="tab-btn" onclick="switchTab(this, 'ticari_taksitli')">Ticari Taksitli</button></div>
+
+    <!-- Ticari Sekmeler -->
+    <div class="tabs no-print" id="tabs-ticari">
+        <button class="tab-btn" onclick="switchTab(this, 'ticari_taksitli')">Ticari Taksitli</button>
+    </div>
+
+    <!-- Bireysel Sekmeler (İhtiyaç ilk sıraya, Konut son sıraya alındı) -->
     <div class="tabs no-print" id="tabs-bireysel">
-        <button class="tab-btn" onclick="switchTab(this, 'konut')">Konut</button>
-        <button class="tab-btn" onclick="switchTab(this, 'tasit')">Taşıt</button>
         <button class="tab-btn" onclick="switchTab(this, 'ihtiyac')">İhtiyaç</button>
+        <button class="tab-btn" onclick="switchTab(this, 'tasit')">Taşıt</button>
+        <button class="tab-btn" onclick="switchTab(this, 'konut')">Konut</button>
     </div>
 
     <div id="calc-engine" class="no-print">
@@ -158,11 +165,9 @@
                 }
                 const kasko = kaskoTemeli * 0.02;
                 
-                // --- %2'DEN BAŞLAYAN VE HER YIL %0.10 ARTAN HAYAT SİGORTASI MANTIĞI ---
-                const bazOran = 0.02; // 1. Yıl Başlangıç Oranı (%2.00)
-                const artisMiktari = 0.001; // Her yıl artış miktarı (%0.10)
-                
-                // Yıllık vadeler için dinamik artış, aylık vadeler için %2 sabit kalır
+                // --- HAYAT SİGORTASI: %2'DEN BAŞLAR %3'TE BİTER ---
+                const bazOran = 0.02; 
+                const artisMiktari = 0.0025; 
                 const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
                 const hayat = tutar * dinamikOran;
 
@@ -235,7 +240,7 @@
                 }
             },
             drawTable: function(tutar, yF, sub, bRate, kRate, v, unit, masraf) {
-                const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
+                const faizOran = (unit === 'Yıl' ) ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
                 const maliyetOran = indirimliOran + (faizOran * bRate) + (indirimliOran * kRate);
                 let pmt = (maliyetOran === 0) ? (tutar / v) : (tutar * maliyetOran * Math.pow(1+maliyetOran, v)) / (Math.pow(1+maliyetOran, v)-1);
