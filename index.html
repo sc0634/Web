@@ -82,6 +82,7 @@
 
     <div id="calc-engine" class="no-print">
         <div class="grid">
+            <div class="field" id="box-proforma" style="width:120px;"><label>Proforma Tutarı</label><input type="text" id="proforma" oninput="Calculator.fmtProforma(this)"></div>
             <div class="field" style="width:120px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="Calculator.fmtMoney(this)"></div>
             <div class="field" style="width:60px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest()"></div>
             <div class="field" id="box-vade" style="width:85px;"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
@@ -117,14 +118,14 @@
 <script>
     const Calculator = (function() {
         const cfg = {
-            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl' },
-            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, kom: 1.0, unit: 'Yıl' },
-            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl' },
-            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl' },
-            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, unit: 'Ay' },
-            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, unit: 'Ay' },
-            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 48, unit: 'Ay' },
-            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 24, unit: 'Ay' }
+            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', pro: true, pRate: 0.75 },
+            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, kom: 1.0, unit: 'Yıl', pro: true, pRate: 1.0 },
+            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', pro: true, pRate: 0.75 },
+            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', pro: false },
+            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, unit: 'Ay', pro: false },
+            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, unit: 'Ay', pro: false },
+            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 48, unit: 'Ay', pro: false },
+            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 24, unit: 'Ay', pro: false }
         };
         let currentMode = 'traktor';
 
@@ -137,22 +138,25 @@
                 if(v) i.value = new Intl.NumberFormat('tr-TR').format(v);
                 this.autoCalc();
             },
+            fmtProforma: function(i) {
+                let v = i.value.replace(/\D/g, "");
+                if(v) {
+                    i.value = new Intl.NumberFormat('tr-TR').format(v);
+                    const rate = cfg[currentMode].pRate || 0.75;
+                    const tutar = Math.floor(parseInt(v) * rate);
+                    document.getElementById('tutar').value = new Intl.NumberFormat('tr-TR').format(tutar);
+                }
+                this.autoCalc();
+            },
             syncInterest: function() { this.autoCalc(); },
             getExtraCosts: function(tutar) {
                 const komPct = parseFloat(document.getElementById('komisyonOran').value) || 0;
                 const kasko = parseFloat(document.getElementById('kasko').value.replace(/\./g, "")) || 0;
                 const hayat = parseFloat(document.getElementById('hayat').value.replace(/\./g, "")) || 0;
                 const rehin = parseFloat(document.getElementById('rehin').value.replace(/\./g, "")) || 0;
-                
-                // Komisyon ve %5 BSMV hesaplaması
                 const netKomisyon = tutar * (komPct/100);
                 const komisyonBrut = netKomisyon * 1.05; 
-                
-                return { 
-                    komisyon: komisyonBrut, 
-                    diger: kasko + hayat + rehin, 
-                    toplam: komisyonBrut + kasko + hayat + rehin 
-                };
+                return { komisyon: komisyonBrut, diger: kasko + hayat + rehin, toplam: komisyonBrut + kasko + hayat + rehin };
             },
             calcEfektif: function(tutar, yF, sub, bRate, kRate, v, unit, mToplam) {
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
@@ -251,6 +255,10 @@
         Calculator.setMode(m); 
         const s = Calculator.getState(m);
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+        
+        // Proforma Görünürlük Kontrolü
+        document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
+        
         document.getElementById('box-vade').style.display = s.unit === 'Yıl' ? 'none' : 'flex';
         if(s.unit === 'Ay') {
             const vSel = document.getElementById('vade-select'); vSel.innerHTML = '';
