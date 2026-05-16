@@ -13,10 +13,10 @@
             --tax-bg: #7f8c8d;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #f1f2f6; margin: 0; padding: 10px; color: var(--dark); font-size: 11px; }
+        body { background: #f1f2f6; margin: 0; padding: 10px; color: var(--dark); font-size: 11px; position: relative; }
         .container { max-width: 1000px; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         
-        .segment-nav { display: flex; gap: 5px; margin-bottom: 15px; }
+        .segment-nav { display: flex; gap: 5px; margin-bottom: 15px; padding-right: 80px; /* Hakkımda butonu için yer açıldı */ }
         .seg-btn { flex: 1; border: none; height: 35px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; opacity: 0.4; transition: 0.2s; font-size: 11px; }
         .seg-btn.active { opacity: 1; transform: scale(1.02); }
         .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); } .bg-bir { background: var(--bireysel); }
@@ -90,15 +90,32 @@
         /* Popup / Modal Tasarımı */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; }
         .modal-box { background: white; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border-top: 5px solid var(--danger); animation: modalShow 0.3s ease-in-out; }
+        .modal-box.info-box { border-top: 5px solid var(--bireysel); } /* Hakkımda için mavi renk */
         .modal-box h3 { margin-top: 0; color: var(--danger); font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .modal-box.info-box h3 { color: var(--bireysel); }
         .modal-box p { font-size: 11px; line-height: 1.5; color: var(--dark); margin: 15px 0; }
         .modal-close-btn { background: var(--dark); color: white; border: none; padding: 8px 20px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .modal-close-btn:hover { background: #1a252f; }
         @keyframes modalShow { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
+        /* Sabit Sağ Üst Hakkımda Butonu */
+        .about-btn-fixed { position: fixed; top: 15px; right: 15px; background: var(--dark); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; z-index: 999; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
+        .about-btn-fixed:hover { background: #1a252f; transform: scale(1.05); }
+
         body.single-print-active .container > *:not(#result-main-container) { display: none !important; }
         body.single-print-active .plan-wrapper { display: none !important; }
         body.single-print-active .plan-wrapper.print-target { display: block !important; border: 1px solid #333; }
+
+        /* Mobil Görünüm Optimizasyonu (Vade Satır Kapsama) */
+        @media (max-width: 600px) {
+            #box-vade {
+                width: 100% !important;
+                order: 10; /* Diğer alanların arkasına, yeni bir tam satır olarak konumlandırır */
+                margin-top: 5px;
+            }
+            .about-btn-fixed { top: 12px; right: 12px; padding: 5px 10px; font-size: 9px; }
+            .segment-nav { padding-right: 65px; }
+        }
 
         @media print { 
             .no-print { display: none !important; } 
@@ -112,6 +129,18 @@
     </style>
 </head>
 <body onload="initApp()">
+
+<!-- Sağ Üst Hakkımda Butonu -->
+<button class="about-btn-fixed no-print" onclick="document.getElementById('aboutModal').style.display = 'flex'">ℹ️ Hakkımda</button>
+
+<!-- Hakkımda Pop-up / Modal -->
+<div id="aboutModal" class="modal-overlay no-print" onclick="if(event.target == this) this.style.display='none'">
+    <div class="modal-box info-box">
+        <h3>ℹ️ UYGULAMA HAKKINDA</h3>
+        <p>Bu platform; <strong>Tarımsal, Ticari ve Bireysel</strong> kredi segmentlerine ait maliyet hesaplamalarını, yasal mevzuat sınırlarını ve güncel faiz simülasyonlarını dinamik olarak gerçekleştirmek amacıyla <strong>S.C.</strong> tarafından geliştirilmiştir.</p>
+        <button class="modal-close-btn" onclick="document.getElementById('aboutModal').style.display = 'none'">Kapat</button>
+    </div>
+</div>
 
 <!-- Limit Aşım Pop-up (PAP) -->
 <div id="limitModal" class="modal-overlay no-print">
@@ -351,7 +380,6 @@
             },
             checkLegalLimit: function(numVal) {
                 const state = cfg[currentMode];
-                // Sadece tarımsal / devlet destekli segmentlerde tetiklenir
                 if (state.isTarim && numVal > LEGAL_LIMIT) {
                     document.getElementById('limitModal').style.display = 'flex';
                     const inputTutar = document.getElementById('tutar');
@@ -365,8 +393,6 @@
                 let v = i.value.replace(/\D/g, "");
                 if(v) {
                     let numVal = parseInt(v);
-                    
-                    // 2026 Cumhurbaşkanlığı Kararnamesi Limit Kontrolü
                     numVal = this.checkLegalLimit(numVal);
 
                     const state = cfg[currentMode];
@@ -391,8 +417,6 @@
                     const profInt = parseInt(v);
                     const rate = cfg[currentMode].pRate || 0.75;
                     let tutar = Math.floor(profInt * rate);
-                    
-                    // Proformadan türeyen tutar için de limit kontrolü
                     tutar = this.checkLegalLimit(tutar);
 
                     document.getElementById('tutar').value = new Intl.NumberFormat('tr-TR').format(tutar);
@@ -466,7 +490,6 @@
                 let tutar = parseFloat(tutarVal) || 0;
                 if (!tutar) { document.getElementById('result-main-container').style.display = 'none'; return; }
                 
-                // Ana hesaplama motoru güvenlik bariyeri
                 if (state.isTarim && tutar > LEGAL_LIMIT) {
                     tutar = LEGAL_LIMIT;
                 }
