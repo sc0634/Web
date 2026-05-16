@@ -134,10 +134,28 @@
             <div class="info-field subv-field"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
 
-            <!-- Yerli Malı Belgesi Checkbox (+%25 Sübvansiyon) -->
+            <!-- Yerli Malı Belgesi Checkbox -->
             <div class="checkbox-field" id="box-yerlimali">
-                <input type="checkbox" id="yerliMaliCheck" onchange="Calculator.autoCalc()">
-                <label for="yerliMaliCheck">🚜 Yerli Malı (+%25 Sübv.)</label>
+                <input type="checkbox" id="yerliMaliCheck" onchange="Calculator.handleSubvModifiers()">
+                <label for="yerliMaliCheck">🚜 Yerli Malı Belgesi</label>
+            </div>
+
+            <!-- Genç Çiftçi Checkbox (+%10) -->
+            <div class="checkbox-field" id="box-gencciftci">
+                <input type="checkbox" id="gencCiftciCheck" onchange="Calculator.handleSubvModifiers()">
+                <label for="gencCiftciCheck">🌱 Genç Çiftçi (<40 Yaş)</label>
+            </div>
+
+            <!-- Kadın Çiftçi Checkbox (+%10) -->
+            <div class="checkbox-field" id="box-kadinciftci">
+                <input type="checkbox" id="kadinCiftciCheck" onchange="Calculator.handleSubvModifiers()">
+                <label for="kadinCiftciCheck">👩‍🌾 Kadın Çiftçi</label>
+            </div>
+
+            <!-- Kooperatif Checkbox (+%10) -->
+            <div class="checkbox-field" id="box-kooperatif">
+                <input type="checkbox" id="kooperatifCheck" onchange="Calculator.handleSubvModifiers()">
+                <label for="kooperatifCheck">🤝 Kooperatif Üyesi</label>
             </div>
 
             <!-- Buy Back Checkbox (Sabit Faizli Kredi) -->
@@ -158,7 +176,7 @@
         <div id="plan-custom" class="plan-wrapper"><div class="result-header"><span class="result-title" id="custom-title">Ödeme Planı</span></div><div class="tbl-res"></div></div>
         
         <div class="print-legal-band">
-            <strong>YASAL BİLGİLENDİRME NOTU:</strong> <span id="legal-faiz-turu"></span>İşbu ödeme planı ve maliyet tablosu sadece bilgilendirme amaçlı olup, bankanın nihai kredi onayını, taahhüdünü veya resmi teklifini oluşturmaz. Hesaplamada kullanılan faiz, vergi (BSMV/KKDF), sigorta primleri ve fon oranları hesaplama tarihindeki mevzuata göre simüle edilmiş olup, kullanım tarihindeki piyasa koşullarına göre değişiklik gösterebilir. Nihai şartlar sözleşme aşamasında belirlenecektir.<br>
+            <strong>YASAL BİLGİLENDİRME NOTU:</strong> <span id="legal-faiz-turu"></span>İşbu ödeme planı ve maliyet tablosu sadece bilgilendirme amaçlı olup, bankanın nihai kredi onayını, taahhüdünü veya resmi teklifini oluşturmaz. Hesaplamada kullanılan faiz, vergi (BSMV/KKDF), sigorta primleri ve fon oranları hesaplama tarihendeki mevzuata göre simüle edilmiş olup, kullanım tarihindeki piyasa koşullarına göre değişiklik gösterebilir. Nihai şartlar sözleşme aşamasında belirlenecektir.<br>
             <span id="print-date-field" style="display:inline-block; margin-top:5px; font-style:italic;"></span>
             
             <div class="print-signatures">
@@ -203,6 +221,31 @@
                 const isChecked = document.getElementById('ihracatCheck').checked;
                 currentBsmv = isChecked ? 0 : cfg[currentMode].bsmv;
                 document.getElementById('bsmv-display').innerText = `%${currentBsmv}.00`;
+                this.autoCalc();
+            },
+            handleSubvModifiers: function() {
+                const isYerliMali = document.getElementById('yerliMaliCheck').checked;
+                const isGencCiftci = document.getElementById('gencCiftciCheck').checked;
+                const isKadinCiftci = document.getElementById('kadinCiftciCheck').checked;
+                const isKooperatif = document.getElementById('kooperatifCheck').checked;
+                
+                const subInput = document.getElementById('subOran');
+                const baseSub = cfg[currentMode].sub;
+
+                // Sadece Traktör, Ekipman ve Sulama sekmelerinde çarpan hesaplaması yapılır
+                const isSpecialSubvMode = ['traktor', 'ekipman', 'modern_sulama'].includes(currentMode);
+
+                if (isSpecialSubvMode && baseSub > 0) {
+                    let dynamicSub = isYerliMali ? baseSub : Math.max(0, baseSub - 25);
+                    
+                    if (isGencCiftci) dynamicSub += 10;
+                    if (isKadinCiftci) dynamicSub += 10;
+                    if (isKooperatif) dynamicSub += 10;
+
+                    subInput.value = Math.min(100, dynamicSub);
+                } else {
+                    subInput.value = baseSub;
+                }
                 this.autoCalc();
             },
             fmtMoney: function(i) {
@@ -311,17 +354,12 @@
                     if(tutar > maxAllowed) tutar = maxAllowed;
                 }
 
-                // Buy Back Kontrolü (Faiz Sabit Kalır)
-                const isBuyBack = document.getElementById('buyBackCheck').checked && (currentMode !== 'ihtiyac' && currentMode !== 'tasit' && currentMode !== 'konut');
+                const isSpecialSubvMode = ['traktor', 'ekipman', 'modern_sulama'].includes(currentMode);
+                const isBuyBack = document.getElementById('buyBackCheck').checked && isSpecialSubvMode;
                 let baseFaiz = parseFloat(document.getElementById('faiz').value);
                 const yF = baseFaiz / 100;
 
-                // Yerli Malı Kontrolü (+%25 Sübvansiyon)
-                const isYerliMali = document.getElementById('yerliMaliCheck').checked && state.sub > 0;
                 let baseSub = (parseFloat(document.getElementById('subOran').value) || 0);
-                if (isYerliMali) {
-                    baseSub = Math.min(100, baseSub + 25); // Maksimum %100 sübvansiyon sınırı
-                }
                 const sub = baseSub / 100;
                 
                 document.getElementById('subv-rate-display').innerText = `%${(yF * (1 - sub) * 100).toFixed(2)}`;
@@ -352,7 +390,6 @@
                     pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik);
                 }
 
-                // Yasal Koruma Bandı Sabit Faiz İbaresi
                 const legalFaizTuru = document.getElementById('legal-faiz-turu');
                 if (isBuyBack) {
                     legalFaizTuru.innerHTML = `<strong>KREDİ TÜRÜ:</strong> Geri Alım Taahhütlü Sabit Faizli Kredi.<br>`;
@@ -422,11 +459,22 @@
                 msg += `💳 *Periyodik Taksit:* ${lastPmtValue.toLocaleString('tr-TR')} TL\n`;
                 msg += `🛡️ *Toplam Masraf:* ${lastTotalCost.toLocaleString('tr-TR')} TL\n\n`;
                 
-                if(document.getElementById('yerliMaliCheck').checked && state.sub > 0) msg += `🚜 *Teşvik:* Yerli Malı Belgesi Uygulandı (+%25 Sübv.)\n`;
-                if(document.getElementById('buyBackCheck').checked) msg += `🔄 *Güvence:* Buy Back (Geri Alım Taahhütlü Sabit Faizli Kredi)\n\n`;
+                const isSpecialSubvMode = ['traktor', 'ekipman', 'modern_sulama'].includes(currentMode);
+                if (isSpecialSubvMode) {
+                    let appliedFeatures = [];
+                    if(document.getElementById('yerliMaliCheck').checked) appliedFeatures.push("Yerli Malı Belgesi");
+                    if(document.getElementById('gencCiftciCheck').checked) appliedFeatures.push("Genç Çiftçi Teşviki (+%10)");
+                    if(document.getElementById('kadinCiftciCheck').checked) appliedFeatures.push("Kadın Çiftçi Teşviki (+%10)");
+                    if(document.getElementById('kooperatifCheck').checked) appliedFeatures.push("Kooperatif Üyeliği (+%10)");
+
+                    if(appliedFeatures.length > 0) msg += `🚜 *Uygulanan Kriterler:* ${appliedFeatures.join(', ')}\n`;
+                    if(!document.getElementById('yerliMaliCheck').checked) msg += `⚠️ *Uyarı:* Yerli Malı Belgesi olmadığı için baz sübvansiyon %25 düşürülmüştür.\n`;
+                    
+                    msg += `📊 *Toplam Sübvansiyon Oranı:* %${document.getElementById('subOran').value}\n`;
+                    if(document.getElementById('buyBackCheck').checked) msg += `🔄 *Güvence:* Buy Back (Geri Alım Taahhütlü Sabit Faizli Kredi)\n\n`;
+                }
                 
                 msg += `_Bilgilendirme amaçlı oluşturulmuştur._`;
-
                 window.open(`https://wa.me/905345217697?text=${encodeURIComponent(msg)}`, '_blank');
             },
             resetProforma: function() {
@@ -453,12 +501,23 @@
         document.getElementById('box-ihracat').style.display = (m === 'ticari_taksitli') ? 'flex' : 'none';
         document.getElementById('box-tutar').classList.remove('error');
 
-        document.getElementById('box-yerlimali').style.display = (s.sub > 0) ? 'flex' : 'none';
-        document.getElementById('box-buyback').style.display = (m !== 'ihtiyac' && m !== 'tasit' && m !== 'konut') ? 'flex' : 'none';
+        // GÖRÜNÜRLÜK FİLTRESİ: Sadece traktör, ekipman ve modern_sulama sekmelerinde aktifleşir
+        const isSpecialSubvMode = ['traktor', 'ekipman', 'modern_sulama'].includes(m);
+        
+        document.getElementById('box-yerlimali').style.display = isSpecialSubvMode ? 'flex' : 'none';
+        document.getElementById('box-gencciftci').style.display = isSpecialSubvMode ? 'flex' : 'none';
+        document.getElementById('box-kadinciftci').style.display = isSpecialSubvMode ? 'flex' : 'none';
+        document.getElementById('box-kooperatif').style.display = isSpecialSubvMode ? 'flex' : 'none';
+        document.getElementById('box-buyback').style.display = isSpecialSubvMode ? 'flex' : 'none';
 
         document.getElementById('ihracatCheck').checked = false;
-        document.getElementById('yerliMaliCheck').checked = false;
-        document.getElementById('buyBackCheck').checked = false;
+        
+        // Önemli seçimleri default set et
+        document.getElementById('yerliMaliCheck').checked = true;
+        document.getElementById('buyBackCheck').checked = true;
+        document.getElementById('gencCiftciCheck').checked = false;
+        document.getElementById('kadinCiftciCheck').checked = false;
+        document.getElementById('kooperatifCheck').checked = false;
 
         if (s.pro) {
             Calculator.resetProforma();
@@ -473,6 +532,7 @@
         }
         document.getElementById('faiz').value = s.faiz.toFixed(2);
         document.getElementById('faiz-aylik').value = (s.faiz / 12).toFixed(2);
+        
         document.getElementById('subOran').value = s.sub;
         
         Calculator.setTaxes(s.bsmv, s.kkdf);
