@@ -30,24 +30,22 @@
         label { font-size: 9px; font-weight: 700; color: #666; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         input, select { height: 32px; padding: 0 2px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; outline: none; width: 100%; text-align: center; }
         
-        /* Yenilenen Resimli Buton (Toggle-Badge) Tasarımı */
         .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; height: 32px; background: #fdf2f2; border: 1px solid #f5c6cb; border-radius: 4px; padding: 0 8px; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative; }
         .cb-field input[type="checkbox"] { display: none; } 
         .cb-field label { font-size: 10px; font-weight: bold; color: var(--danger); cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; gap: 5px; }
         .cb-field svg { width: 14px; height: 14px; fill: var(--danger); transition: fill 0.2s ease; }
         
-        /* Aktif / Seçili Olduğunda (Yeşil Durum) */
         .cb-field.checked-active { background: var(--tarimsal); border-color: #27ae60; box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); }
         .cb-field.checked-active label { color: white !important; }
         .cb-field.checked-active svg { fill: white !important; }
 
         .slider-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
-        .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
+        .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; width: 100%; }
         .vade-label-box { display: flex; justify-content: space-between; width: 100%; font-size: 8px; font-weight: bold; color: var(--dark); margin-top: -2px; }
 
         .std-width { width: 60px; }
         .range-width { width: 110px; }
-        .cb-width { width: 115px; } /* İkonlar için genişlik hafif artırıldı */
+        .cb-width { width: 115px; }
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
         .info-field label { color: #ccc; font-size: 7px; margin-bottom: -1px; width: 100%; font-weight: 700; }
@@ -87,8 +85,9 @@
         .btn-print-single { background: #34495e; }
         .btn-whatsapp-single { background: var(--whatsapp); }
         
-        table { width: 100%; font-size: 11px; border-collapse: collapse; }
-        table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; }
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; font-size: 11px; border-collapse: collapse; min-width: 500px; }
+        table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; white-space: nowrap; }
         table th { background: #f8f9fa; font-size: 9px; }
         table tfoot td { font-weight: bold; background: #eef2f7; border-top: 2px solid var(--dark); }
 
@@ -103,6 +102,21 @@
         
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
         
+        @media screen and (max-width: 768px) {
+            body { padding: 5px; }
+            .container { padding: 10px; border-radius: 4px; width: 100%; max-width: 100%; }
+            .grid { flex-direction: column; align-items: stretch; gap: 10px; }
+            .field, .info-field { width: 100% !important; }
+            .cb-field { width: 100% !important; }
+            .slider-container { width: 100% !important; }
+            .dosya-banner { flex-direction: column; align-items: stretch; gap: 8px; }
+            .db-divider { display: none; }
+            .db-item { text-align: center; padding: 4px 0; border-bottom: 1px dashed #e0c0c0; }
+            .db-item.highlight { border-bottom: none; }
+            .segment-nav { gap: 3px; }
+            .seg-btn { font-size: 9px; height: 32px; padding: 0 2px; }
+        }
+
         @media print { 
             .no-print { display: none !important; } 
             .container { box-shadow: none; max-width: 100%; }
@@ -159,10 +173,8 @@
                 </div>
             </div>
 
-            <!-- Sübv Oran Alanı -->
             <div class="field std-width" id="box-sub"><label>Sübv%</label><input type="number" id="subOran"></div>
             
-            <!-- Resimli ve Dinamik Buton Yapılı Checkbox Alanları -->
             <div class="field cb-width" id="box-yerli" style="display:none;">
                 <div class="cb-field" id="wrapper-yerli">
                     <input type="checkbox" id="cb-yerli">
@@ -178,7 +190,7 @@
                     <input type="checkbox" id="cb-buyback">
                     <label for="cb-buyback">
                         <svg viewBox="0 0 24 24"><path d="M18 7H6v12h12V7zm2-4H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12H7v-2h10v2zm0-4H7V9h10v2z"/></svg>
-                        Taahhüt Var
+                        Buy Back
                     </label>
                 </div>
             </div>
@@ -213,7 +225,6 @@
                 </div>
             </div>
             
-            <!-- Bilgi Gösterge ve Vergi Alanları -->
             <div class="info-field tax-field std-width"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
             <div class="info-field tax-field std-width"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
             <div class="info-field subv-field std-width" id="box-subv-display"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
@@ -282,7 +293,7 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlere entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -319,14 +330,14 @@
         const DEFAULT_BIREYSEL_KREDI = "100.000";
         
         const cfg = {
-            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true },
-            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true },
-            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true },
-            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
-            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
-            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 124, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
-            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
-            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false }
+            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true, hasKasko: true },
+            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true },
+            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true },
+            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: true },
+            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: true },
+            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false },
+            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 36, maxVade: 48, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false },
+            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 36, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false }
         };
         
         let currentMode = 'traktor';
@@ -341,26 +352,35 @@
             getCosts: function(tutar, vade = 1) {
                 const state = cfg[currentMode];
                 const komPct = state.kom || 0.5;
-                let kaskoTemeli = tutar;
-                if(state.pro) {
-                    const profVal = fn.parseMoney(document.getElementById('proforma').value);
-                    if(profVal > 0) kaskoTemeli = profVal;
+                
+                let kasko = 0;
+                if(state.hasKasko && currentSegment !== 'bireysel') {
+                    let kaskoTemeli = tutar;
+                    if(state.pro) {
+                        const profVal = fn.parseMoney(document.getElementById('proforma').value);
+                        if(profVal > 0) kaskoTemeli = profVal;
+                    }
+                    kasko = kaskoTemeli * 0.02;
                 }
-                const kasko = kaskoTemeli * 0.02;
+
                 const bazOran = 0.02; 
                 const artisMiktari = 0.0025; 
                 const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
                 const hayat = tutar * dinamikOran;
                 let tarsimUcreti = state.tarsim ? (tutar * 0.04) : 0;
                 const netKomisyon = tutar * (komPct/100);
+
+                // Bireysel ve Ticari segmentlerde rehin ücreti 0 TL yapılıyor
+                let rehinUcreti = (currentSegment === 'bireysel' || currentSegment === 'ticari') ? 0 : REHIN_SABIT;
+
                 return { 
                     komisyon: netKomisyon * 1.05, 
                     kasko: kasko,
                     hayat: hayat,
                     hayatOran: dinamikOran * 100,
                     tarsim: tarsimUcreti,
-                    rehin: REHIN_SABIT,
-                    toplam: (netKomisyon * 1.05) + kasko + hayat + tarsimUcreti + REHIN_SABIT 
+                    rehin: rehinUcreti,
+                    toplam: (netKomisyon * 1.05) + kasko + hayat + tarsimUcreti + rehinUcreti 
                 };
             },
             calcEfektif: function(tutar, yF, sub, bRate, kRate, v, unit, mToplam) {
@@ -471,6 +491,7 @@
                     <div class="db-item highlight"><span class="db-label">TOPLAM MASRAF</span><span class="db-value">${Math.round(masraf.toplam).toLocaleString('tr-TR')} TL</span></div>
                 </div>`;
 
+                html += `<div class="table-responsive">`;
                 html += `<table><thead><tr><th>No</th><th>Ana Para</th><th>Baz Faiz</th><th>Müşteri Faizi</th><th>BSMV</th><th>KKDF</th><th>Taksit Tutarı</th></tr></thead><tbody>`;
                 let bal = tutar, tAP = 0, tBazF = 0, tIF = 0, tBS = 0, tKK = 0, tPMT = 0;
                 for(let i = 1; i <= v; i++) {
@@ -489,6 +510,7 @@
                     bal -= aPara;
                 }
                 html += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(tAP).toLocaleString('tr-TR')}</td><td>${Math.round(tBazF).toLocaleString('tr-TR')}</td><td>${Math.round(tIF).toLocaleString('tr-TR')}</td><td>${Math.round(tBS).toLocaleString('tr-TR')}</td><td>${Math.round(tKK).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(tPMT).toLocaleString('tr-TR')}</td></tr></tfoot></table>`;
+                html += `</div>`;
                 return html;
             }
         };
@@ -580,7 +602,6 @@
 
             document.getElementById('subOran').addEventListener('input', () => coreCalculator.calculate(true));
             
-            // Tüm butonların tetikleyicileri ve görsel durum güncellemeleri
             const checkboxes = ['cb-yerli', 'cb-buyback', 'cb-kadin', 'cb-genc', 'cb-koop'];
             const wrappers = ['wrapper-yerli', 'wrapper-buyback', 'wrapper-kadin', 'wrapper-genc', 'wrapper-koop'];
             
@@ -683,6 +704,15 @@
                 document.getElementById(wrappers[index]).classList.remove('checked-active');
             });
 
+            if (s.viewYerli) {
+                document.getElementById('cb-yerli').checked = true;
+                document.getElementById('wrapper-yerli').classList.add('checked-active');
+            }
+            if (s.viewBuyback) {
+                document.getElementById('cb-buyback').checked = true;
+                document.getElementById('wrapper-buyback').classList.add('checked-active');
+            }
+
             if (s.hasSubInput) {
                 document.getElementById('box-sub').style.display = 'flex';
                 document.getElementById('subOran').value = s.sub;
@@ -692,12 +722,7 @@
             }
 
             const boxVade = document.getElementById('box-vade');
-            if (currentSegment === 'bireysel') {
-                boxVade.style.display = 'none';
-                const slider = document.getElementById('vade-slider');
-                slider.min = 12; slider.max = 12; slider.value = 12;
-                document.getElementById('vade-val-lbl').innerText = "12 Ay";
-            } else if (s.unit === 'Ay') {
+            if (s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
                 const slider = document.getElementById('vade-slider');
                 slider.min = 1;
