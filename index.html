@@ -51,6 +51,12 @@
         .result-header { background: var(--dark); color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
         .result-title { font-weight: bold; font-size: 12px; }
         
+        /* Sadeleştirilmiş Üst Kredi Bilgileri Kartı */
+        .print-summary-card { background: #f8f9fa; border-bottom: 1px solid var(--border); padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; }
+        .sc-item { display: flex; flex-direction: column; min-width: 110px; }
+        .sc-label { font-size: 8px; font-weight: bold; color: #7f8c8d; text-transform: uppercase; margin-bottom: 2px; }
+        .sc-value { font-size: 11px; font-weight: bold; color: var(--dark); }
+        
         table { width: 100%; font-size: 11px; border-collapse: collapse; }
         table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; }
         table th { background: #f8f9fa; font-size: 9px; }
@@ -75,7 +81,8 @@
             .no-print { display: none !important; } 
             .container { box-shadow: none; max-width: 100%; padding: 0; }
             body { background: white; padding: 0; }
-            .plan-wrapper { border: 1px solid #333; page-break-inside: avoid; }
+            .plan-wrapper { border: 1px solid #333; page-break-inside: avoid; page-break-after: always; }
+            .plan-wrapper:last-child { page-break-after: avoid; }
             .result-header { background: #333 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-legal-band { display: block; }
         }
@@ -140,6 +147,12 @@
                 <label for="yerliMaliCheck">🚜 Yerli Malı Belgesi</label>
             </div>
 
+            <!-- Buy Back Checkbox -->
+            <div class="checkbox-field" id="box-buyback">
+                <input type="checkbox" id="buyBackCheck" onchange="Calculator.autoCalc()">
+                <label for="buyBackCheck">🔄 Buy Back (Sabit Faizli)</label>
+            </div>
+
             <!-- Genç Çiftçi Checkbox (+%10) -->
             <div class="checkbox-field" id="box-gencciftci">
                 <input type="checkbox" id="gencCiftciCheck" onchange="Calculator.handleSubvModifiers()">
@@ -152,16 +165,10 @@
                 <label for="kadinCiftciCheck">👩‍🌾 Kadın Çiftçi</label>
             </div>
 
-            <!-- Kooperatif Checkbox (+%10) -->
+            <!-- Kooperatif Checkbox (+%5 Sübvansiyon) -->
             <div class="checkbox-field" id="box-kooperatif">
                 <input type="checkbox" id="kooperatifCheck" onchange="Calculator.handleSubvModifiers()">
-                <label for="kooperatifCheck">🤝 Kooperatif Üyesi</label>
-            </div>
-
-            <!-- Buy Back Checkbox (Sabit Faizli Kredi) -->
-            <div class="checkbox-field" id="box-buyback">
-                <input type="checkbox" id="buyBackCheck" onchange="Calculator.autoCalc()">
-                <label for="buyBackCheck">🔄 Buy Back (Sabit Faizli)</label>
+                <label for="kooperatifCheck">🤝 Krediyi Çeken Kooperatif</label>
             </div>
         </div>
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" onclick="window.print()">YAZDIR / PDF KAYDET</button>
@@ -176,7 +183,7 @@
         <div id="plan-custom" class="plan-wrapper"><div class="result-header"><span class="result-title" id="custom-title">Ödeme Planı</span></div><div class="tbl-res"></div></div>
         
         <div class="print-legal-band">
-            <strong>YASAL BİLGİLENDİRME NOTU:</strong> <span id="legal-faiz-turu"></span>İşbu ödeme planı ve maliyet tablosu sadece bilgilendirme amaçlı olup, bankanın nihai kredi onayını, taahhüdünü veya resmi teklifini oluşturmaz. Hesaplamada kullanılan faiz, vergi (BSMV/KKDF), sigorta primleri ve fon oranları hesaplama tarihendeki mevzuata göre simüle edilmiş olup, kullanım tarihindeki piyasa koşullarına göre değişiklik gösterebilir. Nihai şartlar sözleşme aşamasında belirlenecektir.<br>
+            <strong>YASAL BİLGİLENDİRME NOTU:</strong> <span id="legal-faiz-turu"></span>İşbu ödeme planı ve maliyet tablosu sadece bilgilendirme amaçlı olup, bankanın nihai kredi onayını, taahhüdünü veya resmi teklifini oluşturmaz. Hesaplamada kullanılan faiz, vergi (BSMV/KKDF), sigorta primleri ve fon oranları hesaplama tarihendeki mevuzuata göre simüle edilmiş olup, kullanım tarihindeki piyasa koşullarına göre değişiklik gösterebilir. Nihai şartlar sözleşme aşamasında belirlenecektir.<br>
             <span id="print-date-field" style="display:inline-block; margin-top:5px; font-style:italic;"></span>
             
             <div class="print-signatures">
@@ -231,17 +238,13 @@
                 
                 const subInput = document.getElementById('subOran');
                 const baseSub = cfg[currentMode].sub;
-
-                // Sadece Traktör, Ekipman ve Sulama sekmelerinde çarpan hesaplaması yapılır
                 const isSpecialSubvMode = ['traktor', 'ekipman', 'modern_sulama'].includes(currentMode);
 
                 if (isSpecialSubvMode && baseSub > 0) {
                     let dynamicSub = isYerliMali ? baseSub : Math.max(0, baseSub - 25);
-                    
                     if (isGencCiftci) dynamicSub += 10;
                     if (isKadinCiftci) dynamicSub += 10;
-                    if (isKooperatif) dynamicSub += 10;
-
+                    if (isKooperatif) dynamicSub += 5;
                     subInput.value = Math.min(100, dynamicSub);
                 } else {
                     subInput.value = baseSub;
@@ -253,7 +256,6 @@
                 if(v) {
                     let numVal = parseInt(v);
                     const state = cfg[currentMode];
-                    
                     if(state.pro) {
                         const profVal = parseFloat(document.getElementById('proforma').value.replace(/\./g, "")) || 0;
                         const maxAllowed = Math.floor(profVal * state.pRate);
@@ -283,7 +285,6 @@
             syncInterest: function(triggerSource) {
                 const yillikInput = document.getElementById('faiz');
                 const aylikInput = document.getElementById('faiz-aylik');
-                
                 if (triggerSource === 'yillik') {
                     const yf = parseFloat(yillikInput.value) || 0;
                     aylikInput.value = (yf / 12).toFixed(2);
@@ -296,19 +297,16 @@
             getExtraCosts: function(tutar, vade = 1) {
                 const state = cfg[currentMode];
                 const komPct = state.kom || 0.5;
-                
                 let kaskoTemeli = tutar;
                 if(state.pro) {
                     const profVal = parseFloat(document.getElementById('proforma').value.replace(/\./g, "")) || 0;
                     if(profVal > 0) kaskoTemeli = profVal;
                 }
                 const kasko = kaskoTemeli * 0.02;
-                
                 const bazOran = 0.02; 
                 const artisMiktari = 0.0025; 
                 const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
                 const hayat = tutar * dinamikOran;
-
                 let tarsimUcreti = state.tarsim ? (tutar * 0.04) : 0;
                 const netKomisyon = tutar * (komPct/100);
                 const komisyonBrut = netKomisyon * 1.05; 
@@ -380,14 +378,16 @@
                     vades.forEach(v => {
                         const pEl = document.getElementById(`plan-${v}`); pEl.style.display = 'block';
                         const masrafVadeyeOzel = this.getExtraCosts(tutar, v);
-                        pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, bRate, kRate, v, 'Yıl', masrafVadeyeOzel);
+                        const vEfe = this.calcEfektif(tutar, yF, sub, bRate, kRate, v, 'Yıl', masrafVadeyeOzel.toplam);
+                        pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, bRate, kRate, v, 'Yıl', masrafVadeyeOzel, vEfe);
                     });
                 } else {
                     const v = parseInt(document.getElementById('vade-select').value);
                     const pEl = document.getElementById('plan-custom'); pEl.style.display = 'block';
                     document.getElementById('custom-title').innerText = `${v} Ay Vadeli Plan`;
                     const masrafAylik = this.getExtraCosts(tutar, 1);
-                    pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik);
+                    const vEfe = this.calcEfektif(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik.toplam);
+                    pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik, vEfe);
                 }
 
                 const legalFaizTuru = document.getElementById('legal-faiz-turu');
@@ -400,7 +400,8 @@
                 const now = new Date();
                 document.getElementById('print-date-field').innerText = `Teklif Hesaplama Tarihi: ${now.toLocaleDateString('tr-TR')} ${now.toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}`;
             },
-            drawTable: function(tutar, yF, sub, bRate, kRate, v, unit, masraf) {
+            drawTable: function(tutar, yF, sub, bRate, kRate, v, unit, masraf, planEfektif) {
+                const state = cfg[currentMode];
                 const faizOran = (unit === 'Yıl' ) ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
                 const maliyetOran = indirimliOran + (faizOran * bRate) + (indirimliOran * kRate);
@@ -409,7 +410,24 @@
                 lastPmtValue = Math.round(pmt);
                 lastTotalCost = Math.round(masraf.toplam);
 
-                let html = `<table><thead><tr><th>No</th><th>Ana Para</th><th>Faiz</th><th>İnd. Faiz</th><th>BSMV</th><th>KKDF</th><th>Taksit</th></tr></thead><tbody>`;
+                const indFaizYuzde = (yF * (1 - sub) * 100).toFixed(2);
+                const bsmvYuzde = (bRate * 100).toFixed(2);
+                const kkdfYuzde = (kRate * 100).toFixed(2);
+
+                // Sadeleştirilmiş Kredi Bilgileri Üst Kartı (Her vadeye özel dinamik basılır)
+                let html = `
+                <div class="print-summary-card">
+                    <div class="sc-item"><span class="sc-label">Kredi Türü</span><span class="sc-value">${state.label}</span></div>
+                    <div class="sc-item"><span class="sc-label">Kredi Tutarı</span><span class="sc-value">${Math.round(tutar).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="sc-item"><span class="sc-label">Vade / Periyot</span><span class="sc-value">${v} ${unit}</span></div>
+                    <div class="sc-item"><span class="sc-label">Yıllık Baz Faiz</span><span class="sc-value">%${(yF*100).toFixed(2)}</span></div>
+                    ${sub > 0 ? `<div class="sc-item"><span class="sc-label">Sübvansiyon / Faiz</span><span class="sc-value">%${(sub*100).toFixed(0)} (Net:%${indFaizYuzde})</span></div>` : ''}
+                    <div class="sc-item"><span class="sc-label">Vergiler</span><span class="sc-value">B:${Math.round(bsmvYuzde)} / K:${Math.round(kkdfYuzde)}</span></div>
+                    <div class="sc-item"><span class="sc-label">Dönem Taksiti</span><span class="sc-value" style="color:var(--dark); font-size:12px;">${Math.round(pmt).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="sc-item"><span class="sc-label">Efektif Faiz (Maliyetli)</span><span class="sc-value" style="color:var(--ticari);">%${planEfektif.toFixed(2)}</span></div>
+                </div>`;
+
+                html += `<table><thead><tr><th>No</th><th>Ana Para</th><th>Faiz</th><th>İnd. Faiz</th><th>BSMV</th><th>KKDF</th><th>Taksit</th></tr></thead><tbody>`;
                 let bal = tutar, tAP = 0, tBazF = 0, tIF = 0, tBS = 0, tKK = 0, tPMT = 0;
                 for(let i = 1; i <= v; i++) {
                     let bazF = bal * faizOran; 
@@ -463,15 +481,15 @@
                 if (isSpecialSubvMode) {
                     let appliedFeatures = [];
                     if(document.getElementById('yerliMaliCheck').checked) appliedFeatures.push("Yerli Malı Belgesi");
+                    if(document.getElementById('buyBackCheck').checked) appliedFeatures.push("Buy Back (Geri Alım Taahhütlü)");
                     if(document.getElementById('gencCiftciCheck').checked) appliedFeatures.push("Genç Çiftçi Teşviki (+%10)");
                     if(document.getElementById('kadinCiftciCheck').checked) appliedFeatures.push("Kadın Çiftçi Teşviki (+%10)");
-                    if(document.getElementById('kooperatifCheck').checked) appliedFeatures.push("Kooperatif Üyeliği (+%10)");
+                    if(document.getElementById('kooperatifCheck').checked) appliedFeatures.push("Krediyi Çeken Kooperatif (+%5)");
 
                     if(appliedFeatures.length > 0) msg += `🚜 *Uygulanan Kriterler:* ${appliedFeatures.join(', ')}\n`;
                     if(!document.getElementById('yerliMaliCheck').checked) msg += `⚠️ *Uyarı:* Yerli Malı Belgesi olmadığı için baz sübvansiyon %25 düşürülmüştür.\n`;
                     
                     msg += `📊 *Toplam Sübvansiyon Oranı:* %${document.getElementById('subOran').value}\n`;
-                    if(document.getElementById('buyBackCheck').checked) msg += `🔄 *Güvence:* Buy Back (Geri Alım Taahhütlü Sabit Faizli Kredi)\n\n`;
                 }
                 
                 msg += `_Bilgilendirme amaçlı oluşturulmuştur._`;
@@ -501,18 +519,16 @@
         document.getElementById('box-ihracat').style.display = (m === 'ticari_taksitli') ? 'flex' : 'none';
         document.getElementById('box-tutar').classList.remove('error');
 
-        // GÖRÜNÜRLÜK FİLTRESİ: Sadece traktör, ekipman ve modern_sulama sekmelerinde aktifleşir
         const isSpecialSubvMode = ['traktor', 'ekipman', 'modern_sulama'].includes(m);
         
         document.getElementById('box-yerlimali').style.display = isSpecialSubvMode ? 'flex' : 'none';
+        document.getElementById('box-buyback').style.display = isSpecialSubvMode ? 'flex' : 'none';
         document.getElementById('box-gencciftci').style.display = isSpecialSubvMode ? 'flex' : 'none';
         document.getElementById('box-kadinciftci').style.display = isSpecialSubvMode ? 'flex' : 'none';
         document.getElementById('box-kooperatif').style.display = isSpecialSubvMode ? 'flex' : 'none';
-        document.getElementById('box-buyback').style.display = isSpecialSubvMode ? 'flex' : 'none';
 
         document.getElementById('ihracatCheck').checked = false;
         
-        // Önemli seçimleri default set et
         document.getElementById('yerliMaliCheck').checked = true;
         document.getElementById('buyBackCheck').checked = true;
         document.getElementById('gencCiftciCheck').checked = false;
@@ -532,7 +548,6 @@
         }
         document.getElementById('faiz').value = s.faiz.toFixed(2);
         document.getElementById('faiz-aylik').value = (s.faiz / 12).toFixed(2);
-        
         document.getElementById('subOran').value = s.sub;
         
         Calculator.setTaxes(s.bsmv, s.kkdf);
