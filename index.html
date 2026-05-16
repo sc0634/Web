@@ -27,12 +27,15 @@
         
         .grid { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin-bottom: 15px; }
         .field { display: flex; flex-direction: column; gap: 3px; }
-        label { font-size: 10px; font-weight: 700; color: #666; }
-        input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
+        label { font-size: 10px; font-weight: 700; color: #666; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        input, select { height: 32px; padding: 0 4px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; text-align: center; }
         
-        .info-field { width: 100px; border-radius: 4px; padding: 2px 4px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 3px solid; }
+        /* Proforma ve Kredi hariç tüm alanların genişliğini label boyutuna (80px) eşitleyen standart kural */
+        .std-width { width: 80px; }
+        
+        .info-field { border-radius: 4px; padding: 2px 4px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 3px solid; }
         .info-field label { color: #ccc; font-size: 7.5px; margin-bottom: -1px; width: 100%; font-weight: 700; }
-        .info-field .rate-value { font-weight: 800; font-size: 12px; width: 100%; }
+        .info-field .rate-value { font-weight: 800; font-size: 11px; width: 100%; white-space: nowrap; }
         
         .subv-field { background: #16a085; color: white; border-left-color: #1abc9c; }
         .efektif-field { background: var(--dark); color: var(--gold); border-left-color: var(--gold); }
@@ -118,20 +121,20 @@
     <!-- Kredi Hesaplama Motoru Alanı -->
     <div id="calc-engine" class="no-print">
         <div class="grid">
-            <div class="field" id="box-proforma" style="width:110px;"><label>Proforma Tutarı</label><input type="text" id="proforma" oninput="Calculator.fmtProforma(this)"></div>
-            <div class="field" style="width:110px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="Calculator.fmtMoney(this)"></div>
-            <div class="field" style="width:55px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
-            <div class="field" style="width:55px;"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.01" oninput="Calculator.syncInterest('aylik')"></div>
-            <div class="field" id="box-vade" style="width:85px;"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
-            <div class="field" id="box-sub" style="width:45px;"><label>Sübv%</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
+            <div class="field" id="box-proforma" style="width:115px;"><label>Proforma Tutarı</label><input type="text" id="proforma" oninput="Calculator.fmtProforma(this)"></div>
+            <div class="field" style="width:115px;"><label>Kredi Tutarı</label><input type="text" id="tutar" oninput="Calculator.fmtMoney(this)"></div>
+            <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
+            <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.01" oninput="Calculator.syncInterest('aylik')"></div>
+            <div class="field std-width" id="box-vade"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
+            <div class="field std-width" id="box-sub"><label>Sübv%</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
             
-            <!-- Vergi Alanları -->
-            <div class="info-field tax-field"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
-            <div class="info-field tax-field"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
+            <!-- Vergi Alanları (80px Genişliğe Eşitlendi) -->
+            <div class="info-field tax-field std-width"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
+            <div class="info-field tax-field std-width"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
 
-            <!-- Faiz Gösterge Alanları -->
-            <div class="info-field subv-field"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
-            <div class="info-field efektif-field"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
+            <!-- Faiz Gösterge Alanları (80px Genişliğe Eşitlendi) -->
+            <div class="info-field subv-field std-width"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
+            <div class="info-field efektif-field std-width"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
         </div>
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" onclick="window.print()">YAZDIR / PDF KAYDET</button>
     </div>
@@ -156,7 +159,7 @@
                         <div class="data-dot dot-genel"></div>
                         <div class="data-info">
                             <strong>Yasal Vergilendirme Temelleri</strong>
-                            <p>Bireysel segmentlerde standart olarak %15 BSMV ve %15 KKDF uygulanırken, ticari ve tarımsal nitelikli kredilerde muafiyet durumlarına göre BSMV %5'e düşmekte, KKDF ise %0 olarak hesaplanmaktadır.</p>
+                            <p>Bireysel segmentlerde standart olarak %15 BSMV hivesi ve %15 KKDF uygulanırken, ticari ve tarımsal nitelikli kredilerde muafiyet durumlarına göre BSMV %5'e düşmekte, KKDF ise %0 olarak hesaplanmaktadır.</p>
                         </div>
                     </div>
                     <div class="data-item">
