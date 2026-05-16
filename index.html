@@ -30,9 +30,14 @@
         label { font-size: 9px; font-weight: 700; color: #666; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         input, select { height: 32px; padding: 0 2px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; outline: none; width: 100%; text-align: center; }
         
-        .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 8px; cursor: pointer; user-select: none; }
-        .cb-field input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: pointer; }
-        .cb-field label { font-size: 9px; font-weight: bold; color: var(--dark); cursor: pointer; }
+        /* Yenilenen Modern Toggle-Badge Buton Tasarımı */
+        .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; height: 32px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative; }
+        .cb-field input[type="checkbox"] { display: none; } /* Gizli checkbox */
+        .cb-field label { font-size: 9.5px; font-weight: bold; color: #555; cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; }
+        
+        /* Aktifleştiğinde Tarımsal Yeşiline Dönen Stil */
+        .cb-field.checked-active { background: var(--tarimsal); border-color: #27ae60; box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); }
+        .cb-field.checked-active label { color: white !important; }
 
         .slider-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
         .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
@@ -139,42 +144,41 @@
             <div class="field" id="box-proforma" style="width:115px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             <div class="field" style="width:115px;"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
             
-            <!-- Dinamik Checkbox Alanları -->
+            <!-- Yenilenen Akıllı / Buton Stil Checkbox Alanları -->
             <div class="field cb-width" id="box-yerli" style="display:none;">
                 <label>Yerli Malı</label>
-                <div class="cb-field">
+                <div class="cb-field" id="wrapper-yerli">
                     <input type="checkbox" id="cb-yerli">
-                    <label for="cb-yerli">Belgesi Var</label>
+                    <label for="cb-yerli">Yerli Malı Var</label>
                 </div>
             </div>
             <div class="field cb-width" id="box-buyback" style="display:none;">
                 <label>Buy Back</label>
-                <div class="cb-field">
+                <div class="cb-field" id="wrapper-buyback">
                     <input type="checkbox" id="cb-buyback">
                     <label for="cb-buyback">Taahhüt Var</label>
                 </div>
             </div>
 
-            <!-- Yeni Eklenen Tarımsal Kriter Alanları -->
             <div class="field cb-width" id="box-kadin" style="display:none;">
                 <label>Kadın Çiftçi</label>
-                <div class="cb-field">
+                <div class="cb-field" id="wrapper-kadin">
                     <input type="checkbox" id="cb-kadin">
-                    <label for="cb-kadin">Evet (+%5)</label>
+                    <label for="cb-kadin">Kadın Çiftçi (+5)</label>
                 </div>
             </div>
             <div class="field cb-width" id="box-genc" style="display:none;">
                 <label>Genç Çiftçi</label>
-                <div class="cb-field">
+                <div class="cb-field" id="wrapper-genc">
                     <input type="checkbox" id="cb-genc">
-                    <label for="cb-genc">Evet (+%5)</label>
+                    <label for="cb-genc">Genç Çiftçi (+5)</label>
                 </div>
             </div>
             <div class="field cb-width" id="box-koop" style="display:none;">
                 <label>Borçlu Kooperatif</label>
-                <div class="cb-field">
+                <div class="cb-field" id="wrapper-koop">
                     <input type="checkbox" id="cb-koop">
-                    <label for="cb-koop">Evet (+%5)</label>
+                    <label for="cb-koop">Borçlu Koop (+5)</label>
                 </div>
             </div>
 
@@ -314,6 +318,7 @@
         let currentBsmv = 0;
         let currentKkdf = 0;
         let currentSegment = 'tarimsal';
+        let isRecalculating = false; // Döngüsel tetiklenmeyi önleme kilidi
 
         const fn = {
             parseMoney: (val) => parseFloat(val.replace(/\./g, "")) || 0,
@@ -384,7 +389,6 @@
                     calculatedSub = cfg[currentMode].sub || 0;
                 }
                 
-                // Yeni kriterlerin %5 sübvansiyon artış etkileri
                 if (cfg[currentMode].viewTarKriter) {
                     if (isKadin) calculatedSub += 5;
                     if (isGenc) calculatedSub += 5;
@@ -392,7 +396,21 @@
                 }
 
                 if (calculatedSub > 100) calculatedSub = 100;
-                document.getElementById('subOran').value = calculatedSub;
+                
+                // Input değerini güvenli bir şekilde güncelle
+                const subInput = document.getElementById('subOran');
+                if(parseFloat(subInput.value) !== calculatedSub) {
+                    subInput.value = calculatedSub;
+                }
+            },
+            updateVisualState: function(checkboxId, wrapperId) {
+                const cb = document.getElementById(checkboxId);
+                const wrapper = document.getElementById(wrapperId);
+                if(cb.checked) {
+                    wrapper.classList.add('checked-active');
+                } else {
+                    wrapper.classList.remove('checked-active');
+                }
             }
         };
 
@@ -462,16 +480,26 @@
         };
 
         const coreCalculator = {
-            calculate: function() {
+            calculate: function(triggeredBySubInput = false) {
+                if (isRecalculating) return;
+                isRecalculating = true;
+
                 const state = cfg[currentMode];
                 const tutar = fn.parseMoney(document.getElementById('tutar').value);
-                if (!tutar) { document.getElementById('result-main-container').style.display = 'none'; return; }
+                if (!tutar) { 
+                    document.getElementById('result-main-container').style.display = 'none'; 
+                    isRecalculating = false;
+                    return; 
+                }
                 
                 const yF = parseFloat(document.getElementById('faiz').value) / 100;
                 
                 let sub = 0;
                 if (state.hasSubInput) {
-                    fn.updateSubventionByCheckboxes(); 
+                    // Eğer kullanıcı el ile subOran alanını değiştirmediyse checkbox kuralına göre güncelle
+                    if (!triggeredBySubInput) {
+                        fn.updateSubventionByCheckboxes();
+                    }
                     sub = (parseFloat(document.getElementById('subOran').value) || 0) / 100;
                     document.getElementById('box-subv-display').style.display = 'flex';
                     document.getElementById('subv-rate-display').innerText = `%${(yF * (1 - sub) * 100).toFixed(2)}`;
@@ -503,6 +531,8 @@
                 const masrafDinamik = fn.getCosts(tutar, repVade);
                 const efektif = fn.calcEfektif(tutar, yF, sub, bRate, kRate, repVade, state.unit, masrafDinamik.toplam);
                 document.getElementById('effective-rate-display').innerText = `%${efektif.toFixed(2)}`;
+
+                isRecalculating = false;
             }
         };
 
@@ -535,15 +565,30 @@
                 coreCalculator.calculate();
             });
 
-            document.getElementById('subOran').addEventListener('input', () => coreCalculator.calculate());
+            // Kullanıcı subOran alanını elle değiştirirse hesaplama tetiklenir ama checkboxlar ezilmez
+            document.getElementById('subOran').addEventListener('input', () => coreCalculator.calculate(true));
             
-            document.getElementById('cb-yerli').addEventListener('change', () => coreCalculator.calculate());
-            document.getElementById('cb-buyback').addEventListener('change', () => coreCalculator.calculate());
-            
-            // Yeni kriterler için event binding
-            document.getElementById('cb-kadin').addEventListener('change', () => coreCalculator.calculate());
-            document.getElementById('cb-genc').addEventListener('change', () => coreCalculator.calculate());
-            document.getElementById('cb-koop').addEventListener('change', () => coreCalculator.calculate());
+            // Modern Toggle Yapısı Değişim Eventleri ve Görsel Güncellemeleri
+            document.getElementById('cb-yerli').addEventListener('change', function() {
+                fn.updateVisualState('cb-yerli', 'wrapper-yerli');
+                coreCalculator.calculate();
+            });
+            document.getElementById('cb-buyback').addEventListener('change', function() {
+                fn.updateVisualState('cb-buyback', 'wrapper-buyback');
+                coreCalculator.calculate();
+            });
+            document.getElementById('cb-kadin').addEventListener('change', function() {
+                fn.updateVisualState('cb-kadin', 'wrapper-kadin');
+                coreCalculator.calculate();
+            });
+            document.getElementById('cb-genc').addEventListener('change', function() {
+                fn.updateVisualState('cb-genc', 'wrapper-genc');
+                coreCalculator.calculate();
+            });
+            document.getElementById('cb-koop').addEventListener('change', function() {
+                fn.updateVisualState('cb-koop', 'wrapper-koop');
+                coreCalculator.calculate();
+            });
 
             const slider = document.getElementById('vade-slider');
             slider.addEventListener('input', function() {
@@ -623,21 +668,21 @@
             
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
             
-            // Checkbox Görünürlük Kontrolleri
+            // Görünürlük Kontrolleri
             document.getElementById('box-yerli').style.display = s.viewYerli ? 'flex' : 'none';
             document.getElementById('box-buyback').style.display = s.viewBuyback ? 'flex' : 'none';
-            
-            // Tarımsal Kriter Alanları Görünürlüğü
             document.getElementById('box-kadin').style.display = s.viewTarKriter ? 'flex' : 'none';
             document.getElementById('box-genc').style.display = s.viewTarKriter ? 'flex' : 'none';
             document.getElementById('box-koop').style.display = s.viewTarKriter ? 'flex' : 'none';
             
-            // Checkbox durumlarını sıfırla
-            document.getElementById('cb-yerli').checked = false;
-            document.getElementById('cb-buyback').checked = false;
-            document.getElementById('cb-kadin').checked = false;
-            document.getElementById('cb-genc').checked = false;
-            document.getElementById('cb-koop').checked = false;
+            // Durum ve Stil Sıfırlama
+            const checkboxes = ['cb-yerli', 'cb-buyback', 'cb-kadin', 'cb-genc', 'cb-koop'];
+            const wrappers = ['wrapper-yerli', 'wrapper-buyback', 'wrapper-kadin', 'wrapper-genc', 'wrapper-koop'];
+            
+            checkboxes.forEach((id, index) => {
+                document.getElementById(id).checked = false;
+                document.getElementById(wrappers[index]).classList.remove('checked-active');
+            });
 
             if (s.hasSubInput) {
                 document.getElementById('box-sub').style.display = 'flex';
