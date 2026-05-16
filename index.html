@@ -142,7 +142,7 @@
     </div>
 
     <div id="calc-engine" class="no-print">
-        <div class="grid">
+        <div class="grid" id="main-grid-container">
             <div class="field" id="box-proforma" style="width:115px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             <div class="field" style="width:115px;"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
             <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
@@ -214,7 +214,7 @@
             <div class="info-field tax-field std-width"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
             <div class="info-field tax-field std-width"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
             <div class="info-field subv-field std-width" id="box-subv-display"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
-            <div class="info-field efektif-field std-width"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
+            <div class="info-field efektif-field std-width" id="box-efektif-display"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
         </div>
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" id="btn-global-print">YAZDIR / PDF KAYDET</button>
     </div>
@@ -245,7 +245,7 @@
                         <div class="data-dot dot-genel"></div>
                         <div class="data-info">
                             <strong>Sübvansiyonlu Kredi Politikaları</strong>
-                            <p>Tarımsal alt segmentlerde (Traktör, Modern Sulama, Ekipman) devlet destekli sübvansiyon oranları dinamik olarak yansıtılmakta; Kadın, Genç ve Borçlu Kooperatif statülerine göre ekstra sübvansiyonlar uygulanabilmektedir.</p>
+                            <p>Tarımsal alt segmentlerde (Traktör, Modern Sulama, Ekipman) devlet destekli sübvansiyon oranları dinamik olarak yansıtılmakta; Kadın, Genç og Borçlu Kooperatif statülerine göre ekstra sübvansiyonlar uygulanabilmektedir.</p>
                         </div>
                     </div>
                 </div>
@@ -272,7 +272,7 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Finansal Teknolojiler ve Bankacılık İnovasyonları</strong>
-                            <p>Kredi risk analiz motorları, faiz/sübvansiyon optimizasyon algoritmaları, vadesiz hesap nakit akış mantıkları (KMH faizsiz dönem optimizasyonları) ve bankacılık ürün verimliliği üzerine uçtan uca mimari tasarımlar.</p>
+                            <p>Kredi risk analiz motorları, faiz/sübvansiyon optimizasyon algoritmaları, vadesiz hesap nakit akış mantıkları (KMH faizsiz dönem optimizasyonları) og bankacılık ürün verimliliği üzerine uçtan uca mimari tasarımlar.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -697,8 +697,13 @@
             }
 
             const boxVade = document.getElementById('box-vade');
+            const gridContainer = document.getElementById('main-grid-container');
+            
             if (currentSegment === 'bireysel') {
                 boxVade.style.display = 'flex';
+                // Slider'ı efektif faiz kutusundan (box-efektif-display) sonra gelecek şekilde DOM'da en sona taşı
+                gridContainer.appendChild(boxVade);
+                
                 const slider = document.getElementById('vade-slider');
                 slider.min = s.minVade || 1;
                 slider.max = s.maxVade || 12;
@@ -707,6 +712,10 @@
                 document.getElementById('vade-val-lbl').innerText = slider.value + " Ay";
             } else if (s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
+                // Tarımsal/Ticari için slider'ı orijinal (Yıllık % kutusundan sonraki) konumuna geri al
+                const boxFaiz = document.getElementById('faiz').parentNode;
+                boxFaiz.parentNode.insertBefore(boxVade, boxFaiz.nextSibling);
+                
                 const slider = document.getElementById('vade-slider');
                 slider.min = 1;
                 slider.max = s.maxVade || 60;
