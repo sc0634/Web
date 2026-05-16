@@ -32,10 +32,9 @@
         
         /* Yenilenen Modern Toggle-Badge Buton Tasarımı */
         .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; height: 32px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative; }
-        .cb-field input[type="checkbox"] { display: none; } /* Gizli checkbox */
+        .cb-field input[type="checkbox"] { display: none; } 
         .cb-field label { font-size: 9.5px; font-weight: bold; color: #555; cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; }
         
-        /* Aktifleştiğinde Tarımsal Yeşiline Dönen Stil */
         .cb-field.checked-active { background: var(--tarimsal); border-color: #27ae60; box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); }
         .cb-field.checked-active label { color: white !important; }
 
@@ -143,8 +142,24 @@
         <div class="grid">
             <div class="field" id="box-proforma" style="width:115px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             <div class="field" style="width:115px;"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
+            <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
+            <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01"></div>
             
-            <!-- Yenilenen Akıllı / Buton Stil Checkbox Alanları -->
+            <div class="field range-width" id="box-vade">
+                <label>Vade Seçimi</label>
+                <div class="slider-container">
+                    <input type="range" id="vade-slider" min="1" max="60" value="12">
+                    <div class="vade-label-box">
+                        <span id="vade-min-lbl">1 Ay</span>
+                        <span id="vade-val-lbl" style="color:var(--danger); font-weight:800;">12 Ay</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sübv Oran Alanı -->
+            <div class="field std-width" id="box-sub"><label>Sübv%</label><input type="number" id="subOran"></div>
+            
+            <!-- Checkbox Butonları (Sübv% alanından sonraya alındı) -->
             <div class="field cb-width" id="box-yerli" style="display:none;">
                 <label>Yerli Malı</label>
                 <div class="cb-field" id="wrapper-yerli">
@@ -159,7 +174,6 @@
                     <label for="cb-buyback">Taahhüt Var</label>
                 </div>
             </div>
-
             <div class="field cb-width" id="box-kadin" style="display:none;">
                 <label>Kadın Çiftçi</label>
                 <div class="cb-field" id="wrapper-kadin">
@@ -181,26 +195,10 @@
                     <label for="cb-koop">Borçlu Koop (+5)</label>
                 </div>
             </div>
-
-            <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
-            <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01"></div>
             
-            <div class="field range-width" id="box-vade">
-                <label>Vade Seçimi</label>
-                <div class="slider-container">
-                    <input type="range" id="vade-slider" min="1" max="60" value="12">
-                    <div class="vade-label-box">
-                        <span id="vade-min-lbl">1 Ay</span>
-                        <span id="vade-val-lbl" style="color:var(--danger); font-weight:800;">12 Ay</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="field std-width" id="box-sub"><label>Sübv%</label><input type="number" id="subOran"></div>
-            
+            <!-- Bilgi Gösterge ve Vergi Alanları -->
             <div class="info-field tax-field std-width"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
             <div class="info-field tax-field std-width"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
-
             <div class="info-field subv-field std-width" id="box-subv-display"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field std-width"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
         </div>
@@ -267,7 +265,7 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması og operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -318,7 +316,7 @@
         let currentBsmv = 0;
         let currentKkdf = 0;
         let currentSegment = 'tarimsal';
-        let isRecalculating = false; // Döngüsel tetiklenmeyi önleme kilidi
+        let isRecalculating = false; 
 
         const fn = {
             parseMoney: (val) => parseFloat(val.replace(/\./g, "")) || 0,
@@ -397,7 +395,6 @@
 
                 if (calculatedSub > 100) calculatedSub = 100;
                 
-                // Input değerini güvenli bir şekilde güncelle
                 const subInput = document.getElementById('subOran');
                 if(parseFloat(subInput.value) !== calculatedSub) {
                     subInput.value = calculatedSub;
@@ -496,7 +493,6 @@
                 
                 let sub = 0;
                 if (state.hasSubInput) {
-                    // Eğer kullanıcı el ile subOran alanını değiştirmediyse checkbox kuralına göre güncelle
                     if (!triggeredBySubInput) {
                         fn.updateSubventionByCheckboxes();
                     }
@@ -565,10 +561,8 @@
                 coreCalculator.calculate();
             });
 
-            // Kullanıcı subOran alanını elle değiştirirse hesaplama tetiklenir ama checkboxlar ezilmez
             document.getElementById('subOran').addEventListener('input', () => coreCalculator.calculate(true));
             
-            // Modern Toggle Yapısı Değişim Eventleri ve Görsel Güncellemeleri
             document.getElementById('cb-yerli').addEventListener('change', function() {
                 fn.updateVisualState('cb-yerli', 'wrapper-yerli');
                 coreCalculator.calculate();
@@ -668,14 +662,12 @@
             
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
             
-            // Görünürlük Kontrolleri
             document.getElementById('box-yerli').style.display = s.viewYerli ? 'flex' : 'none';
             document.getElementById('box-buyback').style.display = s.viewBuyback ? 'flex' : 'none';
             document.getElementById('box-kadin').style.display = s.viewTarKriter ? 'flex' : 'none';
             document.getElementById('box-genc').style.display = s.viewTarKriter ? 'flex' : 'none';
             document.getElementById('box-koop').style.display = s.viewTarKriter ? 'flex' : 'none';
             
-            // Durum ve Stil Sıfırlama
             const checkboxes = ['cb-yerli', 'cb-buyback', 'cb-kadin', 'cb-genc', 'cb-koop'];
             const wrappers = ['wrapper-yerli', 'wrapper-buyback', 'wrapper-kadin', 'wrapper-genc', 'wrapper-koop'];
             
