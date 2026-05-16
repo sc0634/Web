@@ -30,6 +30,11 @@
         label { font-size: 10px; font-weight: 700; color: #666; }
         input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
         
+        /* Slider Özel Tasarımı */
+        .vade-slider-container { display: flex; align-items: center; gap: 8px; height: 32px; width: 100%; }
+        .vade-slider-container input[type="range"] { flex: 1; height: 6px; cursor: pointer; accent-color: var(--dark); }
+        .vade-val-badge { background: var(--dark); color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; min-width: 50px; text-align: center; }
+
         .field.error input { border-color: var(--danger); background-color: #fdf2f2; color: var(--danger); }
         .error-msg { display: none; color: var(--danger); font-size: 8px; font-weight: bold; margin-top: 1px; position: absolute; bottom: -12px; left: 0; width: 150px; }
         .field.error .error-msg { display: block; }
@@ -136,7 +141,16 @@
             </div>
             <div class="field" style="width:55px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
             <div class="field" style="width:55px;"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.01" oninput="Calculator.syncInterest('aylik')"></div>
-            <div class="field" id="box-vade" style="width:85px;"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
+            
+            <!-- Seçim kutusu yerine eklenen yeni slider alanı -->
+            <div class="field" id="box-vade" style="width:180px;">
+                <label>Vade Seçimi</label>
+                <div class="vade-slider-container">
+                    <input type="range" id="vade-slider" min="1" max="36" value="12" oninput="Calculator.updateSliderLabel(this.value)">
+                    <span class="vade-val-badge" id="vade-slider-badge">12 Ay</span>
+                </div>
+            </div>
+
             <div class="field" id="box-sub" style="width:45px;"><label>Sübv%</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
             
             <div class="checkbox-field" id="box-ihracat">
@@ -266,10 +280,10 @@
             modern_sulama: { label: "Tarımsal (Modern Sulama)", faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, kom: 1.0, unit: 'Yıl', pro: true, pRate: 1.0, tarsim: true },
             ekipman: { label: "Tarımsal (Ekipman)", faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', pro: true, pRate: 0.75, tarsim: true },
             zirai: { label: "Çiftçi Taksitli", faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', pro: false, tarsim: false },
-            ticari_taksitli: { label: "Ticari Taksitli", faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, unit: 'Ay', pro: false, tarsim: false },
-            konut: { label: "Bireysel Konut", faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, unit: 'Ay', pro: false, tarsim: false },
-            tasit: { label: "Bireysel Taşıt", faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 48, unit: 'Ay', pro: false, tarsim: false },
-            ihtiyac: { label: "Bireysel İhtiyaç", faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 24, unit: 'Ay', pro: false, tarsim: false }
+            ticari_taksitli: { label: "Ticari Taksitli", faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, minVade: 1, maxVade: 60, unit: 'Ay', pro: false, tarsim: false },
+            konut: { label: "Bireysel Konut", faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 12, minVade: 1, maxVade: 36, unit: 'Ay', pro: false, tarsim: false },
+            tasit: { label: "Bireysel Taşıt", faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, minVade: 1, maxVade: 36, unit: 'Ay', pro: false, tarsim: false },
+            ihtiyac: { label: "Bireysel İhtiyaç", faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, minVade: 1, maxVade: 36, unit: 'Ay', pro: false, tarsim: false }
         };
         let currentMode = 'traktor';
         let currentBsmv = 0;
@@ -282,6 +296,10 @@
             getState: m => cfg[m],
             setTaxes: (b, k) => { currentBsmv = b; currentKkdf = k; },
             autoCalc: function() { this.calculate(); },
+            updateSliderLabel: function(val) {
+                document.getElementById('vade-slider-badge').innerText = val + " Ay";
+                this.autoCalc();
+            },
             toggleIhracat: function() {
                 const isChecked = document.getElementById('ihracatCheck').checked;
                 currentBsmv = isChecked ? 0 : cfg[currentMode].bsmv;
@@ -424,7 +442,7 @@
                 const kRate = currentKkdf / 100;
 
                 const masrafVarsayilan = this.getExtraCosts(tutar, 5);
-                const repVade = (state.unit === 'Yıl') ? 5 : parseInt(document.getElementById('vade-select').value || 12);
+                const repVade = (state.unit === 'Yıl') ? 5 : parseInt(document.getElementById('vade-slider').value || 12);
                 const efektif = this.calcEfektif(tutar, yF, sub, bRate, kRate, repVade, state.unit, masrafVarsayilan.toplam);
                 document.getElementById('effective-rate-display').innerText = `%${efektif.toFixed(2)}`;
                 
@@ -440,11 +458,11 @@
                         pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, sub, bRate, kRate, v, 'Yıl', masrafVadeyeOzel, vEfe);
                     });
                 } else {
-                    const v = parseInt(document.getElementById('vade-select').value);
+                    const v = parseInt(document.getElementById('vade-slider').value);
                     const pEl = document.getElementById('plan-custom'); pEl.style.display = 'block';
                     document.getElementById('custom-title').innerText = `${v} Ay Vadeli Plan`;
                     const masrafAylik = this.getExtraCosts(tutar, 1);
-                    const vEfe = this.calcEfektif(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik.toplam);
+                    const vEfe = this.calcEfektif(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik.topham);
                     pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik, vEfe);
                 }
 
@@ -531,7 +549,7 @@
                 const state = cfg[currentMode];
                 const tutarStr = document.getElementById('tutar').value;
                 const efektifStr = document.getElementById('effective-rate-display').innerText;
-                const vadeStr = state.unit === 'Yıl' ? "Yıllık (En Uzun Plan)" : document.getElementById('vade-select').value + " Ay";
+                const vadeStr = state.unit === 'Yıl' ? "Yıllık (En Uzun Plan)" : document.getElementById('vade-slider').value + " Ay";
                 
                 let msg = `📌 *KREDİ TEKLİF ÖZETİ*\n\n`;
                 msg += `🗂️ *Segment:* ${state.label}\n`;
@@ -586,6 +604,15 @@
         document.getElementById('box-ihracat').style.display = (m === 'ticari_taksitli') ? 'flex' : 'none';
         document.getElementById('box-tutar').classList.remove('error');
 
+        // Segment limit ve kurallarına göre slider'ı güncelle
+        if(s.unit === 'Ay') {
+            const slider = document.getElementById('vade-slider');
+            slider.min = s.minVade || 1;
+            slider.max = s.maxVade || 36;
+            slider.value = s.defVade || 12;
+            document.getElementById('vade-slider-badge').innerText = slider.value + " Ay";
+        }
+
         const isSpecialSubvMode = ['traktor', 'ekipman', 'modern_sulama'].includes(m);
         
         document.getElementById('box-yerlimali').style.display = isSpecialSubvMode ? 'flex' : 'none';
@@ -608,11 +635,6 @@
             document.getElementById('tutar').value = "1.000.000";
         }
         
-        if(s.unit === 'Ay') {
-            const vSel = document.getElementById('vade-select'); vSel.innerHTML = '';
-            const vades = m === 'konut' ? [12,24,36,48,60,72,84,96,108,120] : [12,24,36,48,60];
-            vades.forEach(v => { let o = document.createElement('option'); o.value = v; o.text = v + " Ay"; if(v===s.defVade) o.selected=true; vSel.appendChild(o); });
-        }
         document.getElementById('faiz').value = s.faiz.toFixed(2);
         document.getElementById('faiz-aylik').value = (s.faiz / 12).toFixed(2);
         document.getElementById('subOran').value = s.sub;
