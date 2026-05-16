@@ -30,12 +30,10 @@
         label { font-size: 9px; font-weight: 700; color: #666; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         input, select { height: 32px; padding: 0 2px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; outline: none; width: 100%; text-align: center; }
         
-        /* Checkbox Özel Alan Stilleri */
-        .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 8px; cursor: pointer; unselectable: none; }
+        .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 8px; cursor: pointer; user-select: none; }
         .cb-field input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: pointer; }
         .cb-field label { font-size: 9px; font-weight: bold; color: var(--dark); cursor: pointer; }
 
-        /* Slider özel stili */
         .slider-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
         .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
         .vade-label-box { display: flex; justify-content: space-between; width: 100%; font-size: 8px; font-weight: bold; color: var(--dark); margin-top: -2px; }
@@ -111,7 +109,6 @@
 <body>
 
 <div class="container">
-    <!-- Ana Segment Navigasyonu -->
     <div class="segment-nav no-print">
         <button id="seg-tar" class="seg-btn bg-tar">TARIMSAL</button>
         <button id="seg-tic" class="seg-btn bg-tic">TİCARİ</button>
@@ -120,7 +117,6 @@
         <button id="seg-mim" class="seg-btn bg-mim">HAKKIMDA</button>
     </div>
 
-    <!-- Tarımsal Sekmeler -->
     <div class="tabs no-print" id="tabs-tarimsal">
         <button class="tab-btn" data-mode="traktor">Traktör</button>
         <button class="tab-btn" data-mode="modern_sulama">Modern Sulama</button>
@@ -128,25 +124,22 @@
         <button class="tab-btn" data-mode="zirai">Çiftçi Taksitli</button>
     </div>
 
-    <!-- Ticari Sekmeler -->
     <div class="tabs no-print" id="tabs-ticari">
         <button class="tab-btn" data-mode="ticari_taksitli">Ticari Taksitli</button>
     </div>
 
-    <!-- Bireysel Sekmeler -->
     <div class="tabs no-print" id="tabs-bireysel">
         <button class="tab-btn" data-mode="ihtiyac">İhtiyaç</button>
         <button class="tab-btn" data-mode="tasit">Taşıt</button>
         <button class="tab-btn" data-mode="konut">Konut</button>
     </div>
 
-    <!-- Kredi Hesaplama Motoru Alanı -->
     <div id="calc-engine" class="no-print">
         <div class="grid">
             <div class="field" id="box-proforma" style="width:115px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             <div class="field" style="width:115px;"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
             
-            <!-- Geri Getirilen Dinamik Checkbox Alanları -->
+            <!-- Dinamik Checkbox Alanları -->
             <div class="field cb-width" id="box-yerli" style="display:none;">
                 <label>Yerli Malı</label>
                 <div class="cb-field">
@@ -162,10 +155,32 @@
                 </div>
             </div>
 
+            <!-- Yeni Eklenen Tarımsal Kriter Alanları -->
+            <div class="field cb-width" id="box-kadin" style="display:none;">
+                <label>Kadın Çiftçi</label>
+                <div class="cb-field">
+                    <input type="checkbox" id="cb-kadin">
+                    <label for="cb-kadin">Evet (+%5)</label>
+                </div>
+            </div>
+            <div class="field cb-width" id="box-genc" style="display:none;">
+                <label>Genç Çiftçi</label>
+                <div class="cb-field">
+                    <input type="checkbox" id="cb-genc">
+                    <label for="cb-genc">Evet (+%5)</label>
+                </div>
+            </div>
+            <div class="field cb-width" id="box-koop" style="display:none;">
+                <label>Borçlu Kooperatif</label>
+                <div class="cb-field">
+                    <input type="checkbox" id="cb-koop">
+                    <label for="cb-koop">Evet (+%5)</label>
+                </div>
+            </div>
+
             <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
             <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01"></div>
             
-            <!-- Vade Slider Alanı -->
             <div class="field range-width" id="box-vade">
                 <label>Vade Seçimi</label>
                 <div class="slider-container">
@@ -177,21 +192,17 @@
                 </div>
             </div>
 
-            <!-- Sübvansiyon Alanı -->
             <div class="field std-width" id="box-sub"><label>Sübv%</label><input type="number" id="subOran"></div>
             
-            <!-- Vergi Alanları -->
             <div class="info-field tax-field std-width"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
             <div class="info-field tax-field std-width"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
 
-            <!-- Faiz Gösterge Alanları -->
             <div class="info-field subv-field std-width" id="box-subv-display"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field std-width"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
         </div>
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" id="btn-global-print">YAZDIR / PDF KAYDET</button>
     </div>
 
-    <!-- GENEL VERİLER Sekmesi İçeriği -->
     <div id="genel-section" class="info-section">
         <div class="info-content">
             <div class="info-grid">
@@ -218,7 +229,7 @@
                         <div class="data-dot dot-genel"></div>
                         <div class="data-info">
                             <strong>Sübvansiyonlu Kredi Politikaları</strong>
-                            <p>Tarımsal alt segmentlerde (Traktör, Modern Sulama, Ekipman) devlet destekli sübvansiyon oranları dinamik olarak yansıtılmakta; Modern Sulama alanında %100'e varan sübvansiyon desteği baz alınmaktadır.</p>
+                            <p>Tarımsal alt segmentlerde (Traktör, Modern Sulama, Ekipman) devlet destekli sübvansiyon oranları dinamik olarak yansıtılmakta; Kadın, Genç ve Borçlu Kooperatif statülerine göre ekstra sübvansiyonlar uygulanabilmektedir.</p>
                         </div>
                     </div>
                 </div>
@@ -226,7 +237,6 @@
         </div>
     </div>
 
-    <!-- HAKKIMDA Sekmesi İçeriği -->
     <div id="about-section" class="info-section">
         <div class="info-content">
             <div class="info-grid">
@@ -253,7 +263,7 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlere entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -268,7 +278,6 @@
         </div>
     </div>
 
-    <!-- Sonuç Tablo Alanları -->
     <div id="result-main-container" class="result-main-container">
         <div id="plan-5" class="plan-wrapper"></div>
         <div id="plan-4" class="plan-wrapper"></div>
@@ -279,7 +288,6 @@
     </div>
 </div>
 
-<!-- WhatsApp Sabit Genel Buton -->
 <a href="javascript:void(0)" id="whatsapp-fixed-btn" class="whatsapp-fixed no-print">
     <svg viewBox="0 0 32 32" style="width:30px; height:30px; fill:white;"><path d="M16 0c-8.837 0-16 7.163-16 16 0 2.825 0.733 5.476 2.016 7.781l-2.016 7.219 7.426-1.948c2.152 1.137 4.596 1.748 7.174 1.748 8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 29.333c-2.316 0-4.515-0.613-6.435-1.776l-0.461-0.279-4.309 1.13 1.151-4.116-0.306-0.487c-1.285-2.039-1.966-4.409-1.966-6.805 0-7.353 5.98-13.333 13.333-13.333s13.333 5.98 13.333 13.333z"></path></svg>
 </a>
@@ -292,14 +300,14 @@
         const DEFAULT_BIREYSEL_KREDI = "100.000";
         
         const cfg = {
-            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, hasExtraCb: true },
-            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, hasExtraCb: false },
-            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, hasExtraCb: true },
-            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, hasExtraCb: false },
-            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, hasExtraCb: false },
-            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 124, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, hasExtraCb: false },
-            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, hasExtraCb: false },
-            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, hasExtraCb: false }
+            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true },
+            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true },
+            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true },
+            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 124, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false }
         };
         
         let currentMode = 'traktor';
@@ -355,24 +363,34 @@
                 }
                 return (Math.pow(1 + r, (unit === 'Yıl' ? 1 : 12)) - 1) * 100;
             },
-            // Checkbox durumlarına göre dinamik sübvansiyon hesaplayıcı fonksiyon
             updateSubventionByCheckboxes: function() {
-                const state = cfg[currentMode];
-                if (!state.hasExtraCb) return;
-
                 const isYerli = document.getElementById('cb-yerli').checked;
-                const isBuyback = document.getElementById('cb-buyback').checked;
+                const isKadin = document.getElementById('cb-kadin').checked;
+                const isGenc = document.getElementById('cb-genc').checked;
+                const isKoop = document.getElementById('cb-koop').checked;
                 
                 let calculatedSub = 0;
+                
                 if (currentMode === 'traktor') {
-                    calculatedSub = 50;
+                    calculatedSub = 25; 
+                    if (isYerli) calculatedSub += 25; 
+                } else if (currentMode === 'modern_sulama') {
+                    calculatedSub = 75; 
                     if (isYerli) calculatedSub += 25;
-                    if (isBuyback) calculatedSub += 25;
                 } else if (currentMode === 'ekipman') {
-                    calculatedSub = 75;
-                    if (isYerli || isBuyback) calculatedSub = 100; // Ekipmanda herhangi biri %100 yapar
+                    calculatedSub = 50; 
+                    if (isYerli) calculatedSub += 25;
+                } else {
+                    calculatedSub = cfg[currentMode].sub || 0;
                 }
                 
+                // Yeni kriterlerin %5 sübvansiyon artış etkileri
+                if (cfg[currentMode].viewTarKriter) {
+                    if (isKadin) calculatedSub += 5;
+                    if (isGenc) calculatedSub += 5;
+                    if (isKoop) calculatedSub += 5;
+                }
+
                 if (calculatedSub > 100) calculatedSub = 100;
                 document.getElementById('subOran').value = calculatedSub;
             }
@@ -385,7 +403,17 @@
                 const maliyetOran = indirimliOran + (indirimliOran * bRate) + (indirimliOran * kRate);
                 let pmt = (maliyetOran === 0) ? (tutar / v) : (tutar * maliyetOran * Math.pow(1+maliyetOran, v)) / (Math.pow(1+maliyetOran, v)-1);
                 
-                const dinamikBaslik = `${vadeText} ${periodText} Kredİ Ödeme Planı`;
+                let dinamikBaslik = "";
+                if (unit === 'Yıl') {
+                    const isBuybackChecked = document.getElementById('cb-buyback').checked;
+                    if (isBuybackChecked) {
+                        dinamikBaslik = `${v} YIL VADELİ SABİT FAİZLİ YILDA BİR ÖDEMELİ KREDİ ÖDEME PLANI`;
+                    } else {
+                        dinamikBaslik = `${v} YIL VADELİ DEĞİŞKEN FAİZLİ YILDA BİR ÖDEMELİ ÖDEME PLANI`;
+                    }
+                } else {
+                    dinamikBaslik = `${vadeText} ${periodText} Kredİ Ödeme Planı`;
+                }
 
                 let html = `<div class="result-header">
                     <span class="result-title">${dinamikBaslik}</span>
@@ -443,7 +471,7 @@
                 
                 let sub = 0;
                 if (state.hasSubInput) {
-                    fn.updateSubventionByCheckboxes(); // Checkbox durumuna göre inputu otomatik güncelle
+                    fn.updateSubventionByCheckboxes(); 
                     sub = (parseFloat(document.getElementById('subOran').value) || 0) / 100;
                     document.getElementById('box-subv-display').style.display = 'flex';
                     document.getElementById('subv-rate-display').innerText = `%${(yF * (1 - sub) * 100).toFixed(2)}`;
@@ -473,7 +501,7 @@
 
                 const repVade = (state.unit === 'Yıl') ? 5 : parseInt(document.getElementById('vade-slider').value);
                 const masrafDinamik = fn.getCosts(tutar, repVade);
-                const efektif = fn.calcEfektif(tutar, yF, sub, bRate, kRate, repVade, state.unit, masrafDinamik.topham || masrafDinamik.toplam);
+                const efektif = fn.calcEfektif(tutar, yF, sub, bRate, kRate, repVade, state.unit, masrafDinamik.toplam);
                 document.getElementById('effective-rate-display').innerText = `%${efektif.toFixed(2)}`;
             }
         };
@@ -509,9 +537,13 @@
 
             document.getElementById('subOran').addEventListener('input', () => coreCalculator.calculate());
             
-            // Checkbox event dinleyicileri
             document.getElementById('cb-yerli').addEventListener('change', () => coreCalculator.calculate());
             document.getElementById('cb-buyback').addEventListener('change', () => coreCalculator.calculate());
+            
+            // Yeni kriterler için event binding
+            document.getElementById('cb-kadin').addEventListener('change', () => coreCalculator.calculate());
+            document.getElementById('cb-genc').addEventListener('change', () => coreCalculator.calculate());
+            document.getElementById('cb-koop').addEventListener('change', () => coreCalculator.calculate());
 
             const slider = document.getElementById('vade-slider');
             slider.addEventListener('input', function() {
@@ -591,16 +623,21 @@
             
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
             
-            // Checkbox görünürlük kontrolü
-            if (s.hasExtraCb) {
-                document.getElementById('box-yerli').style.display = 'flex';
-                document.getElementById('box-buyback').style.display = 'flex';
-            } else {
-                document.getElementById('box-yerli').style.display = 'none';
-                document.getElementById('box-buyback').style.display = 'none';
-                document.getElementById('cb-yerli').checked = false;
-                document.getElementById('cb-buyback').checked = false;
-            }
+            // Checkbox Görünürlük Kontrolleri
+            document.getElementById('box-yerli').style.display = s.viewYerli ? 'flex' : 'none';
+            document.getElementById('box-buyback').style.display = s.viewBuyback ? 'flex' : 'none';
+            
+            // Tarımsal Kriter Alanları Görünürlüğü
+            document.getElementById('box-kadin').style.display = s.viewTarKriter ? 'flex' : 'none';
+            document.getElementById('box-genc').style.display = s.viewTarKriter ? 'flex' : 'none';
+            document.getElementById('box-koop').style.display = s.viewTarKriter ? 'flex' : 'none';
+            
+            // Checkbox durumlarını sıfırla
+            document.getElementById('cb-yerli').checked = false;
+            document.getElementById('cb-buyback').checked = false;
+            document.getElementById('cb-kadin').checked = false;
+            document.getElementById('cb-genc').checked = false;
+            document.getElementById('cb-koop').checked = false;
 
             if (s.hasSubInput) {
                 document.getElementById('box-sub').style.display = 'flex';
