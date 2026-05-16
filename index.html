@@ -51,7 +51,12 @@
         .result-header { background: var(--dark); color: white; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
         .result-title { font-weight: bold; font-size: 12px; }
         
-        /* Sadeleştirilmiş Üst Kredi Bilgileri Kartı */
+        .header-actions { display: flex; gap: 6px; align-items: center; }
+        .action-btn { border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 3px; }
+        .btn-print-single { background: #ffffff; color: var(--dark); }
+        .btn-pdf-single { background: #3498db; color: white; }
+        .action-btn:hover { transform: scale(1.05); opacity: 0.9; }
+        
         .print-summary-card { background: #f8f9fa; border-bottom: 1px solid var(--border); padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; }
         .sc-item { display: flex; flex-direction: column; min-width: 110px; }
         .sc-label { font-size: 8px; font-weight: bold; color: #7f8c8d; text-transform: uppercase; margin-bottom: 2px; }
@@ -77,12 +82,16 @@
         .print-signatures { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 20px; }
         .signature-box { text-align: center; width: 150px; border-top: 1px solid #333; padding-top: 5px; font-weight: bold; font-size: 10px; }
 
+        body.single-print-active .container > *:not(#result-main-container) { display: none !important; }
+        body.single-print-active .plan-wrapper { display: none !important; }
+        body.single-print-active .plan-wrapper.print-target { display: block !important; border: 1px solid #333; }
+
         @media print { 
             .no-print { display: none !important; } 
             .container { box-shadow: none; max-width: 100%; padding: 0; }
             body { background: white; padding: 0; }
-            .plan-wrapper { border: 1px solid #333; page-break-inside: avoid; page-break-after: always; }
-            .plan-wrapper:last-child { page-break-after: avoid; }
+            body:not(.single-print-active) .plan-wrapper { border: 1px solid #333; page-break-inside: avoid; page-break-after: always; }
+            body:not(.single-print-active) .plan-wrapper:last-child { page-break-after: avoid; }
             .result-header { background: #333 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-legal-band { display: block; }
         }
@@ -141,46 +150,95 @@
             <div class="info-field subv-field"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
 
-            <!-- Yerli Malı Belgesi Checkbox -->
             <div class="checkbox-field" id="box-yerlimali">
                 <input type="checkbox" id="yerliMaliCheck" onchange="Calculator.handleSubvModifiers()">
                 <label for="yerliMaliCheck">🚜 Yerli Malı Belgesi</label>
             </div>
 
-            <!-- Buy Back Checkbox -->
             <div class="checkbox-field" id="box-buyback">
                 <input type="checkbox" id="buyBackCheck" onchange="Calculator.autoCalc()">
                 <label for="buyBackCheck">🔄 Buy Back (Sabit Faizli)</label>
             </div>
 
-            <!-- Genç Çiftçi Checkbox (+%10) -->
             <div class="checkbox-field" id="box-gencciftci">
                 <input type="checkbox" id="gencCiftciCheck" onchange="Calculator.handleSubvModifiers()">
-                <label for="gencCiftciCheck">🌱 Genç Çiftçi (<40 Yaş)</label>
+                <label for="gencCiftciCheck">🌱 Genç Çiftçi (&lt;40 Yaş)</label>
             </div>
 
-            <!-- Kadın Çiftçi Checkbox (+%10) -->
             <div class="checkbox-field" id="box-kadinciftci">
                 <input type="checkbox" id="kadinCiftciCheck" onchange="Calculator.handleSubvModifiers()">
-                <label for="kadinCiftciCheck">👩‍🌾 Kadın Çiftçi</label>
+                <label for="kadinCiftciCheck">👩‍&amp;🌾 Kadın Çiftçi</label>
             </div>
 
-            <!-- Kooperatif Checkbox (+%5 Sübvansiyon) -->
             <div class="checkbox-field" id="box-kooperatif">
                 <input type="checkbox" id="kooperatifCheck" onchange="Calculator.handleSubvModifiers()">
                 <label for="kooperatifCheck">🤝 Krediyi Çeken Kooperatif</label>
             </div>
         </div>
-        <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" onclick="window.print()">YAZDIR / PDF KAYDET</button>
+        <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" onclick="window.print()">TÜM PLANLARI BİRLEŞİK YAZDIR / PDF YAP</button>
     </div>
 
     <div id="result-main-container" class="result-main-container">
-        <div id="plan-5" class="plan-wrapper"><div class="result-header"><span class="result-title">5 Yıl Vadeli Plan</span></div><div class="tbl-res"></div></div>
-        <div id="plan-4" class="plan-wrapper"><div class="result-header"><span class="result-title">4 Yıl Vadeli Plan</span></div><div class="tbl-res"></div></div>
-        <div id="plan-3" class="plan-wrapper"><div class="result-header"><span class="result-title">3 Yıl Vadeli Plan</span></div><div class="tbl-res"></div></div>
-        <div id="plan-2" class="plan-wrapper"><div class="result-header"><span class="result-title">2 Yıl Vadeli Plan</span></div><div class="tbl-res"></div></div>
-        <div id="plan-1" class="plan-wrapper"><div class="result-header"><span class="result-title">1 Yıl Vadeli Plan</span></div><div class="tbl-res"></div></div>
-        <div id="plan-custom" class="plan-wrapper"><div class="result-header"><span class="result-title" id="custom-title">Ödeme Planı</span></div><div class="tbl-res"></div></div>
+        <div id="plan-5" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title">5 Yıl Vadeli Plan</span>
+                <div class="header-actions no-print">
+                    <button class="action-btn btn-print-single" onclick="Calculator.printSinglePlan('plan-5')">🖨️ Yazdır</button>
+                    <button class="action-btn btn-pdf-single" onclick="Calculator.printSinglePlan('plan-5')">📄 PDF Kaydet</button>
+                </div>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
+        <div id="plan-4" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title">4 Yıl Vadeli Plan</span>
+                <div class="header-actions no-print">
+                    <button class="action-btn btn-print-single" onclick="Calculator.printSinglePlan('plan-4')">🖨️ Yazdır</button>
+                    <button class="action-btn btn-pdf-single" onclick="Calculator.printSinglePlan('plan-4')">📄 PDF Kaydet</button>
+                </div>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
+        <div id="plan-3" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title">3 Yıl Vadeli Plan</span>
+                <div class="header-actions no-print">
+                    <button class="action-btn btn-print-single" onclick="Calculator.printSinglePlan('plan-3')">🖨️ Yazdır</button>
+                    <button class="action-btn btn-pdf-single" onclick="Calculator.printSinglePlan('plan-3')">📄 PDF Kaydet</button>
+                </div>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
+        <div id="plan-2" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title">2 Yıl Vadeli Plan</span>
+                <div class="header-actions no-print">
+                    <button class="action-btn btn-print-single" onclick="Calculator.printSinglePlan('plan-2')">🖨️ Yazdır</button>
+                    <button class="action-btn btn-pdf-single" onclick="Calculator.printSinglePlan('plan-2')">📄 PDF Kaydet</button>
+                </div>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
+        <div id="plan-1" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title">1 Yıl Vadeli Plan</span>
+                <div class="header-actions no-print">
+                    <button class="action-btn btn-print-single" onclick="Calculator.printSinglePlan('plan-1')">🖨️ Yazdır</button>
+                    <button class="action-btn btn-pdf-single" onclick="Calculator.printSinglePlan('plan-1')">📄 PDF Kaydet</button>
+                </div>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
+        <div id="plan-custom" class="plan-wrapper">
+            <div class="result-header">
+                <span class="result-title" id="custom-title">Ödeme Planı</span>
+                <div class="header-actions no-print">
+                    <button class="action-btn btn-print-single" onclick="Calculator.printSinglePlan('plan-custom')">🖨️ Yazdır</button>
+                    <button class="action-btn btn-pdf-single" onclick="Calculator.printSinglePlan('plan-custom')">📄 PDF Kaydet</button>
+                </div>
+            </div>
+            <div class="tbl-res"></div>
+        </div>
         
         <div class="print-legal-band">
             <strong>YASAL BİLGİLENDİRME NOTU:</strong> <span id="legal-faiz-turu"></span>İşbu ödeme planı ve maliyet tablosu sadece bilgilendirme amaçlı olup, bankanın nihai kredi onayını, taahhüdünü veya resmi teklifini oluşturmaz. Hesaplamada kullanılan faiz, vergi (BSMV/KKDF), sigorta primleri ve fon oranları hesaplama tarihendeki mevuzuata göre simüle edilmiş olup, kullanım tarihindeki piyasa koşullarına göre değişiklik gösterebilir. Nihai şartlar sözleşme aşamasında belirlenecektir.<br>
@@ -414,7 +472,6 @@
                 const bsmvYuzde = (bRate * 100).toFixed(2);
                 const kkdfYuzde = (kRate * 100).toFixed(2);
 
-                // Sadeleştirilmiş Kredi Bilgileri Üst Kartı (Her vadeye özel dinamik basılır)
                 let html = `
                 <div class="print-summary-card">
                     <div class="sc-item"><span class="sc-label">Kredi Türü</span><span class="sc-value">${state.label}</span></div>
@@ -423,8 +480,7 @@
                     <div class="sc-item"><span class="sc-label">Yıllık Baz Faiz</span><span class="sc-value">%${(yF*100).toFixed(2)}</span></div>
                     ${sub > 0 ? `<div class="sc-item"><span class="sc-label">Sübvansiyon / Faiz</span><span class="sc-value">%${(sub*100).toFixed(0)} (Net:%${indFaizYuzde})</span></div>` : ''}
                     <div class="sc-item"><span class="sc-label">Vergiler</span><span class="sc-value">B:${Math.round(bsmvYuzde)} / K:${Math.round(kkdfYuzde)}</span></div>
-                    <div class="sc-item"><span class="sc-label">Dönem Taksiti</span><span class="sc-value" style="color:var(--dark); font-size:12px;">${Math.round(pmt).toLocaleString('tr-TR')} TL</span></div>
-                    <div class="sc-item"><span class="sc-label">Efektif Faiz (Maliyetli)</span><span class="sc-value" style="color:var(--ticari);">%${planEfektif.toFixed(2)}</span></div>
+                    <div class="sc-item"><span class="sc-label">Efektif Faiz (Maliyetli)</span><span class="sc-value" style="color:var(--ticari); font-size:12px;">%${planEfektif.toFixed(2)}</span></div>
                 </div>`;
 
                 html += `<table><thead><tr><th>No</th><th>Ana Para</th><th>Faiz</th><th>İnd. Faiz</th><th>BSMV</th><th>KKDF</th><th>Taksit</th></tr></thead><tbody>`;
@@ -459,6 +515,17 @@
                     <div class="db-item highlight"><span class="db-label">TOPLAM MASRAF</span><span class="db-value">${Math.round(masraf.toplam).toLocaleString('tr-TR')} TL</span></div>
                 </div>`;
                 return html;
+            },
+            printSinglePlan: function(planId) {
+                document.body.classList.add('single-print-active');
+                document.querySelectorAll('.plan-wrapper').forEach(p => p.classList.remove('print-target'));
+                document.getElementById(planId).classList.add('print-target');
+                
+                window.print();
+                
+                setTimeout(() => {
+                    document.body.classList.remove('single-print-active');
+                }, 500);
             },
             sendWhatsApp: function() {
                 const state = cfg[currentMode];
