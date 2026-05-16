@@ -30,17 +30,19 @@
         label { font-size: 9px; font-weight: 700; color: #666; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         input, select { height: 32px; padding: 0 2px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; outline: none; width: 100%; text-align: center; }
         
+        /* Resimli Buton (Toggle-Badge) Tasarımı */
         .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; height: 32px; background: #fdf2f2; border: 1px solid #f5c6cb; border-radius: 4px; padding: 0 8px; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative; }
         .cb-field input[type="checkbox"] { display: none; } 
         .cb-field label { font-size: 10px; font-weight: bold; color: var(--danger); cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; gap: 5px; }
         .cb-field svg { width: 14px; height: 14px; fill: var(--danger); transition: fill 0.2s ease; }
         
+        /* Aktif / Seçili Olduğunda (Yeşil Durum) */
         .cb-field.checked-active { background: var(--tarimsal); border-color: #27ae60; box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); }
         .cb-field.checked-active label { color: white !important; }
         .cb-field.checked-active svg { fill: white !important; }
 
         .slider-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
-        .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; width: 100%; }
+        .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
         .vade-label-box { display: flex; justify-content: space-between; width: 100%; font-size: 8px; font-weight: bold; color: var(--dark); margin-top: -2px; }
 
         .std-width { width: 60px; }
@@ -85,9 +87,8 @@
         .btn-print-single { background: #34495e; }
         .btn-whatsapp-single { background: var(--whatsapp); }
         
-        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; font-size: 11px; border-collapse: collapse; min-width: 500px; }
-        table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; white-space: nowrap; }
+        table { width: 100%; font-size: 11px; border-collapse: collapse; }
+        table th, table td { border: 1px solid #eee; padding: 8px 4px; text-align: center; }
         table th { background: #f8f9fa; font-size: 9px; }
         table tfoot td { font-weight: bold; background: #eef2f7; border-top: 2px solid var(--dark); }
 
@@ -102,21 +103,6 @@
         
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
         
-        @media screen and (max-width: 768px) {
-            body { padding: 5px; }
-            .container { padding: 10px; border-radius: 4px; width: 100%; max-width: 100%; }
-            .grid { flex-direction: column; align-items: stretch; gap: 10px; }
-            .field, .info-field { width: 100% !important; }
-            .cb-field { width: 100% !important; }
-            .slider-container { width: 100% !important; }
-            .dosya-banner { flex-direction: column; align-items: stretch; gap: 8px; }
-            .db-divider { display: none; }
-            .db-item { text-align: center; padding: 4px 0; border-bottom: 1px dashed #e0c0c0; }
-            .db-item.highlight { border-bottom: none; }
-            .segment-nav { gap: 3px; }
-            .seg-btn { font-size: 9px; height: 32px; padding: 0 2px; }
-        }
-
         @media print { 
             .no-print { display: none !important; } 
             .container { box-shadow: none; max-width: 100%; }
@@ -330,14 +316,14 @@
         const DEFAULT_BIREYSEL_KREDI = "100.000";
         
         const cfg = {
-            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true, hasKasko: true },
-            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true },
-            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true },
-            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: true },
-            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: true },
-            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false },
-            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 36, maxVade: 48, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false },
-            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 36, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false }
+            traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true },
+            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true },
+            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true },
+            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 124, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false }
         };
         
         let currentMode = 'traktor';
@@ -352,35 +338,26 @@
             getCosts: function(tutar, vade = 1) {
                 const state = cfg[currentMode];
                 const komPct = state.kom || 0.5;
-                
-                let kasko = 0;
-                if(state.hasKasko && currentSegment !== 'bireysel') {
-                    let kaskoTemeli = tutar;
-                    if(state.pro) {
-                        const profVal = fn.parseMoney(document.getElementById('proforma').value);
-                        if(profVal > 0) kaskoTemeli = profVal;
-                    }
-                    kasko = kaskoTemeli * 0.02;
+                let kaskoTemeli = tutar;
+                if(state.pro) {
+                    const profVal = fn.parseMoney(document.getElementById('proforma').value);
+                    if(profVal > 0) kaskoTemeli = profVal;
                 }
-
+                const kasko = kaskoTemeli * 0.02;
                 const bazOran = 0.02; 
                 const artisMiktari = 0.0025; 
                 const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
                 const hayat = tutar * dinamikOran;
                 let tarsimUcreti = state.tarsim ? (tutar * 0.04) : 0;
                 const netKomisyon = tutar * (komPct/100);
-
-                // Bireysel ve Ticari segmentlerde rehin ücreti 0 TL yapılıyor
-                let rehinUcreti = (currentSegment === 'bireysel' || currentSegment === 'ticari') ? 0 : REHIN_SABIT;
-
                 return { 
                     komisyon: netKomisyon * 1.05, 
                     kasko: kasko,
                     hayat: hayat,
                     hayatOran: dinamikOran * 100,
                     tarsim: tarsimUcreti,
-                    rehin: rehinUcreti,
-                    toplam: (netKomisyon * 1.05) + kasko + hayat + tarsimUcreti + rehinUcreti 
+                    rehin: REHIN_SABIT,
+                    toplam: (netKomisyon * 1.05) + kasko + hayat + tarsimUcreti + REHIN_SABIT 
                 };
             },
             calcEfektif: function(tutar, yF, sub, bRate, kRate, v, unit, mToplam) {
@@ -491,7 +468,6 @@
                     <div class="db-item highlight"><span class="db-label">TOPLAM MASRAF</span><span class="db-value">${Math.round(masraf.toplam).toLocaleString('tr-TR')} TL</span></div>
                 </div>`;
 
-                html += `<div class="table-responsive">`;
                 html += `<table><thead><tr><th>No</th><th>Ana Para</th><th>Baz Faiz</th><th>Müşteri Faizi</th><th>BSMV</th><th>KKDF</th><th>Taksit Tutarı</th></tr></thead><tbody>`;
                 let bal = tutar, tAP = 0, tBazF = 0, tIF = 0, tBS = 0, tKK = 0, tPMT = 0;
                 for(let i = 1; i <= v; i++) {
@@ -510,7 +486,6 @@
                     bal -= aPara;
                 }
                 html += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(tAP).toLocaleString('tr-TR')}</td><td>${Math.round(tBazF).toLocaleString('tr-TR')}</td><td>${Math.round(tIF).toLocaleString('tr-TR')}</td><td>${Math.round(tBS).toLocaleString('tr-TR')}</td><td>${Math.round(tKK).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(tPMT).toLocaleString('tr-TR')}</td></tr></tfoot></table>`;
-                html += `</div>`;
                 return html;
             }
         };
@@ -704,6 +679,7 @@
                 document.getElementById(wrappers[index]).classList.remove('checked-active');
             });
 
+            // "Yerli Malı" ve "Buy Back" başlangıç durumlarını ayarla
             if (s.viewYerli) {
                 document.getElementById('cb-yerli').checked = true;
                 document.getElementById('wrapper-yerli').classList.add('checked-active');
@@ -722,7 +698,12 @@
             }
 
             const boxVade = document.getElementById('box-vade');
-            if (s.unit === 'Ay') {
+            if (currentSegment === 'bireysel') {
+                boxVade.style.display = 'none';
+                const slider = document.getElementById('vade-slider');
+                slider.min = 12; slider.max = 12; slider.value = 12;
+                document.getElementById('vade-val-lbl').innerText = "12 Ay";
+            } else if (s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
                 const slider = document.getElementById('vade-slider');
                 slider.min = 1;
