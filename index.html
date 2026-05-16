@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kredi Planlama & Yönetim Panel - S.C.</title>
+    <title>Kredi Planlama & Yönetim Paneli - Süleyman Coşkun</title>
     <style>
         :root { 
             --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --genel: #16a085; --mimar: #9b59b6;
@@ -176,7 +176,7 @@
         <div class="info-content">
             <div class="info-grid">
                 <div class="info-left mimar-border">
-                    <h3>S.C.</h3>
+                    <h3>Süleyman Coşkun</h3>
                     <p class="info-subtitle">Kıdemli Yazılım Geliştirici & Sistem Mimarı</p>
                     <div class="info-badges">
                         <span class="badge">Fintech & Banking</span>
@@ -198,7 +198,7 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlere entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -422,10 +422,8 @@
     })();
 
     function switchSegment(seg) {
-        // Tüm butonlardan active sınıfını temizle
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         
-        // İlgili butonu aktif yap
         if(seg === 'tarimsal') document.getElementById('seg-tar').classList.add('active');
         if(seg === 'ticari') document.getElementById('seg-tic').classList.add('active');
         if(seg === 'bireysel') document.getElementById('seg-bir').classList.add('active');
@@ -437,7 +435,6 @@
         const aboutSection = document.getElementById('about-section');
         const genelSection = document.getElementById('genel-section');
         
-        // Tüm alt sekmeleri ve bilgi alanlarını gizle
         document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
         aboutSection.style.display = 'none';
         genelSection.style.display = 'none';
