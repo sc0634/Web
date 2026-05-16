@@ -72,7 +72,7 @@
         table th { background: #f8f9fa; font-size: 9px; }
         table tfoot td { font-weight: bold; background: #eef2f7; border-top: 2px solid var(--dark); }
 
-        .dosya-banner { background: #fdf2f2; border-top: 2px solid var(--dosya); display: flex; padding: 8px 12px; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+        .dosya-banner { background: #fdf2f2; border-bottom: 2px solid var(--dosya); display: flex; padding: 8px 12px; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
         .db-item { display: flex; flex-direction: column; min-width: 80px; }
         .db-item.highlight { background: #27ae60; padding: 4px 8px; border-radius: 4px; color: white; border-left: 3px solid #218c4e; }
         .db-label { font-size: 8px; font-weight: 700; color: #999; text-transform: uppercase; }
@@ -373,7 +373,6 @@
                 const state = cfg[currentMode];
                 const komPct = state.kom || 0.5;
                 
-                // Kasko Sadece Traktör modunda var, diğerlerinde sıfır.
                 let kasko = 0;
                 if(currentMode === 'traktor') {
                     let kaskoTemeli = tutar;
@@ -393,7 +392,6 @@
                     komisyon: komisyonBrut, 
                     kasko: kasko,
                     hayat: hayat,
-                    hayatOran: dinamikOran * 100,
                     tarsim: tarsimUcreti,
                     rehin: REHIN_SABIT,
                     toplam: komisyonBrut + kasko + hayat + tarsimUcreti + REHIN_SABIT 
@@ -493,6 +491,24 @@
                 const bsmvYuzde = (bRate * 100).toFixed(2);
                 const kkdfYuzde = (kRate * 100).toFixed(2);
 
+                // Masraflar kartı (Tablonun Üzerine Taşındı)
+                let masrafHtml = `
+                <div class="dosya-banner">
+                    <div class="db-item"><span class="db-label">Komisyon</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.komisyon).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="db-divider"></div>
+                    <div class="db-item"><span class="db-label">Kasko</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.kasko).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="db-divider"></div>
+                    <div class="db-item"><span class="db-label">Hayat Sigortası</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.hayat).toLocaleString('tr-TR')} TL</span></div>
+                    ${masraf.tarsim > 0 ? `
+                    <div class="db-divider"></div>
+                    <div class="db-item"><span class="db-label">Tarsim (Her Yıl)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.tarsim).toLocaleString('tr-TR')} TL</span></div>
+                    ` : ''}
+                    <div class="db-divider"></div>
+                    <div class="db-item"><span class="db-label">Rehin Tesis Ücreti</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.rehin).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="db-divider"></div>
+                    <div class="db-item highlight"><span class="db-label">TOPLAM MASRAF</span><span class="db-value">${Math.round(masraf.toplam).toLocaleString('tr-TR')} TL</span></div>
+                </div>`;
+
                 let html = `
                 <div class="print-summary-card">
                     <div class="sc-item"><span class="sc-label">Kredi Türü</span><span class="sc-value">${state.label}</span></div>
@@ -503,6 +519,9 @@
                     <div class="sc-item"><span class="sc-label">Vergiler</span><span class="sc-value">B:${Math.round(bsmvYuzde)} / K:${Math.round(kkdfYuzde)}</span></div>
                     <div class="sc-item"><span class="sc-label">Efektif Faiz (Maliyetli)</span><span class="sc-value" style="color:var(--ticari); font-size:12px;">%${planEfektif.toFixed(2)}</span></div>
                 </div>`;
+
+                // Masraf Paneli Tablodan Önce Ekleniyor
+                html += masrafHtml;
 
                 html += `<table><thead><tr><th>No</th><th>Ana Para</th><th>Faiz</th><th>İnd. Faiz</th><th>BSMV</th><th>KKDF</th><th>Taksit</th></tr></thead><tbody>`;
                 let bal = tutar, tAP = 0, tBazF = 0, tIF = 0, tBS = 0, tKK = 0, tPMT = 0;
@@ -520,21 +539,6 @@
                 }
                 html += `</tbody><tfoot><tr><td>TOPLAM</td><td>${Math.round(tAP).toLocaleString('tr-TR')}</td><td>${Math.round(tBazF).toLocaleString('tr-TR')}</td><td>${Math.round(tIF).toLocaleString('tr-TR')}</td><td>${Math.round(tBS).toLocaleString('tr-TR')}</td><td>${Math.round(tKK).toLocaleString('tr-TR')}</td><td style="font-weight:bold">${Math.round(tPMT).toLocaleString('tr-TR')}</td></tr></tfoot></table>`;
                 
-                html += `<div class="dosya-banner">
-                    <div class="db-item"><span class="db-label">Komisyon</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.komisyon).toLocaleString('tr-TR')} TL</span></div>
-                    <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">Kasko</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.kasko).toLocaleString('tr-TR')} TL</span></div>
-                    <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">Hayat Sigortası (%${masraf.hayatOran.toFixed(2)})</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.hayat).toLocaleString('tr-TR')} TL</span></div>
-                    ${masraf.tarsim > 0 ? `
-                    <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">Tarsim (Her Yıl)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.tarsim).toLocaleString('tr-TR')} TL</span></div>
-                    ` : ''}
-                    <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">Rehin Tesis Ücreti</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.rehin).toLocaleString('tr-TR')} TL</span></div>
-                    <div class="db-divider"></div>
-                    <div class="db-item highlight"><span class="db-label">TOPLAM MASRAF</span><span class="db-value">${Math.round(masraf.toplam).toLocaleString('tr-TR')} TL</span></div>
-                </div>`;
                 return html;
             },
             printSinglePlan: function(planId) {
@@ -607,7 +611,6 @@
         document.getElementById('box-ihracat').style.display = (m === 'ticari_taksitli') ? 'flex' : 'none';
         document.getElementById('box-tutar').classList.remove('error');
 
-        // Segment limit ve kurallarına göre slider'ı güncelle
         if(s.unit === 'Ay') {
             const slider = document.getElementById('vade-slider');
             slider.min = s.minVade || 1;
