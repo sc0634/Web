@@ -10,6 +10,7 @@
             --success: #27ae60; --dark: #2c3e50; --light: #f8f9fa; --border: #dcdde1;
             --danger: #e74c3c; --whatsapp: #25d366; --gold: #f1c40f;
             --print-all-color: #3f51b5; --dosya: #c0392b;
+            --tax-bg: #7f8c8d;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background: #f1f2f6; margin: 0; padding: 10px; color: var(--dark); font-size: 11px; }
@@ -29,11 +30,13 @@
         label { font-size: 10px; font-weight: 700; color: #666; }
         input, select { height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; outline: none; width: 100%; }
         
-        .info-field { width: 110px; border-radius: 4px; padding: 2px 4px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 3px solid; }
-        .info-field label { color: #ccc; font-size: 7.5px; margin-bottom: -1px; width: 100%; }
+        .info-field { width: 100px; border-radius: 4px; padding: 2px 4px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 3px solid; }
+        .info-field label { color: #ccc; font-size: 7.5px; margin-bottom: -1px; width: 100%; font-weight: 700; }
         .info-field .rate-value { font-weight: 800; font-size: 12px; width: 100%; }
+        
         .subv-field { background: #16a085; color: white; border-left-color: #1abc9c; }
         .efektif-field { background: var(--dark); color: var(--gold); border-left-color: var(--gold); }
+        .tax-field { background: var(--tax-bg); color: white; border-left-color: #bdc3c7; }
 
         .result-main-container { margin-top: 5px; display: none; }
         .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 20px; background: white; }
@@ -95,9 +98,12 @@
             <div class="field" style="width:55px;"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.01" oninput="Calculator.syncInterest('aylik')"></div>
             <div class="field" id="box-vade" style="width:85px;"><label>Vade</label><select id="vade-select" onchange="Calculator.autoCalc()"></select></div>
             <div class="field" id="box-sub" style="width:45px;"><label>Sübv%</label><input type="number" id="subOran" oninput="Calculator.autoCalc()"></div>
-            <div class="field" style="width:45px;"><label>BSMV%</label><input type="number" id="bsmv" readonly></div>
-            <div class="field" style="width:45px;"><label>KKDF%</label><input type="number" id="kkdf" readonly></div>
+            
+            <!-- Readonly Kutu Vergi Alanları -->
+            <div class="info-field tax-field"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
+            <div class="info-field tax-field"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
 
+            <!-- Faiz Gösterge Alanları -->
             <div class="info-field subv-field"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
         </div>
@@ -134,10 +140,13 @@
             ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 24, unit: 'Ay', pro: false, tarsim: false }
         };
         let currentMode = 'traktor';
+        let currentBsmv = 0;
+        let currentKkdf = 0;
 
         return {
             setMode: m => currentMode = m,
             getState: m => cfg[m],
+            setTaxes: (b, k) => { currentBsmv = b; currentKkdf = k; },
             autoCalc: function() { this.calculate(); },
             fmtMoney: function(i) {
                 let v = i.value.replace(/\D/g, "");
@@ -148,7 +157,6 @@
                 let v = i.value.replace(/\D/g, "");
                 if(v) {
                     i.value = new Intl.NumberFormat('tr-TR').format(v);
-                    // Kullanıcı proformayı elle değiştirirse kredi tutarı LTV oranına göre değişsin
                     const profInt = parseInt(v);
                     const rate = cfg[currentMode].pRate || 0.75;
                     const tutar = Math.floor(profInt * rate);
@@ -225,8 +233,8 @@
                 if (!tutar) { document.getElementById('result-main-container').style.display = 'none'; return; }
                 const yF = parseFloat(document.getElementById('faiz').value) / 100;
                 const sub = (parseFloat(document.getElementById('subOran').value) || 0) / 100;
-                const bRate = parseFloat(document.getElementById('bsmv').value) / 100;
-                const kRate = parseFloat(document.getElementById('kkdf').value) / 100;
+                const bRate = currentBsmv / 100;
+                const kRate = currentKkdf / 100;
                 
                 document.getElementById('subv-rate-display').innerText = `%${(yF * (1 - sub) * 100).toFixed(2)}`;
                 
@@ -318,7 +326,6 @@
         document.getElementById('box-vade').style.display = s.unit === 'Yıl' ? 'none' : 'flex';
         
         if (s.pro) {
-            // Tarımsal proformalı sekmelerin tamamında proforma 2M, kredi 1M olacak şekilde sabitlendi.
             Calculator.resetProforma();
         } else {
             document.getElementById('tutar').value = "1.000.000";
@@ -332,8 +339,12 @@
         document.getElementById('faiz').value = s.faiz.toFixed(2);
         document.getElementById('faiz-aylik').value = (s.faiz / 12).toFixed(2);
         document.getElementById('subOran').value = s.sub;
-        document.getElementById('bsmv').value = s.bsmv;
-        document.getElementById('kkdf').value = s.kkdf;
+        
+        // Vergi oranlarını kutucuklara aktar ve hafızaya al
+        Calculator.setTaxes(s.bsmv, s.kkdf);
+        document.getElementById('bsmv-display').innerText = `%${s.bsmv}.00`;
+        document.getElementById('kkdf-display').innerText = `%${s.kkdf}.00`;
+        
         Calculator.calculate();
     }
     function initApp() {
