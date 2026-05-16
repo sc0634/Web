@@ -279,7 +279,7 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması og operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -321,9 +321,9 @@
             ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true },
             zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
             ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
-            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 124, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
-            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
-            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false }
+            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 36, maxVade: 48, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 24, minVade: 1, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false }
         };
         
         let currentMode = 'traktor';
@@ -441,7 +441,7 @@
                         dinamikBaslik = `${v} YIL VADELİ DEĞİŞKEN FAİZLİ YILDA BİR ÖDEMELİ ÖDEME PLANI`;
                     }
                 } else {
-                    dinamikBaslik = `${vadeText} ${periodText} Kredİ Ödeme Planı`;
+                    dinamikBaslik = `${vadeText} ${periodText} Kredi Ödeme Planı`;
                 }
 
                 let html = `<div class="result-header">
@@ -679,7 +679,6 @@
                 document.getElementById(wrappers[index]).classList.remove('checked-active');
             });
 
-            // "Yerli Malı" ve "Buy Back" başlangıç durumlarını ayarla
             if (s.viewYerli) {
                 document.getElementById('cb-yerli').checked = true;
                 document.getElementById('wrapper-yerli').classList.add('checked-active');
@@ -699,10 +698,13 @@
 
             const boxVade = document.getElementById('box-vade');
             if (currentSegment === 'bireysel') {
-                boxVade.style.display = 'none';
+                boxVade.style.display = 'flex';
                 const slider = document.getElementById('vade-slider');
-                slider.min = 12; slider.max = 12; slider.value = 12;
-                document.getElementById('vade-val-lbl').innerText = "12 Ay";
+                slider.min = s.minVade || 1;
+                slider.max = s.maxVade || 12;
+                slider.value = s.defVade || 12;
+                document.getElementById('vade-min-lbl').innerText = slider.min + " Ay";
+                document.getElementById('vade-val-lbl').innerText = slider.value + " Ay";
             } else if (s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
                 const slider = document.getElementById('vade-slider');
