@@ -142,7 +142,6 @@
             <div class="field" style="width:55px;"><label>Yıllık %</label><input type="number" id="faiz" step="0.01" oninput="Calculator.syncInterest('yillik')"></div>
             <div class="field" style="width:55px;"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.01" oninput="Calculator.syncInterest('aylik')"></div>
             
-            <!-- Seçim kutusu yerine eklenen yeni slider alanı -->
             <div class="field" id="box-vade" style="width:180px;">
                 <label>Vade Seçimi</label>
                 <div class="vade-slider-container">
@@ -373,12 +372,16 @@
             getExtraCosts: function(tutar, vade = 1) {
                 const state = cfg[currentMode];
                 const komPct = state.kom || 0.5;
-                let kaskoTemeli = tutar;
-                if(state.pro) {
+                
+                // Kasko Sadece Traktör modunda var, diğerlerinde sıfır.
+                let kasko = 0;
+                if(currentMode === 'traktor') {
+                    let kaskoTemeli = tutar;
                     const profVal = parseFloat(document.getElementById('proforma').value.replace(/\./g, "")) || 0;
                     if(profVal > 0) kaskoTemeli = profVal;
+                    kasko = kaskoTemeli * 0.02;
                 }
-                const kasko = kaskoTemeli * 0.02;
+                
                 const bazOran = 0.02; 
                 const artisMiktari = 0.0025; 
                 const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
@@ -462,7 +465,7 @@
                     const pEl = document.getElementById('plan-custom'); pEl.style.display = 'block';
                     document.getElementById('custom-title').innerText = `${v} Ay Vadeli Plan`;
                     const masrafAylik = this.getExtraCosts(tutar, 1);
-                    const vEfe = this.calcEfektif(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik.topham);
+                    const vEfe = this.calcEfektif(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik.toplam);
                     pEl.querySelector('.tbl-res').innerHTML = this.drawTable(tutar, yF, 0, bRate, kRate, v, 'Ay', masrafAylik, vEfe);
                 }
 
