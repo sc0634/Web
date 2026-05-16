@@ -30,13 +30,16 @@
         label { font-size: 9px; font-weight: 700; color: #666; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         input, select { height: 32px; padding: 0 2px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; outline: none; width: 100%; text-align: center; }
         
-        /* Yenilenen Modern Toggle-Badge Buton Tasarımı */
-        .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; height: 32px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative; }
+        /* Yenilenen Resimli Buton (Toggle-Badge) Tasarımı */
+        .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; height: 32px; background: #fdf2f2; border: 1px solid #f5c6cb; border-radius: 4px; padding: 0 8px; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative; }
         .cb-field input[type="checkbox"] { display: none; } 
-        .cb-field label { font-size: 9.5px; font-weight: bold; color: #555; cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; }
+        .cb-field label { font-size: 10px; font-weight: bold; color: var(--danger); cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; gap: 5px; }
+        .cb-field svg { width: 14px; height: 14px; fill: var(--danger); transition: fill 0.2s ease; }
         
+        /* Aktif / Seçili Olduğunda (Yeşil Durum) */
         .cb-field.checked-active { background: var(--tarimsal); border-color: #27ae60; box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); }
         .cb-field.checked-active label { color: white !important; }
+        .cb-field.checked-active svg { fill: white !important; }
 
         .slider-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
         .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
@@ -44,7 +47,7 @@
 
         .std-width { width: 60px; }
         .range-width { width: 110px; }
-        .cb-width { width: 95px; }
+        .cb-width { width: 115px; } /* İkonlar için genişlik hafif artırıldı */
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
         .info-field label { color: #ccc; font-size: 7px; margin-bottom: -1px; width: 100%; font-weight: 700; }
@@ -159,40 +162,54 @@
             <!-- Sübv Oran Alanı -->
             <div class="field std-width" id="box-sub"><label>Sübv%</label><input type="number" id="subOran"></div>
             
-            <!-- Checkbox Butonları (Sübv% alanından sonraya alındı) -->
+            <!-- Resimli ve Dinamik Buton Yapılı Checkbox Alanları -->
             <div class="field cb-width" id="box-yerli" style="display:none;">
-                <label>Yerli Malı</label>
                 <div class="cb-field" id="wrapper-yerli">
                     <input type="checkbox" id="cb-yerli">
-                    <label for="cb-yerli">Yerli Malı Var</label>
+                    <label for="cb-yerli">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Yerli Malı
+                    </label>
                 </div>
             </div>
+            
             <div class="field cb-width" id="box-buyback" style="display:none;">
-                <label>Buy Back</label>
                 <div class="cb-field" id="wrapper-buyback">
                     <input type="checkbox" id="cb-buyback">
-                    <label for="cb-buyback">Taahhüt Var</label>
+                    <label for="cb-buyback">
+                        <svg viewBox="0 0 24 24"><path d="M18 7H6v12h12V7zm2-4H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12H7v-2h10v2zm0-4H7V9h10v2z"/></svg>
+                        Taahhüt Var
+                    </label>
                 </div>
             </div>
+            
             <div class="field cb-width" id="box-kadin" style="display:none;">
-                <label>Kadın Çiftçi</label>
                 <div class="cb-field" id="wrapper-kadin">
                     <input type="checkbox" id="cb-kadin">
-                    <label for="cb-kadin">Kadın Çiftçi (+5)</label>
+                    <label for="cb-kadin">
+                        <svg viewBox="0 0 24 24"><path d="M12 2c-2.76 0-5 2.24-5 5 0 2.05 1.23 3.81 3 4.58V14H9v2h1V19H9v2h2v-2h2v2h2v-2h-1v-3h1v-2h-1v-2.42c1.77-.77 3-2.53 3-4.58 0-2.76-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+                        Kadın Çiftçi
+                    </label>
                 </div>
             </div>
+            
             <div class="field cb-width" id="box-genc" style="display:none;">
-                <label>Genç Çiftçi</label>
                 <div class="cb-field" id="wrapper-genc">
                     <input type="checkbox" id="cb-genc">
-                    <label for="cb-genc">Genç Çiftçi (+5)</label>
+                    <label for="cb-genc">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-3-8-3z"/></svg>
+                        Genç Çiftçi
+                    </label>
                 </div>
             </div>
+            
             <div class="field cb-width" id="box-koop" style="display:none;">
-                <label>Borçlu Kooperatif</label>
                 <div class="cb-field" id="wrapper-koop">
                     <input type="checkbox" id="cb-koop">
-                    <label for="cb-koop">Borçlu Koop (+5)</label>
+                    <label for="cb-koop">
+                        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 1.34 5 3s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        Borçlu Koop
+                    </label>
                 </div>
             </div>
             
@@ -265,7 +282,7 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması og operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlere entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -563,25 +580,15 @@
 
             document.getElementById('subOran').addEventListener('input', () => coreCalculator.calculate(true));
             
-            document.getElementById('cb-yerli').addEventListener('change', function() {
-                fn.updateVisualState('cb-yerli', 'wrapper-yerli');
-                coreCalculator.calculate();
-            });
-            document.getElementById('cb-buyback').addEventListener('change', function() {
-                fn.updateVisualState('cb-buyback', 'wrapper-buyback');
-                coreCalculator.calculate();
-            });
-            document.getElementById('cb-kadin').addEventListener('change', function() {
-                fn.updateVisualState('cb-kadin', 'wrapper-kadin');
-                coreCalculator.calculate();
-            });
-            document.getElementById('cb-genc').addEventListener('change', function() {
-                fn.updateVisualState('cb-genc', 'wrapper-genc');
-                coreCalculator.calculate();
-            });
-            document.getElementById('cb-koop').addEventListener('change', function() {
-                fn.updateVisualState('cb-koop', 'wrapper-koop');
-                coreCalculator.calculate();
+            // Tüm butonların tetikleyicileri ve görsel durum güncellemeleri
+            const checkboxes = ['cb-yerli', 'cb-buyback', 'cb-kadin', 'cb-genc', 'cb-koop'];
+            const wrappers = ['wrapper-yerli', 'wrapper-buyback', 'wrapper-kadin', 'wrapper-genc', 'wrapper-koop'];
+            
+            checkboxes.forEach((id, idx) => {
+                document.getElementById(id).addEventListener('change', function() {
+                    fn.updateVisualState(id, wrappers[idx]);
+                    coreCalculator.calculate();
+                });
             });
 
             const slider = document.getElementById('vade-slider');
