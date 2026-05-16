@@ -121,7 +121,8 @@
 <script>
     const Calculator = (function() {
         const REHIN_SABIT = 1500;
-        const DEFAULT_PROFORMA = "1.333.333";
+        const DEFAULT_PROFORMA = "2.000.000";
+        const DEFAULT_KREDI = "1.000.000";
         const cfg = {
             traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', pro: true, pRate: 0.75, tarsim: true },
             modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 100, kom: 1.0, unit: 'Yıl', pro: true, pRate: 1.0, tarsim: true },
@@ -147,6 +148,7 @@
                 let v = i.value.replace(/\D/g, "");
                 if(v) {
                     i.value = new Intl.NumberFormat('tr-TR').format(v);
+                    // Kullanıcı proformayı elle değiştirirse kredi tutarı LTV oranına göre değişsin
                     const profInt = parseInt(v);
                     const rate = cfg[currentMode].pRate || 0.75;
                     const tutar = Math.floor(profInt * rate);
@@ -295,9 +297,8 @@
                 window.open(`https://wa.me/905345217697?text=${encodeURIComponent(text)}`, '_blank');
             },
             resetProforma: function() {
-                const profInput = document.getElementById('proforma');
-                profInput.value = DEFAULT_PROFORMA;
-                this.fmtProforma(profInput);
+                document.getElementById('proforma').value = DEFAULT_PROFORMA;
+                document.getElementById('tutar').value = DEFAULT_KREDI;
             }
         };
     })();
@@ -317,11 +318,8 @@
         document.getElementById('box-vade').style.display = s.unit === 'Yıl' ? 'none' : 'flex';
         
         if (s.pro) {
-            const hedefKredi = 1000000;
-            const gerekliProforma = Math.ceil(hedefKredi / s.pRate);
-            const profInput = document.getElementById('proforma');
-            profInput.value = new Intl.NumberFormat('tr-TR').format(gerekliProforma);
-            document.getElementById('tutar').value = new Intl.NumberFormat('tr-TR').format(hedefKredi);
+            // Tarımsal proformalı sekmelerin tamamında proforma 2M, kredi 1M olacak şekilde sabitlendi.
+            Calculator.resetProforma();
         } else {
             document.getElementById('tutar').value = "1.000.000";
         }
@@ -339,7 +337,6 @@
         Calculator.calculate();
     }
     function initApp() {
-        document.getElementById('tutar').value = "1.000.000";
         switchSegment('tarimsal');
     }
 </script>
