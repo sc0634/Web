@@ -139,6 +139,7 @@
         .form-container { margin-top: 20px; border: 1px solid var(--border); border-radius: 6px; background: #fff; overflow: hidden; }
         .form-header { background: var(--dark); color: white; padding: 8px 12px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
         .form-body { padding: 10px; display: flex; flex-direction: row; gap: 5px; align-items: flex-end; width: 100%; }
+        .form-body.disabled-form { opacity: 0.6; pointer-events: none; }
         .form-field { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
         .form-field label { text-align: center; font-size: 9px; color: #666; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .form-field input, .form-field textarea { height: 32px; padding: 0 5px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; text-align: center; width: 100%; margin: 0; }
@@ -234,15 +235,6 @@
     <div id="calc-engine" class="no-print">
         <div class="grid" id="main-grid-container">
             <div class="field" id="box-proforma" style="width:80px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
-            
-            <!-- Modern Sulama Tipi Container Seçimi -->
-            <div class="field" id="box-sulama-tipi" style="width:105px; display:none;">
-                <label>Sulama Yöntemi</label>
-                <select id="sulama-tipi-select">
-                    <option value="modern" selected>Damlama / Yağmurlama</option>
-                    <option value="vahsi">Yüzeyel / Vahşi Sulama</option>
-                </select>
-            </div>
 
             <div class="field cb-width" id="box-ekb-a" style="display:none;">
                 <div class="cb-field ekb-a" id="wrapper-ekb-a">
@@ -359,7 +351,6 @@
                         <p>TÜİK Veri Portalı üzerinden yayınlanan en güncel tarımsal endeks değişim bültenlerini ve tarihsel setleri anlık kontrol edin.</p>
                     </div>
                 </div>
-                <!-- Otomatik Güncellenen Dinamik Haber Bülteni/Açık Veri Link Bağlantısı -->
                 <a href="https://data.tuik.gov.tr/Search/Search?text=Tar%C4%B1m%20%C3%9CFE" target="_blank" class="btn-tuik-link">
                     Güncel TÜİK Verisine Bağlan ↗
                 </a>
@@ -547,8 +538,7 @@
                     calculatedSub = 25; 
                     if (isYerli) calculatedSub += 25; 
                 } else if (currentMode === 'modern_sulama') {
-                    const sulamaTipi = document.getElementById('sulama-tipi-select').value;
-                    calculatedSub = (sulamaTipi === 'modern') ? 75 : 25; 
+                    calculatedSub = 75; // Seçim kutusu kalktı, taban doğrudan %75
                     if (isYerli) calculatedSub += 25;
                 } else if (currentMode === 'ekipman') {
                     calculatedSub = 50; 
@@ -748,22 +738,12 @@
                         if (ekbSecili === 'B') rate = 0.85; 
                         else rate = 0.75; 
                     } else if (currentMode === 'modern_sulama') {
-                        const sulamaTipi = document.getElementById('sulama-tipi-select').value;
-                        rate = (sulamaTipi === 'modern') ? 1.0 : 0.75;
+                        rate = 1.0; // Doğrudan %100 oran ataması
                     }
 
                     document.getElementById('tutar').value = fn.formatMoney(Math.floor(parseInt(v) * rate));
                 }
                 coreCalculator.calculate();
-            });
-
-            document.getElementById('sulama-tipi-select').addEventListener('change', function() {
-                const profEl = document.getElementById('proforma');
-                if(profEl.value) {
-                    profEl.dispatchEvent(new Event('input'));
-                } else {
-                    coreCalculator.calculate();
-                }
             });
 
             document.getElementById('tutar').addEventListener('input', function() {
@@ -919,8 +899,6 @@
             btn.classList.add('active');
             
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
-            
-            document.getElementById('box-sulama-tipi').style.display = (m === 'modern_sulama') ? 'flex' : 'none';
             
             const viewEkb = s.viewEkb || false;
             document.getElementById('box-ekb-a').style.display = viewEkb ? 'flex' : 'none';
