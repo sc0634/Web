@@ -64,7 +64,7 @@
         .box-proforma-tutar { width: 80px; flex-shrink: 0; }
         .box-kredi-tutar { width: 80px; flex-shrink: 0; }
         .std-width { width: 40px; } 
-        .range-width { width: 200px; } /* Vade alanı genişliği yan yana görünüm için optimize edildi */
+        .range-width { width: 200px; }
         .cb-width { width: 85px; }
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
@@ -163,7 +163,7 @@
                 flex-grow: 1 !important; 
                 width: calc(100% - 172px) !important; 
                 min-width: 120px;
-                order: 3; /* Mobilde de kredi tutarının hemen sağına yerleşmesi için order ayarlandı */
+                order: 3;
             }
             
             .field:not(.box-kredi-tutar):not(.box-proforma-tutar):not(.range-width) { 
@@ -217,7 +217,7 @@
         <button class="tab-btn" data-mode="traktor">Traktör</button>
         <button class="tab-btn" data-mode="modern_sulama">Modern Sulama</button>
         <button class="tab-btn" data-mode="ekipman">Ekipman</button>
-        <button class="tab-btn tab-ges" data-mode="ges" disabled>☀️ GES Yatırımı <span class="ges-badge">Yakında</span></button>
+        <button class="tab-btn" data-mode="ges" disabled>☀️ GES Yatırımı <span class="ges-badge">Yakında</span></button>
         <button class="tab-btn" data-mode="isletme_kredisi">İşletme Kredisi</button>
         <button class="tab-btn" data-mode="zirai">Çiftçi Taksitli</button>
     </div>
@@ -237,7 +237,6 @@
             <div class="field box-proforma-tutar" id="box-proforma"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             <div class="field box-kredi-tutar" id="box-kredi-tutar-div"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
 
-            <!-- Vade Alanı DOM Sıralamasında Kredi Tutarının Yanına Çekildi -->
             <div class="field range-width" id="box-vade">
                 <label>Vade Seçimi</label>
                 <div class="slider-container">
@@ -433,16 +432,29 @@
 
 <script>
     async function fetchTarimUfeData() {
-        const url = "https://raw.githubusercontent.com/fatih/turkiye-ekonomi-verileri/main/tarim_ufe.json";
+        // AllOrigins proxy'si kullanılarak TÜİK basın bülteni güncel API'sine güvenli bağlantı sağlandı.
+        const targetUrl = "https://veriportali.tuik.gov.tr/api/press/current?id=tarim_ufe";
+        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
         const statusEl = document.getElementById('tuik-live-status');
 
         try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error("Veri kaynağına bağlanılamadı.");
+            const response = await fetch(proxyUrl);
+            if (!response.ok) throw new Error("Veri köprüsüne bağlanılamadı.");
             
-            const data = await response.json();
+            const wrapper = await response.json();
+            // AllOrigins dönen objeyi stringified .contents içinde verir, onu parse ediyoruz.
+            const data = JSON.parse(wrapper.contents);
             
-            if (data && data.length > 0) {
+            if (data && data.oran) {
+                if (statusEl) {
+                    statusEl.innerHTML = `
+                        <strong>Canlı Veri:</strong> Tarım ÜFE Yıllık Değişim Oranı: 
+                        <span style="color: var(--success); font-weight: 800; font-size: 11px;">%${data.oran}</span>
+                        <br>Dönem: <strong>${data.tarih || 'Güncel Dönem'}</strong> | Sistem Kontrolü: Canlı (${new Date().toLocaleTimeString('tr-TR')})
+                    `;
+                }
+            } else if (data && data.length > 0) {
+                // Eğer dizi halinde dönen alternatif bir yapı gelirse fallback logic
                 const sonVeri = data[data.length - 1];
                 if (statusEl) {
                     statusEl.innerHTML = `
@@ -451,12 +463,14 @@
                         <br>Dönem: <strong>${sonVeri.tarih}</strong> | Sistem Kontrolü: Canlı (${new Date().toLocaleTimeString('tr-TR')})
                     `;
                 }
+            } else {
+                throw new Error("Beklenen veri formatı çözülemedi.");
             }
         } catch (error) {
             console.error("Tarım ÜFE verisi çekilemedi:", error);
             if (statusEl) {
                 statusEl.innerHTML = `
-                    <span style="color: var(--danger);">⚠️ Canlı bağlantı sağlanamadı.</span> 
+                    <span style="color: var(--danger);">⚠️ Canlı veri portalına şu an ulaşılamıyor. (CORS / Zaman Aşımı)</span><br> 
                     Resmi oranları anlık doğrulamak için sağdaki butondan TÜİK portalına bağlanabilirsiniz.
                 `;
             }
@@ -1049,12 +1063,11 @@
             const boxTutarDiv = document.getElementById('box-kredi-tutar-div');
             const mainGrid = document.getElementById('main-grid-container');
             
-            // İstek Doğrultusunda Sıralama Düzenlendi: Proforma -> Kredi Tutarı -> Vade Seçimi
             if (currentSegment === 'bireysel' || currentSegment === 'ticari' || s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
                 mainGrid.insertBefore(boxProforma, mainGrid.firstChild);
                 mainGrid.insertBefore(boxTutarDiv, boxProforma.nextSibling);
-                mainGrid.insertBefore(boxVade, boxTutarDiv.nextSibling); // Vade, Kredi Tutarının tam sağına alındı
+                mainGrid.insertBefore(boxVade, boxTutarDiv.nextSibling);
                 
                 const slider = document.getElementById('vade-slider');
                 slider.min = s.minVade || 1;
