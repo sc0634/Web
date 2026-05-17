@@ -120,6 +120,27 @@
         
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
         
+        /* MOBİL GÖRÜNÜM OPTİMİZASYONU */
+        @media (max-width: 580px) {
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .grid .field {
+                width: 100% !important;
+            }
+            /* Bireysel Vade Seçim Kutusunu Tam Satır Yapıp Alta Atar */
+            #box-vade {
+                grid-column: span 2;
+                order: 9; /* Sıralamada kontrollü olarak aşağıya çeker */
+            }
+            /* Bilgi ve Vergi Kutularını Yan Yana İkili Hizalar */
+            .info-field {
+                width: 100% !important;
+            }
+        }
+
         @media print { 
             .no-print { display: none !important; } 
             .container { box-shadow: none; max-width: 100%; }
@@ -314,7 +335,7 @@
                         <span class="badge">Full-Stack Dev</span>
                     </div>
                     <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-                    <p>Finans, bankacılık ve endüstriyel otomasyon sektörlerinde operasyonel verimliliği artıran, yüksek ölçeklenebilir yazılım mimarileri ve özel container çözümleri geliştiren deneyimli bir sistem mimarı.</p>
+                    <p>Finans, bankacılık og endüstriyel otomasyon sektörlerinde operasyonel verimliliği artıran, yüksek ölçeklenebilir yazılım mimarileri ve özel container çözümleri geliştiren deneyimli bir sistem mimarı.</p>
                 </div>
                 <div class="info-right">
                     <div class="data-item">
@@ -394,7 +415,7 @@
                     const profVal = fn.parseMoney(document.getElementById('proforma').value);
                     if(profVal > 0) kaskoTemeli = profVal;
                 }
-                const kasko = currentMode === 'konut' ? 0 : kaskoTemeli * 0.02; // Konut kredisinde kasko sıfırlandı varsayalım
+                const kasko = currentMode === 'konut' ? 0 : kaskoTemeli * 0.02; 
                 const bazOran = 0.02; 
                 const artisMiktari = 0.0025; 
                 const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
@@ -573,8 +594,8 @@
                 if (currentMode === 'konut') {
                     const ekbSecili = document.querySelector('input[name="ekbSinifi"]:checked').value;
                     let faizIndirimi = 0;
-                    if (ekbSecili === 'A') faizIndirimi = 0.15; // Aylık bazda yüzde 0.15 puan yeşil faiz indirimi
-                    else if (ekbSecili === 'B') faizIndirimi = 0.05; // Aylık bazda yüzde 0.05 puan yeşil faiz indirimi
+                    if (ekbSecili === 'A') faizIndirimi = 0.15; 
+                    else if (ekbSecili === 'B') faizIndirimi = 0.05; 
                     
                     let hesaplananAylikFaiz = (parseFloat(document.getElementById('faiz').value) / 12) - faizIndirimi;
                     yF = (hesaplananAylikFaiz * 12) / 100;
@@ -631,9 +652,9 @@
                     // BDDK Konut Enerji Sınıfı Limit Düzenleme Kuralları
                     if (currentMode === 'konut') {
                         const ekbSecili = document.querySelector('input[name="ekbSinifi"]:checked').value;
-                        if (ekbSecili === 'A') rate = 0.90; // A sınıfı %90 kredi imkanı
-                        else if (ekbSecili === 'B') rate = 0.85; // B sınıfı %85 kredi imkanı
-                        else rate = 0.75; // Standart evler %75
+                        if (ekbSecili === 'A') rate = 0.90; 
+                        if (ekbSecili === 'B') rate = 0.85; 
+                        else rate = 0.75; 
                     }
 
                     document.getElementById('tutar').value = fn.formatMoney(Math.floor(parseInt(v) * rate));
@@ -671,12 +692,10 @@
                 });
             });
 
-            // EKB Radyo Buton Değişim Dinamikleri
             const ekbRadios = ['ekb-a', 'ekb-b', 'ekb-diger'];
             ekbRadios.forEach(id => {
                 document.getElementById(id).addEventListener('change', function() {
                     fn.updateEkbVisualState();
-                    // Proforma girdisini tetikle ki limit yeniden hesaplansın
                     const profEl = document.getElementById('proforma');
                     if(profEl.value) {
                         profEl.dispatchEvent(new Event('input'));
@@ -705,7 +724,7 @@
 
             document.querySelectorAll('.tabs .tab-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    if (this.classList.contains('tab-ges')) return; // GES sekmesi devre dışı koruması
+                    if (this.classList.contains('tab-ges')) return; 
                     switchTab(this, this.getAttribute('data-mode'));
                 });
             });
@@ -753,7 +772,6 @@
                 calcEngine.style.display = 'block';
                 const tabContainer = document.getElementById(`tabs-${seg}`);
                 tabContainer.style.display = 'flex';
-                // İlk aktif olabilecek sekmeyi seç (GES sekmelerini pas geç)
                 const firstValidTab = tabContainer.querySelector('.tab-btn:not([disabled])');
                 if (firstValidTab) firstValidTab.click();
             }
@@ -767,7 +785,6 @@
             
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
             
-            // Konut EKB alanlarını göster/gizle kontrolü
             const viewEkb = s.viewEkb || false;
             document.getElementById('box-ekb-a').style.display = viewEkb ? 'flex' : 'none';
             document.getElementById('box-ekb-b').style.display = viewEkb ? 'flex' : 'none';
@@ -787,7 +804,6 @@
                 document.getElementById(wrappers[index]).classList.remove('checked-active');
             });
 
-            // Konut kredisi için EKB radio durumlarını resetle/default yap
             document.getElementById('ekb-diger').checked = true;
             fn.updateEkbVisualState();
 
