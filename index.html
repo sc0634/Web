@@ -74,7 +74,7 @@
         
         /* Sübv. Faiz ve Efektif Faiz Alanları */
         .subv-field { background: #16a085; color: white; border-left-color: #1abc9c; width: 50px !important; }
-        .efektif-field { background: var(--dark); color: var(--gold); border-left-color: var(--gold); width: 50px !important; }
+        .efektif-field { background: var(--dark); color: var(--gold); border-left-color: var(--gold); width: 55px !important; } /* Genişlik 5px artırıldı */
         .tax-field { background: var(--tax-bg); color: white; border-left-color: #bdc3c7; }
 
         .info-field.std-width { width: 40px; }
@@ -125,18 +125,44 @@
         
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
 
-        /* MOBİL GÖRÜNÜM VE DİNAMİK CİHAZ GENİŞLİĞİ AYARI */
+        /* MOBİL GÖRÜNÜM VE MOBİL CİHAZ GENİŞLİĞİNE GÖRE DÜZENLEME */
         @media (max-width: 768px) {
-            .grid { display: flex; flex-wrap: wrap; gap: 6px; }
+            .grid { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
             
-            /* Kredi Tutarı alanı her koşulda 80px sabit genişlikte kalacak ve ezilmeyecek */
-            .box-kredi-tutar { width: 80px !important; flex-shrink: 0 !important; }
+            /* Kredi Tutarı ilk satırda 80px sabit genişlikte kalacak, asla ezilmeyecek */
+            .box-kredi-tutar { 
+                width: 80px !important; 
+                flex-shrink: 0 !important; 
+                flex-grow: 0 !important;
+                order: 1; /* İlk eleman */
+            }
             
-            /* Vade Seçimi alanı yanındaki sabit alan haricindeki tüm boş alanı kaplayacak */
-            .range-width { flex-grow: 1 !important; width: auto !important; min-width: 120px; }
+            /* Vade Seçimi ilk satırın geri kalan tüm boşluğunu milimetrik kaplayacak */
+            .range-width { 
+                flex-grow: 1 !important; 
+                width: calc(100% - 86px) !important; /* Toplam genişlik - (Kredi Tutar genişliği + gap) */
+                min-width: 120px;
+                order: 2; /* İkinci eleman (Yan yana sığma) */
+            }
             
-            /* Diğer girdi alanlarının mobil uyumu */
-            .field:not(.box-kredi-tutar):not(.range-width) { flex-grow: 1; }
+            /* Diğer tüm form elemanları bir alt satıra geçip boşlukları esnek dolduracak */
+            .field:not(.box-kredi-tutar):not(.range-width) { 
+                flex-grow: 1; 
+                min-width: 65px;
+                order: 3;
+            }
+            
+            /* Bilgi kutuları (Faiz oranları, vergiler) daha küçük ekranlarda düzgün kırılacak */
+            .info-field {
+                flex-grow: 1;
+                min-width: 50px;
+                order: 4;
+            }
+            
+            /* Mobil ekranda efektif faiz alanının esnek yapısı için minimum genişlik koruması */
+            .efektif-field {
+                min-width: 55px !important;
+            }
         }
 
         @media print { 
@@ -821,10 +847,12 @@
 
             const boxVade = document.getElementById('box-vade');
             const boxTutar = document.querySelector('.box-kredi-tutar');
+            const mainGrid = document.getElementById('main-grid-container');
             
             if (currentSegment === 'bireysel' || s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
-                boxTutar.parentNode.insertBefore(boxVade, boxTutar.nextSibling);
+                mainGrid.insertBefore(boxTutar, mainGrid.firstChild);
+                mainGrid.insertBefore(boxVade, boxTutar.nextSibling);
                 
                 const slider = document.getElementById('vade-slider');
                 slider.min = s.minVade || 1;
