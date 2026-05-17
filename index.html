@@ -107,7 +107,7 @@
         .tuik-title-section { display: flex; align-items: center; gap: 10px; }
         .tuik-icon { background: #e6f7ed; color: #2ecc71; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; }
         .tuik-text h4 { margin: 0; font-size: 12px; color: var(--dark); font-weight: 700; }
-        .tuik-text p { margin: 2px 0 0 0; font-size: 10px; color: #64748b; }
+        .tuik-text p { margin: 2px 0 0 0; font-size: 10px; color: #64748b; line-height: 1.4; }
         .btn-tuik-link { background: #2ecc71; color: white; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; font-size: 10.5px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s; }
         .btn-tuik-link:hover { background: #27ae60; }
 
@@ -219,6 +219,7 @@
         <button class="tab-btn" data-mode="modern_sulama">Modern Sulama</button>
         <button class="tab-btn" data-mode="ekipman">Ekipman</button>
         <button class="tab-btn tab-ges" data-mode="ges" disabled>☀️ GES Yatırımı <span class="ges-badge">Yakında</span></button>
+        <button class="tab-btn" data-mode="isletme_kredisi">İşletme Kredisi</button>
         <button class="tab-btn" data-mode="zirai">Çiftçi Taksitli</button>
     </div>
 
@@ -331,16 +332,16 @@
                     </label>
                 </div>
             </div>
-            
+
             <div class="info-field tax-field std-width"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
             <div class="info-field tax-field std-width"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
-            <div class="info-field subv-field" id="box-subv-display"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
+            <div class="info-field sub-field std-width" id="box-subv-display"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field" id="box-efektif-display"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
         </div>
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" id="btn-global-print">YAZDIR / PDF KAYDET</button>
     </div>
 
-    <!-- GENEL VERİLER SEKME ALANI (GÜNCELLENMİŞ TÜİK PORTALI) -->
+    <!-- GENEL VERİLER SEKME ALANI -->
     <div id="genel-section" class="info-section">
         <div class="info-content">
             <div class="tuik-box">
@@ -348,11 +349,11 @@
                     <div class="tuik-icon">📊</div>
                     <div class="tuik-text">
                         <h4>Tarım ÜFE (Üretici Fiyat Endeksi)</h4>
-                        <p>TÜİK Veri Portalı üzerinden yayınlanan en güncel tarımsal endeks değişim bültenlerini ve tarihsel setleri anlık kontrol edin.</p>
+                        <p id="tuik-live-status">⏳ Sayfa yüklendiğinde güncel veri sorgulanacak...</p>
                     </div>
                 </div>
                 <a href="https://data.tuik.gov.tr/Search/Search?text=Tar%C4%B1m%20%C3%9CFE" target="_blank" class="btn-tuik-link">
-                    Güncel TÜİK Verisine Bağlan ↗
+                    Resmi TÜİK Portalı ↗
                 </a>
             </div>
         </div>
@@ -440,6 +441,38 @@
         });
     })();
 
+    // CANLI TARIM ÜFE VERİ ÇEKME FONKSİYONU (CORS-FREE RAW JSON)
+    async function fetchTarimUfeData() {
+        const url = "https://raw.githubusercontent.com/fatih/turkiye-ekonomi-verileri/main/tarim_ufe.json";
+        const statusEl = document.getElementById('tuik-live-status');
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Veri kaynağına bağlanılamadı.");
+            
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                const sonVeri = data[data.length - 1]; // En güncel ayı seçiyoruz
+                if (statusEl) {
+                    statusEl.innerHTML = `
+                        <strong>Canlı Veri:</strong> Tarım ÜFE Yıllık Değişim Oranı: 
+                        <span style="color: var(--success); font-weight: 800; font-size: 11px;">%${sonVeri.oran}</span>
+                        <br>Dönem: <strong>${sonVeri.tarih}</strong> | Sistem Kontrolü: Canlı (${new Date().toLocaleTimeString('tr-TR')})
+                    `;
+                }
+            }
+        } catch (error) {
+            console.error("Tarım ÜFE verisi çekilemedi:", error);
+            if (statusEl) {
+                statusEl.innerHTML = `
+                    <span style="color: var(--danger);">⚠️ Canlı bağlantı sağlanamadı.</span> 
+                    Resmi oranları anlık doğrulamak için sağdaki butondan TÜİK portalına bağlanabilirsiniz.
+                `;
+            }
+        }
+    }
+
     const LoanApp = (function() {
         const REHIN_SABIT = 1500;
         const DEFAULT_PROFORMA = "2.000.000";
@@ -448,10 +481,17 @@
         const DEFAULT_KONUT_PROFORMA = "3.000.000";
         const DEFAULT_KONUT_KREDI = "2.250.000";
         
+        const MASRAF_SABITLERI = {
+            KONUT_DASK_MATRAH: 1250,
+            KONUT_SIGORTA_ORAN: 0.0015,
+            KONUT_EKSPERTIZ_IPOTEK: 9500
+        };
+        
         const cfg = {
             traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true, hasKasko: true, hasRehin: true },
             modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true, hasRehin: true },
             ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true, hasRehin: true },
+            isletme_kredisi: { isEmpty: true }, 
             zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: true, hasRehin: true },
             ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false, hasRehin: false, hasHayat: false },
             konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, viewEkb: true, hasKasko: false, hasRehin: true },
@@ -470,15 +510,17 @@
             formatMoney: (num) => new Intl.NumberFormat('tr-TR').format(num),
             getCosts: function(tutar, vade = 1) {
                 const state = cfg[currentMode];
-                const komPct = state.kom || 0.5;
+                if (!state || state.isEmpty) return { komisyon: 0, kasko: 0, hayat: 0, tarsim: 0, rehin: 0, limitTahsis: 0, dask: 0, konutSigortasi: 0, digerEkspertizMaktu: 0, toplam: 0 };
                 
+                const komPct = state.kom || 0.5;
                 let kasko = 0;
+                let profVal = 0;
+                if(state.pro) {
+                    profVal = fn.parseMoney(document.getElementById('proforma').value);
+                }
+
                 if(state.hasKasko) {
-                    let kaskoTemeli = tutar;
-                    if(state.pro) {
-                        const profVal = fn.parseMoney(document.getElementById('proforma').value);
-                        if(profVal > 0) kaskoTemeli = profVal;
-                    }
+                    let kaskoTemeli = profVal > 0 ? profVal : tutar;
                     kasko = kaskoTemeli * 0.02;
                 }
 
@@ -496,6 +538,20 @@
                     limitTahsis = tutar * 0.005;
                 }
 
+                let dask = 0;
+                let konutSigortasi = 0;
+                let digerEkspertizMaktu = 0;
+
+                if (currentMode === 'konut') {
+                    dask = MASRAF_SABITLERI.KONUT_DASK_MATRAH;
+                    let konutTemeli = profVal > 0 ? profVal : (tutar / 0.75);
+                    konutSigortasi = konutTemeli * MASRAF_SABITLERI.KONUT_SIGORTA_ORAN;
+                    digerEkspertizMaktu = MASRAF_SABITLERI.KONUT_EKSPERTIZ_IPOTEK;
+                    rehinUcreti = 0;
+                }
+
+                let toplamMasraf = (netKomisyon * 1.05) + kasko + hayat + tarsimUcreti + rehinUcreti + limitTahsis + dask + konutSigortasi + digerEkspertizMaktu;
+
                 return { 
                     komisyon: netKomisyon * 1.05, 
                     kasko: kasko,
@@ -503,7 +559,10 @@
                     tarsim: tarsimUcreti,
                     rehin: rehinUcreti,
                     limitTahsis: limitTahsis,
-                    toplam: (netKomisyon * 1.05) + kasko + hayat + tarsimUcreti + rehinUcreti + limitTahsis 
+                    dask: dask,
+                    konutSigortasi: konutSigortasi,
+                    digerEkspertizMaktu: digerEkspertizMaktu,
+                    toplam: toplamMasraf 
                 };
             },
             calcEfektif: function(tutar, yF, sub, bRate, kRate, v, unit, mToplam) {
@@ -538,16 +597,16 @@
                     calculatedSub = 25; 
                     if (isYerli) calculatedSub += 25; 
                 } else if (currentMode === 'modern_sulama') {
-                    calculatedSub = 75; // Seçim kutusu kalktı, taban doğrudan %75
+                    calculatedSub = 75;
                     if (isYerli) calculatedSub += 25;
                 } else if (currentMode === 'ekipman') {
                     calculatedSub = 50; 
                     if (isYerli) calculatedSub += 25;
                 } else {
-                    calculatedSub = cfg[currentMode].sub || 0;
+                    calculatedSub = (cfg[currentMode] && cfg[currentMode].sub) || 0;
                 }
                 
-                if (cfg[currentMode].viewTarKriter) {
+                if (cfg[currentMode] && cfg[currentMode].viewTarKriter) {
                     if (isKadin) calculatedSub += 5;
                     if (isGenc) calculatedSub += 5;
                     if (isKoop) calculatedSub += 5;
@@ -633,6 +692,20 @@
                     <div class="db-divider"></div>
                     <div class="db-item"><span class="db-label">Rehin Tesis Ücreti</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.rehin).toLocaleString('tr-TR')} TL</span></div>
                     ` : ''}
+                    
+                    ${masraf.dask > 0 ? `
+                    <div class="db-divider"></div>
+                    <div class="db-item"><span class="db-label">DASK Sigortası</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.dask).toLocaleString('tr-TR')} TL</span></div>
+                    ` : ''}
+                    ${masraf.konutSigortasi > 0 ? `
+                    <div class="db-divider"></div>
+                    <div class="db-item"><span class="db-label">Konut Sigortası</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.konutSigortasi).toLocaleString('tr-TR')} TL</span></div>
+                    ` : ''}
+                    ${masraf.digerEkspertizMaktu > 0 ? `
+                    <div class="db-divider"></div>
+                    <div class="db-item"><span class="db-label">Ekspertiz & İpotek</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.digerEkspertizMaktu).toLocaleString('tr-TR')} TL</span></div>
+                    ` : ''}
+
                     <div class="db-divider"></div>
                     <div class="db-item highlight"><span class="db-label">TOPLAM MASRAF</span><span class="db-value">${Math.round(masraf.toplam).toLocaleString('tr-TR')} TL</span></div>
                 </div>`;
@@ -665,6 +738,13 @@
                 isRecalculating = true;
 
                 const state = cfg[currentMode];
+                
+                if (!state || state.isEmpty) {
+                    document.getElementById('result-main-container').style.display = 'none';
+                    isRecalculating = false;
+                    return;
+                }
+
                 const tutar = fn.parseMoney(document.getElementById('tutar').value);
                 if (!tutar) { 
                     document.getElementById('result-main-container').style.display = 'none'; 
@@ -727,6 +807,7 @@
 
         const bindEvents = function() {
             document.getElementById('proforma').addEventListener('input', function() {
+                if (cfg[currentMode] && cfg[currentMode].isEmpty) return;
                 let v = this.value.replace(/\D/g, "");
                 if(v) {
                     this.value = fn.formatMoney(v);
@@ -738,7 +819,7 @@
                         if (ekbSecili === 'B') rate = 0.85; 
                         else rate = 0.75; 
                     } else if (currentMode === 'modern_sulama') {
-                        rate = 1.0; // Doğrudan %100 oran ataması
+                        rate = 1.0; 
                     }
 
                     document.getElementById('tutar').value = fn.formatMoney(Math.floor(parseInt(v) * rate));
@@ -747,6 +828,7 @@
             });
 
             document.getElementById('tutar').addEventListener('input', function() {
+                if (cfg[currentMode] && cfg[currentMode].isEmpty) return;
                 let v = this.value.replace(/\D/g, "");
                 if(v) this.value = fn.formatMoney(v);
                 coreCalculator.calculate();
@@ -898,6 +980,33 @@
             document.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
+            if (s && s.isEmpty) {
+                document.getElementById('proforma').value = "";
+                document.getElementById('tutar').value = "";
+                document.getElementById('faiz').value = "";
+                document.getElementById('faiz-aylik').value = "";
+                document.getElementById('subOran').value = "";
+                document.getElementById('bsmv-display').innerText = "%0.00";
+                document.getElementById('kkdf-display').innerText = "%0.00";
+                document.getElementById('effective-rate-display').innerText = "%0.00";
+                
+                document.getElementById('box-proforma').style.display = 'none';
+                document.getElementById('box-ekb-a').style.display = 'none';
+                document.getElementById('box-ekb-b').style.display = 'none';
+                document.getElementById('box-ekb-diger').style.display = 'none';
+                document.getElementById('box-yerli').style.display = 'none';
+                document.getElementById('box-buyback').style.display = 'none';
+                document.getElementById('box-kadin').style.display = 'none';
+                document.getElementById('box-genc').style.display = 'none';
+                document.getElementById('box-koop').style.display = 'none';
+                document.getElementById('box-vade').style.display = 'none';
+                document.getElementById('box-sub').style.display = 'none';
+                document.getElementById('box-subv-display').style.display = 'none';
+                
+                document.getElementById('result-main-container').style.display = 'none';
+                return;
+            }
+
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
             
             const viewEkb = s.viewEkb || false;
@@ -985,6 +1094,7 @@
             init: function() {
                 bindEvents();
                 switchSegment('tarimsal');
+                fetchTarimUfeData(); // SAYFA YÜKLENDİĞİNDE ANLIK VERİYİ ÇEKER
             }
         };
     })();
