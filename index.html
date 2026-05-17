@@ -113,7 +113,6 @@
         .btn-tuik-link { background: #2ecc71; color: white; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; font-size: 10.5px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s; }
         .btn-tuik-link:hover { background: #27ae60; }
 
-        /* Yeni Eklenen Sulama Projeksiyon Kutusu ve Kart Stilleri */
         .sulama-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .sulama-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
         .sulama-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 10px; text-align: center; }
@@ -161,19 +160,16 @@
 
         @media (max-width: 768px) {
             .grid { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
-            
             .box-proforma-tutar { width: 80px !important; flex-shrink: 0 !important; flex-grow: 0 !important; order: 1; }
             .box-kredi-tutar { width: 80px !important; flex-shrink: 0 !important; flex-grow: 0 !important; order: 2; }
             .range-width { flex-grow: 1 !important; width: calc(100% - 172px) !important; min-width: 120px; order: 3; }
             .field:not(.box-kredi-tutar):not(.box-proforma-tutar):not(.range-width) { flex-grow: 1; min-width: 65px; order: 4; }
             .info-field { flex-grow: 1; min-width: 50px; order: 5; }
             .efektif-field { min-width: 55px !important; }
-            
             .form-body { flex-direction: row !important; gap: 4px !important; padding: 6px !important; }
             .form-field label { font-size: 8px !important; }
             .form-field input, .form-field textarea { font-size: 10px !important; height: 32px !important; padding: 0 3px !important; }
             .btn-submit { font-size: 10px !important; padding: 0 6px !important; height: 32px !important; }
-            
             .tuik-box { flex-direction: column; text-align: center; gap: 10px; }
             .tuik-top-row { flex-direction: column; }
             .tuik-title-section { flex-direction: column; }
@@ -266,7 +262,6 @@
 
             <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
             <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01"></div>
-            
             <div class="field std-width" id="box-sub"><label>Sübv%</label><input type="number" id="subOran"></div>
             
             <div class="field cb-width" id="box-yerli" style="display:none;">
@@ -373,15 +368,14 @@
                             <td>Makro istikrar adımları ve tarımsal yapısal reform kalıcı normalleşme senaryosu.</td>
                         </tr>
                         <tr>
-                            <td><strong>2026 Yıl Sonu Hedefi</strong></td>
-                            <td class="center" style="color: #3f51b5;">%34,20</td>
+                            <td><strong>Yıl Sonu Hedefi</strong></td>
+                            <td class="center" style="color: #3f51b5;" id="table-tuik-yilsonu">%34,20</td>
                             <td>TCMB Enflasyon Patikası konsensüs beklentisi.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- ENTEGRE EDİLEN YENİ SULAMA OTOMASYONU VE KONTEYNER VERİMLİLİK BLOKU -->
             <div class="sulama-box">
                 <div class="tuik-top-row">
                     <div class="tuik-title-section">
@@ -495,7 +489,6 @@
 
     <div class="form-container no-print" id="application-container">
         <div class="form-header">KREDİ HIZLI BAŞVURU FORMU (E-POSTA YÖNLENDİMRMELİ)</div>
-        <!-- Formspree ID veya kendi konteyner endpoint'in için action alanı hazırlandı -->
         <form id="loan-application-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="form-body">
             <input type="hidden" id="mail-kredi-turu" name="Kredi Türü">
             <input type="hidden" id="mail-kredi-tutari" name="Talep Edilen Tutar">
@@ -523,6 +516,7 @@
 </a>
 
 <script>
+    // Dinamik TÜİK Veri Entegrasyon ve Önbellek Motoru
     async function fetchTarimUfeData() {
         const targetUrl = "https://veriportali.tuik.gov.tr/api/press/current?id=tarim_ufe";
         const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
@@ -532,53 +526,66 @@
         const cell1Ay = document.getElementById('table-tuik-1ay');
         const cell12Ay = document.getElementById('table-tuik-12ay');
         const cell24Ay = document.getElementById('table-tuik-24ay');
+        const cellYilSonu = document.getElementById('table-tuik-yilsonu');
         const cellSonDesc = document.getElementById('table-tuik-son-desc');
+
+        // Sabit/Önbellek Kararlı Durum Verileri (Fallback Senaryosu)
+        const localCacheFallback = {
+            oran: 42.53,
+            tarih: "Nisan 2026",
+            tahminler: { m1: 41.80, m12: 28.50, m24: 18.20, ysonu: 34.20 }
+        };
 
         try {
             const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error("Veri köprüsüne bağlanılamadı.");
+            if (!response.ok) throw new Error("Ağ geçidi bağlantı hatası.");
             
             const wrapper = await response.json();
-            const data = JSON.parse(wrapper.contents);
+            if (!wrapper || !wrapper.contents) throw new Error("Proxy boş veri döndürdü.");
             
+            const data = JSON.parse(wrapper.contents);
             let gelenOran = null;
-            let gelenTarih = "Güncel Dönem";
+            let gelenTarih = localCacheFallback.tarih;
 
             if (data && data.oran) {
                 gelenOran = parseFloat(data.oran);
                 gelenTarih = data.tarih || 'Güncel Dönem';
-            } else if (data && data.length > 0) {
+            } else if (Array.isArray(data) && data.length > 0) {
                 const sonVeri = data[data.length - 1];
                 gelenOran = parseFloat(sonVeri.oran);
-                gelenTarih = sonVeri.tarih;
+                gelenTarih = sonVeri.tarih || gelenTarih;
             }
 
-            if (gelenOran) {
-                if (statusEl) {
-                    statusEl.innerHTML = `
-                        <strong>Canlı Veri:</strong> Tarım ÜFE Yıllık Değişim Oranı: 
-                        <span style="color: var(--success); font-weight: 800; font-size: 11px;">%${gelenOran}</span>
-                        <br>Dönem: <strong>${gelenTarih}</strong> | Sistem Kontrolü: Canlı (${new Date().toLocaleTimeString('tr-TR')})
-                    `;
-                }
-
-                cellSon.innerText = `%${gelenOran.toFixed(2)}`;
-                cellSonDesc.innerText = `TÜİK tarafından açıklanan en son resmi (${gelenTarih}) verisidir.`;
-                
-                cell1Ay.innerText = `%${(gelenOran - 0.73).toFixed(2)}`;
-                cell12Ay.innerText = `%${(gelenOran * 0.67).toFixed(2)}`;
-                cell24Ay.innerText = `%${(gelenOran * 0.42).toFixed(2)}`;
+            // Gelen canlı veri geçerli mi kontrolü
+            if (gelenOran && !isNaN(gelenOran)) {
+                statusEl.innerHTML = `
+                    <strong>Canlı Veri Bağlantısı:</strong> Tarım ÜFE Yıllık Değişim: 
+                    <span style="color: var(--success); font-weight: 800; font-size: 11px;">%${gelenOran.toFixed(2)}</span>
+                    <br>Referans Dönemi: <strong>${gelenTarih}</strong> | Durum: Canlı Senkronize (${new Date().toLocaleTimeString('tr-TR')})
+                `;
+                renderTuikUI(gelenOran, gelenTarih);
             } else {
-                throw new Error("Beklenen veri formatı çözülemedi.");
+                throw new Error("Veri formatı uyuşmazlığı.");
             }
         } catch (error) {
-            console.error("Tarım ÜFE verisi çekilemedi, yedek senaryo aktif:", error);
-            if (statusEl) {
-                statusEl.innerHTML = `
-                    <span style="color: var(--danger);">⚠️ Canlı veri portalına şu an ulaşılamıyor (CORS / Zaman Aşımı).</span><br> 
-                    Sistem önbelleğindeki kararlı veriler gösteriliyor. Doğrulamak için TÜİK portalına bağlanabilirsiniz.
-                `;
-            }
+            console.warn("TÜİK canlı veri portalına bağlanılamadı, kararlı yerel sistem önbelleği devrede:", error.message);
+            statusEl.innerHTML = `
+                <span style="color: var(--danger); font-weight: bold;">⚠️ Canlı veri portalına şu an ulaşılamıyor (CORS / Zaman Aşımı).</span><br> 
+                Güvenli sistem önbelleğindeki kararlı veriler gösteriliyor. Doğrulamak için TÜİK portalını ziyaret edebilirsiniz.
+            `;
+            renderTuikUI(localCacheFallback.oran, localCacheFallback.tarih);
+        }
+
+        // UI Hücrelerini hesaplama ve besleme fonksiyonu
+        function renderTuikUI(baseOran, tarihBilgisi) {
+            cellSon.innerText = `%${baseOran.toFixed(2)}`;
+            cellSonDesc.innerText = `TÜİK tarafından resmi olarak yayımlanan en güncel (${tarihBilgisi}) verisidir.`;
+            
+            // Projeksiyon eğrisi hesaplamaları
+            cell1Ay.innerText = `%${(baseOran - 0.73).toFixed(2)}`;
+            cell12Ay.innerText = `%${(baseOran * 0.67).toFixed(2)}`;
+            cell24Ay.innerText = `%${(baseOran * 0.42).toFixed(2)}`;
+            cellYilSonu.innerText = `%${(baseOran * 0.80).toFixed(2)}`;
         }
     }
 
@@ -920,7 +927,6 @@
                 const efektifDisplayStr = `%${efektif.toFixed(2)}`;
                 document.getElementById('effective-rate-display').innerText = efektifDisplayStr;
 
-                // Dinamik ROI Hesaplama Motoru (Gelişmiş Sulama Optimizasyonu)
                 if (currentMode === 'modern_sulama' && tutar > 0) {
                     const aylikTasarrufPotansiyeli = 35000; 
                     const hesaplananROI = (tutar + masrafDinamik.toplam) / aylikTasarrufPotansiyeli;
@@ -1044,7 +1050,6 @@
                 }
             });
 
-            // html2pdf.js Entegrasyonu Sağlanmış Yeni Global Çıktı Butonu
             document.getElementById('btn-global-print').addEventListener('click', function() {
                 const element = document.getElementById('main-container-pdf');
                 const options = {
