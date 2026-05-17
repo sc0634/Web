@@ -62,20 +62,20 @@
         .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
         .vade-label-box { display: flex; justify-content: space-between; width: 100%; font-size: 8px; font-weight: bold; color: var(--dark); margin-top: -2px; }
 
-        /* Genişliklerin Yeni Piksel Değerleri (25px -> 40px, 100px -> 80px) */
+        /* Genişlik Değerleri */
         .std-width { width: 40px; } 
-        .range-width { width: 110px; }
+        .range-width { width: 200px; } /* 110px'den 200px'e çıkarıldı */
         .cb-width { width: 80px; }
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
         .info-field label { color: #ccc; font-size: 7px; margin-bottom: -1px; width: 100%; font-weight: 700; }
         .info-field .rate-value { font-weight: 800; font-size: 10px; width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
         
-        .subv-field { background: #16a085; color: white; border-left-color: #1abc9c; }
-        .efektif-field { background: var(--dark); color: var(--gold); border-left-color: var(--gold); }
+        /* Sübv. Faiz ve Efektif Faiz Alanları */
+        .subv-field { background: #16a085; color: white; border-left-color: #1abc9c; width: 50px !important; }
+        .efektif-field { background: var(--dark); color: var(--gold); border-left-color: var(--gold); width: 50px !important; }
         .tax-field { background: var(--tax-bg); color: white; border-left-color: #bdc3c7; }
 
-        /* Bilgi ve Vergi Alanları da 40px Yapıldı */
         .info-field.std-width { width: 40px; }
 
         .info-section { display: none; background: white; border: 1px solid var(--border); border-radius: 6px; margin-top: 5px; overflow: hidden; }
@@ -264,8 +264,8 @@
             
             <div class="info-field tax-field std-width"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
             <div class="info-field tax-field std-width"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
-            <div class="info-field subv-field std-width" id="box-subv-display"><label>SÜBV.\ FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
-            <div class="info-field efektif-field std-width" id="box-efektif-display"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
+            <div class="info-field subv-field" id="box-subv-display"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
+            <div class="info-field efektif-field" id="box-efektif-display"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
         </div>
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" id="btn-global-print">YAZDIR / PDF KAYDET</button>
     </div>
@@ -282,21 +282,21 @@
                         <span class="badge">Sistem Durumu</span>
                     </div>
                     <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-                    <p>Bu alanda uygulamanın arka planında koşan hesaplama parametrelerini, güncel yasal komisyon oran sınırlarını og sistem genelindeki temel verileri takip edebilirsiniz.</p>
+                    <p>Bu alanda uygulamanın arka planında koşan hesaplama parametrelerini, güncel yasal komisyon oran sınırlarını ve sistem genelindeki temel verileri takip edebilirsiniz.</p>
                 </div>
                 <div class="info-right">
                     <div class="data-item">
                         <div class="data-dot dot-genel"></div>
                         <div class="data-info">
                             <strong>Yasal Vergilendirme Temelleri</strong>
-                            <p>Bireysel segmentlerde standart olarak %15 BSMV og %15 KKDF uygulanırken, ticari ve tarımsal nitelikli kredilerde muafiyet durumlarına göre BSMV %5'e düşmekte, KKDF ise %0 olarak hesaplanmaktadır.</p>
+                            <p>Bireysel segmentlerde standart olarak %15 BSMV ve %15 KKDF uygulanırken, ticari ve tarımsal nitelikli kredilerde muafiyet durumlarına göre BSMV %5'e düşmekte, KKDF ise %0 olarak hesaplanmaktadır.</p>
                         </div>
                     </div>
                     <div class="data-item">
                         <div class="data-dot dot-genel"></div>
                         <div class="data-info">
                             <strong>Sübvansiyonlu Kredi Politikaları</strong>
-                            <p>Tarımsal alt segmentlerde (Traktör, Modern Sulama, Ekipman) devlet destekli sübvansiyon oranları dinamik olarak yansıtılmakta; Kadın, Genç og Borçlu Kooperatif statülerine göre ekstra sübvansiyonlar uygulanabilmektedir.</p>
+                            <p>Tarımsal alt segmentlerde (Traktör, Modern Sulama, Ekipman) devlet destekli sübvansiyon oranları dinamik olarak yansıtılmakta; Kadın, Genç ve Borçlu Kooperatif statülerine göre ekstra sübvansiyonlar uygulanabilmektedir.</p>
                         </div>
                     </div>
                 </div>
@@ -330,13 +330,13 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması og operasyonel çalışma mantıklarının sistemlere entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlere entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
-                            <strong>Endüstriyel Uygulamalar og IoT (Sulama Sistemleri)</strong>
+                            <strong>Endüstriyel Uygulamalar ve IoT (Sulama Sistemleri)</strong>
                             <p>Geliştirilen güçlü container yapılarının endüstriyel alanlara adaptasyonu; sulama ve tarımsal otomasyon sekmeleri gibi donanım/yazılım entegrasyonu gerektiren kritik modüllerin modüler mimari ile devreye alınması.</p>
                         </div>
                     </div>
