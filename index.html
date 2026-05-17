@@ -22,9 +22,18 @@
         .bg-tar { background: var(--tarimsal); } .bg-tic { background: var(--ticari); } .bg-bir { background: var(--bireysel); } .bg-gen { background: var(--genel); } .bg-mim { background: var(--mimar); }
         
         .tabs { display: none; gap: 3px; margin-bottom: 10px; flex-wrap: wrap; }
-        .tab-btn { padding: 5px 10px; border: 1px solid var(--border); background: #fff; border-radius: 3px; cursor: pointer; font-size: 11px; }
+        .tab-btn { padding: 5px 10px; border: 1px solid var(--border); background: #fff; border-radius: 3px; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 4px; }
         .tab-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
         
+        /* GES Yakında Sekmesi Özel Stilleri */
+        .tab-btn.tab-ges { background: #f1f5f9; color: #94a3b8; border-color: #cbd5e1; cursor: not-allowed; user-select: none; }
+        .ges-badge { background-color: #f59e0b; color: white; font-size: 8px; font-weight: 800; padding: 1px 4px; border-radius: 3px; text-transform: uppercase; animation: gesPulse 2s infinite; }
+        @keyframes gesPulse {
+            0% { opacity: 0.7; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { opacity: 1; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0); }
+            100% { opacity: 0.7; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
         .grid { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end; margin-bottom: 15px; }
         .field { display: flex; flex-direction: column; gap: 3px; }
         label { font-size: 9px; font-weight: 700; color: #666; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -32,7 +41,7 @@
         
         /* Resimli Buton (Toggle-Badge) Tasarımı */
         .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; height: 32px; background: #fdf2f2; border: 1px solid #f5c6cb; border-radius: 4px; padding: 0 8px; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative; }
-        .cb-field input[type="checkbox"] { display: none; } 
+        .cb-field input[type="checkbox"], .cb-field input[type="radio"] { display: none; } 
         .cb-field label { font-size: 10px; font-weight: bold; color: var(--danger); cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; gap: 5px; }
         .cb-field svg { width: 14px; height: 14px; fill: var(--danger); transition: fill 0.2s ease; }
         
@@ -40,6 +49,14 @@
         .cb-field.checked-active { background: var(--tarimsal); border-color: #27ae60; box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); }
         .cb-field.checked-active label { color: white !important; }
         .cb-field.checked-active svg { fill: white !important; }
+
+        /* Enerji Sınıfları İçin Özel Renk Kodları */
+        .cb-field.ekb-a { background: #e8f5e9; border-color: #c8e6c9; }
+        .cb-field.ekb-a label { color: #2e7d32; }
+        .cb-field.ekb-a svg { fill: #2e7d32; }
+        .cb-field.ekb-b { background: #f1f8e9; border-color: #dcedc8; }
+        .cb-field.ekb-b label { color: #558b2f; }
+        .cb-field.ekb-b svg { fill: #558b2f; }
 
         .slider-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
         .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
@@ -128,6 +145,8 @@
         <button class="tab-btn" data-mode="traktor">Traktör</button>
         <button class="tab-btn" data-mode="modern_sulama">Modern Sulama</button>
         <button class="tab-btn" data-mode="ekipman">Ekipman</button>
+        <!-- YENİ EKLEYENEN: GES Sekmesi -->
+        <button class="tab-btn tab-ges" data-mode="ges" disabled>☀️ GES Yatırımı <span class="ges-badge">Yakında</span></button>
         <button class="tab-btn" data-mode="zirai">Çiftçi Taksitli</button>
     </div>
 
@@ -144,6 +163,36 @@
     <div id="calc-engine" class="no-print">
         <div class="grid" id="main-grid-container">
             <div class="field" id="box-proforma" style="width:115px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
+            
+            <!-- YENİ EKLENEN: Konut Kredisi Enerji Kimlik Belgesi (EKB) Checkbox Grupları -->
+            <div class="field cb-width" id="box-ekb-a" style="display:none;">
+                <div class="cb-field ekb-a" id="wrapper-ekb-a">
+                    <input type="radio" name="ekbSinifi" id="ekb-a" value="A">
+                    <label for="ekb-a">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM13 16h-2v2h2v-2zm0-6h-2v4h2v-4z"/></svg>
+                        A Sınıfı EKB
+                    </label>
+                </div>
+            </div>
+            <div class="field cb-width" id="box-ekb-b" style="display:none;">
+                <div class="cb-field ekb-b" id="wrapper-ekb-b">
+                    <input type="radio" name="ekbSinifi" id="ekb-b" value="B">
+                    <label for="ekb-b">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM13 16h-2v2h2v-2zm0-6h-2v4h2v-4z"/></svg>
+                        B Sınıfı EKB
+                    </label>
+                </div>
+            </div>
+            <div class="field cb-width" id="box-ekb-diger" style="display:none;">
+                <div class="cb-field" id="wrapper-ekb-diger">
+                    <input type="radio" name="ekbSinifi" id="ekb-diger" value="DIGER" checked>
+                    <label for="ekb-diger">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Diğer EKB
+                    </label>
+                </div>
+            </div>
+
             <div class="field" style="width:115px;"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
             <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
             <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01"></div>
@@ -314,6 +363,8 @@
         const DEFAULT_PROFORMA = "2.000.000";
         const DEFAULT_KREDI = "1.000.000";
         const DEFAULT_BIREYSEL_KREDI = "100.000";
+        const DEFAULT_KONUT_PROFORMA = "3.000.000";
+        const DEFAULT_KONUT_KREDI = "2.250.000";
         
         const cfg = {
             traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true },
@@ -321,7 +372,7 @@
             ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true },
             zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
             ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
-            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
+            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, viewEkb: true },
             tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 36, maxVade: 48, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false },
             ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 24, minVade: 1, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false }
         };
@@ -343,7 +394,7 @@
                     const profVal = fn.parseMoney(document.getElementById('proforma').value);
                     if(profVal > 0) kaskoTemeli = profVal;
                 }
-                const kasko = kaskoTemeli * 0.02;
+                const kasko = currentMode === 'konut' ? 0 : kaskoTemeli * 0.02; // Konut kredisinde kasko sıfırlandı varsayalım
                 const bazOran = 0.02; 
                 const artisMiktari = 0.0025; 
                 const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
@@ -422,6 +473,19 @@
                 } else {
                     wrapper.classList.remove('checked-active');
                 }
+            },
+            updateEkbVisualState: function() {
+                const ekbRadios = ['ekb-a', 'ekb-b', 'ekb-diger'];
+                const ekbWrappers = ['wrapper-ekb-a', 'wrapper-ekb-b', 'wrapper-ekb-diger'];
+                ekbRadios.forEach((id, idx) => {
+                    const rb = document.getElementById(id);
+                    const wp = document.getElementById(ekbWrappers[idx]);
+                    if(rb && rb.checked) {
+                        wp.classList.add('checked-active');
+                    } else if(wp) {
+                        wp.classList.remove('checked-active');
+                    }
+                });
             }
         };
 
@@ -503,8 +567,19 @@
                     return; 
                 }
                 
-                const yF = parseFloat(document.getElementById('faiz').value) / 100;
+                let yF = parseFloat(document.getElementById('faiz').value) / 100;
                 
+                // Konut Kredisine özel Yeşil Ev Faiz İndirimi Algoritması
+                if (currentMode === 'konut') {
+                    const ekbSecili = document.querySelector('input[name="ekbSinifi"]:checked').value;
+                    let faizIndirimi = 0;
+                    if (ekbSecili === 'A') faizIndirimi = 0.15; // Aylık bazda yüzde 0.15 puan yeşil faiz indirimi
+                    else if (ekbSecili === 'B') faizIndirimi = 0.05; // Aylık bazda yüzde 0.05 puan yeşil faiz indirimi
+                    
+                    let hesaplananAylikFaiz = (parseFloat(document.getElementById('faiz').value) / 12) - faizIndirimi;
+                    yF = (hesaplananAylikFaiz * 12) / 100;
+                }
+
                 let sub = 0;
                 if (state.hasSubInput) {
                     if (!triggeredBySubInput) {
@@ -551,7 +626,16 @@
                 let v = this.value.replace(/\D/g, "");
                 if(v) {
                     this.value = fn.formatMoney(v);
-                    const rate = cfg[currentMode].pRate || 0.75;
+                    let rate = cfg[currentMode].pRate || 0.75;
+                    
+                    // BDDK Konut Enerji Sınıfı Limit Düzenleme Kuralları
+                    if (currentMode === 'konut') {
+                        const ekbSecili = document.querySelector('input[name="ekbSinifi"]:checked').value;
+                        if (ekbSecili === 'A') rate = 0.90; // A sınıfı %90 kredi imkanı
+                        else if (ekbSecili === 'B') rate = 0.85; // B sınıfı %85 kredi imkanı
+                        else rate = 0.75; // Standart evler %75
+                    }
+
                     document.getElementById('tutar').value = fn.formatMoney(Math.floor(parseInt(v) * rate));
                 }
                 coreCalculator.calculate();
@@ -587,6 +671,21 @@
                 });
             });
 
+            // EKB Radyo Buton Değişim Dinamikleri
+            const ekbRadios = ['ekb-a', 'ekb-b', 'ekb-diger'];
+            ekbRadios.forEach(id => {
+                document.getElementById(id).addEventListener('change', function() {
+                    fn.updateEkbVisualState();
+                    // Proforma girdisini tetikle ki limit yeniden hesaplansın
+                    const profEl = document.getElementById('proforma');
+                    if(profEl.value) {
+                        profEl.dispatchEvent(new Event('input'));
+                    } else {
+                        coreCalculator.calculate();
+                    }
+                });
+            });
+
             const slider = document.getElementById('vade-slider');
             slider.addEventListener('input', function() {
                 document.getElementById('vade-val-lbl').innerText = this.value + " Ay";
@@ -606,6 +705,7 @@
 
             document.querySelectorAll('.tabs .tab-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
+                    if (this.classList.contains('tab-ges')) return; // GES sekmesi devre dışı koruması
                     switchTab(this, this.getAttribute('data-mode'));
                 });
             });
@@ -653,7 +753,9 @@
                 calcEngine.style.display = 'block';
                 const tabContainer = document.getElementById(`tabs-${seg}`);
                 tabContainer.style.display = 'flex';
-                tabContainer.querySelector('.tab-btn').click();
+                // İlk aktif olabilecek sekmeyi seç (GES sekmelerini pas geç)
+                const firstValidTab = tabContainer.querySelector('.tab-btn:not([disabled])');
+                if (firstValidTab) firstValidTab.click();
             }
         };
 
@@ -664,6 +766,12 @@
             btn.classList.add('active');
             
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
+            
+            // Konut EKB alanlarını göster/gizle kontrolü
+            const viewEkb = s.viewEkb || false;
+            document.getElementById('box-ekb-a').style.display = viewEkb ? 'flex' : 'none';
+            document.getElementById('box-ekb-b').style.display = viewEkb ? 'flex' : 'none';
+            document.getElementById('box-ekb-diger').style.display = viewEkb ? 'flex' : 'none';
             
             document.getElementById('box-yerli').style.display = s.viewYerli ? 'flex' : 'none';
             document.getElementById('box-buyback').style.display = s.viewBuyback ? 'flex' : 'none';
@@ -678,6 +786,10 @@
                 document.getElementById(id).checked = false;
                 document.getElementById(wrappers[index]).classList.remove('checked-active');
             });
+
+            // Konut kredisi için EKB radio durumlarını resetle/default yap
+            document.getElementById('ekb-diger').checked = true;
+            fn.updateEkbVisualState();
 
             if (s.viewYerli) {
                 document.getElementById('cb-yerli').checked = true;
@@ -701,7 +813,6 @@
             
             if (currentSegment === 'bireysel') {
                 boxVade.style.display = 'flex';
-                // Slider'ı efektif faiz kutusundan (box-efektif-display) sonra gelecek şekilde DOM'da en sona taşı
                 gridContainer.appendChild(boxVade);
                 
                 const slider = document.getElementById('vade-slider');
@@ -712,7 +823,6 @@
                 document.getElementById('vade-val-lbl').innerText = slider.value + " Ay";
             } else if (s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
-                // Tarımsal/Ticari için slider'ı orijinal (Yıllık % kutusundan sonraki) konumuna geri al
                 const boxFaiz = document.getElementById('faiz').parentNode;
                 boxFaiz.parentNode.insertBefore(boxVade, boxFaiz.nextSibling);
                 
@@ -726,7 +836,10 @@
                 boxVade.style.display = 'none';
             }
 
-            if (currentSegment === 'bireysel') {
+            if (currentMode === 'konut') {
+                document.getElementById('proforma').value = DEFAULT_KONUT_PROFORMA;
+                document.getElementById('tutar').value = DEFAULT_KONUT_KREDI;
+            } else if (currentSegment === 'bireysel') {
                 document.getElementById('tutar').value = DEFAULT_BIREYSEL_KREDI;
             } else if (s.pro) {
                 document.getElementById('proforma').value = DEFAULT_PROFORMA;
