@@ -62,7 +62,8 @@
         .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
         .vade-label-box { display: flex; justify-content: space-between; width: 100%; font-size: 8px; font-weight: bold; color: var(--dark); margin-top: -2px; }
 
-        .std-width { width: 60px; }
+        /* Genişliklerin 13px Değerine Düşürülmesi (Proforma ve Kredi Hariç) */
+        .std-width { width: 13px; } 
         .range-width { width: 110px; }
         .cb-width { width: 115px; }
         
@@ -73,6 +74,9 @@
         .subv-field { background: #16a085; color: white; border-left-color: #1abc9c; }
         .efektif-field { background: var(--dark); color: var(--gold); border-left-color: var(--gold); }
         .tax-field { background: var(--tax-bg); color: white; border-left-color: #bdc3c7; }
+
+        /* Bilgi ve Vergi Alanları da 13px Yapıldı */
+        .info-field.std-width { width: 13px; }
 
         .info-section { display: none; background: white; border: 1px solid var(--border); border-radius: 6px; margin-top: 5px; overflow: hidden; }
         .info-content { padding: 20px; background: #fff; }
@@ -119,27 +123,6 @@
         .db-divider { width: 1px; height: 25px; background: #e0c0c0; }
         
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
-        
-        /* MOBİL GÖRÜNÜM OPTİMİZASYONU */
-        @media (max-width: 580px) {
-            .grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-            .grid .field {
-                width: 100% !important;
-            }
-            /* Bireysel Vade Seçim Kutusunu Tam Satır Yapıp Alta Atar */
-            #box-vade {
-                grid-column: span 2;
-                order: 9; /* Sıralamada kontrollü olarak aşağıya çeker */
-            }
-            /* Bilgi ve Vergi Kutularını Yan Yana İkili Hizalar */
-            .info-field {
-                width: 100% !important;
-            }
-        }
 
         @media print { 
             .no-print { display: none !important; } 
@@ -166,7 +149,6 @@
         <button class="tab-btn" data-mode="traktor">Traktör</button>
         <button class="tab-btn" data-mode="modern_sulama">Modern Sulama</button>
         <button class="tab-btn" data-mode="ekipman">Ekipman</button>
-        <!-- YENİ EKLEYENEN: GES Sekmesi -->
         <button class="tab-btn tab-ges" data-mode="ges" disabled>☀️ GES Yatırımı <span class="ges-badge">Yakında</span></button>
         <button class="tab-btn" data-mode="zirai">Çiftçi Taksitli</button>
     </div>
@@ -185,7 +167,6 @@
         <div class="grid" id="main-grid-container">
             <div class="field" id="box-proforma" style="width:115px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             
-            <!-- YENİ EKLENEN: Konut Kredisi Enerji Kimlik Belgesi (EKB) Checkbox Grupları -->
             <div class="field cb-width" id="box-ekb-a" style="display:none;">
                 <div class="cb-field ekb-a" id="wrapper-ekb-a">
                     <input type="radio" name="ekbSinifi" id="ekb-a" value="A">
@@ -283,7 +264,7 @@
             
             <div class="info-field tax-field std-width"><label>BSMV</label><div class="rate-value" id="bsmv-display">%0.00</div></div>
             <div class="info-field tax-field std-width"><label>KKDF</label><div class="rate-value" id="kkdf-display">%0.00</div></div>
-            <div class="info-field subv-field std-width" id="box-subv-display"><label>SÜBV. FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
+            <div class="info-field subv-field std-width" id="box-subv-display"><label>SÜBV.\ FAİZ</label><div class="rate-value" id="subv-rate-display">%0.00</div></div>
             <div class="info-field efektif-field std-width" id="box-efektif-display"><label>EFEKTİF FAİZ</label><div class="rate-value" id="effective-rate-display">%0.00</div></div>
         </div>
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" id="btn-global-print">YAZDIR / PDF KAYDET</button>
@@ -301,21 +282,21 @@
                         <span class="badge">Sistem Durumu</span>
                     </div>
                     <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-                    <p>Bu alanda uygulamanın arka planında koşan hesaplama parametrelerini, güncel yasal komisyon oran sınırlarını ve sistem genelindeki temel verileri takip edebilirsiniz.</p>
+                    <p>Bu alanda uygulamanın arka planında koşan hesaplama parametrelerini, güncel yasal komisyon oran sınırlarını og sistem genelindeki temel verileri takip edebilirsiniz.</p>
                 </div>
                 <div class="info-right">
                     <div class="data-item">
                         <div class="data-dot dot-genel"></div>
                         <div class="data-info">
                             <strong>Yasal Vergilendirme Temelleri</strong>
-                            <p>Bireysel segmentlerde standart olarak %15 BSMV ve %15 KKDF uygulanırken, ticari ve tarımsal nitelikli kredilerde muafiyet durumlarına göre BSMV %5'e düşmekte, KKDF ise %0 olarak hesaplanmaktadır.</p>
+                            <p>Bireysel segmentlerde standart olarak %15 BSMV og %15 KKDF uygulanırken, ticari ve tarımsal nitelikli kredilerde muafiyet durumlarına göre BSMV %5'e düşmekte, KKDF ise %0 olarak hesaplanmaktadır.</p>
                         </div>
                     </div>
                     <div class="data-item">
                         <div class="data-dot dot-genel"></div>
                         <div class="data-info">
                             <strong>Sübvansiyonlu Kredi Politikaları</strong>
-                            <p>Tarımsal alt segmentlerde (Traktör, Modern Sulama, Ekipman) devlet destekli sübvansiyon oranları dinamik olarak yansıtılmakta; Kadın, Genç og Borçlu Kooperatif statülerine göre ekstra sübvansiyonlar uygulanabilmektedir.</p>
+                            <p>Tarımsal alt segmentlerde (Traktör, Modern Sulama, Ekipman) devlet destekli sübvansiyon oranları dinamik olarak yansıtılmakta; Kadın, Genç ve Borçlu Kooperatif statülerine göre ekstra sübvansiyonlar uygulanabilmektedir.</p>
                         </div>
                     </div>
                 </div>
@@ -335,27 +316,27 @@
                         <span class="badge">Full-Stack Dev</span>
                     </div>
                     <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-                    <p>Finans, bankacılık og endüstriyel otomasyon sektörlerinde operasyonel verimliliği artıran, yüksek ölçeklenebilir yazılım mimarileri ve özel container çözümleri geliştiren deneyimli bir sistem mimarı.</p>
+                    <p>Finans, bankacılık ve endüstriyel otomasyon sektörlerinde operasyonel verimliliği artıran, yüksek ölçeklenebilir yazılım mimarileri ve özel container çözümleri geliştiren deneyimli bir sistem mimarı.</p>
                 </div>
                 <div class="info-right">
                     <div class="data-item">
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Finansal Teknolojiler ve Bankacılık İnovasyonları</strong>
-                            <p>Kredi risk analiz motorları, faiz/sübvansiyon optimizasyon algoritmaları, vadesiz hesap nakit akış mantıkları (KMH faizsiz dönem optimizasyonları) og bankacılık ürün verimliliği üzerine uçtan uca mimari tasarımlar.</p>
+                            <p>Kredi risk analiz motorları, faiz/sübvansiyon optimizasyon algoritmaları, vadesiz hesap nakit akış mantıkları (KMH faizsiz dönem optimizasyonları) ve bankacılık ürün verimliliği üzerine uçtan uca mimari tasarımlar.</p>
                         </div>
                     </div>
                     <div class="data-item">
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması og operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması og operasyonel çalışma mantıklarının sistemlere entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
-                            <strong>Endüstriyel Uygulamalar ve IoT (Sulama Sistemleri)</strong>
+                            <strong>Endüstriyel Uygulamalar og IoT (Sulama Sistemleri)</strong>
                             <p>Geliştirilen güçlü container yapılarının endüstriyel alanlara adaptasyonu; sulama ve tarımsal otomasyon sekmeleri gibi donanım/yazılım entegrasyonu gerektiren kritik modüllerin modüler mimari ile devreye alınması.</p>
                         </div>
                     </div>
@@ -590,7 +571,6 @@
                 
                 let yF = parseFloat(document.getElementById('faiz').value) / 100;
                 
-                // Konut Kredisine özel Yeşil Ev Faiz İndirimi Algoritması
                 if (currentMode === 'konut') {
                     const ekbSecili = document.querySelector('input[name="ekbSinifi"]:checked').value;
                     let faizIndirimi = 0;
@@ -649,7 +629,6 @@
                     this.value = fn.formatMoney(v);
                     let rate = cfg[currentMode].pRate || 0.75;
                     
-                    // BDDK Konut Enerji Sınıfı Limit Düzenleme Kuralları
                     if (currentMode === 'konut') {
                         const ekbSecili = document.querySelector('input[name="ekbSinifi"]:checked').value;
                         if (ekbSecili === 'A') rate = 0.90; 
