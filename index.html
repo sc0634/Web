@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kredi Planlama & Yönetim Paneli - Süleyman Coşkun</title>
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- html2pdf.js SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
             --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --genel: #16a085; --mimar: #9b59b6;
@@ -27,7 +27,6 @@
         .tab-btn { padding: 5px 10px; border: 1px solid var(--border); background: #fff; border-radius: 3px; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 4px; }
         .tab-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
         
-        /* GES Yakında Sekmesi Özel Stilleri */
         .tab-btn.tab-ges { background: #f1f5f9; color: #94a3b8; border-color: #cbd5e1; cursor: not-allowed; user-select: none; }
         .ges-badge { background-color: #f59e0b; color: white; font-size: 8px; font-weight: 800; padding: 1px 4px; border-radius: 3px; text-transform: uppercase; animation: gesPulse 2s infinite; }
         @keyframes gesPulse {
@@ -42,18 +41,15 @@
         input, select, textarea { height: 32px; padding: 0 5px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; outline: none; width: 100%; text-align: center; }
         textarea { text-align: left; padding: 5px; height: 60px; resize: none; }
 
-        /* Resimli Buton (Toggle-Badge) Tasarımı */
         .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; height: 32px; background: #fdf2f2; border: 1px solid #f5c6cb; border-radius: 4px; padding: 0 8px; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative; }
         .cb-field input[type="checkbox"], .cb-field input[type="radio"] { display: none; } 
         .cb-field label { font-size: 10px; font-weight: bold; color: var(--danger); cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; gap: 5px; }
         .cb-field svg { width: 14px; height: 14px; fill: var(--danger); transition: fill 0.2s ease; }
         
-        /* Aktif / Seçili Olduğunda (Yeşil Durum) */
         .cb-field.checked-active { background: var(--tarimsal); border-color: #27ae60; box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); }
         .cb-field.checked-active label { color: white !important; }
         .cb-field.checked-active svg { fill: white !important; }
 
-        /* Enerji Sınıfları İçin Özel Renk Kodları */
         .cb-field.ekb-a { background: #e8f5e9; border-color: #c8e6c9; }
         .cb-field.ekb-a label { color: #2e7d32; }
         .cb-field.ekb-a svg { fill: #2e7d32; }
@@ -65,7 +61,6 @@
         .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; width: 100%; }
         .vade-label-box { display: flex; justify-content: space-between; width: 100%; font-size: 8px; font-weight: bold; color: var(--dark); margin-top: -2px; }
 
-        /* Genişlik Değerleri (Masaüstü Temelli) */
         .box-proforma-tutar { width: 80px; flex-shrink: 0; }
         .box-kredi-tutar { width: 80px; flex-shrink: 0; }
         .std-width { width: 40px; } 
@@ -76,7 +71,6 @@
         .info-field label { color: #ccc; font-size: 7px; margin-bottom: -1px; width: 100%; font-weight: 700; }
         .info-field .rate-value { font-weight: 800; font-size: 10px; width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
         
-        /* Sübv. Faiz ve Efektif Faiz Alanları */
         .subv-field { background: #16a085; color: white; border-left-color: #1abc9c; width: 50px !important; }
         .efektif-field { background: var(--dark); color: var(--gold); border-left-color: var(--gold); width: 55px !important; }
         .tax-field { background: var(--tax-bg); color: white; border-left-color: #bdc3c7; }
@@ -103,7 +97,6 @@
         .data-info strong { font-size: 11px; color: var(--dark); display: block; margin-bottom: 3px; }
         .data-info p { margin: 0; color: #555; line-height: 1.4; font-size: 10.5px; }
 
-        /* TÜİK Tarım ÜFE Kutusu Stilleri */
         .tuik-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .tuik-title-section { display: flex; align-items: center; gap: 10px; }
         .tuik-icon { background: #e6f7ed; color: #2ecc71; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; }
@@ -136,7 +129,6 @@
         .db-item.highlight .db-value { font-size: 12px; font-weight: 900; }
         .db-divider { width: 1px; height: 25px; background: #e0c0c0; }
         
-        /* BAŞVURU FORMU - MOBİL TEK SATIR STİLLERİ */
         .form-container { margin-top: 20px; border: 1px solid var(--border); border-radius: 6px; background: #fff; overflow: hidden; }
         .form-header { background: var(--dark); color: white; padding: 8px 12px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
         .form-body { padding: 10px; display: flex; flex-direction: row; gap: 5px; align-items: flex-end; width: 100%; }
@@ -145,12 +137,11 @@
         .form-field label { text-align: center; font-size: 9px; color: #666; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .form-field input, .form-field textarea { height: 32px; padding: 0 5px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; text-align: center; width: 100%; margin: 0; }
         .form-field textarea { text-align: left; padding: 6px 5px; line-height: 1.2; }
-        .btn-submit { background: var(--success); color: white; border: none; height: 32px; padding: 0 10px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 10.5px; white-space: nowrap; flex-shrink: 0; }
+        .btn-submit { background: var(--success); color: white; border: none; height: 32px; padding: 0 15px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 10.5px; white-space: nowrap; flex-shrink: 0; }
         .btn-submit:hover { background: #218c4e; }
 
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
 
-        /* MOBİL GÖRÜNÜM DÜZENLEME */
         @media (max-width: 768px) {
             .grid { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
             
@@ -203,7 +194,7 @@
 
         @media print { 
             .no-print { display: none !important; } 
-            .container { box-shadow: none; max-width: 100%; }
+            .container { box-shadow: none; max-width: 100%; padding: 0; margin: 0; }
             .plan-wrapper { display: none !important; border: none !important; }
             .plan-wrapper.print-target { display: block !important; }
             .result-header { background: #eee !important; color: #000 !important; border-bottom: 1px solid #000; }
@@ -213,7 +204,7 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="main-container-pdf">
     <div class="segment-nav no-print">
         <button id="seg-tar" class="seg-btn bg-tar">TARIMSAL</button>
         <button id="seg-tic" class="seg-btn bg-tic">TİCARİ</button>
@@ -241,9 +232,8 @@
         <button class="tab-btn" data-mode="konut">Konut</button>
     </div>
 
-    <div id="calc-engine" class="no-print">
+    <div id="calc-engine">
         <div class="grid" id="main-grid-container">
-            <!-- Proforma Alanı, Kredi Tutarının Önüne Alındı -->
             <div class="field box-proforma-tutar" id="box-proforma"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             <div class="field box-kredi-tutar" id="box-kredi-tutar-div"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
 
@@ -303,7 +293,6 @@
             
             <div class="field cb-width" id="box-buyback" style="display:none;">
                 <div class="cb-field" id="wrapper-buyback">
-                    <input type="checkbox" id="cb-yerli"> <!-- Önceki kod yapısı korunmuştur -->
                     <input type="checkbox" id="cb-buyback">
                     <label for="cb-buyback">
                         <svg viewBox="0 0 24 24"><path d="M18 7H6v12h12V7zm2-4H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12H7v-2h10v2zm0-4H7V9h10v2z"/></svg>
@@ -350,7 +339,6 @@
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" id="btn-global-print">YAZDIR / PDF KAYDET</button>
     </div>
 
-    <!-- GENEL VERİLER SEKME ALANI -->
     <div id="genel-section" class="info-section">
         <div class="info-content">
             <div class="tuik-box">
@@ -433,7 +421,8 @@
                 <label for="form-message">Mesajınız</label>
                 <textarea id="form-message" name="message" placeholder="Açıklama..." required></textarea>
             </div>
-            <button type="submit" class="btn-submit" id="btn-form-submit">GÖNDER</button>
+            <!-- Değişen Buton: GÖNDER yerine KAYDET yapıldı -->
+            <button type="submit" class="btn-submit" id="btn-form-submit">KAYDET</button>
         </form>
     </div>
 </div>
@@ -443,14 +432,6 @@
 </a>
 
 <script>
-    // EmailJS Başlatma
-    (function() {
-        emailjs.init({
-            publicKey: "YOUR_PUBLIC_KEY", 
-        });
-    })();
-
-    // CANLI TARIM ÜFE VERİ ÇEKME FONKSİYONU (CORS-FREE RAW JSON)
     async function fetchTarimUfeData() {
         const url = "https://raw.githubusercontent.com/fatih/turkiye-ekonomi-verileri/main/tarim_ufe.json";
         const statusEl = document.getElementById('tuik-live-status');
@@ -462,7 +443,7 @@
             const data = await response.json();
             
             if (data && data.length > 0) {
-                const sonVeri = data[data.length - 1]; // En güncel ayı seçiyoruz
+                const sonVeri = data[data.length - 1];
                 if (statusEl) {
                     statusEl.innerHTML = `
                         <strong>Canlı Veri:</strong> Tarım ÜFE Yıllık Değişim Oranı: 
@@ -577,7 +558,6 @@
             calcEfektif: function(tutar, yF, sub, bRate, kRate, v, unit, mToplam) {
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
-                // Efektif faiz PMT hesaplamasında tarımsal BSMV baz faiz üzerinden eklendiği için formül güncellendi
                 const maliyetOran = (currentSegment === 'tarimsal') 
                     ? (indirimliOran + (faizOran * bRate) + (indirimliOran * kRate))
                     : (indirimliOran + (indirimliOran * bRate) + (indirimliOran * kRate));
@@ -661,7 +641,6 @@
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
                 
-                // PMT Hesaplama Aşamasında Tarımsal Alan için BSMV'yi Baz Faiz (indirim öncesi) üzerinden yansıtıyoruz
                 const maliyetOran = (currentSegment === 'tarimsal')
                     ? (indirimliOran + (faizOran * bRate) + (indirimliOran * kRate))
                     : (indirimliOran + (indirimliOran * bRate) + (indirimliOran * kRate));
@@ -684,7 +663,7 @@
                     <span class="result-title">${dinamikBaslik}</span>
                     <div class="header-actions no-print">
                         <button class="btn-action btn-print-single" data-target="${wrapperId}">Yazdır</button>
-                        <button class="btn-action btn-whatsapp-single" data-title="${dinamikBaslik}">Kaydet / Gönder</button>
+                        <button class="btn-action btn-whatsapp-single" data-title="${dinamikBaslik}">WhatsApp</button>
                     </div>
                 </div>`;
 
@@ -734,7 +713,6 @@
                     let bazF = bal * faizOran; 
                     let fI = bal * indirimliOran; 
                     
-                    // Tarımsal segmentte BSMV'yi talep ettiğiniz üzere "Baz Faiz (bazF)" üzerinden hesaplıyoruz.
                     let b = (currentSegment === 'tarimsal') ? (bazF * bRate) : (fI * bRate);
                     let k = fI * kRate; 
                     let aPara = pmt - (fI + b + k);
@@ -935,34 +913,35 @@
                 window.open(`https://wa.me/905345217697?text=${encodeURIComponent(text)}`, '_blank');
             });
 
+            // YENİ ENTEGRASYON: Butona Basıldığında PDF Olarak Kaydetme Mantığı
             document.getElementById('loan-application-form').addEventListener('submit', function(event) {
                 event.preventDefault();
                 
                 const btnSubmit = document.getElementById('btn-form-submit');
-                btnSubmit.innerText = "SABRET...";
+                const eskiMetin = btnSubmit.innerText;
+                btnSubmit.innerText = "PDF ÜRETİLİYOR...";
                 btnSubmit.disabled = true;
 
-                const templateParams = {
-                    tckn: document.getElementById('form-tckn').value,
-                    phone: document.getElementById('form-phone').value,
-                    message: document.getElementById('form-message').value,
-                    kredi_segment: currentSegment.toUpperCase(),
-                    kredi_modu: currentMode.toUpperCase(),
-                    kredi_tutari: document.getElementById('tutar').value + " TL",
-                    efektif_faiz: document.getElementById('effective-rate-display').innerText
+                // PDF oluşturma ayarları
+                const hedefElement = document.getElementById('main-container-pdf');
+                const opsiyonlar = {
+                    margin:       8,
+                    filename:     'Kredi_Planlama_Raporu.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true }, 
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
 
-                emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
-                    .then(function() {
-                        alert('Başvurunuz başarıyla iletildi!');
-                        document.getElementById('loan-application-form').reset();
-                        btnSubmit.innerText = "GÖNDER";
-                        btnSubmit.disabled = false;
-                    }, function(error) {
-                        alert('Hata oluştu: ' + JSON.stringify(error));
-                        btnSubmit.innerText = "GÖNDER";
-                        btnSubmit.disabled = false;
-                    });
+                // html2pdf kütüphanesini tetikliyoruz
+                html2pdf().set(opsiyonlar).from(hedefElement).save().then(() => {
+                    btnSubmit.innerText = eskiMetin;
+                    btnSubmit.disabled = false;
+                }).catch(err => {
+                    console.error("PDF oluşturma hatası:", err);
+                    alert("PDF oluşturulurken bir hata meydana geldi.");
+                    btnSubmit.innerText = eskiMetin;
+                    btnSubmit.disabled = false;
+                });
             });
         };
 
