@@ -62,10 +62,10 @@
         .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
         .vade-label-box { display: flex; justify-content: space-between; width: 100%; font-size: 8px; font-weight: bold; color: var(--dark); margin-top: -2px; }
 
-        /* Genişliklerin 25px Değerine Yükseltilmesi ve 115px Değerlerinin 100px Yapılması */
-        .std-width { width: 25px; } 
+        /* Genişliklerin Yeni Piksel Değerleri (25px -> 40px, 100px -> 80px) */
+        .std-width { width: 40px; } 
         .range-width { width: 110px; }
-        .cb-width { width: 100px; }
+        .cb-width { width: 80px; }
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
         .info-field label { color: #ccc; font-size: 7px; margin-bottom: -1px; width: 100%; font-weight: 700; }
@@ -75,8 +75,8 @@
         .efektif-field { background: var(--dark); color: var(--gold); border-left-color: var(--gold); }
         .tax-field { background: var(--tax-bg); color: white; border-left-color: #bdc3c7; }
 
-        /* Bilgi ve Vergi Alanları da 25px Yapıldı */
-        .info-field.std-width { width: 25px; }
+        /* Bilgi ve Vergi Alanları da 40px Yapıldı */
+        .info-field.std-width { width: 40px; }
 
         .info-section { display: none; background: white; border: 1px solid var(--border); border-radius: 6px; margin-top: 5px; overflow: hidden; }
         .info-content { padding: 20px; background: #fff; }
@@ -165,7 +165,7 @@
 
     <div id="calc-engine" class="no-print">
         <div class="grid" id="main-grid-container">
-            <div class="field" id="box-proforma" style="width:100px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
+            <div class="field" id="box-proforma" style="width:80px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             
             <div class="field cb-width" id="box-ekb-a" style="display:none;">
                 <div class="cb-field ekb-a" id="wrapper-ekb-a">
@@ -195,7 +195,7 @@
                 </div>
             </div>
 
-            <div class="field" style="width:100px;"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
+            <div class="field" style="width:80px;"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
             <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
             <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01"></div>
             
