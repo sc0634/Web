@@ -69,7 +69,7 @@
         .box-kredi-tutar { width: 80px; flex-shrink: 0; }
         .std-width { width: 40px; } 
         .range-width { width: 260px; }
-        .cb-width { width: 80px; }
+        .cb-width { width: 85px; }
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
         .info-field label { color: #ccc; font-size: 7px; margin-bottom: -1px; width: 100%; font-weight: 700; }
@@ -102,7 +102,7 @@
         .data-info strong { font-size: 11px; color: var(--dark); display: block; margin-bottom: 3px; }
         .data-info p { margin: 0; color: #555; line-height: 1.4; font-size: 10.5px; }
 
-        /* Yeni Eklenen TÜİK Tarım ÜFE Kutusu Stilleri */
+        /* TÜİK Tarım ÜFE Kutusu Stilleri */
         .tuik-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .tuik-title-section { display: flex; align-items: center; gap: 10px; }
         .tuik-icon { background: #e6f7ed; color: #2ecc71; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; }
@@ -139,7 +139,6 @@
         .form-container { margin-top: 20px; border: 1px solid var(--border); border-radius: 6px; background: #fff; overflow: hidden; }
         .form-header { background: var(--dark); color: white; padding: 8px 12px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
         .form-body { padding: 10px; display: flex; flex-direction: row; gap: 5px; align-items: flex-end; width: 100%; }
-        .form-body { padding: 10px; display: flex; flex-direction: row; gap: 5px; align-items: flex-end; width: 100%; }
         .form-field { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
         .form-field label { text-align: center; font-size: 9px; color: #666; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .form-field input, .form-field textarea { height: 32px; padding: 0 5px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; text-align: center; width: 100%; margin: 0; }
@@ -149,7 +148,7 @@
 
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
 
-        /* MOBİL GÖRÜNÜM VE MOBİL CİHAZ GENİŞLİĞİNE GÖRE DÜZENLEME */
+        /* MOBİL GÖRÜNÜM DÜZENLEME */
         @media (max-width: 768px) {
             .grid { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
             
@@ -183,13 +182,11 @@
                 min-width: 55px !important;
             }
             
-            /* Form mobilde de tek satır kalmaya devam etsin */
             .form-body { flex-direction: row !important; gap: 4px !important; padding: 6px !important; }
             .form-field label { font-size: 8px !important; }
             .form-field input, .form-field textarea { font-size: 10px !important; height: 32px !important; padding: 0 3px !important; }
             .btn-submit { font-size: 10px !important; padding: 0 6px !important; height: 32px !important; }
             
-            /* TÜİK kutusu mobil uyum */
             .tuik-box { flex-direction: column; text-align: center; gap: 10px; }
             .tuik-title-section { flex-direction: column; }
             .btn-tuik-link { width: 100%; justify-content: center; }
@@ -238,6 +235,15 @@
         <div class="grid" id="main-grid-container">
             <div class="field" id="box-proforma" style="width:80px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             
+            <!-- Modern Sulama Tipi Container Seçimi -->
+            <div class="field" id="box-sulama-tipi" style="width:105px; display:none;">
+                <label>Sulama Yöntemi</label>
+                <select id="sulama-tipi-select">
+                    <option value="modern" selected>Damlama / Yağmurlama</option>
+                    <option value="vahsi">Yüzeyel / Vahşi Sulama</option>
+                </select>
+            </div>
+
             <div class="field cb-width" id="box-ekb-a" style="display:none;">
                 <div class="cb-field ekb-a" id="wrapper-ekb-a">
                     <input type="radio" name="ekbSinifi" id="ekb-a" value="A">
@@ -342,7 +348,6 @@
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" id="btn-global-print">YAZDIR / PDF KAYDET</button>
     </div>
 
-    <!-- TEMİZLENEN GENEL VERİLER ALANI VE ENTEGRE EDİLEN TARIM ÜFE KUTUSU -->
     <div id="genel-section" class="info-section">
         <div class="info-content">
             <div class="tuik-box">
@@ -386,7 +391,7 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlere entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -410,7 +415,6 @@
         <div id="plan-custom" class="plan-wrapper"></div>
     </div>
 
-    <!-- BAŞVURU FORMU CONTAINER (MOBİL TEK SATIR UYUMLU) -->
     <div class="form-container no-print" id="application-container">
         <div class="form-header">KREDİ HIZLI BAŞVURU FORMU</div>
         <form id="loan-application-form" class="form-body">
@@ -456,7 +460,7 @@
             modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true, hasRehin: true },
             ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true, hasRehin: true },
             zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: true, hasRehin: true },
-            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false, hasRehin: false },
+            ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false, hasRehin: false, hasHayat: false },
             konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, viewEkb: true, hasKasko: false, hasRehin: true },
             tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 36, maxVade: 48, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: true, hasRehin: true },
             ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 24, minVade: 1, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false, hasRehin: false }
@@ -488,20 +492,26 @@
                 const bazOran = 0.02; 
                 const artisMiktari = 0.0025; 
                 const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
-                const hayat = tutar * dinamikOran;
+                const hayat = (state.hasHayat !== false) ? (tutar * dinamikOran) : 0;
                 
                 let tarsimUcreti = state.tarsim ? (tutar * 0.04) : 0;
                 const netKomisyon = tutar * (komPct/100);
                 let rehinUcreti = state.hasRehin ? REHIN_SABIT : 0;
 
+                // Tarımsal ve Ticari sekmeleri için binde 5 Limit Tahsis Masrafı hesabı
+                let limitTahsis = 0;
+                if (currentSegment === 'tarimsal' || currentSegment === 'ticari') {
+                    limitTahsis = tutar * 0.005;
+                }
+
                 return { 
                     komisyon: netKomisyon * 1.05, 
                     kasko: kasko,
                     hayat: hayat,
-                    hayatOran: dinamikOran * 100,
                     tarsim: tarsimUcreti,
                     rehin: rehinUcreti,
-                    toplam: (netKomisyon * 1.05) + kasko + hayat + tarsimUcreti + rehinUcreti 
+                    limitTahsis: limitTahsis,
+                    toplam: (netKomisyon * 1.05) + kasko + hayat + tarsimUcreti + rehinUcreti + limitTahsis 
                 };
             },
             calcEfektif: function(tutar, yF, sub, bRate, kRate, v, unit, mToplam) {
@@ -536,7 +546,8 @@
                     calculatedSub = 25; 
                     if (isYerli) calculatedSub += 25; 
                 } else if (currentMode === 'modern_sulama') {
-                    calculatedSub = 75; 
+                    const sulamaTipi = document.getElementById('sulama-tipi-select').value;
+                    calculatedSub = (sulamaTipi === 'modern') ? 75 : 25; 
                     if (isYerli) calculatedSub += 25;
                 } else if (currentMode === 'ekipman') {
                     calculatedSub = 50; 
@@ -615,8 +626,14 @@
                     <div class="db-divider"></div>
                     <div class="db-item"><span class="db-label">Kasko</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.kasko).toLocaleString('tr-TR')} TL</span></div>
                     ` : ''}
+                    ${masraf.hayat > 0 ? `
                     <div class="db-divider"></div>
-                    <div class="db-item"><span class="db-label">Hayat Sigortası (%${masraf.hayatOran.toFixed(2)})</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.hayat).toLocaleString('tr-TR')} TL</span></div>
+                    <div class="db-item"><span class="db-label">Hayat Sigortası</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.hayat).toLocaleString('tr-TR')} TL</span></div>
+                    ` : ''}
+                    ${masraf.limitTahsis > 0 ? `
+                    <div class="db-divider"></div>
+                    <div class="db-item"><span class="db-label">Limit Tahsis Masrafı</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.limitTahsis).toLocaleString('tr-TR')} TL</span></div>
+                    ` : ''}
                     ${masraf.tarsim > 0 ? `
                     <div class="db-divider"></div>
                     <div class="db-item"><span class="db-label">Tarsim (Her Yıl)</span><span class="db-value" style="color:var(--dosya)">${Math.round(masraf.tarsim).toLocaleString('tr-TR')} TL</span></div>
@@ -729,11 +746,24 @@
                         if (ekbSecili === 'A') rate = 0.90; 
                         if (ekbSecili === 'B') rate = 0.85; 
                         else rate = 0.75; 
+                    } else if (currentMode === 'modern_sulama') {
+                        const sulamaTipi = document.getElementById('sulama-tipi-select').value;
+                        rate = (sulamaTipi === 'modern') ? 1.0 : 0.75;
                     }
 
                     document.getElementById('tutar').value = fn.formatMoney(Math.floor(parseInt(v) * rate));
                 }
                 coreCalculator.calculate();
+            });
+
+            // Sulama Tipi Değiştiğinde Proforma Tetikleme ve Yeniden Hesaplama
+            document.getElementById('sulama-tipi-select').addEventListener('change', function() {
+                const profEl = document.getElementById('proforma');
+                if(profEl.value) {
+                    profEl.dispatchEvent(new Event('input'));
+                } else {
+                    coreCalculator.calculate();
+                }
             });
 
             document.getElementById('tutar').addEventListener('input', function() {
@@ -841,7 +871,6 @@
                     efektif_faiz: document.getElementById('effective-rate-display').innerText
                 };
 
-                // EmailJS Gönderim Tetikleyici
                 emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
                     .then(function() {
                         alert('Başvurunuz başarıyla iletildi!');
@@ -891,6 +920,9 @@
             btn.classList.add('active');
             
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
+            
+            // Sulama Tipi Seçim Kutusu Kontrolü
+            document.getElementById('box-sulama-tipi').style.display = (m === 'modern_sulama') ? 'flex' : 'none';
             
             const viewEkb = s.viewEkb || false;
             document.getElementById('box-ekb-a').style.display = viewEkb ? 'flex' : 'none';
