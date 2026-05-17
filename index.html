@@ -235,7 +235,6 @@
 
     <div id="calc-engine" class="no-print">
         <div class="grid" id="main-grid-container">
-            <!-- Sıralama Güncellendi: Önce Kredi Tutarı, Sonra Proforma Tutarı -->
             <div class="field box-kredi-tutar"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
             <div class="field" id="box-proforma" style="width:80px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
 
@@ -487,7 +486,6 @@
             KONUT_EKSPERTIZ_IPOTEK: 9500
         };
         
-        /* GÜNCELLEME: Kasko ve Rehin sadece traktor ve tasit modlarında true bırakıldı */
         const cfg = {
             traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true, hasKasko: true, hasRehin: true },
             modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: false, hasRehin: false },
@@ -501,7 +499,7 @@
         };
         
         let currentMode = 'traktor';
-        let currentBsmv = 0;
+        let currentBsmv = 5;
         let currentKkdf = 0;
         let currentSegment = 'tarimsal';
         let isRecalculating = false; 
@@ -1055,7 +1053,6 @@
             
             if (currentSegment === 'bireysel' || s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
-                // Sıralama Güncellemesi: Kredi tutarını en başa yerleştir, vadiyi hemen yanına koy (veya dom ağacındaki sırayı koru)
                 mainGrid.insertBefore(boxTutar, mainGrid.firstChild);
                 mainGrid.insertBefore(boxVade, boxTutar.nextSibling);
                 
@@ -1067,7 +1064,6 @@
                 document.getElementById('vade-val-lbl').innerText = slider.value + " Ay";
             } else {
                 boxVade.style.display = 'none';
-                // Ay vadeli olmayan modlarda da Kredi Tutarının ilk sırada kalmasını garanti edelim
                 mainGrid.insertBefore(boxTutar, mainGrid.firstChild);
             }
 
@@ -1086,6 +1082,7 @@
             document.getElementById('faiz').value = s.faiz.toFixed(2);
             document.getElementById('faiz-aylik').value = (s.faiz / 12).toFixed(4);
             
+            // Vergi Oranları Güncellemesi: currentBsmv ve currentKkdf doğrudan cfg nesnesinden okunuyor.
             currentBsmv = s.bsmv;
             currentKkdf = s.kkdf;
             document.getElementById('bsmv-display').innerText = `%${s.bsmv}.00`;
@@ -1098,7 +1095,7 @@
             init: function() {
                 bindEvents();
                 switchSegment('tarimsal');
-                fetchTarimUfeData(); // SAYFA YÜKLENDİĞİNDE ANLIK VERİYİ ÇEKER
+                fetchTarimUfeData();
             }
         };
     })();
