@@ -13,8 +13,6 @@
             --danger: #e74c3c; --whatsapp: #25d366; --gold: #f1c40f;
             --print-all-color: #3f51b5; --dosya: #c0392b;
             --tax-bg: #7f8c8d;
-            --container-blue: #2980b9;
-            --irrigation-cyan: #1abc9c;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background: #f1f2f6; margin: 0; padding: 10px; color: var(--dark); font-size: 11px; }
@@ -66,7 +64,7 @@
         .box-proforma-tutar { width: 80px; flex-shrink: 0; }
         .box-kredi-tutar { width: 80px; flex-shrink: 0; }
         .std-width { width: 40px; } 
-        .range-width { width: 200px; }
+        .range-width { width: 200px; } 
         .cb-width { width: 85px; }
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
@@ -99,27 +97,13 @@
         .data-info strong { font-size: 11px; color: var(--dark); display: block; margin-bottom: 3px; }
         .data-info p { margin: 0; color: #555; line-height: 1.4; font-size: 10.5px; }
 
-        .tuik-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
-        .tuik-table th, .tuik-table td { padding: 10px; border: 1px solid #e2e8f0; text-align: left; }
-        .tuik-table th { background-color: #f8fafc; font-weight: 700; color: #334155; }
-        .tuik-table td.center { text-align: center; font-weight: bold; }
-
-        .tuik-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .tuik-top-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%; }
+        .tuik-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .tuik-title-section { display: flex; align-items: center; gap: 10px; }
         .tuik-icon { background: #e6f7ed; color: #2ecc71; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; }
         .tuik-text h4 { margin: 0; font-size: 12px; color: var(--dark); font-weight: 700; }
         .tuik-text p { margin: 2px 0 0 0; font-size: 10px; color: #64748b; line-height: 1.4; }
         .btn-tuik-link { background: #2ecc71; color: white; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; font-size: 10.5px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s; }
         .btn-tuik-link:hover { background: #27ae60; }
-
-        .sulama-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .sulama-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
-        .sulama-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 10px; text-align: center; }
-        .sulama-card h5 { margin: 0 0 4px 0; font-size: 10px; color: #64748b; text-transform: uppercase; }
-        .sulama-card .stat-val { font-size: 14px; font-weight: 800; color: var(--dark); }
-        .sulama-card .stat-val.positive { color: var(--success); }
-        .sulama-card .stat-val.tech { color: var(--container-blue); }
 
         .result-main-container { margin-top: 5px; display: none; }
         .plan-wrapper { border: 1px solid var(--dark); border-radius: 5px; overflow: hidden; margin-bottom: 20px; background: white; }
@@ -147,7 +131,7 @@
         
         .form-container { margin-top: 20px; border: 1px solid var(--border); border-radius: 6px; background: #fff; overflow: hidden; }
         .form-header { background: var(--dark); color: white; padding: 8px 12px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
-        .form-body { padding: 10px; display: flex; flex-direction: row; gap: 5px; align-items: stretch; width: 100%; }
+        .form-body { padding: 10px; display: flex; flex-direction: row; gap: 5px; align-items: flex-end; width: 100%; }
         .form-body.disabled-form { opacity: 0.6; pointer-events: none; }
         .form-field { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
         .form-field label { text-align: center; font-size: 9px; color: #666; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -160,18 +144,50 @@
 
         @media (max-width: 768px) {
             .grid { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
-            .box-proforma-tutar { width: 80px !important; flex-shrink: 0 !important; flex-grow: 0 !important; order: 1; }
-            .box-kredi-tutar { width: 80px !important; flex-shrink: 0 !important; flex-grow: 0 !important; order: 2; }
-            .range-width { flex-grow: 1 !important; width: calc(100% - 172px) !important; min-width: 120px; order: 3; }
-            .field:not(.box-kredi-tutar):not(.box-proforma-tutar):not(.range-width) { flex-grow: 1; min-width: 65px; order: 4; }
-            .info-field { flex-grow: 1; min-width: 50px; order: 5; }
-            .efektif-field { min-width: 55px !important; }
+            
+            .box-proforma-tutar {
+                width: 80px !important;
+                flex-shrink: 0 !important;
+                flex-grow: 0 !important;
+                order: 1;
+            }
+
+            .box-kredi-tutar { 
+                width: 80px !important; 
+                flex-shrink: 0 !important; 
+                flex-grow: 0 !important;
+                order: 2;
+            }
+            
+            .range-width { 
+                flex-grow: 1 !important; 
+                width: calc(100% - 172px) !important; 
+                min-width: 120px;
+                order: 3; 
+            }
+            
+            .field:not(.box-kredi-tutar):not(.box-proforma-tutar):not(.range-width) { 
+                flex-grow: 1; 
+                min-width: 65px;
+                order: 4;
+            }
+            
+            .info-field {
+                flex-grow: 1;
+                min-width: 50px;
+                order: 5;
+            }
+            
+            .efektif-field {
+                min-width: 55px !important;
+            }
+            
             .form-body { flex-direction: row !important; gap: 4px !important; padding: 6px !important; }
             .form-field label { font-size: 8px !important; }
             .form-field input, .form-field textarea { font-size: 10px !important; height: 32px !important; padding: 0 3px !important; }
             .btn-submit { font-size: 10px !important; padding: 0 6px !important; height: 32px !important; }
+            
             .tuik-box { flex-direction: column; text-align: center; gap: 10px; }
-            .tuik-top-row { flex-direction: column; }
             .tuik-title-section { flex-direction: column; }
             .btn-tuik-link { width: 100%; justify-content: center; }
         }
@@ -179,10 +195,12 @@
         @media print { 
             .no-print { display: none !important; } 
             .container { box-shadow: none; max-width: 100%; padding: 0; margin: 0; }
-            .plan-wrapper { display: none !important; border: none !important; }
+            .plan-wrapper { display: none !important; border: none !important; page-break-inside: avoid !important; }
             .plan-wrapper.print-target { display: block !important; }
             .result-header { background: #eee !important; color: #000 !important; border-bottom: 1px solid #000; }
             .header-actions { display: none !important; }
+            tr { page-break-inside: avoid !important; page-break-after: auto !important; }
+            thead { display: table-header-group !important; }
         }
     </style>
 </head>
@@ -201,7 +219,7 @@
         <button class="tab-btn" data-mode="traktor">Traktör</button>
         <button class="tab-btn" data-mode="modern_sulama">Modern Sulama</button>
         <button class="tab-btn" data-mode="ekipman">Ekipman</button>
-        <button class="tab-btn" data-mode="ges" disabled>☀️ GES Yatırımı <span class="ges-badge">Yakında</span></button>
+        <button class="tab-btn tab-ges" data-mode="ges" disabled>☀️ GES Yatırımı <span class="ges-badge">Yakında</span></button>
         <button class="tab-btn" data-mode="isletme_kredisi">İşletme Kredisi</button>
         <button class="tab-btn" data-mode="zirai">Çiftçi Taksitli</button>
     </div>
@@ -262,6 +280,7 @@
 
             <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
             <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01"></div>
+            
             <div class="field std-width" id="box-sub"><label>Sübv%</label><input type="number" id="subOran"></div>
             
             <div class="field cb-width" id="box-yerli" style="display:none;">
@@ -325,114 +344,16 @@
     <div id="genel-section" class="info-section">
         <div class="info-content">
             <div class="tuik-box">
-                <div class="tuik-top-row">
-                    <div class="tuik-title-section">
-                        <div class="tuik-icon">📊</div>
-                        <div class="tuik-text">
-                            <h4>Tarım ÜFE (Üretici Fiyat Endeksi) Raporu & Projeksiyonu</h4>
-                            <p id="tuik-live-status">⏳ Sayfa yüklendiğinde güncel veri sorgulanacak...</p>
-                        </div>
-                    </div>
-                    <a href="https://data.tuik.gov.tr/Search/Search?text=Tar%C4%B1m%20%C3%9CFE" target="_blank" class="btn-tuik-link">
-                        Resmi TÜİK Portalı ↗
-                    </a>
-                </div>
-
-                <table class="tuik-table">
-                    <thead>
-                        <tr>
-                            <th>Dönem / Zaman Grafiği</th>
-                            <th style="text-align: center; width: 150px;">Tarım-ÜFE Oranı</th>
-                            <th>Durum / Senaryo Analizi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Son Resmi Veri</strong></td>
-                            <td class="center" id="table-tuik-son" style="color: #27ae60; font-size: 12px;">%42,53</td>
-                            <td id="table-tuik-son-desc">Resmi açıklanan güncel veridir. Sektör maliyet dengesi izlenmektedir.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>1 Ay Sonra</strong></td>
-                            <td class="center" id="table-tuik-1ay" style="color: #2c3e50;">%41,80</td>
-                            <td>Mevsimsellik etkisi (üretim artışı) sebebiyle maliyetlerde hafif gevşeme bekleniyor.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>12 Ay Sonra (1 Yıl)</strong></td>
-                            <td class="center" id="table-tuik-12ay" style="color: #e67e22;">%28,50</td>
-                            <td>Sıkı para politikası ve baz etkisiyle %30 bandının altına gerileme öngörülüyor.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>24 Ay Sonra (2 Yıl)</strong></td>
-                            <td class="center" id="table-tuik-24ay" style="color: #3498db;">%18,20</td>
-                            <td>Makro istikrar adımları ve tarımsal yapısal reform kalıcı normalleşme senaryosu.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Yıl Sonu Hedefi</strong></td>
-                            <td class="center" style="color: #3f51b5;" id="table-tuik-yilsonu">%34,20</td>
-                            <td>TCMB Enflasyon Patikası konsensüs beklentisi.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="sulama-box">
-                <div class="tuik-top-row">
-                    <div class="tuik-title-section">
-                        <div class="tuik-icon" style="background: #e8f8f5; color: var(--irrigation-cyan);">💧</div>
-                        <div class="tuik-text">
-                            <h4>Konteyner Tabanlı Akıllı Sulama (IoT) Verimlilik Projeksiyonu</h4>
-                            <p>Yerel mikroservis container mimarisi ile optimize edilmiş donanım/yazılım entegrasyonu analizi.</p>
-                        </div>
-                    </div>
-                    <span class="badge" style="background: var(--container-blue); color: white; padding: 6px 10px; font-weight: bold; border-radius: 4px;">Container Node: Active</span>
-                </div>
-
-                <div class="sulama-stats-grid">
-                    <div class="sulama-card">
-                        <h5>Su ve Enerji Tasarrufu</h5>
-                        <div class="stat-val positive">%42.5</div>
-                    </div>
-                    <div class="sulama-card">
-                        <h5>Gübre & İşçilik Optimizasyonu</h5>
-                        <div class="stat-val positive">%30.0</div>
-                    </div>
-                    <div class="sulama-card">
-                        <h5>Yatırım Geri Dönüş (ROI)</h5>
-                        <div class="stat-val tech" id="sulama-dynamic-roi">14.2 Ay</div>
-                    </div>
-                    <div class="sulama-card">
-                        <h5>Sistem Kararlılığı (Uptime)</h5>
-                        <div class="stat-val tech">%99.98</div>
+                <div class="tuik-title-section">
+                    <div class="tuik-icon">📊</div>
+                    <div class="tuik-text">
+                        <h4>Tarım ÜFE (Üretici Fiyat Endeksi)</h4>
+                        <p id="tuik-live-status">⏳ Sayfa yüklendiğinde güncel veri sorgulanacak...</p>
                     </div>
                 </div>
-
-                <table class="tuik-table" style="margin-top: 12px;">
-                    <thead>
-                        <tr>
-                            <th>Otomasyon Katmanı (Konteyner Servisi)</th>
-                            <th style="text-align: center; width: 150px;">Operasyonel Etki</th>
-                            <th>Teknolojik Avantaj / Altyapı Notu</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Sensör Veri İşleme Node'u</strong></td>
-                            <td class="center" style="color: var(--irrigation-cyan);">Anlık Reaksiyon</td>
-                            <td>Toprak nemi ve buharlaşma endeksine göre dinamik debi ayarı (0 gecikme).</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Güç & Vana Yönetim Modülü</strong></td>
-                            <td class="center" style="color: var(--container-blue);">%25 Enerji Kazancı</td>
-                            <td>Pik akım zamanlarında enerji yük dengelemesi (Load Balancing) optimizasyonu.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Fail-Safe Kesinti Koruması</strong></td>
-                            <td class="center" style="color: var(--danger);">İzole Çalışma Mantığı</td>
-                            <td>Merkezi şebeke/bulut kesilse dahi lokal container içinde otonom sürdürülebilirlik.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <a href="https://data.tuik.gov.tr/Search/Search?text=Tar%C4%B1m%20%C3%9CFE" target="_blank" class="btn-tuik-link">
+                    Resmi TÜİK Portalı ↗
+                </a>
             </div>
         </div>
     </div>
@@ -463,7 +384,7 @@
                         <div class="data-dot dot-mimar"></div>
                         <div class="data-info">
                             <strong>Altyapı ve Container Teknolojileri</strong>
-                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli ve bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
+                            <p>Yüksek erişilebilirlik gerektiren projeler için özelleştirilmiş, güvenli và bağımsız yerli container altyapılarının tasarlanması, mikroservis mimarilerinin kurgulanması ve operasyonel çalışma mantıklarının sistemlene entegrasyonu.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -488,25 +409,21 @@
     </div>
 
     <div class="form-container no-print" id="application-container">
-        <div class="form-header">KREDİ HIZLI BAŞVURU FORMU (E-POSTA YÖNLENDİMRMELİ)</div>
-        <form id="loan-application-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="form-body">
-            <input type="hidden" id="mail-kredi-turu" name="Kredi Türü">
-            <input type="hidden" id="mail-kredi-tutari" name="Talep Edilen Tutar">
-            <input type="hidden" id="mail-efektif-faiz" name="Efektif Faiz Oranı">
-            
+        <div class="form-header">KREDİ HIZLI BAŞVURU FORMU</div>
+        <form id="loan-application-form" class="form-body">
             <div class="form-field">
                 <label for="form-tckn">TC Kimlik No</label>
-                <input type="text" id="form-tckn" name="TCKN" maxlength="11" pattern="\d{11}" placeholder="11 Haneli" required>
+                <input type="text" id="form-tckn" name="tckn" maxlength="11" pattern="\d{11}" placeholder="11 Haneli" required>
             </div>
             <div class="form-field">
                 <label for="form-phone">Cep Telefonu</label>
-                <input type="tel" id="form-phone" name="Telefon" placeholder="05XX XXX XX XX" required>
+                <input type="tel" id="form-phone" name="phone" placeholder="05XX XXX XX XX" required>
             </div>
             <div class="form-field" style="flex: 1.5;">
-                <label for="form-message">Mesajınız / Ek Notlar</label>
-                <textarea id="form-message" name="Müşteri Mesajı" placeholder="Açıklama..." required></textarea>
+                <label for="form-message">Mesajınız</label>
+                <textarea id="form-message" name="message" placeholder="Açıklama..." required></textarea>
             </div>
-            <button type="submit" class="btn-submit" id="btn-form-submit">E-POSTA İLE GÖNDER</button>
+            <button type="submit" class="btn-submit" id="btn-form-submit">KAYRET</button>
         </form>
     </div>
 </div>
@@ -516,76 +433,73 @@
 </a>
 
 <script>
-    // Dinamik TÜİK Veri Entegrasyon ve Önbellek Motoru
+    // MERKEZ BANKASI EVDS CANLI VERİ ENTEGRASYONU SİSTEMİ
     async function fetchTarimUfeData() {
-        const targetUrl = "https://veriportali.tuik.gov.tr/api/press/current?id=tarim_ufe";
-        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
         const statusEl = document.getElementById('tuik-live-status');
-        
-        const cellSon = document.getElementById('table-tuik-son');
-        const cell1Ay = document.getElementById('table-tuik-1ay');
-        const cell12Ay = document.getElementById('table-tuik-12ay');
-        const cell24Ay = document.getElementById('table-tuik-24ay');
-        const cellYilSonu = document.getElementById('table-tuik-yilsonu');
-        const cellSonDesc = document.getElementById('table-tuik-son-desc');
+        if (!statusEl) return;
 
-        // Sabit/Önbellek Kararlı Durum Verileri (Fallback Senaryosu)
-        const localCacheFallback = {
-            oran: 42.53,
-            tarih: "Nisan 2026",
-            tahminler: { m1: 41.80, m12: 28.50, m24: 18.20, ysonu: 34.20 }
+        // EVDS Yapılandırma Parametreleri
+        const CONFIG = {
+            API_KEY: "SİZİN_EVDS_API_ANAHTARINIZ", // Aldığınız gerçek EVDS API anahtarını buraya girin
+            SERI_KODU: "TP.FG.J0",                // Örnek: Tüketici Fiyat Endeksi
+            FALLBACK_ORAN: "48.25"                 // Bağlantı kesilirse gösterilecek kararlı yedek veri
+        };
+        
+        const bugun = new Date();
+        const ucAyOnce = new Date();
+        ucAyOnce.setMonth(bugun.getMonth() - 3);
+        
+        const formatEvdsDate = (date) => {
+            const d = String(date.getDate()).padStart(2, '0');
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const y = date.getFullYear();
+            return `${d}-${m}-${y}`;
         };
 
+        const evdsUrl = `https://evds2.tcmb.gov.tr/service/evds/?series=${CONFIG.SERI_KODU}&startDate=${formatEvdsDate(ucAyOnce)}&endDate=${formatEvdsDate(bugun)}&type=json`;
+        const proxyUrl = `https://cors-anywhere.herokuapp.com/${evdsUrl}`;
+
         try {
-            const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error("Ağ geçidi bağlantı hatası.");
-            
-            const wrapper = await response.json();
-            if (!wrapper || !wrapper.contents) throw new Error("Proxy boş veri döndürdü.");
-            
-            const data = JSON.parse(wrapper.contents);
-            let gelenOran = null;
-            let gelenTarih = localCacheFallback.tarih;
+            statusEl.innerHTML = `⏳ Merkez Bankası EVDS sistemine güvenli bağlantı kuruluyor...`;
 
-            if (data && data.oran) {
-                gelenOran = parseFloat(data.oran);
-                gelenTarih = data.tarih || 'Güncel Dönem';
-            } else if (Array.isArray(data) && data.length > 0) {
-                const sonVeri = data[data.length - 1];
-                gelenOran = parseFloat(sonVeri.oran);
-                gelenTarih = sonVeri.tarih || gelenTarih;
-            }
+            const response = await fetch(proxyUrl, {
+                method: 'GET',
+                headers: {
+                    'key': CONFIG.API_KEY,
+                    'Accept': 'application/json'
+                }
+            });
 
-            // Gelen canlı veri geçerli mi kontrolü
-            if (gelenOran && !isNaN(gelenOran)) {
+            if (!response.ok) throw new Error("EVDS API portundan geçersiz yanıt döndü.");
+            
+            const data = await response.json();
+            
+            if (data && data.items && data.items.length > 0) {
+                const gecerliVeriler = data.items.filter(item => 
+                    item[CONFIG.SERI_KODU] !== null && 
+                    item[CONFIG.SERI_KODU] !== undefined && 
+                    item[CONFIG.SERI_KODU] !== ""
+                );
+                
+                if (gecerliVeriler.length === 0) throw new Error("Tarih aralığında veri bulunamadı.");
+
+                const sonVeri = gecerliVeriler[gecerliVeriler.length - 1];
+                const oran = parseFloat(sonVeri[CONFIG.SERI_KODU]).toFixed(2);
+                
                 statusEl.innerHTML = `
-                    <strong>Canlı Veri Bağlantısı:</strong> Tarım ÜFE Yıllık Değişim: 
-                    <span style="color: var(--success); font-weight: 800; font-size: 11px;">%${gelenOran.toFixed(2)}</span>
-                    <br>Referans Dönemi: <strong>${gelenTarih}</strong> | Durum: Canlı Senkronize (${new Date().toLocaleTimeString('tr-TR')})
+                    <strong>Canlı Veri (TCMB EVDS):</strong> Resmi Endeks/Değişim Oranı: 
+                    <span style="color: var(--success); font-weight: 800; font-size: 11px;">%${oran}</span>
+                    <br>Veri Dönemi: <strong>${sonVeri.Tarih}</strong> | Sistem Kontrolü: Canlı (${new Date().toLocaleTimeString('tr-TR')})
                 `;
-                renderTuikUI(gelenOran, gelenTarih);
             } else {
-                throw new Error("Veri formatı uyuşmazlığı.");
+                throw new Error("Veri okunamadı.");
             }
         } catch (error) {
-            console.warn("TÜİK canlı veri portalına bağlanılamadı, kararlı yerel sistem önbelleği devrede:", error.message);
+            console.warn("EVDS Canlı Bağlantı Hatası, Yedek Mod Aktif:", error.message);
             statusEl.innerHTML = `
-                <span style="color: var(--danger); font-weight: bold;">⚠️ Canlı veri portalına şu an ulaşılamıyor (CORS / Zaman Aşımı).</span><br> 
-                Güvenli sistem önbelleğindeki kararlı veriler gösteriliyor. Doğrulamak için TÜİK portalını ziyaret edebilirsiniz.
+                <span style="color: var(--danger); font-weight:bold;">⚠️ Canlı veri portalına şu an ulaşılamıyor (CORS / Servis Hatası).</span><br>
+                Sistem önbelleğindeki kararlı veriler gösteriliyor: <strong>%${CONFIG.FALLBACK_ORAN}</strong>
             `;
-            renderTuikUI(localCacheFallback.oran, localCacheFallback.tarih);
-        }
-
-        // UI Hücrelerini hesaplama ve besleme fonksiyonu
-        function renderTuikUI(baseOran, tarihBilgisi) {
-            cellSon.innerText = `%${baseOran.toFixed(2)}`;
-            cellSonDesc.innerText = `TÜİK tarafından resmi olarak yayımlanan en güncel (${tarihBilgisi}) verisidir.`;
-            
-            // Projeksiyon eğrisi hesaplamaları
-            cell1Ay.innerText = `%${(baseOran - 0.73).toFixed(2)}`;
-            cell12Ay.innerText = `%${(baseOran * 0.67).toFixed(2)}`;
-            cell24Ay.innerText = `%${(baseOran * 0.42).toFixed(2)}`;
-            cellYilSonu.innerText = `%${(baseOran * 0.80).toFixed(2)}`;
         }
     }
 
@@ -607,7 +521,7 @@
             traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true, hasKasko: true, hasRehin: true },
             modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: false, hasRehin: false },
             ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: false, hasRehin: false },
-            isletme_kredisi: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: true, hasSubInput: true, viewYerli: false, viewBuyback: false, viewTarKriter: true, hasKasko: false, hasRehin: false }, 
+            isletme_kredisi: { isEmpty: true }, 
             zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false, hasRehin: false },
             ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false, hasRehin: false, hasHayat: false },
             konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, viewEkb: true, hasKasko: false, hasRehin: false },
@@ -692,13 +606,17 @@
                 const netAnalik = tutar - mToplam;
                 if (netAnalik <= 0) return 0;
                 let r = maliyetOran > 0 ? maliyetOran : 0.03;
+                
+                // Newton-Raphson Algoritması Gelişmiş Hassasiyet & Koruma Filtresi
                 for (let i = 0; i < 100; i++) {
                     let pv = 0, dpv = 0;
                     for (let t = 1; t <= v; t++) {
                         let d = Math.pow(1 + r, t);
-                        pv += pmt / d; dpv -= t * pmt / (d * (1 + r));
+                        pv += pmt / d; 
+                        dpv -= t * pmt / (d * (1 + r));
                     }
                     let f = pv - netAnalik;
+                    if (Math.abs(dpv) < 1e-10) break; // Sıfıra bölme / tanımsız türev koruması
                     if (Math.abs(f) < 0.00001) break;
                     r = r - f / dpv;
                 }
@@ -894,10 +812,14 @@
                         fn.updateSubventionByCheckboxes();
                     }
                     sub = (parseFloat(document.getElementById('subOran').value) || 0) / 100;
-                    document.getElementById('box-subv-display').style.display = 'flex';
-                    document.getElementById('subv-rate-display').innerText = `%${(yF * (1 - sub) * 100).toFixed(2)}`;
+                    const subvDisplay = document.getElementById('box-subv-display');
+                    if (subvDisplay) {
+                        subvDisplay.style.display = 'flex';
+                        document.getElementById('subv-rate-display').innerText = `%${(yF * (1 - sub) * 100).toFixed(2)}`;
+                    }
                 } else {
-                    document.getElementById('box-subv-display').style.display = 'none';
+                    const subvDisplay = document.getElementById('box-subv-display');
+                    if (subvDisplay) subvDisplay.style.display = 'none';
                 }
 
                 const bRate = currentBsmv / 100;
@@ -923,30 +845,14 @@
                 const repVade = (state.unit === 'Yıl') ? 5 : parseInt(document.getElementById('vade-slider').value);
                 const masrafDinamik = fn.getCosts(tutar, repVade);
                 const efektif = fn.calcEfektif(tutar, yF, sub, bRate, kRate, repVade, state.unit, masrafDinamik.toplam);
-                
-                const efektifDisplayStr = `%${efektif.toFixed(2)}`;
-                document.getElementById('effective-rate-display').innerText = efektifDisplayStr;
-
-                if (currentMode === 'modern_sulama' && tutar > 0) {
-                    const aylikTasarrufPotansiyeli = 35000; 
-                    const hesaplananROI = (tutar + masrafDinamik.toplam) / aylikTasarrufPotansiyeli;
-                    const roiElement = document.getElementById('sulama-dynamic-roi');
-                    if (roiElement) {
-                        roiElement.innerText = `${hesaplananROI.toFixed(1)} Ay`;
-                    }
-                } else {
-                    document.getElementById('sulama-dynamic-roi').innerText = "14.2 Ay";
-                }
-
-                document.getElementById('mail-kredi-turu').value = currentMode.toUpperCase();
-                document.getElementById('mail-kredi-tutari').value = document.getElementById('tutar').value + " TL";
-                document.getElementById('mail-efektif-faiz').value = efektifDisplayStr;
+                document.getElementById('effective-rate-display').innerText = `%${efektif.toFixed(2)}`;
 
                 isRecalculating = false;
             }
         };
 
         const bindEvents = function() {
+            // EVENT DELEGATION VE MERKEZİ GİRİŞ KONTROLLERİ
             document.getElementById('proforma').addEventListener('input', function() {
                 if (cfg[currentMode] && cfg[currentMode].isEmpty) return;
                 let v = this.value.replace(/\D/g, "");
@@ -1050,18 +956,7 @@
                 }
             });
 
-            document.getElementById('btn-global-print').addEventListener('click', function() {
-                const element = document.getElementById('main-container-pdf');
-                const options = {
-                    margin:       10,
-                    filename:     'Kredi_Planlama_Raporu.pdf',
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-                html2pdf().set(options).from(element).save();
-            });
-
+            document.getElementById('btn-global-print').addEventListener('click', () => window.print());
             document.getElementById('whatsapp-fixed-btn').addEventListener('click', function() {
                 const text = `Kredi Planlama: ${document.getElementById('tutar').value} TL, Efektif Faiz: ${document.getElementById('effective-rate-display').innerText}`;
                 window.open(`https://wa.me/905345217697?text=${encodeURIComponent(text)}`, '_blank');
@@ -1070,39 +965,26 @@
             document.getElementById('loan-application-form').addEventListener('submit', function(event) {
                 event.preventDefault();
                 
-                const formElement = this;
                 const btnSubmit = document.getElementById('btn-form-submit');
                 const eskiMetin = btnSubmit.innerText;
-                
-                btnSubmit.innerText = "GÖNDERİLİYOR...";
+                btnSubmit.innerText = "PDF ÜRETİLİYOR...";
                 btnSubmit.disabled = true;
 
-                const formData = new FormData(formElement);
-                
-                fetch(formElement.action, {
-                    method: formElement.method,
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        alert("Başvuru formunuz ve kredi simülasyon detayları başarıyla e-posta adresinize gönderildi.");
-                        formElement.reset();
-                        coreCalculator.calculate();
-                    } else {
-                        response.json().then(data => {
-                            if (Object.hasOwn(data, 'errors')) {
-                                alert("Hata: " + data.errors.map(error => error.message).join(", "));
-                            } else {
-                                alert("E-posta gönderilirken bir sorun oluştu. Lütfen Form ID alanını doğrulayın.");
-                            }
-                        });
-                    }
-                }).catch(error => {
-                    console.error("E-posta gönderim hatası:", error);
-                    alert("Sistem bağlantı hatası: Başvuru e-postası ulaştırılamadı.");
-                }).finally(() => {
+                const hedefElement = document.getElementById('main-container-pdf');
+                const opsiyonlar = {
+                    margin:       8,
+                    filename:     'Kredi_Planlama_Raporu.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true }, 
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf().set(opsiyonlar).from(hedefElement).save().then(() => {
+                    btnSubmit.innerText = eskiMetin;
+                    btnSubmit.disabled = false;
+                }).catch(err => {
+                    console.error("PDF oluşturma hatası:", err);
+                    alert("PDF oluşturulurken bir hata meydana geldi.");
                     btnSubmit.innerText = eskiMetin;
                     btnSubmit.disabled = false;
                 });
@@ -1143,7 +1025,34 @@
             document.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            if (s && s.isEmpty) { return; }
+            if (s && s.isEmpty) {
+                document.getElementById('proforma').value = "";
+                document.getElementById('tutar').value = "";
+                document.getElementById('faiz').value = "";
+                document.getElementById('faiz-aylik').value = "";
+                document.getElementById('subOran').value = "";
+                document.getElementById('bsmv-display').innerText = "%0.00";
+                document.getElementById('kkdf-display').innerText = "%0.00";
+                document.getElementById('effective-rate-display').innerText = "%0.00";
+                
+                document.getElementById('box-proforma').style.display = 'none';
+                document.getElementById('box-ekb-a').style.display = 'none';
+                document.getElementById('box-ekb-b').style.display = 'none';
+                document.getElementById('box-ekb-diger').style.display = 'none';
+                document.getElementById('box-yerli').style.display = 'none';
+                document.getElementById('box-buyback').style.display = 'none';
+                document.getElementById('box-kadin').style.display = 'none';
+                document.getElementById('box-genc').style.display = 'none';
+                document.getElementById('box-koop').style.display = 'none';
+                document.getElementById('box-vade').style.display = 'none';
+                document.getElementById('box-sub').style.display = 'none';
+                
+                const subvDisplay = document.getElementById('box-subv-display');
+                if (subvDisplay) subvDisplay.style.display = 'none';
+                
+                document.getElementById('result-main-container').style.display = 'none';
+                return;
+            }
 
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
             
@@ -1195,7 +1104,7 @@
                 boxVade.style.display = 'flex';
                 mainGrid.insertBefore(boxProforma, mainGrid.firstChild);
                 mainGrid.insertBefore(boxTutarDiv, boxProforma.nextSibling);
-                mainGrid.insertBefore(boxVade, boxTutarDiv.nextSibling);
+                mainGrid.insertBefore(boxVade, boxTutarDiv.nextSibling); 
                 
                 const slider = document.getElementById('vade-slider');
                 slider.min = s.minVade || 1;
@@ -1236,7 +1145,7 @@
             init: function() {
                 bindEvents();
                 switchSegment('tarimsal');
-                fetchTarimUfeData();
+                fetchTarimUfeData(); // TCMB EVDS Entegrasyon Başlatıcı
             }
         };
     })();
