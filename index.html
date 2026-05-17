@@ -64,7 +64,7 @@
         .box-proforma-tutar { width: 80px; flex-shrink: 0; }
         .box-kredi-tutar { width: 80px; flex-shrink: 0; }
         .std-width { width: 40px; } 
-        .range-width { width: 260px; }
+        .range-width { width: 200px; } /* Vade alanı genişliği yan yana görünüm için optimize edildi */
         .cb-width { width: 85px; }
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
@@ -163,13 +163,13 @@
                 flex-grow: 1 !important; 
                 width: calc(100% - 172px) !important; 
                 min-width: 120px;
-                order: 4;
+                order: 3; /* Mobilde de kredi tutarının hemen sağına yerleşmesi için order ayarlandı */
             }
             
             .field:not(.box-kredi-tutar):not(.box-proforma-tutar):not(.range-width) { 
                 flex-grow: 1; 
                 min-width: 65px;
-                order: 3;
+                order: 4;
             }
             
             .info-field {
@@ -237,6 +237,18 @@
             <div class="field box-proforma-tutar" id="box-proforma"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
             <div class="field box-kredi-tutar" id="box-kredi-tutar-div"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
 
+            <!-- Vade Alanı DOM Sıralamasında Kredi Tutarının Yanına Çekildi -->
+            <div class="field range-width" id="box-vade">
+                <label>Vade Seçimi</label>
+                <div class="slider-container">
+                    <input type="range" id="vade-slider" min="1" max="60" value="12">
+                    <div class="vade-label-box">
+                        <span id="vade-min-lbl">1 Ay</span>
+                        <span id="vade-val-lbl" style="color:var(--danger); font-weight:800;">12 Ay</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="field cb-width" id="box-ekb-a" style="display:none;">
                 <div class="cb-field ekb-a" id="wrapper-ekb-a">
                     <input type="radio" name="ekbSinifi" id="ekb-a" value="A">
@@ -262,17 +274,6 @@
                         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                         Diğer EKB
                     </label>
-                </div>
-            </div>
-            
-            <div class="field range-width" id="box-vade">
-                <label>Vade Seçimi</label>
-                <div class="slider-container">
-                    <input type="range" id="vade-slider" min="1" max="60" value="12">
-                    <div class="vade-label-box">
-                        <span id="vade-min-lbl">1 Ay</span>
-                        <span id="vade-val-lbl" style="color:var(--danger); font-weight:800;">12 Ay</span>
-                    </div>
                 </div>
             </div>
 
@@ -421,7 +422,6 @@
                 <label for="form-message">Mesajınız</label>
                 <textarea id="form-message" name="message" placeholder="Açıklama..." required></textarea>
             </div>
-            <!-- Değişen Buton: GÖNDER yerine KAYDET yapıldı -->
             <button type="submit" class="btn-submit" id="btn-form-submit">KAYDET</button>
         </form>
     </div>
@@ -913,7 +913,6 @@
                 window.open(`https://wa.me/905345217697?text=${encodeURIComponent(text)}`, '_blank');
             });
 
-            // YENİ ENTEGRASYON: Butona Basıldığında PDF Olarak Kaydetme Mantığı
             document.getElementById('loan-application-form').addEventListener('submit', function(event) {
                 event.preventDefault();
                 
@@ -922,7 +921,6 @@
                 btnSubmit.innerText = "PDF ÜRETİLİYOR...";
                 btnSubmit.disabled = true;
 
-                // PDF oluşturma ayarları
                 const hedefElement = document.getElementById('main-container-pdf');
                 const opsiyonlar = {
                     margin:       8,
@@ -932,7 +930,6 @@
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
 
-                // html2pdf kütüphanesini tetikliyoruz
                 html2pdf().set(opsiyonlar).from(hedefElement).save().then(() => {
                     btnSubmit.innerText = eskiMetin;
                     btnSubmit.disabled = false;
@@ -1052,11 +1049,12 @@
             const boxTutarDiv = document.getElementById('box-kredi-tutar-div');
             const mainGrid = document.getElementById('main-grid-container');
             
-            if (currentSegment === 'bireysel' || s.unit === 'Ay') {
+            // İstek Doğrultusunda Sıralama Düzenlendi: Proforma -> Kredi Tutarı -> Vade Seçimi
+            if (currentSegment === 'bireysel' || currentSegment === 'ticari' || s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
                 mainGrid.insertBefore(boxProforma, mainGrid.firstChild);
                 mainGrid.insertBefore(boxTutarDiv, boxProforma.nextSibling);
-                mainGrid.insertBefore(boxVade, boxTutarDiv.nextSibling);
+                mainGrid.insertBefore(boxVade, boxTutarDiv.nextSibling); // Vade, Kredi Tutarının tam sağına alındı
                 
                 const slider = document.getElementById('vade-slider');
                 slider.min = s.minVade || 1;
