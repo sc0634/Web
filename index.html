@@ -64,7 +64,7 @@
 
         /* Genişlik Değerleri */
         .std-width { width: 40px; } 
-        .range-width { width: 200px; } /* 110px'den 200px'e çıkarıldı */
+        .range-width { width: 200px; }
         .cb-width { width: 80px; }
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
@@ -196,8 +196,6 @@
             </div>
 
             <div class="field" style="width:80px;"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
-            <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
-            <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01"></div>
             
             <div class="field range-width" id="box-vade">
                 <label>Vade Seçimi</label>
@@ -210,6 +208,9 @@
                 </div>
             </div>
 
+            <div class="field std-width"><label>Aylık %</label><input type="number" id="faiz-aylik" step="0.0001"></div>
+            <div class="field std-width"><label>Yıllık %</label><input type="number" id="faiz" step="0.01"></div>
+            
             <div class="field std-width" id="box-sub"><label>Sübv%</label><input type="number" id="subOran"></div>
             
             <div class="field cb-width" id="box-yerli" style="display:none;">
@@ -804,28 +805,18 @@
             }
 
             const boxVade = document.getElementById('box-vade');
+            const boxTutar = document.getElementById('tutar').parentNode;
             const gridContainer = document.getElementById('main-grid-container');
             
-            if (currentSegment === 'bireysel') {
+            if (currentSegment === 'bireysel' || s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
-                gridContainer.appendChild(boxVade);
+                boxTutar.parentNode.insertBefore(boxVade, boxTutar.nextSibling);
                 
                 const slider = document.getElementById('vade-slider');
                 slider.min = s.minVade || 1;
-                slider.max = s.maxVade || 12;
-                slider.value = s.defVade || 12;
-                document.getElementById('vade-min-lbl').innerText = slider.min + " Ay";
-                document.getElementById('vade-val-lbl').innerText = slider.value + " Ay";
-            } else if (s.unit === 'Ay') {
-                boxVade.style.display = 'flex';
-                const boxFaiz = document.getElementById('faiz').parentNode;
-                boxFaiz.parentNode.insertBefore(boxVade, boxFaiz.nextSibling);
-                
-                const slider = document.getElementById('vade-slider');
-                slider.min = 1;
                 slider.max = s.maxVade || 60;
                 slider.value = s.defVade || 12;
-                document.getElementById('vade-min-lbl').innerText = "1 Ay";
+                document.getElementById('vade-min-lbl').innerText = slider.min + " Ay";
                 document.getElementById('vade-val-lbl').innerText = slider.value + " Ay";
             } else {
                 boxVade.style.display = 'none';
