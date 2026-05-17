@@ -348,6 +348,7 @@
         <button class="btn-print-all no-print" style="background:var(--print-all-color); color:white; border:none; padding:10px; border-radius:4px; width:100%; cursor:pointer; font-weight:bold; margin-bottom:15px;" id="btn-global-print">YAZDIR / PDF KAYDET</button>
     </div>
 
+    <!-- GENEL VERİLER SEKME ALANI (GÜNCELLENMİŞ TÜİK PORTALI) -->
     <div id="genel-section" class="info-section">
         <div class="info-content">
             <div class="tuik-box">
@@ -355,11 +356,12 @@
                     <div class="tuik-icon">📊</div>
                     <div class="tuik-text">
                         <h4>Tarım ÜFE (Üretici Fiyat Endeksi)</h4>
-                        <p>TÜİK tarafından yayınlanan en güncel tarım endeks verilerini resmi web sitesi üzerinden anlık kontrol edin.</p>
+                        <p>TÜİK Veri Portalı üzerinden yayınlanan en güncel tarımsal endeks değişim bültenlerini ve tarihsel setleri anlık kontrol edin.</p>
                     </div>
                 </div>
-                <a href="https://data.tuik.gov.tr/Kategori/GetKategori?p=Tarim-26" target="_blank" class="btn-tuik-link">
-                    TÜİK Verisine Bağlan ↗
+                <!-- Otomatik Güncellenen Dinamik Haber Bülteni/Açık Veri Link Bağlantısı -->
+                <a href="https://data.tuik.gov.tr/Search/Search?text=Tar%C4%B1m%20%C3%9CFE" target="_blank" class="btn-tuik-link">
+                    Güncel TÜİK Verisine Bağlan ↗
                 </a>
             </div>
         </div>
@@ -498,7 +500,6 @@
                 const netKomisyon = tutar * (komPct/100);
                 let rehinUcreti = state.hasRehin ? REHIN_SABIT : 0;
 
-                // Tarımsal ve Ticari sekmeleri için binde 5 Limit Tahsis Masrafı hesabı
                 let limitTahsis = 0;
                 if (currentSegment === 'tarimsal' || currentSegment === 'ticari') {
                     limitTahsis = tutar * 0.005;
@@ -756,7 +757,6 @@
                 coreCalculator.calculate();
             });
 
-            // Sulama Tipi Değiştiğinde Proforma Tetikleme ve Yeniden Hesaplama
             document.getElementById('sulama-tipi-select').addEventListener('change', function() {
                 const profEl = document.getElementById('proforma');
                 if(profEl.value) {
@@ -853,7 +853,6 @@
                 window.open(`https://wa.me/905345217697?text=${encodeURIComponent(text)}`, '_blank');
             });
 
-            // EmailJS Form Submit Event
             document.getElementById('loan-application-form').addEventListener('submit', function(event) {
                 event.preventDefault();
                 
@@ -921,7 +920,6 @@
             
             document.getElementById('box-proforma').style.display = s.pro ? 'flex' : 'none';
             
-            // Sulama Tipi Seçim Kutusu Kontrolü
             document.getElementById('box-sulama-tipi').style.display = (m === 'modern_sulama') ? 'flex' : 'none';
             
             const viewEkb = s.viewEkb || false;
