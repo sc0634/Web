@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kredi Planlama & Yönetim Paneli - Süleyman Coşkun</title>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         :root { 
             --tarimsal: #2ecc71; --ticari: #e67e22; --bireysel: #3498db; --genel: #16a085; --mimar: #9b59b6;
@@ -37,8 +39,9 @@
         .grid { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end; margin-bottom: 15px; }
         .field { display: flex; flex-direction: column; gap: 3px; }
         label { font-size: 9px; font-weight: 700; color: #666; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        input, select { height: 32px; padding: 0 2px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; outline: none; width: 100%; text-align: center; }
-        
+        input, select, textarea { height: 32px; padding: 0 5px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; outline: none; width: 100%; text-align: center; }
+        textarea { text-align: left; padding: 5px; height: 60px; resize: none; }
+
         /* Resimli Buton (Toggle-Badge) Tasarımı */
         .cb-field { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; height: 32px; background: #fdf2f2; border: 1px solid #f5c6cb; border-radius: 4px; padding: 0 8px; cursor: pointer; user-select: none; transition: all 0.2s ease; position: relative; }
         .cb-field input[type="checkbox"], .cb-field input[type="radio"] { display: none; } 
@@ -123,6 +126,17 @@
         .db-item.highlight .db-value { font-size: 12px; font-weight: 900; }
         .db-divider { width: 1px; height: 25px; background: #e0c0c0; }
         
+        /* Başvuru Formu Stilleri */
+        .form-container { margin-top: 25px; border: 1px solid var(--border); border-radius: 6px; background: #fff; overflow: hidden; }
+        .form-header { background: var(--dark); color: white; padding: 10px 15px; font-weight: bold; font-size: 12px; text-transform: uppercase; }
+        .form-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .form-field { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 4px; }
+        .form-field label { text-align: left; font-size: 10px; color: #555; }
+        .form-field input, .form-field textarea { text-align: left; }
+        .btn-submit { background: var(--success); color: white; border: none; height: 35px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 11px; margin-top: 5px; }
+        .btn-submit:hover { background: #218c4e; }
+
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
 
         /* MOBİL GÖRÜNÜM VE MOBİL CİHAZ GENİŞLİĞİNE GÖRE DÜZENLEME */
@@ -158,6 +172,7 @@
             .efektif-field {
                 min-width: 55px !important;
             }
+            .form-row { flex-direction: column; gap: 10px; }
         }
 
         @media print { 
@@ -390,6 +405,28 @@
         <div id="plan-1" class="plan-wrapper"></div>
         <div id="plan-custom" class="plan-wrapper"></div>
     </div>
+
+    <!-- Başvuru Formu Containerı -->
+    <div class="form-container no-print" id="application-container">
+        <div class="form-header">KREDİ HIZLI BAŞVURU FORMU</div>
+        <form id="loan-application-form" class="form-body">
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="form-tckn">T.C. Kimlik Numarası</label>
+                    <input type="text" id="form-tckn" name="tckn" maxlength="11" pattern="\d{11}" placeholder="11 Haneli TC Kimlik No" required>
+                </div>
+                <div class="form-field">
+                    <label for="form-phone">Cep Telefonu</label>
+                    <input type="tel" id="form-phone" name="phone" placeholder="05XX XXX XX XX" required>
+                </div>
+            </div>
+            <div class="form-field">
+                <label for="form-message">Mesajınız</label>
+                <textarea id="form-message" name="message" placeholder="Başvuru detaylarınızı veya eklemek istediklerinizi yazınız..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit" id="btn-form-submit">BAŞVURUYU GÖNDER</button>
+        </form>
+    </div>
 </div>
 
 <a href="javascript:void(0)" id="whatsapp-fixed-btn" class="whatsapp-fixed no-print">
@@ -397,6 +434,13 @@
 </a>
 
 <script>
+    // EmailJS Başlatma (Kendi Public Key'inizi buraya girin)
+    (function() {
+        emailjs.init({
+            publicKey: "YOUR_PUBLIC_KEY", 
+        });
+    })();
+
     const LoanApp = (function() {
         const REHIN_SABIT = 1500;
         const DEFAULT_PROFORMA = "2.000.000";
@@ -429,7 +473,6 @@
                 const state = cfg[currentMode];
                 const komPct = state.kom || 0.5;
                 
-                // Kasko Belirleme
                 let kasko = 0;
                 if(state.hasKasko) {
                     let kaskoTemeli = tutar;
@@ -440,13 +483,11 @@
                     kasko = kaskoTemeli * 0.02;
                 }
 
-                // Hayat Sigortası
                 const bazOran = 0.02; 
                 const artisMiktari = 0.0025; 
                 const dinamikOran = (state.unit === 'Yıl') ? (bazOran + ((vade - 1) * artisMiktari)) : bazOran;
                 const hayat = tutar * dinamikOran;
                 
-                // Diğer Masraflar
                 let tarsimUcreti = state.tarsim ? (tutar * 0.04) : 0;
                 const netKomisyon = tutar * (komPct/100);
                 let rehinUcreti = state.hasRehin ? REHIN_SABIT : 0;
@@ -779,6 +820,40 @@
                 const text = `Kredi Planlama: ${document.getElementById('tutar').value} TL, Efektif Faiz: ${document.getElementById('effective-rate-display').innerText}`;
                 window.open(`https://wa.me/905345217697?text=${encodeURIComponent(text)}`, '_blank');
             });
+
+            // EmailJS Form Submit Event Handlers
+            document.getElementById('loan-application-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const btnSubmit = document.getElementById('btn-form-submit');
+                btnSubmit.innerText = "GÖNDERİLİYOR...";
+                btnSubmit.disabled = true;
+
+                // Form parametrelerini ve hesaplanan güncel kredi bilgilerini birleştiriyoruz
+                const templateParams = {
+                    tckn: document.getElementById('form-tckn').value,
+                    phone: document.getElementById('form-phone').value,
+                    message: document.getElementById('form-message').value,
+                    kredi_segment: currentSegment.toUpperCase(),
+                    kredi_modu: currentMode.toUpperCase(),
+                    kredi_tutari: document.getElementById('tutar').value + " TL",
+                    efektif_faiz: document.getElementById('effective-rate-display').innerText
+                };
+
+                // EmailJS Gönderim Tetikleyici
+                // NOT: "YOUR_SERVICE_ID" ve "YOUR_TEMPLATE_ID" alanlarını kendi panelinizden doldurun.
+                emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+                    .then(function() {
+                        alert('Başvurunuz başarıyla iletildi!');
+                        document.getElementById('loan-application-form').reset();
+                        btnSubmit.innerText = "BAŞVURUYU GÖNDER";
+                        btnSubmit.disabled = false;
+                    }, function(error) {
+                        alert('Gönderim esnasında bir hata oluştu: ' + JSON.stringify(error));
+                        btnSubmit.innerText = "BAŞVURUYU GÖNDER";
+                        btnSubmit.disabled = false;
+                    });
+            });
         };
 
         const switchSegment = function(seg) {
@@ -788,19 +863,20 @@
             
             const calcEngine = document.getElementById('calc-engine');
             const resultMain = document.getElementById('result-main-container');
+            const appContainer = document.getElementById('application-container');
             
             document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
             document.getElementById('about-section').style.display = 'none';
             document.getElementById('genel-section').style.display = 'none';
 
             if (seg === 'mimar') {
-                calcEngine.style.display = 'none'; resultMain.style.display = 'none';
+                calcEngine.style.display = 'none'; resultMain.style.display = 'none'; appContainer.style.display = 'none';
                 document.getElementById('about-section').style.display = 'block';
             } else if (seg === 'genel') {
-                calcEngine.style.display = 'none'; resultMain.style.display = 'none';
+                calcEngine.style.display = 'none'; resultMain.style.display = 'none'; appContainer.style.display = 'none';
                 document.getElementById('genel-section').style.display = 'block';
             } else {
-                calcEngine.style.display = 'block';
+                calcEngine.style.display = 'block'; appContainer.style.display = 'block';
                 const tabContainer = document.getElementById(`tabs-${seg}`);
                 tabContainer.style.display = 'flex';
                 const firstValidTab = tabContainer.querySelector('.tab-btn:not([disabled])');
