@@ -126,15 +126,15 @@
         .db-item.highlight .db-value { font-size: 12px; font-weight: 900; }
         .db-divider { width: 1px; height: 25px; background: #e0c0c0; }
         
-        /* Başvuru Formu Stilleri */
-        .form-container { margin-top: 25px; border: 1px solid var(--border); border-radius: 6px; background: #fff; overflow: hidden; }
-        .form-header { background: var(--dark); color: white; padding: 10px 15px; font-weight: bold; font-size: 12px; text-transform: uppercase; }
-        .form-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
-        .form-field { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 4px; }
-        .form-field label { text-align: left; font-size: 10px; color: #555; }
-        .form-field input, .form-field textarea { text-align: left; }
-        .btn-submit { background: var(--success); color: white; border: none; height: 35px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 11px; margin-top: 5px; }
+        /* BAŞVURU FORMU - MOBİL TEK SATIR STİLLERİ */
+        .form-container { margin-top: 20px; border: 1px solid var(--border); border-radius: 6px; background: #fff; overflow: hidden; }
+        .form-header { background: var(--dark); color: white; padding: 8px 12px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        .form-body { padding: 10px; display: flex; flex-direction: row; gap: 5px; align-items: flex-end; width: 100%; }
+        .form-field { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .form-field label { text-align: center; font-size: 9px; color: #666; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .form-field input, .form-field textarea { height: 32px; padding: 0 5px; border: 1px solid var(--border); border-radius: 4px; font-size: 10.5px; text-align: center; width: 100%; margin: 0; }
+        .form-field textarea { text-align: left; padding: 6px 5px; line-height: 1.2; }
+        .btn-submit { background: var(--success); color: white; border: none; height: 32px; padding: 0 10px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 10.5px; white-space: nowrap; flex-shrink: 0; }
         .btn-submit:hover { background: #218c4e; }
 
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
@@ -172,7 +172,12 @@
             .efektif-field {
                 min-width: 55px !important;
             }
-            .form-row { flex-direction: column; gap: 10px; }
+            
+            /* Form mobilde de tek satır kalmaya devam etsin */
+            .form-body { flex-direction: row !important; gap: 4px !important; padding: 6px !important; }
+            .form-field label { font-size: 8px !important; }
+            .form-field input, .form-field textarea { font-size: 10px !important; height: 32px !important; padding: 0 3px !important; }
+            .btn-submit { font-size: 10px !important; padding: 0 6px !important; height: 32px !important; }
         }
 
         @media print { 
@@ -406,25 +411,23 @@
         <div id="plan-custom" class="plan-wrapper"></div>
     </div>
 
-    <!-- Başvuru Formu Containerı -->
+    <!-- BAŞVURU FORMU CONTAINER (MOBİL TEK SATIR UYUMLU) -->
     <div class="form-container no-print" id="application-container">
         <div class="form-header">KREDİ HIZLI BAŞVURU FORMU</div>
         <form id="loan-application-form" class="form-body">
-            <div class="form-row">
-                <div class="form-field">
-                    <label for="form-tckn">T.C. Kimlik Numarası</label>
-                    <input type="text" id="form-tckn" name="tckn" maxlength="11" pattern="\d{11}" placeholder="11 Haneli TC Kimlik No" required>
-                </div>
-                <div class="form-field">
-                    <label for="form-phone">Cep Telefonu</label>
-                    <input type="tel" id="form-phone" name="phone" placeholder="05XX XXX XX XX" required>
-                </div>
+            <div class="form-field">
+                <label for="form-tckn">TC Kimlik No</label>
+                <input type="text" id="form-tckn" name="tckn" maxlength="11" pattern="\d{11}" placeholder="11 Haneli" required>
             </div>
             <div class="form-field">
-                <label for="form-message">Mesajınız</label>
-                <textarea id="form-message" name="message" placeholder="Başvuru detaylarınızı veya eklemek istediklerinizi yazınız..." required></textarea>
+                <label for="form-phone">Cep Telefonu</label>
+                <input type="tel" id="form-phone" name="phone" placeholder="05XX XXX XX XX" required>
             </div>
-            <button type="submit" class="btn-submit" id="btn-form-submit">BAŞVURUYU GÖNDER</button>
+            <div class="form-field" style="flex: 1.5;">
+                <label for="form-message">Mesajınız</label>
+                <textarea id="form-message" name="message" placeholder="Açıklama..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit" id="btn-form-submit">GÖNDER</button>
         </form>
     </div>
 </div>
@@ -434,7 +437,7 @@
 </a>
 
 <script>
-    // EmailJS Başlatma (Kendi Public Key'inizi buraya girin)
+    // EmailJS Başlatma
     (function() {
         emailjs.init({
             publicKey: "YOUR_PUBLIC_KEY", 
@@ -821,15 +824,14 @@
                 window.open(`https://wa.me/905345217697?text=${encodeURIComponent(text)}`, '_blank');
             });
 
-            // EmailJS Form Submit Event Handlers
+            // EmailJS Form Submit Event
             document.getElementById('loan-application-form').addEventListener('submit', function(event) {
                 event.preventDefault();
                 
                 const btnSubmit = document.getElementById('btn-form-submit');
-                btnSubmit.innerText = "GÖNDERİLİYOR...";
+                btnSubmit.innerText = "SABRET...";
                 btnSubmit.disabled = true;
 
-                // Form parametrelerini ve hesaplanan güncel kredi bilgilerini birleştiriyoruz
                 const templateParams = {
                     tckn: document.getElementById('form-tckn').value,
                     phone: document.getElementById('form-phone').value,
@@ -840,17 +842,16 @@
                     efektif_faiz: document.getElementById('effective-rate-display').innerText
                 };
 
-                // EmailJS Gönderim Tetikleyici
-                // NOT: "YOUR_SERVICE_ID" ve "YOUR_TEMPLATE_ID" alanlarını kendi panelinizden doldurun.
+                // EmailJS Gönderim Tetikleyici (Buraları doldurmayı unutmayın)
                 emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
                     .then(function() {
                         alert('Başvurunuz başarıyla iletildi!');
                         document.getElementById('loan-application-form').reset();
-                        btnSubmit.innerText = "BAŞVURUYU GÖNDER";
+                        btnSubmit.innerText = "GÖNDER";
                         btnSubmit.disabled = false;
                     }, function(error) {
-                        alert('Gönderim esnasında bir hata oluştu: ' + JSON.stringify(error));
-                        btnSubmit.innerText = "BAŞVURUYU GÖNDER";
+                        alert('Hata oluştu: ' + JSON.stringify(error));
+                        btnSubmit.innerText = "GÖNDER";
                         btnSubmit.disabled = false;
                     });
             });
