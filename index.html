@@ -58,13 +58,14 @@
         .cb-field.ekb-b label { color: #558b2f; }
         .cb-field.ekb-b svg { fill: #558b2f; }
 
-        .slider-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
-        .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; }
+        .slider-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; width: 100%; }
+        .slider-container input[type="range"] { height: auto; margin: 0; cursor: pointer; width: 100%; }
         .vade-label-box { display: flex; justify-content: space-between; width: 100%; font-size: 8px; font-weight: bold; color: var(--dark); margin-top: -2px; }
 
-        /* Genişlik Değerleri */
+        /* Genişlik Değerleri (Masaüstü Temelli) */
+        .box-kredi-tutar { width: 80px; flex-shrink: 0; }
         .std-width { width: 40px; } 
-        .range-width { width: 260px; } /* Vade alanı 30px daha genişletildi (230px -> 260px) */
+        .range-width { width: 260px; }
         .cb-width { width: 80px; }
         
         .info-field { border-radius: 4px; padding: 2px 2px; height: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-left: 2px solid; }
@@ -123,6 +124,20 @@
         .db-divider { width: 1px; height: 25px; background: #e0c0c0; }
         
         .whatsapp-fixed { position: fixed; bottom: 20px; right: 20px; background-color: var(--whatsapp); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 9999; }
+
+        /* MOBİL GÖRÜNÜM VE DİNAMİK CİHAZ GENİŞLİĞİ AYARI */
+        @media (max-width: 768px) {
+            .grid { display: flex; flex-wrap: wrap; gap: 6px; }
+            
+            /* Kredi Tutarı alanı her koşulda 80px sabit genişlikte kalacak ve ezilmeyecek */
+            .box-kredi-tutar { width: 80px !important; flex-shrink: 0 !important; }
+            
+            /* Vade Seçimi alanı yanındaki sabit alan haricindeki tüm boş alanı kaplayacak */
+            .range-width { flex-grow: 1 !important; width: auto !important; min-width: 120px; }
+            
+            /* Diğer girdi alanlarının mobil uyumu */
+            .field:not(.box-kredi-tutar):not(.range-width) { flex-grow: 1; }
+        }
 
         @media print { 
             .no-print { display: none !important; } 
@@ -195,7 +210,7 @@
                 </div>
             </div>
 
-            <div class="field" style="width:80px;"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
+            <div class="field box-kredi-tutar"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
             
             <div class="field range-width" id="box-vade">
                 <label>Vade Seçimi</label>
@@ -290,7 +305,7 @@
                         <div class="data-dot dot-genel"></div>
                         <div class="data-info">
                             <strong>Yasal Vergilendirme Temelleri</strong>
-                            <p>Bireysel segmentlerde standart olarak %15 BSMV ve %15 KKDF uygulanırken, ticari ve tarımsal nitelikli kredilerde muafiyet durumlarına göre BSMV %5'e düşmekte, KKDF ise %0 olarak hesaplanmaktadır.</p>
+                            <p>Bireysel segmentlerde standart olarak %15 BSMV và %15 KKDF uygulanırken, ticari ve tarımsal nitelikli kredilerde muafiyet durumlarına göre BSMV %5'e düşmekte, KKDF ise %0 olarak hesaplanmaktadır.</p>
                         </div>
                     </div>
                     <div class="data-item">
@@ -805,8 +820,7 @@
             }
 
             const boxVade = document.getElementById('box-vade');
-            const boxTutar = document.getElementById('tutar').parentNode;
-            const gridContainer = document.getElementById('main-grid-container');
+            const boxTutar = document.querySelector('.box-kredi-tutar');
             
             if (currentSegment === 'bireysel' || s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
