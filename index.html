@@ -66,6 +66,7 @@
         .vade-label-box { display: flex; justify-content: space-between; width: 100%; font-size: 8px; font-weight: bold; color: var(--dark); margin-top: -2px; }
 
         /* Genişlik Değerleri (Masaüstü Temelli) */
+        .box-proforma-tutar { width: 80px; flex-shrink: 0; }
         .box-kredi-tutar { width: 80px; flex-shrink: 0; }
         .std-width { width: 40px; } 
         .range-width { width: 260px; }
@@ -153,30 +154,37 @@
         @media (max-width: 768px) {
             .grid { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
             
+            .box-proforma-tutar {
+                width: 80px !important;
+                flex-shrink: 0 !important;
+                flex-grow: 0 !important;
+                order: 1;
+            }
+
             .box-kredi-tutar { 
                 width: 80px !important; 
                 flex-shrink: 0 !important; 
                 flex-grow: 0 !important;
-                order: 1;
+                order: 2;
             }
             
             .range-width { 
                 flex-grow: 1 !important; 
-                width: calc(100% - 86px) !important; 
+                width: calc(100% - 172px) !important; 
                 min-width: 120px;
-                order: 3;
+                order: 4;
             }
             
-            .field:not(.box-kredi-tutar):not(.range-width) { 
+            .field:not(.box-kredi-tutar):not(.box-proforma-tutar):not(.range-width) { 
                 flex-grow: 1; 
                 min-width: 65px;
-                order: 2;
+                order: 3;
             }
             
             .info-field {
                 flex-grow: 1;
                 min-width: 50px;
-                order: 4;
+                order: 5;
             }
             
             .efektif-field {
@@ -235,8 +243,9 @@
 
     <div id="calc-engine" class="no-print">
         <div class="grid" id="main-grid-container">
-            <div class="field box-kredi-tutar"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
-            <div class="field" id="box-proforma" style="width:80px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
+            <!-- Proforma Alanı, Kredi Tutarının Önüne Alındı -->
+            <div class="field box-proforma-tutar" id="box-proforma"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
+            <div class="field box-kredi-tutar" id="box-kredi-tutar-div"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
 
             <div class="field cb-width" id="box-ekb-a" style="display:none;">
                 <div class="cb-field ekb-a" id="wrapper-ekb-a">
@@ -294,6 +303,7 @@
             
             <div class="field cb-width" id="box-buyback" style="display:none;">
                 <div class="cb-field" id="wrapper-buyback">
+                    <input type="checkbox" id="cb-yerli"> <!-- Önceki kod yapısı korunmuştur -->
                     <input type="checkbox" id="cb-buyback">
                     <label for="cb-buyback">
                         <svg viewBox="0 0 24 24"><path d="M18 7H6v12h12V7zm2-4H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12H7v-2h10v2zm0-4H7V9h10v2z"/></svg>
@@ -567,7 +577,11 @@
             calcEfektif: function(tutar, yF, sub, bRate, kRate, v, unit, mToplam) {
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
-                const maliyetOran = indirimliOran + (indirimliOran * bRate) + (indirimliOran * kRate);
+                // Efektif faiz PMT hesaplamasında tarımsal BSMV baz faiz üzerinden eklendiği için formül güncellendi
+                const maliyetOran = (currentSegment === 'tarimsal') 
+                    ? (indirimliOran + (faizOran * bRate) + (indirimliOran * kRate))
+                    : (indirimliOran + (indirimliOran * bRate) + (indirimliOran * kRate));
+                
                 let pmt = (maliyetOran === 0) ? (tutar / v) : (tutar * maliyetOran * Math.pow(1 + maliyetOran, v)) / (Math.pow(1 + maliyetOran, v) - 1);
                 const netAnalik = tutar - mToplam;
                 if (netAnalik <= 0) return 0;
@@ -646,7 +660,12 @@
             draw: function(vadeText, periodText, tutar, yF, sub, bRate, kRate, v, unit, masraf, wrapperId) {
                 const faizOran = (unit === 'Yıl') ? yF : (yF / 12);
                 const indirimliOran = faizOran * (1 - sub);
-                const maliyetOran = indirimliOran + (indirimliOran * bRate) + (indirimliOran * kRate);
+                
+                // PMT Hesaplama Aşamasında Tarımsal Alan için BSMV'yi Baz Faiz (indirim öncesi) üzerinden yansıtıyoruz
+                const maliyetOran = (currentSegment === 'tarimsal')
+                    ? (indirimliOran + (faizOran * bRate) + (indirimliOran * kRate))
+                    : (indirimliOran + (indirimliOran * bRate) + (indirimliOran * kRate));
+
                 let pmt = (maliyetOran === 0) ? (tutar / v) : (tutar * maliyetOran * Math.pow(1+maliyetOran, v)) / (Math.pow(1+maliyetOran, v)-1);
                 
                 let dinamikBaslik = "";
@@ -714,7 +733,9 @@
                 for(let i = 1; i <= v; i++) {
                     let bazF = bal * faizOran; 
                     let fI = bal * indirimliOran; 
-                    let b = fI * bRate; 
+                    
+                    // Tarımsal segmentte BSMV'yi talep ettiğiniz üzere "Baz Faiz (bazF)" üzerinden hesaplıyoruz.
+                    let b = (currentSegment === 'tarimsal') ? (bazF * bRate) : (fI * bRate);
                     let k = fI * kRate; 
                     let aPara = pmt - (fI + b + k);
                     
@@ -1048,13 +1069,15 @@
             }
 
             const boxVade = document.getElementById('box-vade');
-            const boxTutar = document.querySelector('.box-kredi-tutar');
+            const boxProforma = document.getElementById('box-proforma');
+            const boxTutarDiv = document.getElementById('box-kredi-tutar-div');
             const mainGrid = document.getElementById('main-grid-container');
             
             if (currentSegment === 'bireysel' || s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
-                mainGrid.insertBefore(boxTutar, mainGrid.firstChild);
-                mainGrid.insertBefore(boxVade, boxTutar.nextSibling);
+                mainGrid.insertBefore(boxProforma, mainGrid.firstChild);
+                mainGrid.insertBefore(boxTutarDiv, boxProforma.nextSibling);
+                mainGrid.insertBefore(boxVade, boxTutarDiv.nextSibling);
                 
                 const slider = document.getElementById('vade-slider');
                 slider.min = s.minVade || 1;
@@ -1064,7 +1087,8 @@
                 document.getElementById('vade-val-lbl').innerText = slider.value + " Ay";
             } else {
                 boxVade.style.display = 'none';
-                mainGrid.insertBefore(boxTutar, mainGrid.firstChild);
+                mainGrid.insertBefore(boxProforma, mainGrid.firstChild);
+                mainGrid.insertBefore(boxTutarDiv, boxProforma.nextSibling);
             }
 
             if (currentMode === 'konut') {
@@ -1082,7 +1106,6 @@
             document.getElementById('faiz').value = s.faiz.toFixed(2);
             document.getElementById('faiz-aylik').value = (s.faiz / 12).toFixed(4);
             
-            // Vergi Oranları Güncellemesi: currentBsmv ve currentKkdf doğrudan cfg nesnesinden okunuyor.
             currentBsmv = s.bsmv;
             currentKkdf = s.kkdf;
             document.getElementById('bsmv-display').innerText = `%${s.bsmv}.00`;
