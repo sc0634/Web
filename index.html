@@ -164,13 +164,13 @@
                 flex-grow: 1 !important; 
                 width: calc(100% - 86px) !important; 
                 min-width: 120px;
-                order: 2;
+                order: 3;
             }
             
             .field:not(.box-kredi-tutar):not(.range-width) { 
                 flex-grow: 1; 
                 min-width: 65px;
-                order: 3;
+                order: 2;
             }
             
             .info-field {
@@ -235,6 +235,8 @@
 
     <div id="calc-engine" class="no-print">
         <div class="grid" id="main-grid-container">
+            <!-- Sıralama Güncellendi: Önce Kredi Tutarı, Sonra Proforma Tutarı -->
+            <div class="field box-kredi-tutar"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
             <div class="field" id="box-proforma" style="width:80px;"><label>Proforma Tutarı</label><input type="text" id="proforma"></div>
 
             <div class="field cb-width" id="box-ekb-a" style="display:none;">
@@ -264,8 +266,6 @@
                     </label>
                 </div>
             </div>
-
-            <div class="field box-kredi-tutar"><label>Kredi Tutarı</label><input type="text" id="tutar"></div>
             
             <div class="field range-width" id="box-vade">
                 <label>Vade Seçimi</label>
@@ -487,14 +487,15 @@
             KONUT_EKSPERTIZ_IPOTEK: 9500
         };
         
+        /* GÜNCELLEME: Kasko ve Rehin sadece traktor ve tasit modlarında true bırakıldı */
         const cfg = {
             traktor: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 25, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: true, viewTarKriter: true, hasKasko: true, hasRehin: true },
-            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true, hasRehin: true },
-            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: true, hasRehin: true },
+            modern_sulama: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 75, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 1.0, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: false, hasRehin: false },
+            ekipman: { faiz: 40.5, bsmv: 5, kkdf: 0, sub: 50, kom: 1.0, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: true, hasSubInput: true, viewYerli: true, viewBuyback: false, viewTarKriter: true, hasKasko: false, hasRehin: false },
             isletme_kredisi: { isEmpty: true }, 
-            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: true, hasRehin: true },
+            zirai: { faiz: 46.0, bsmv: 15, kkdf: 15, sub: 0, kom: 1.1, unit: 'Yıl', periodText: 'Yılda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false, hasRehin: false },
             ticari_taksitli: { faiz: 46.0, bsmv: 5, kkdf: 0, sub: 0, kom: 1.1, defVade: 24, maxVade: 60, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false, hasRehin: false, hasHayat: false },
-            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, viewEkb: true, hasKasko: false, hasRehin: true },
+            konut: { faiz: 34.0, bsmv: 0, kkdf: 0, sub: 0, kom: 0.5, defVade: 120, maxVade: 120, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: true, pRate: 0.75, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, viewEkb: true, hasKasko: false, hasRehin: false },
             tasit: { faiz: 40.5, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 36, maxVade: 48, minVade: 12, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: true, hasRehin: true },
             ihtiyac: { faiz: 52.6, bsmv: 15, kkdf: 15, sub: 0, kom: 0.5, defVade: 12, maxVade: 24, minVade: 1, unit: 'Ay', periodText: 'Ayda Bir Ödemeli', pro: false, tarsim: false, hasSubInput: false, viewYerli: false, viewBuyback: false, viewTarKriter: false, hasKasko: false, hasRehin: false }
         };
@@ -1054,6 +1055,7 @@
             
             if (currentSegment === 'bireysel' || s.unit === 'Ay') {
                 boxVade.style.display = 'flex';
+                // Sıralama Güncellemesi: Kredi tutarını en başa yerleştir, vadiyi hemen yanına koy (veya dom ağacındaki sırayı koru)
                 mainGrid.insertBefore(boxTutar, mainGrid.firstChild);
                 mainGrid.insertBefore(boxVade, boxTutar.nextSibling);
                 
@@ -1065,6 +1067,8 @@
                 document.getElementById('vade-val-lbl').innerText = slider.value + " Ay";
             } else {
                 boxVade.style.display = 'none';
+                // Ay vadeli olmayan modlarda da Kredi Tutarının ilk sırada kalmasını garanti edelim
+                mainGrid.insertBefore(boxTutar, mainGrid.firstChild);
             }
 
             if (currentMode === 'konut') {
